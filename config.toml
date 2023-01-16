@@ -1,6 +1,6 @@
 baseURL = "/"
 languageCode = "en-us"
-title = "Hugo Hero Theme"
+title = "www.larmic.de"
 themesDir = "themes"
 theme = "hugo-hero-theme"
 
