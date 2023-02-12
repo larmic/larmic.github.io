@@ -27,6 +27,8 @@ params:
     title: "Lars Michaelis"
     subtitle: "️🧑‍💻 Developer | 🎙️ Speaker | 🤵 Consultant"
     imageUrl: "https://avatars.githubusercontent.com/larmic"
+    imageWidth: 240 # custom size
+    imageHeight: 240 # custom size
 
   favicon: "/favicon.ico"
   favicon16x16: "/favicon16x16.png"
