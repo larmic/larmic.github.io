@@ -1,4 +1,32 @@
-baseURL: http://example.org/
+baseURL: http://larmic.de/
 languageCode: en-us
 title: larmic.de
 theme: "PaperMod"
+
+params:
+  defaultTheme: dark
+  profileMode:
+    enabled: true
+    title: "Lars Michaelis"
+    subtitle: "Welcome to my homepage"
+    #buttons:
+    #  - name: twitter
+    #    url: "https://twitter.com/larmicDE"
+    #  - name: Github
+    #    url: "https://github.com/"
+
+  socialIcons: # optional
+    - name: "twitter"
+      url: "https://twitter.com/larmicDE"
+    - name: "mastodon"
+      url: "https://mastodon.social/@larmic"
+    - name: "github"
+      url: "https://github.com/larmic"
+    - name: "linkedin"
+      url: "https://www.linkedin.com/in/lars-michaelis-6778761b3/"
+    - name: "xing"
+      url: "https://www.xing.com/profile/Lars_Michaelis2/cv"
+    - name: "youtube"
+      url: "https://www.youtube.com/channel/UCuJB-Eqjil4ZTGCK2UeDl9g"
+    - name: "email"
+      url: "mail@larmic.de"
