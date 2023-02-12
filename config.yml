@@ -1,19 +1,35 @@
 baseURL: http://larmic.de/
-languageCode: en-us
+languageCode: de
+defaultContentLanguage: de
 title: larmic.de
 theme: "PaperMod"
 
+enableRobotsTXT: true
+
+languages:
+  de:
+    languageName: "englisch"
+    menu:
+      main:
+        - name: Videos
+          url: "/videos"
+          weight: 5
+        - name: About
+          url: "/about"
+          weight: 5
+
 params:
-  defaultTheme: dark
-  profileMode:
-    enabled: true
+  env: production # to enable google analytics, opengraph, twitter-cards and schema.
+
+  homeInfoParams:
+    #env: production
     title: "Lars Michaelis"
-    subtitle: "Welcome to my homepage"
-    #buttons:
-    #  - name: twitter
-    #    url: "https://twitter.com/larmicDE"
-    #  - name: Github
-    #    url: "https://github.com/"
+    content: "Welcome to my homepage"
+    menu:
+      - name: Videos
+        url: "/videos"
+      - name: Videos
+        url: "/videos"
 
   socialIcons: # optional
     - name: "twitter"
@@ -29,4 +45,4 @@ params:
     - name: "youtube"
       url: "https://www.youtube.com/channel/UCuJB-Eqjil4ZTGCK2UeDl9g"
     - name: "email"
-      url: "mail@larmic.de"
+      url: "mailto:mail@larmic.de"
