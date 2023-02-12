@@ -46,3 +46,13 @@ params:
       url: "https://www.youtube.com/channel/UCuJB-Eqjil4ZTGCK2UeDl9g"
     - name: "email"
       url: "mailto:mail@larmic.de"
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true  # enable embedd html content
+
+privacy:
+  youtube:
+    disabled: false
+    privacyEnhanced: true

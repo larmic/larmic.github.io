@@ -1,7 +1,15 @@
----
-title: "Videos"
-date: 2023-02-12T20:39:38+01:00
-draft: true
----
+## Einstieg in die Hexagonale Archiektur
 
-Hi
+{{< youtube 9S_rgrabTA >}}
+
+## Testcontainers
+
+{{< youtube LYnmbkBfeZA >}}
+
+## Event Storming
+
+{{< youtube 9MGaB7GhE4g >}}
+
+## Das untere Ende der Testpyramide
+
+{{< youtube _CGvdhRc9DE >}}
