@@ -25,11 +25,10 @@ params:
     #env: production
     title: "Lars Michaelis"
     content: "Welcome to my homepage"
-    menu:
-      - name: Videos
-        url: "/videos"
-      - name: Videos
-        url: "/videos"
+
+  favicon: "/favicon.ico"
+  favicon16x16: "/favicon16x16.png"
+  favicon32x32: "/favicon32x32.png"
 
   socialIcons: # optional
     - name: "twitter"
