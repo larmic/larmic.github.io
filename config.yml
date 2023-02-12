@@ -21,10 +21,11 @@ languages:
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
 
-  homeInfoParams:
+  profileMode:
+    enabled: true
     #env: production
     title: "Lars Michaelis"
-    content: "Welcome to my homepage"
+    subtitle: "️🧑‍💻Developer | 🎙️Speaker | 🤵Consultant"
 
   favicon: "/favicon.ico"
   favicon16x16: "/favicon16x16.png"
