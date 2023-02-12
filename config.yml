@@ -45,8 +45,6 @@ params:
       url: "https://www.xing.com/profile/Lars_Michaelis2/cv"
     - name: "youtube"
       url: "https://www.youtube.com/channel/UCuJB-Eqjil4ZTGCK2UeDl9g"
-    - name: "email"
-      url: "mailto:mail@larmic.de"
 
 markup:
   goldmark:
