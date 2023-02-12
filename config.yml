@@ -26,6 +26,7 @@ params:
     #env: production
     title: "Lars Michaelis"
     subtitle: "️🧑‍💻Developer | 🎙️Speaker | 🤵Consultant"
+    imageUrl: "https://avatars.githubusercontent.com/larmic"
 
   favicon: "/favicon.ico"
   favicon16x16: "/favicon16x16.png"
