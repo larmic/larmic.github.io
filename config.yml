@@ -8,7 +8,7 @@ enableRobotsTXT: true
 
 languages:
   de:
-    languageName: "englisch"
+    languageName: "english"
     menu:
       main:
         - name: Videos
