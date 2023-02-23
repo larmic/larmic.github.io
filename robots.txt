@@ -1,3 +1,3 @@
 User-agent: *
 Disallow:
-Sitemap: http://larmic.github.io/sitemap.xml
+Sitemap: https://larmic.de/sitemap.xml
