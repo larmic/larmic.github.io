@@ -1,6 +1,6 @@
 ---
 title: "[Workshop] Domain Driven Design und hexagonale Architektur"
-date: 2023-02-12T20:45:26+01:00
+date: 2023-03-12T20:45:26+01:00
 draft: false
 ---
 

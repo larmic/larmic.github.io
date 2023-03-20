@@ -11,6 +11,9 @@ languages:
     languageName: "english"
     menu:
       main:
+        - name: Impressum
+          url: "/impressum"
+          weight: 4
         - name: Videos
           url: "/videos"
           weight: 3
