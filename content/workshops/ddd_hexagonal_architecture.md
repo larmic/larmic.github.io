@@ -9,6 +9,8 @@ fachlichen Aspekte in den Vordergrund. Die hexagonale Architektur greift diesen 
 Inhalte in den Kern der Anwendung. Die eigentliche Technik (Datenbank, MQ-System, ...) spielt dabei eine 
 untergeordnete Rolle.
 
+![Yellow Duck](/ddd_workshop.png 'Yellow Duck')
+
 Ich biete einen [regelmäßigen Workshop](https://it-bildungshaus.de/weiterbildung/seminar-ddd-domain-driven-design) 
 zum Thema DDD und wie man das in hexagonaler Architektur umsetzt an. Alternativ komme ich auch gerne zu euch 
 in die Firma.
