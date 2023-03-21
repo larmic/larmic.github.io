@@ -1,5 +1,5 @@
 ---
-title: "[Workshop] Domain Driven Design und hexagonale Architektur"
+title: "Domain Driven Design und hexagonale Architektur (für Entwickler:innen)"
 date: 2023-03-12T20:45:26+01:00
 draft: false
 ---
@@ -20,9 +20,9 @@ in die Firma.
 
 ## Anforderungen
 Was sind die Teilnahmebedingungen?
-* Patterns, SOLID und Cleancode verspeist ihr zum Frühstück
-* Ihr seid Architekt:innen oder wollt dies werden
-* Ihr könnt 2 Tage Zeit (am Stück) erübrigen
-* Ihr bringt ein Entwickler-Notebook mit
+* Patterns, SOLID und Cleancode verspeist Du zum Frühstück
+* Du bist Architekt:innen oder willst dies werden
+* Du kannst 2 Tage Zeit (am Stück) erübrigen
+* Du bringt ein Entwickler-Notebook mit
 
-Bei Fragen und/oder Interesse einfach eine Mail an [mich](mailto:mail@larmic.de?subject=Workshop:%20DDD%20und%20hex.%20Architektur).
+Bei Fragen und/oder Interesse sende mir einfach eine [Mail](mailto:mail@larmic.de?subject=Workshop:%20DDD%20und%20hex.%20Architektur).
