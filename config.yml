@@ -8,25 +8,43 @@ enableRobotsTXT: true
 
 languages:
   de:
-    languageName: "english"
+    weight: 2
+    params:
+      languageAltTitle: German
     menu:
       main:
         - name: Videos
-          url: "/videos"
+          url: "/videos/"
           weight: 3
         - name: Workshops
-          url: "/workshops"
+          url: "/workshops/"
           weight: 2
         - name: Über mich
+          url: "/about"
+          weight: 1
+  en:
+    params:
+      languageAltTitle: English
+    menu:
+      main:
+        - name: Videos
+          url: "/videos/"
+          weight: 3
+        - name: Workshops
+          url: "/workshops/"
+          weight: 2
+        - name: About me
           url: "/about"
           weight: 1
 
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
 
+  defaultTheme: auto
+  disableThemeToggle: true
+
   profileMode:
     enabled: true
-    #env: production
     title: "Lars Michaelis"
     subtitle: "️🧑‍💻 Developer | 🎙️ Speaker | 🤵 Consultant"
     imageUrl: "https://avatars.githubusercontent.com/larmic"

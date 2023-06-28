@@ -4,8 +4,9 @@ date: 2023-02-22T21:25:16+01:00
 draft: false
 ---
 
-[Event Storming](https://www.eventstorming.com/) ist ein kollaboratives
-Werkzeug zum schnellen Erfassen von Prozessen.
+[Event Storming](https://www.eventstorming.com/) ist eine kollaborative Workshop-Methode, die in der Softwareentwicklung 
+eingesetzt wird, um komplexe Geschäftsprozesse oder Anforderungen zu visualisieren und zu verstehen. Dabei werden alle 
+beteiligten Personen, wie z.B. Entwickler, Projektmanager, Productowner und Domainexperten, eingebunden.
 
 #### Vorteile
 
