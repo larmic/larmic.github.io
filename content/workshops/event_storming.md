@@ -18,7 +18,7 @@ Entwicklung dient.
 
 ![Workshop](/workshop/event_storming.png)
 
-Ich biete einen regelmäßigen Workshop zum Event Storming an. Alternativ komme ich auch gerne zu euch in die Firma.
+Ich biete einen regelmäßigen Workshop zum Thema Event Storming an. Alternativ komme ich auch gerne zu euch in die Firma.
 
 **Schwierigkeitsgrad**: Einfach  
 **Workshop-Größe**: max. 20 Personen
@@ -26,3 +26,5 @@ Ich biete einen regelmäßigen Workshop zum Event Storming an. Alternativ komme 
 ## Anforderungen
 Was sind die Teilnahmebedingungen?
 * Du kannst 4 bis 6 Stunden Zeit erübrigen
+
+Bei Fragen und/oder Interesse sende mir einfach eine [Mail](mailto:mail@larmic.de?subject=Workshop:%20Event%20Storming).
