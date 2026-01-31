@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Videos on larmic.de</title><link>https://larmic.de/en/videos/</link><description>Recent content in Videos on larmic.de</description><generator>Hugo -- 0.154.5</generator><language>en</language><lastBuildDate>Wed, 22 Feb 2023 21:28:19 +0100</lastBuildDate><atom:link href="https://larmic.de/en/videos/index.xml" rel="self" type="application/rss+xml"/><item><title>Unit vs Integration Testing</title><link>https://larmic.de/en/videos/unit-vs-integration-testing/</link><pubDate>Wed, 22 Feb 2023 21:28:19 +0100</pubDate><guid>https://larmic.de/en/videos/unit-vs-integration-testing/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; This talk is available in german only.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;How dogmatic do you have to be when distinguishing between unit and integration testing?
+In this talk I show different points of view on this topic and try to break through the existing dogmas.&lt;/p&gt;
+&lt;h4 id="team-neusta-freitagsfrühstück-friday-breakfast"&gt;Team Neusta Freitagsfrühstück (friday breakfast)&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; This talk was recorded as part of a &lt;em&gt;Freitagsfrühstück&lt;/em&gt;.
+The &lt;em&gt;Freitagsfrühstück&lt;/em&gt; is a regular event of the
+&lt;a href="https://www.team-neusta.de/"&gt;Team Neusta&lt;/a&gt; and serves for further education
+and the technical exchange among each other.&lt;/p&gt;</description></item><item><title>Event Storming</title><link>https://larmic.de/en/videos/event-storming/</link><pubDate>Wed, 22 Feb 2023 21:25:16 +0100</pubDate><guid>https://larmic.de/en/videos/event-storming/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; This talk is available in german only.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;a href="https://www.eventstorming.com/"&gt;Event Storming&lt;/a&gt; is a collaborative workshop method used in software development to
+visualize and understand complex business processes or requirements. It involves all the people involved, such as
+developers, project managers, product owners and domain experts.&lt;/p&gt;
+&lt;h4 id="advantages"&gt;Advantages&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;It goes fast&lt;/li&gt;
+&lt;li&gt;It is easy to understand&lt;/li&gt;
+&lt;li&gt;It costs little money&lt;/li&gt;
+&lt;li&gt;It serves to gain knowledge&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="team-neusta-freitagsfrühstück-friday-breakfast"&gt;Team Neusta Freitagsfrühstück (friday breakfast)&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; This talk was recorded as part of a &lt;em&gt;Freitagsfrühstück&lt;/em&gt;.
+The &lt;em&gt;Freitagsfrühstück&lt;/em&gt; is a regular event of the
+&lt;a href="https://www.team-neusta.de/"&gt;Team Neusta&lt;/a&gt; and serves for further education
+and the technical exchange among each other.&lt;/p&gt;</description></item><item><title>Testcontainers</title><link>https://larmic.de/en/videos/testcontainers/</link><pubDate>Wed, 22 Feb 2023 21:19:27 +0100</pubDate><guid>https://larmic.de/en/videos/testcontainers/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; This talk is available in german only.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;a href="https://www.testcontainers.org/"&gt;Testcontainers&lt;/a&gt; is a framework that
+allows to use a database or other things during the test execution.
+test execution.&lt;/p&gt;
+&lt;p&gt;Testcontainers uses the &lt;a href="https://www.docker.com/"&gt;Docker Environment&lt;/a&gt; for this purpose.&lt;/p&gt;
+&lt;h4 id="vorteile"&gt;Vorteile&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;A free port is searched for and used&lt;/li&gt;
+&lt;li&gt;A Docker sidecar &lt;a href="https://hub.docker.com/r/testcontainers/ryuk"&gt;ryuk&lt;/a&gt; takes care of clearing the containers afterwards&lt;/li&gt;
+&lt;li&gt;The framework is supported by all major programming languages&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="team-neusta-freitagsfrühstück-friday-breakfast"&gt;Team Neusta Freitagsfrühstück (friday breakfast)&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; This talk was recorded as part of a &lt;em&gt;Freitagsfrühstück&lt;/em&gt;.
+The &lt;em&gt;Freitagsfrühstück&lt;/em&gt; is a regular event of the
+&lt;a href="https://www.team-neusta.de/"&gt;Team Neusta&lt;/a&gt; and serves for further education
+and the technical exchange among each other.&lt;/p&gt;</description></item><item><title>First steps into hexagonal architecture</title><link>https://larmic.de/en/videos/hexagonal-architecture/</link><pubDate>Wed, 22 Feb 2023 19:41:47 +0100</pubDate><guid>https://larmic.de/en/videos/hexagonal-architecture/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; This talk is available in german only.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Domain Driven Design (DDD for short) is an approach to modeling complex software and focuses on the technical aspects.
+aspects in the foreground. The hexagonal architecture picks up on this concept and integrates the domain-oriented
+content into the core of the application. The concrete technical implementation (such as database or
+MQ systems) plays a subordinate role.&lt;/p&gt;
+&lt;p&gt;In this talk I motivate the implementation of software in a hexagonal architecture.&lt;/p&gt;</description></item></channel></rss>

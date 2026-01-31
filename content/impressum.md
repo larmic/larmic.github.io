@@ -1,6 +1,6 @@
 ---
 title: "Impressum"
-date: 2023-03-120T20:45:26+01:00
+date: 2023-03-12T20:45:26+01:00
 draft: false
 ---
 
