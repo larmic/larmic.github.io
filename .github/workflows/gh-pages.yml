@@ -6,6 +6,7 @@ on:
       - main  # Set a branch to deploy
     paths-ignore:
       - "README.md"
+      - "CLAUDE.md"
       - ".gitignore"
       - ".gitmodules"
 
