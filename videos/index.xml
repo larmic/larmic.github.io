@@ -1,56 +1,55 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Videos on larmic.de</title><link>https://larmic.de/videos/</link><description>Recent content in Videos on larmic.de</description><generator>Hugo -- gohugo.io</generator><language>de</language><lastBuildDate>Wed, 22 Feb 2023 21:28:19 +0100</lastBuildDate><atom:link href="https://larmic.de/videos/index.xml" rel="self" type="application/rss+xml"/><item><title>Unit vs Integration Testing</title><link>https://larmic.de/videos/unit-vs-integration-testing/</link><pubDate>Wed, 22 Feb 2023 21:28:19 +0100</pubDate><guid>https://larmic.de/videos/unit-vs-integration-testing/</guid><description>&lt;p>Wie dogmatisch muss man beim Unterscheiden von Unit- und Integrationstests sein?
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Videos on larmic.de</title><link>https://larmic.de/videos/</link><description>Recent content in Videos on larmic.de</description><generator>Hugo -- 0.155.1</generator><language>de</language><lastBuildDate>Wed, 22 Feb 2023 21:28:19 +0100</lastBuildDate><atom:link href="https://larmic.de/videos/index.xml" rel="self" type="application/rss+xml"/><item><title>Unit vs Integration Testing</title><link>https://larmic.de/videos/unit-vs-integration-testing/</link><pubDate>Wed, 22 Feb 2023 21:28:19 +0100</pubDate><guid>https://larmic.de/videos/unit-vs-integration-testing/</guid><description>&lt;p&gt;Wie dogmatisch muss man beim Unterscheiden von Unit- und Integrationstests sein?
 In diesem Video zeige ich verschiedene Sichtweisen zu diesem Thema auf und
-versuche, die bestehenden Dogmen zu durchbrechen.&lt;/p>
-&lt;h4 id="team-neusta-freitagsfrühstück">Team Neusta Freitagsfrühstück&lt;/h4>
-&lt;blockquote>
-&lt;p>&lt;strong>Hinweis&lt;/strong> Dieses Video ist im Rahmen eines &lt;em>Freitagsfrühstücks&lt;/em> aufgenommen worden.
-Das &lt;em>Freitagsfrühstück&lt;/em> ist eine regelmäßige Veranstaltung der
-&lt;a href="https://www.team-neusta.de/">Team Neusta&lt;/a> und dient der Weiterbildung
-und dem technischen Austausch untereinander.&lt;/p>
-&lt;p>Die anschließende Diskussion wurde nicht in das öffentliche Video übernommen.&lt;/p>
-&lt;/blockquote>
-&lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-&lt;iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube-nocookie.com/embed/_CGvdhRc9DE?autoplay=0&amp;controls=1&amp;end=0&amp;loop=0&amp;mute=0&amp;start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"
->&lt;/iframe>
-&lt;/div></description></item><item><title>Event Storming</title><link>https://larmic.de/videos/event-storming/</link><pubDate>Wed, 22 Feb 2023 21:25:16 +0100</pubDate><guid>https://larmic.de/videos/event-storming/</guid><description>&lt;p>&lt;a href="https://www.eventstorming.com/">Event Storming&lt;/a> ist eine kollaborative Workshop-Methode, die in der Softwareentwicklung
+versuche, die bestehenden Dogmen zu durchbrechen.&lt;/p&gt;
+&lt;h4 id="team-neusta-freitagsfrühstück"&gt;Team Neusta Freitagsfrühstück&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Hinweis&lt;/strong&gt; Dieses Video ist im Rahmen eines &lt;em&gt;Freitagsfrühstücks&lt;/em&gt; aufgenommen worden.
+Das &lt;em&gt;Freitagsfrühstück&lt;/em&gt; ist eine regelmäßige Veranstaltung der
+&lt;a href="https://www.team-neusta.de/"&gt;Team Neusta&lt;/a&gt; und dient der Weiterbildung
+und dem technischen Austausch untereinander.&lt;/p&gt;
+&lt;p&gt;Die anschließende Diskussion wurde nicht in das öffentliche Video übernommen.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"&gt;
+&lt;iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube-nocookie.com/embed/_CGvdhRc9DE?autoplay=0&amp;amp;controls=1&amp;amp;end=0&amp;amp;loop=0&amp;amp;mute=0&amp;amp;start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"&gt;&lt;/iframe&gt;
+&lt;/div&gt;</description></item><item><title>Event Storming</title><link>https://larmic.de/videos/event-storming/</link><pubDate>Wed, 22 Feb 2023 21:25:16 +0100</pubDate><guid>https://larmic.de/videos/event-storming/</guid><description>&lt;p&gt;&lt;a href="https://www.eventstorming.com/"&gt;Event Storming&lt;/a&gt; ist eine kollaborative Workshop-Methode, die in der Softwareentwicklung
 eingesetzt wird, um komplexe Geschäftsprozesse oder Anforderungen zu visualisieren und zu verstehen. Dabei werden alle
-beteiligten Personen, wie z.B. Entwickler, Projektmanager, Productowner und Domainexperten, eingebunden.&lt;/p>
-&lt;h4 id="vorteile">Vorteile&lt;/h4>
-&lt;ul>
-&lt;li>Es geht schnell&lt;/li>
-&lt;li>Es ist leicht verständlich&lt;/li>
-&lt;li>Es kostet wenig Geld&lt;/li>
-&lt;li>Es dient dem Erkenntnisgewinn&lt;/li>
-&lt;/ul>
-&lt;h4 id="team-neusta-freitagsfrühstück">Team Neusta Freitagsfrühstück&lt;/h4>
-&lt;blockquote>
-&lt;p>&lt;strong>Hinweis&lt;/strong> Dieses Video ist im Rahmen eines &lt;em>Freitagsfrühstücks&lt;/em> aufgenommen worden.
-Das &lt;em>Freitagsfrühstück&lt;/em> ist eine regelmäßige Veranstaltung der
-&lt;a href="https://www.team-neusta.de/">Team Neusta&lt;/a> und dient der Weiterbildung
-und dem technischen Austausch untereinander.&lt;/p></description></item><item><title>Testcontainers</title><link>https://larmic.de/videos/testcontainers/</link><pubDate>Wed, 22 Feb 2023 21:19:27 +0100</pubDate><guid>https://larmic.de/videos/testcontainers/</guid><description>&lt;p>&lt;a href="https://www.testcontainers.org/">Testcontainers&lt;/a> ist ein Framework, dass
+beteiligten Personen, wie z.B. Entwickler, Projektmanager, Productowner und Domainexperten, eingebunden.&lt;/p&gt;
+&lt;h4 id="vorteile"&gt;Vorteile&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Es geht schnell&lt;/li&gt;
+&lt;li&gt;Es ist leicht verständlich&lt;/li&gt;
+&lt;li&gt;Es kostet wenig Geld&lt;/li&gt;
+&lt;li&gt;Es dient dem Erkenntnisgewinn&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="team-neusta-freitagsfrühstück"&gt;Team Neusta Freitagsfrühstück&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Hinweis&lt;/strong&gt; Dieses Video ist im Rahmen eines &lt;em&gt;Freitagsfrühstücks&lt;/em&gt; aufgenommen worden.
+Das &lt;em&gt;Freitagsfrühstück&lt;/em&gt; ist eine regelmäßige Veranstaltung der
+&lt;a href="https://www.team-neusta.de/"&gt;Team Neusta&lt;/a&gt; und dient der Weiterbildung
+und dem technischen Austausch untereinander.&lt;/p&gt;</description></item><item><title>Testcontainers</title><link>https://larmic.de/videos/testcontainers/</link><pubDate>Wed, 22 Feb 2023 21:19:27 +0100</pubDate><guid>https://larmic.de/videos/testcontainers/</guid><description>&lt;p&gt;&lt;a href="https://www.testcontainers.org/"&gt;Testcontainers&lt;/a&gt; ist ein Framework, dass
 es im Test ermöglicht, eine Datenbank oder andere Dinge während der
-Testausführung zu nutzen.&lt;/p>
-&lt;p>Testcontainers nutzt dafür das &lt;a href="https://www.docker.com/">Docker Environment&lt;/a>.&lt;/p>
-&lt;h4 id="vorteile">Vorteile&lt;/h4>
-&lt;ul>
-&lt;li>Es wird ein freier Port gesucht und genutzt&lt;/li>
-&lt;li>Der Docker-Sidecar &lt;a href="https://hub.docker.com/r/testcontainers/ryuk">ryuk&lt;/a> sorgt anschließend für das Abräumen der Container&lt;/li>
-&lt;li>Das Framework wird mittlerweile von allen gängigen Programmiersprachen unterstützt&lt;/li>
-&lt;/ul>
-&lt;h4 id="team-neusta-freitagsfrühstück">Team Neusta Freitagsfrühstück&lt;/h4>
-&lt;blockquote>
-&lt;p>&lt;strong>Hinweis&lt;/strong> Dieses Video ist im Rahmen eines &lt;em>Freitagsfrühstücks&lt;/em> aufgenommen worden.
-Das &lt;em>Freitagsfrühstück&lt;/em> ist eine regelmäßige Veranstaltung der
-&lt;a href="https://www.team-neusta.de/">Team Neusta&lt;/a> und dient der Weiterbildung
-und dem technischen Austausch untereinander.&lt;/p></description></item><item><title>Einstieg in die Hexagonale Architektur</title><link>https://larmic.de/videos/hexagonal-architecture/</link><pubDate>Wed, 22 Feb 2023 19:41:47 +0100</pubDate><guid>https://larmic.de/videos/hexagonal-architecture/</guid><description>&lt;p>Domain Driven Design (kurz: DDD) ist ein Ansatz zur Modellierung
+Testausführung zu nutzen.&lt;/p&gt;
+&lt;p&gt;Testcontainers nutzt dafür das &lt;a href="https://www.docker.com/"&gt;Docker Environment&lt;/a&gt;.&lt;/p&gt;
+&lt;h4 id="vorteile"&gt;Vorteile&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Es wird ein freier Port gesucht und genutzt&lt;/li&gt;
+&lt;li&gt;Der Docker-Sidecar &lt;a href="https://hub.docker.com/r/testcontainers/ryuk"&gt;ryuk&lt;/a&gt; sorgt anschließend für das Abräumen der Container&lt;/li&gt;
+&lt;li&gt;Das Framework wird mittlerweile von allen gängigen Programmiersprachen unterstützt&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="team-neusta-freitagsfrühstück"&gt;Team Neusta Freitagsfrühstück&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Hinweis&lt;/strong&gt; Dieses Video ist im Rahmen eines &lt;em&gt;Freitagsfrühstücks&lt;/em&gt; aufgenommen worden.
+Das &lt;em&gt;Freitagsfrühstück&lt;/em&gt; ist eine regelmäßige Veranstaltung der
+&lt;a href="https://www.team-neusta.de/"&gt;Team Neusta&lt;/a&gt; und dient der Weiterbildung
+und dem technischen Austausch untereinander.&lt;/p&gt;</description></item><item><title>Einstieg in die Hexagonale Architektur</title><link>https://larmic.de/videos/hexagonal-architecture/</link><pubDate>Wed, 22 Feb 2023 19:41:47 +0100</pubDate><guid>https://larmic.de/videos/hexagonal-architecture/</guid><description>&lt;p&gt;Domain Driven Design (kurz: DDD) ist ein Ansatz zur Modellierung
 komplexer Software und stellt dabei die fachlichen Aspekte in
-den Vordergrund.&lt;/p>
-&lt;p>Die hexagonale Architektur greift diesen Punkt
+den Vordergrund.&lt;/p&gt;
+&lt;p&gt;Die hexagonale Architektur greift diesen Punkt
 auf und setzt diese Inhalte in den Kern der Anwendung. Die eigentliche
-Technik (Datenbank, MQ-System, &amp;hellip;) spielt dabei eine untergeordnete Rolle.&lt;/p>
-&lt;h4 id="team-neusta-freitagsfrühstück">Team Neusta Freitagsfrühstück&lt;/h4>
-&lt;blockquote>
-&lt;p>&lt;strong>Hinweis&lt;/strong> Dieses Video ist im Rahmen eines &lt;em>Freitagsfrühstücks&lt;/em> aufgenommen worden.
-Das &lt;em>Freitagsfrühstück&lt;/em> ist eine regelmäßige Veranstaltung der
-&lt;a href="https://www.team-neusta.de/">Team Neusta&lt;/a> und dient der Weiterbildung
-und dem technischen Austausch untereinander.&lt;/p></description></item></channel></rss>
+Technik (Datenbank, MQ-System, &amp;hellip;) spielt dabei eine untergeordnete Rolle.&lt;/p&gt;
+&lt;h4 id="team-neusta-freitagsfrühstück"&gt;Team Neusta Freitagsfrühstück&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Hinweis&lt;/strong&gt; Dieses Video ist im Rahmen eines &lt;em&gt;Freitagsfrühstücks&lt;/em&gt; aufgenommen worden.
+Das &lt;em&gt;Freitagsfrühstück&lt;/em&gt; ist eine regelmäßige Veranstaltung der
+&lt;a href="https://www.team-neusta.de/"&gt;Team Neusta&lt;/a&gt; und dient der Weiterbildung
+und dem technischen Austausch untereinander.&lt;/p&gt;</description></item></channel></rss>

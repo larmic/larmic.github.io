@@ -1,83 +1,81 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>larmic.de</title><link>https://larmic.de/</link><description>Recent content on larmic.de</description><generator>Hugo -- gohugo.io</generator><language>de</language><lastBuildDate>Tue, 21 Mar 2023 20:45:26 +0100</lastBuildDate><atom:link href="https://larmic.de/index.xml" rel="self" type="application/rss+xml"/><item><title>Event Storming</title><link>https://larmic.de/workshops/event_storming/</link><pubDate>Tue, 21 Mar 2023 20:45:26 +0100</pubDate><guid>https://larmic.de/workshops/event_storming/</guid><description>&lt;p>Event Storming ist eine kollaborative Workshop-Methode, die in der Softwareentwicklung eingesetzt wird, um komplexe
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>larmic.de</title><link>https://larmic.de/</link><description>Recent content on larmic.de</description><generator>Hugo -- 0.155.1</generator><language>de</language><lastBuildDate>Tue, 21 Mar 2023 20:45:26 +0100</lastBuildDate><atom:link href="https://larmic.de/index.xml" rel="self" type="application/rss+xml"/><item><title>Event Storming</title><link>https://larmic.de/workshops/event_storming/</link><pubDate>Tue, 21 Mar 2023 20:45:26 +0100</pubDate><guid>https://larmic.de/workshops/event_storming/</guid><description>&lt;p&gt;Event Storming ist eine kollaborative Workshop-Methode, die in der Softwareentwicklung eingesetzt wird, um komplexe
 Geschäftsprozesse oder Anforderungen zu visualisieren und zu verstehen. Dabei werden alle beteiligten Personen,
-wie z.B. Entwickler, Projektmanager, Productowner und Domainexperten, eingebunden.&lt;/p>
-&lt;p>Im Workshop wird auf einer großen Wandtafel, Brownpaper oder einem Whiteboard ein visuelles Modell erstellt, das den
+wie z.B. Entwickler, Projektmanager, Productowner und Domainexperten, eingebunden.&lt;/p&gt;
+&lt;p&gt;Im Workshop wird auf einer großen Wandtafel, Brownpaper oder einem Whiteboard ein visuelles Modell erstellt, das den
 Geschäftsprozess oder die Anforderung darstellt. Dabei werden die verschiedenen Ereignisse (Events), die in diesem
 Prozess auftreten können, sowie die auslösenden Aktionen und beteiligten Akteure identifiziert und in einer zeitlichen
-Reihenfolge dargestellt.&lt;/p></description></item><item><title>Domain Driven Design und hexagonale Architektur (für Entwickler:innen)</title><link>https://larmic.de/workshops/ddd_hexagonal_architecture_for_devs/</link><pubDate>Sun, 12 Mar 2023 20:45:26 +0100</pubDate><guid>https://larmic.de/workshops/ddd_hexagonal_architecture_for_devs/</guid><description>&lt;p>Domain Driven Design (kurz DDD) ist ein Ansatz zur Modellierung komplexer Software und stellt dabei die
+Reihenfolge dargestellt.&lt;/p&gt;</description></item><item><title>Domain Driven Design und hexagonale Architektur (für Entwickler:innen)</title><link>https://larmic.de/workshops/ddd_hexagonal_architecture_for_devs/</link><pubDate>Sun, 12 Mar 2023 20:45:26 +0100</pubDate><guid>https://larmic.de/workshops/ddd_hexagonal_architecture_for_devs/</guid><description>&lt;p&gt;Domain Driven Design (kurz DDD) ist ein Ansatz zur Modellierung komplexer Software und stellt dabei die
 fachlichen Aspekte in den Vordergrund. Die hexagonale Architektur greift dieses Konzept auf und integriert die
 fachlichen Inhalte in den Kern der Anwendung. Die konkrete technische Umsetzung (wie beispielsweise Datenbank oder
-MQ-Systeme) spielt dabei eine untergeordnete Rolle.&lt;/p>
-&lt;p>&lt;img loading="lazy" src="https://larmic.de/workshop/ddd_hex_architecture.png" alt="Workshop" />
-&lt;/p>
-&lt;p>Ich biete einen &lt;a href="https://it-bildungshaus.de/weiterbildung/seminar-ddd-domain-driven-design">regelmäßigen Workshop&lt;/a>
+MQ-Systeme) spielt dabei eine untergeordnete Rolle.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Workshop" loading="lazy" src="https://larmic.de/workshop/ddd_hex_architecture.png"&gt;&lt;/p&gt;
+&lt;p&gt;Ich biete einen &lt;a href="https://it-bildungshaus.de/weiterbildung/seminar-ddd-domain-driven-design"&gt;regelmäßigen Workshop&lt;/a&gt;
 zum Thema DDD und wie man das in hexagonaler Architektur umsetzt an. Alternativ komme ich auch gerne zu euch
-in die Firma.&lt;/p></description></item><item><title>Unit vs Integration Testing</title><link>https://larmic.de/videos/unit-vs-integration-testing/</link><pubDate>Wed, 22 Feb 2023 21:28:19 +0100</pubDate><guid>https://larmic.de/videos/unit-vs-integration-testing/</guid><description>&lt;p>Wie dogmatisch muss man beim Unterscheiden von Unit- und Integrationstests sein?
+in die Firma.&lt;/p&gt;</description></item><item><title>Impressum</title><link>https://larmic.de/impressum/</link><pubDate>Sun, 12 Mar 2023 20:45:26 +0100</pubDate><guid>https://larmic.de/impressum/</guid><description>&lt;p&gt;Angaben gemäß § 5 TMG&lt;/p&gt;
+&lt;p&gt;Lars Michaelis&lt;br&gt;
+Langwedeler Str. 3A&lt;br&gt;
+28307 Bremen&lt;br&gt;
+Telefon: 0421 163 40 70&lt;br&gt;
+E-Mail: mail[at]larmic.de&lt;/p&gt;
+&lt;h3 id="verantwortlich-für-den-inhalt-nach--55-abs-2-rstv"&gt;Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:&lt;/h3&gt;
+&lt;p&gt;Lars Michaelis&lt;br&gt;
+Langwedeler Str. 3A&lt;br&gt;
+28307 Bremen&lt;/p&gt;
+&lt;h3 id="haftungsausschluss"&gt;Haftungsausschluss:&lt;/h3&gt;
+&lt;h4 id="haftung-für-inhalte"&gt;Haftung für Inhalte&lt;/h4&gt;
+&lt;p&gt;Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.&lt;/p&gt;</description></item><item><title>Unit vs Integration Testing</title><link>https://larmic.de/videos/unit-vs-integration-testing/</link><pubDate>Wed, 22 Feb 2023 21:28:19 +0100</pubDate><guid>https://larmic.de/videos/unit-vs-integration-testing/</guid><description>&lt;p&gt;Wie dogmatisch muss man beim Unterscheiden von Unit- und Integrationstests sein?
 In diesem Video zeige ich verschiedene Sichtweisen zu diesem Thema auf und
-versuche, die bestehenden Dogmen zu durchbrechen.&lt;/p>
-&lt;h4 id="team-neusta-freitagsfrühstück">Team Neusta Freitagsfrühstück&lt;/h4>
-&lt;blockquote>
-&lt;p>&lt;strong>Hinweis&lt;/strong> Dieses Video ist im Rahmen eines &lt;em>Freitagsfrühstücks&lt;/em> aufgenommen worden.
-Das &lt;em>Freitagsfrühstück&lt;/em> ist eine regelmäßige Veranstaltung der
-&lt;a href="https://www.team-neusta.de/">Team Neusta&lt;/a> und dient der Weiterbildung
-und dem technischen Austausch untereinander.&lt;/p>
-&lt;p>Die anschließende Diskussion wurde nicht in das öffentliche Video übernommen.&lt;/p>
-&lt;/blockquote>
-&lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-&lt;iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube-nocookie.com/embed/_CGvdhRc9DE?autoplay=0&amp;controls=1&amp;end=0&amp;loop=0&amp;mute=0&amp;start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"
->&lt;/iframe>
-&lt;/div></description></item><item><title>Event Storming</title><link>https://larmic.de/videos/event-storming/</link><pubDate>Wed, 22 Feb 2023 21:25:16 +0100</pubDate><guid>https://larmic.de/videos/event-storming/</guid><description>&lt;p>&lt;a href="https://www.eventstorming.com/">Event Storming&lt;/a> ist eine kollaborative Workshop-Methode, die in der Softwareentwicklung
+versuche, die bestehenden Dogmen zu durchbrechen.&lt;/p&gt;
+&lt;h4 id="team-neusta-freitagsfrühstück"&gt;Team Neusta Freitagsfrühstück&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Hinweis&lt;/strong&gt; Dieses Video ist im Rahmen eines &lt;em&gt;Freitagsfrühstücks&lt;/em&gt; aufgenommen worden.
+Das &lt;em&gt;Freitagsfrühstück&lt;/em&gt; ist eine regelmäßige Veranstaltung der
+&lt;a href="https://www.team-neusta.de/"&gt;Team Neusta&lt;/a&gt; und dient der Weiterbildung
+und dem technischen Austausch untereinander.&lt;/p&gt;
+&lt;p&gt;Die anschließende Diskussion wurde nicht in das öffentliche Video übernommen.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"&gt;
+&lt;iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube-nocookie.com/embed/_CGvdhRc9DE?autoplay=0&amp;amp;controls=1&amp;amp;end=0&amp;amp;loop=0&amp;amp;mute=0&amp;amp;start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"&gt;&lt;/iframe&gt;
+&lt;/div&gt;</description></item><item><title>Event Storming</title><link>https://larmic.de/videos/event-storming/</link><pubDate>Wed, 22 Feb 2023 21:25:16 +0100</pubDate><guid>https://larmic.de/videos/event-storming/</guid><description>&lt;p&gt;&lt;a href="https://www.eventstorming.com/"&gt;Event Storming&lt;/a&gt; ist eine kollaborative Workshop-Methode, die in der Softwareentwicklung
 eingesetzt wird, um komplexe Geschäftsprozesse oder Anforderungen zu visualisieren und zu verstehen. Dabei werden alle
-beteiligten Personen, wie z.B. Entwickler, Projektmanager, Productowner und Domainexperten, eingebunden.&lt;/p>
-&lt;h4 id="vorteile">Vorteile&lt;/h4>
-&lt;ul>
-&lt;li>Es geht schnell&lt;/li>
-&lt;li>Es ist leicht verständlich&lt;/li>
-&lt;li>Es kostet wenig Geld&lt;/li>
-&lt;li>Es dient dem Erkenntnisgewinn&lt;/li>
-&lt;/ul>
-&lt;h4 id="team-neusta-freitagsfrühstück">Team Neusta Freitagsfrühstück&lt;/h4>
-&lt;blockquote>
-&lt;p>&lt;strong>Hinweis&lt;/strong> Dieses Video ist im Rahmen eines &lt;em>Freitagsfrühstücks&lt;/em> aufgenommen worden.
-Das &lt;em>Freitagsfrühstück&lt;/em> ist eine regelmäßige Veranstaltung der
-&lt;a href="https://www.team-neusta.de/">Team Neusta&lt;/a> und dient der Weiterbildung
-und dem technischen Austausch untereinander.&lt;/p></description></item><item><title>Testcontainers</title><link>https://larmic.de/videos/testcontainers/</link><pubDate>Wed, 22 Feb 2023 21:19:27 +0100</pubDate><guid>https://larmic.de/videos/testcontainers/</guid><description>&lt;p>&lt;a href="https://www.testcontainers.org/">Testcontainers&lt;/a> ist ein Framework, dass
+beteiligten Personen, wie z.B. Entwickler, Projektmanager, Productowner und Domainexperten, eingebunden.&lt;/p&gt;
+&lt;h4 id="vorteile"&gt;Vorteile&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Es geht schnell&lt;/li&gt;
+&lt;li&gt;Es ist leicht verständlich&lt;/li&gt;
+&lt;li&gt;Es kostet wenig Geld&lt;/li&gt;
+&lt;li&gt;Es dient dem Erkenntnisgewinn&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="team-neusta-freitagsfrühstück"&gt;Team Neusta Freitagsfrühstück&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Hinweis&lt;/strong&gt; Dieses Video ist im Rahmen eines &lt;em&gt;Freitagsfrühstücks&lt;/em&gt; aufgenommen worden.
+Das &lt;em&gt;Freitagsfrühstück&lt;/em&gt; ist eine regelmäßige Veranstaltung der
+&lt;a href="https://www.team-neusta.de/"&gt;Team Neusta&lt;/a&gt; und dient der Weiterbildung
+und dem technischen Austausch untereinander.&lt;/p&gt;</description></item><item><title>Testcontainers</title><link>https://larmic.de/videos/testcontainers/</link><pubDate>Wed, 22 Feb 2023 21:19:27 +0100</pubDate><guid>https://larmic.de/videos/testcontainers/</guid><description>&lt;p&gt;&lt;a href="https://www.testcontainers.org/"&gt;Testcontainers&lt;/a&gt; ist ein Framework, dass
 es im Test ermöglicht, eine Datenbank oder andere Dinge während der
-Testausführung zu nutzen.&lt;/p>
-&lt;p>Testcontainers nutzt dafür das &lt;a href="https://www.docker.com/">Docker Environment&lt;/a>.&lt;/p>
-&lt;h4 id="vorteile">Vorteile&lt;/h4>
-&lt;ul>
-&lt;li>Es wird ein freier Port gesucht und genutzt&lt;/li>
-&lt;li>Der Docker-Sidecar &lt;a href="https://hub.docker.com/r/testcontainers/ryuk">ryuk&lt;/a> sorgt anschließend für das Abräumen der Container&lt;/li>
-&lt;li>Das Framework wird mittlerweile von allen gängigen Programmiersprachen unterstützt&lt;/li>
-&lt;/ul>
-&lt;h4 id="team-neusta-freitagsfrühstück">Team Neusta Freitagsfrühstück&lt;/h4>
-&lt;blockquote>
-&lt;p>&lt;strong>Hinweis&lt;/strong> Dieses Video ist im Rahmen eines &lt;em>Freitagsfrühstücks&lt;/em> aufgenommen worden.
-Das &lt;em>Freitagsfrühstück&lt;/em> ist eine regelmäßige Veranstaltung der
-&lt;a href="https://www.team-neusta.de/">Team Neusta&lt;/a> und dient der Weiterbildung
-und dem technischen Austausch untereinander.&lt;/p></description></item><item><title>Einstieg in die Hexagonale Architektur</title><link>https://larmic.de/videos/hexagonal-architecture/</link><pubDate>Wed, 22 Feb 2023 19:41:47 +0100</pubDate><guid>https://larmic.de/videos/hexagonal-architecture/</guid><description>&lt;p>Domain Driven Design (kurz: DDD) ist ein Ansatz zur Modellierung
+Testausführung zu nutzen.&lt;/p&gt;
+&lt;p&gt;Testcontainers nutzt dafür das &lt;a href="https://www.docker.com/"&gt;Docker Environment&lt;/a&gt;.&lt;/p&gt;
+&lt;h4 id="vorteile"&gt;Vorteile&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Es wird ein freier Port gesucht und genutzt&lt;/li&gt;
+&lt;li&gt;Der Docker-Sidecar &lt;a href="https://hub.docker.com/r/testcontainers/ryuk"&gt;ryuk&lt;/a&gt; sorgt anschließend für das Abräumen der Container&lt;/li&gt;
+&lt;li&gt;Das Framework wird mittlerweile von allen gängigen Programmiersprachen unterstützt&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="team-neusta-freitagsfrühstück"&gt;Team Neusta Freitagsfrühstück&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Hinweis&lt;/strong&gt; Dieses Video ist im Rahmen eines &lt;em&gt;Freitagsfrühstücks&lt;/em&gt; aufgenommen worden.
+Das &lt;em&gt;Freitagsfrühstück&lt;/em&gt; ist eine regelmäßige Veranstaltung der
+&lt;a href="https://www.team-neusta.de/"&gt;Team Neusta&lt;/a&gt; und dient der Weiterbildung
+und dem technischen Austausch untereinander.&lt;/p&gt;</description></item><item><title>Einstieg in die Hexagonale Architektur</title><link>https://larmic.de/videos/hexagonal-architecture/</link><pubDate>Wed, 22 Feb 2023 19:41:47 +0100</pubDate><guid>https://larmic.de/videos/hexagonal-architecture/</guid><description>&lt;p&gt;Domain Driven Design (kurz: DDD) ist ein Ansatz zur Modellierung
 komplexer Software und stellt dabei die fachlichen Aspekte in
-den Vordergrund.&lt;/p>
-&lt;p>Die hexagonale Architektur greift diesen Punkt
+den Vordergrund.&lt;/p&gt;
+&lt;p&gt;Die hexagonale Architektur greift diesen Punkt
 auf und setzt diese Inhalte in den Kern der Anwendung. Die eigentliche
-Technik (Datenbank, MQ-System, &amp;hellip;) spielt dabei eine untergeordnete Rolle.&lt;/p>
-&lt;h4 id="team-neusta-freitagsfrühstück">Team Neusta Freitagsfrühstück&lt;/h4>
-&lt;blockquote>
-&lt;p>&lt;strong>Hinweis&lt;/strong> Dieses Video ist im Rahmen eines &lt;em>Freitagsfrühstücks&lt;/em> aufgenommen worden.
-Das &lt;em>Freitagsfrühstück&lt;/em> ist eine regelmäßige Veranstaltung der
-&lt;a href="https://www.team-neusta.de/">Team Neusta&lt;/a> und dient der Weiterbildung
-und dem technischen Austausch untereinander.&lt;/p></description></item><item><title>Über mich</title><link>https://larmic.de/about/</link><pubDate>Sun, 12 Feb 2023 20:45:26 +0100</pubDate><guid>https://larmic.de/about/</guid><description>&lt;p>Ich arbeite seit über 18 Jahren für Neusta und bin ein erfahrener Backend-Entwickler mit einem aktuellen Schwerpunkt auf Kotlin und Spring Boot. Ich beschäftige mich auch mit der Sprache Go und interessiere mich für IoT in meinem Privatleben. Ich bin der Ersteller des JSF-Frameworks ButterFaces.org, obwohl ich mich heutzutage mehr mit SPAs mit React oder Web Components beschäftige.&lt;/p>
-&lt;p>Meine Leidenschaft liegt in der Erstellung von Architekturen mit einem starken Geschäftsfokus. Ich gebe regelmäßig Schulungen zu Domain Driven Design und hexagonalen Architekturen und beschäftige mich gelegentlich mit Anforderungsmanagement mit Event Storming.&lt;/p></description></item><item><title>Impressum</title><link>https://larmic.de/impressum/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://larmic.de/impressum/</guid><description>&lt;p>Angaben gemäß § 5 TMG&lt;/p>
-&lt;p>Lars Michaelis&lt;br>
-Langwedeler Str. 3A&lt;br>
-28307 Bremen&lt;br>
-Telefon: 0421 163 40 70&lt;br>
-E-Mail: mail[at]larmic.de&lt;/p>
-&lt;h3 id="verantwortlich-für-den-inhalt-nach--55-abs-2-rstv">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:&lt;/h3>
-&lt;p>Lars Michaelis&lt;br>
-Langwedeler Str. 3A&lt;br>
-28307 Bremen&lt;/p>
-&lt;h3 id="haftungsausschluss">Haftungsausschluss:&lt;/h3>
-&lt;h4 id="haftung-für-inhalte">Haftung für Inhalte&lt;/h4>
-&lt;p>Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.&lt;/p></description></item></channel></rss>
+Technik (Datenbank, MQ-System, &amp;hellip;) spielt dabei eine untergeordnete Rolle.&lt;/p&gt;
+&lt;h4 id="team-neusta-freitagsfrühstück"&gt;Team Neusta Freitagsfrühstück&lt;/h4&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Hinweis&lt;/strong&gt; Dieses Video ist im Rahmen eines &lt;em&gt;Freitagsfrühstücks&lt;/em&gt; aufgenommen worden.
+Das &lt;em&gt;Freitagsfrühstück&lt;/em&gt; ist eine regelmäßige Veranstaltung der
+&lt;a href="https://www.team-neusta.de/"&gt;Team Neusta&lt;/a&gt; und dient der Weiterbildung
+und dem technischen Austausch untereinander.&lt;/p&gt;</description></item><item><title>Über mich</title><link>https://larmic.de/about/</link><pubDate>Sun, 12 Feb 2023 20:45:26 +0100</pubDate><guid>https://larmic.de/about/</guid><description>&lt;p&gt;Ich arbeite seit über 18 Jahren für Neusta und bin ein erfahrener Backend-Entwickler mit einem aktuellen Schwerpunkt auf Kotlin und Spring Boot. Ich beschäftige mich auch mit der Sprache Go und interessiere mich für IoT in meinem Privatleben. Ich bin der Ersteller des JSF-Frameworks ButterFaces.org, obwohl ich mich heutzutage mehr mit SPAs mit React oder Web Components beschäftige.&lt;/p&gt;
+&lt;p&gt;Meine Leidenschaft liegt in der Erstellung von Architekturen mit einem starken Geschäftsfokus. Ich gebe regelmäßig Schulungen zu Domain Driven Design und hexagonalen Architekturen und beschäftige mich gelegentlich mit Anforderungsmanagement mit Event Storming.&lt;/p&gt;</description></item></channel></rss>
