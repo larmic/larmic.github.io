@@ -1,0 +1,319 @@
+<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Glow filter for animated paths on brain -->
+    <filter id="glow-gold" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Gradient from pink to glowing gold (horizontal, left to right) -->
+    <linearGradient id="pink-to-blue-h" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="60%" stop-color="#ff4088"/>
+      <stop offset="75%" stop-color="#ffdd00"/>
+      <stop offset="90%" stop-color="#ffff88"/>
+      <stop offset="100%" stop-color="#ffff88" stop-opacity="0"/>
+    </linearGradient>
+    <!-- Gradient from glowing gold to pink (horizontal, right to left) -->
+    <linearGradient id="blue-to-pink-h" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffff88" stop-opacity="0"/>
+      <stop offset="10%" stop-color="#ffff88"/>
+      <stop offset="25%" stop-color="#ffdd00"/>
+      <stop offset="40%" stop-color="#ff4088"/>
+    </linearGradient>
+    <!-- Gradient vertical down (top to bottom) -->
+    <linearGradient id="pink-to-blue-v-down" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="60%" stop-color="#ff4088"/>
+      <stop offset="75%" stop-color="#ffdd00"/>
+      <stop offset="90%" stop-color="#ffff88"/>
+      <stop offset="100%" stop-color="#ffff88" stop-opacity="0"/>
+    </linearGradient>
+    <!-- Gradient vertical up (bottom to top) -->
+    <linearGradient id="pink-to-blue-v-up" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="60%" stop-color="#ff4088"/>
+      <stop offset="75%" stop-color="#ffdd00"/>
+      <stop offset="90%" stop-color="#ffff88"/>
+      <stop offset="100%" stop-color="#ffff88" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    .line-path {
+      stroke-dasharray: 5 500;
+      stroke-dashoffset: 505;
+      animation: dash-line 5.5s linear infinite;
+      /* Kein Filter mehr - verbessert Performance erheblich */
+    }
+    .line-path[data-animation-duration="8"] { animation-duration: 8s; }
+    .line-path[data-animation-duration="11"] { animation-duration: 11s; }
+    .line-path[data-animation-duration="13"] { animation-duration: 13s; }
+    .line-path[data-animation-duration="16"] { animation-duration: 16.5s; }
+    .line-path[data-animation-duration="19"] { animation-duration: 19s; }
+    .line-path[data-animation-duration="22"] { animation-duration: 22s; }
+    .line-path[data-animation-duration="25"] { animation-duration: 25s; }
+    .line-path[data-animation-duration="27"] { animation-duration: 27.5s; }
+    .line-path[data-animation-duration="30"] { animation-duration: 30s; }
+
+    @keyframes dash-line {
+      from { stroke-dashoffset: 505; }
+      to { stroke-dashoffset: 0; }
+    }
+  </style>
+
+  <rect width="400" height="400" fill="#121212"></rect>
+
+  <!-- Static base lines (12 original + 3 new = 15 total, ~20% more) -->
+  <polyline points="0,0 35,20 70,20 100,45 140,45 175,85" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="400,0 365,20 330,20 300,45 260,45 225,85" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="0,200 35,180 70,180 100,155 140,155 175,115" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="400,200 365,180 330,180 300,155 260,155 225,115" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="120,0 135,25 160,25 192,72" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="280,0 265,25 240,25 208,72" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="120,200 135,175 160,175 195,125" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="280,200 265,175 240,175 205,125" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="0,50 40,65 80,65 120,80 172,95" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="0,150 40,135 80,135 120,120 172,105" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="400,50 360,65 320,65 280,80 228,95" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="400,150 360,135 320,135 280,120 228,105" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <!-- New static lines (distributed: left-center, right-center, top-center) -->
+  <polyline points="0,100 50,100 100,100 150,100 172,100" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="400,100 350,100 300,100 250,100 228,100" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="200,0 200,30 200,50 200,72" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+
+  <!-- Animated paths (12 original + 3 new = 15 total, ~20% more, all 10% slower) -->
+  <!-- Top-left to brain, then clockwise on brain -->
+  <path class="line-path" d="M0,0 L35,20 L70,20 L100,45 L140,45 L175,85 L185,78 L192,72 L200,72 L208,72 L218,78 L228,95 L228,105 L225,115"
+    fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="27"/>
+
+  <!-- Top-right to brain, then counter-clockwise -->
+  <path class="line-path" d="M400,0 L365,20 L330,20 L300,45 L260,45 L225,85 L215,78 L208,72 L200,72 L192,72 L182,78 L172,95 L172,105 L175,115"
+    fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="11"/>
+
+  <!-- Bottom-left to brain, then counter-clockwise -->
+  <path class="line-path" d="M0,200 L35,180 L70,180 L100,155 L140,155 L175,115 L185,122 L195,125 L200,125 L205,125 L215,122 L225,115 L228,105 L228,95"
+    fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="22"/>
+
+  <!-- Bottom-right to brain, then clockwise -->
+  <path class="line-path" d="M400,200 L365,180 L330,180 L300,155 L260,155 L225,115 L215,122 L205,125 L200,125 L195,125 L185,122 L175,115 L172,105 L172,95"
+    fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3"/>
+
+  <!-- Top-center-left to brain, then clockwise -->
+  <path class="line-path" d="M120,0 L135,25 L160,25 L192,72 L200,72 L208,72 L218,78 L225,85 L228,95 L228,105 L225,115"
+    fill="none" stroke="url(#pink-to-blue-v-down)" stroke-width="3"/>
+
+  <!-- Top-center-right to brain, then counter-clockwise -->
+  <path class="line-path" d="M280,0 L265,25 L240,25 L208,72 L200,72 L192,72 L182,78 L175,85 L172,95 L172,105 L175,115"
+    fill="none" stroke="url(#pink-to-blue-v-down)" stroke-width="3" data-animation-duration="27"/>
+
+  <!-- Bottom-center-left to brain, then counter-clockwise -->
+  <path class="line-path" d="M120,200 L135,175 L160,175 L195,125 L200,125 L205,125 L215,122 L225,115 L228,105 L228,95 L225,85"
+    fill="none" stroke="url(#pink-to-blue-v-up)" stroke-width="3" data-animation-duration="16"/>
+
+  <!-- Bottom-center-right to brain, then clockwise -->
+  <path class="line-path" d="M280,200 L265,175 L240,175 L205,125 L200,125 L195,125 L185,122 L175,115 L172,105 L172,95 L175,85"
+    fill="none" stroke="url(#pink-to-blue-v-up)" stroke-width="3" data-animation-duration="22"/>
+
+  <!-- Left-upper to brain, then counter-clockwise -->
+  <path class="line-path" d="M0,50 L40,65 L80,65 L120,80 L172,95 L172,105 L175,115 L185,122 L195,125 L205,125 L215,122 L225,115"
+    fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="11"/>
+
+  <!-- Left-lower to brain, then clockwise -->
+  <path class="line-path" d="M0,150 L40,135 L80,135 L120,120 L172,105 L172,95 L175,85 L182,78 L192,72 L200,72 L208,72 L218,78"
+    fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="16"/>
+
+  <!-- Right-upper to brain, then clockwise -->
+  <path class="line-path" d="M400,50 L360,65 L320,65 L280,80 L228,95 L228,105 L225,115 L215,122 L205,125 L195,125 L185,122 L175,115"
+    fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="27"/>
+
+  <!-- Right-lower to brain, then counter-clockwise -->
+  <path class="line-path" d="M400,150 L360,135 L320,135 L280,120 L228,105 L228,95 L225,85 L218,78 L208,72 L200,72 L192,72 L182,78"
+    fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="11"/>
+
+  <!-- NEW: Additional line from left center -->
+  <path class="line-path" d="M0,100 L50,100 L100,100 L150,100 L172,100 L175,115 L185,122 L195,125 L205,125 L215,122 L225,115 L228,105"
+    fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="16"/>
+
+  <!-- NEW: Additional line from right center -->
+  <path class="line-path" d="M400,100 L350,100 L300,100 L250,100 L228,100 L225,115 L215,122 L205,125 L195,125 L185,122 L175,115 L172,105"
+    fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="22"/>
+
+  <!-- NEW: Additional line from top center -->
+  <path class="line-path" d="M200,0 L200,30 L200,50 L200,72 L208,72 L218,78 L225,85 L228,95 L228,105 L225,115 L215,122"
+    fill="none" stroke="url(#pink-to-blue-v-down)" stroke-width="3" data-animation-duration="27"/>
+
+  <!-- PARALLEL POINTS: Same lines, different speeds (50% more = 8 additional) -->
+  <!-- Parallel on top-left line (faster) -->
+  <path class="line-path" d="M0,0 L35,20 L70,20 L100,45 L140,45 L175,85 L185,78 L192,72 L200,72 L208,72 L218,78 L228,95 L228,105 L225,115"
+    fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="16"/>
+
+  <!-- Parallel on top-right line (faster) -->
+  <path class="line-path" d="M400,0 L365,20 L330,20 L300,45 L260,45 L225,85 L215,78 L208,72 L200,72 L192,72 L182,78 L172,95 L172,105 L175,115"
+    fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="19"/>
+
+  <!-- Parallel on bottom-left line (slower) -->
+  <path class="line-path" d="M0,200 L35,180 L70,180 L100,155 L140,155 L175,115 L185,122 L195,125 L200,125 L205,125 L215,122 L225,115 L228,105 L228,95"
+    fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="13"/>
+
+  <!-- Parallel on bottom-right line (faster) -->
+  <path class="line-path" d="M400,200 L365,180 L330,180 L300,155 L260,155 L225,115 L215,122 L205,125 L200,125 L195,125 L185,122 L175,115 L172,105 L172,95"
+    fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="11"/>
+
+  <!-- Parallel on left-upper line (slower) -->
+  <path class="line-path" d="M0,50 L40,65 L80,65 L120,80 L172,95 L172,105 L175,115 L185,122 L195,125 L205,125 L215,122 L225,115"
+    fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="22"/>
+
+  <!-- Parallel on right-upper line (faster) -->
+  <path class="line-path" d="M400,50 L360,65 L320,65 L280,80 L228,95 L228,105 L225,115 L215,122 L205,125 L195,125 L185,122 L175,115"
+    fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="16"/>
+
+  <!-- Parallel on left-center line (faster) -->
+  <path class="line-path" d="M0,100 L50,100 L100,100 L150,100 L172,100 L175,115 L185,122 L195,125 L205,125 L215,122 L225,115 L228,105"
+    fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="25"/>
+
+  <!-- Parallel on top-center line (faster) -->
+  <path class="line-path" d="M200,0 L200,30 L200,50 L200,72 L208,72 L218,78 L225,85 L228,95 L228,105 L225,115 L215,122"
+    fill="none" stroke="url(#pink-to-blue-v-down)" stroke-width="3" data-animation-duration="16"/>
+
+  <!-- Brain structure (Tron-style with glow and colors) -->
+  <defs>
+    <!-- Glow filters -->
+    <filter id="glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-pink" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-strong" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Brain gradients -->
+    <linearGradient id="brain-gradient-lr" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00ffff"/>
+      <stop offset="50%" stop-color="#ff4088"/>
+      <stop offset="100%" stop-color="#00ffff"/>
+    </linearGradient>
+    <linearGradient id="brain-gradient-tb" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4488ff"/>
+      <stop offset="50%" stop-color="#ff4088"/>
+      <stop offset="100%" stop-color="#4488ff"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(200, 100)">
+    <!-- Brain outer glow background -->
+    <ellipse cx="0" cy="0" rx="30" ry="28" fill="none" stroke="#00ffff" stroke-width="1" opacity="0.15" filter="url(#glow-strong)"/>
+
+    <!-- Brain outline - left hemisphere (cyan glow) -->
+    <polyline points="-3,28 -8,26 -14,23 -20,18 -25,12 -28,5 -28,-3 -27,-10 -24,-16 -20,-21 -14,-25 -8,-27 0,-28"
+      fill="none" stroke="#00ffff" stroke-width="2" filter="url(#glow-cyan)" opacity="0.9"/>
+
+    <!-- Brain outline - right hemisphere (cyan glow) -->
+    <polyline points="3,28 8,26 14,23 20,18 25,12 28,5 28,-3 27,-10 24,-16 20,-21 14,-25 8,-27 0,-28"
+      fill="none" stroke="#00ffff" stroke-width="2" filter="url(#glow-cyan)" opacity="0.9"/>
+
+    <!-- Brain bottom connection -->
+    <polyline points="-3,28 0,30 3,28" fill="none" stroke="#00ffff" stroke-width="2" filter="url(#glow-cyan)" opacity="0.9"/>
+
+    <!-- Corpus callosum (center connection) - pink -->
+    <polyline points="0,-28 -2,-22 2,-16 -2,-10 2,-4 -2,2 2,8 -2,14 2,20 0,28"
+      fill="none" stroke="#ff4088" stroke-width="2" filter="url(#glow-pink)" opacity="0.8"/>
+
+    <!-- Left hemisphere gyri (brain folds) - detailed -->
+    <!-- Frontal lobe folds -->
+    <polyline points="-26,-8 -20,-10 -16,-6 -20,-2"
+      fill="none" stroke="#4488ff" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.7"/>
+    <polyline points="-24,-14 -18,-16 -14,-12 -18,-8"
+      fill="none" stroke="#4488ff" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.7"/>
+    <polyline points="-20,-20 -14,-22 -10,-18 -14,-14"
+      fill="none" stroke="#4488ff" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.6"/>
+
+    <!-- Parietal lobe folds -->
+    <polyline points="-26,2 -20,0 -16,4 -20,8"
+      fill="none" stroke="#00ffff" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.7"/>
+    <polyline points="-24,10 -18,8 -14,12 -18,16"
+      fill="none" stroke="#00ffff" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.7"/>
+
+    <!-- Temporal lobe folds -->
+    <polyline points="-22,18 -16,16 -12,20 -16,24"
+      fill="none" stroke="#ff4088" stroke-width="1.5" filter="url(#glow-pink)" opacity="0.6"/>
+    <polyline points="-10,22 -6,18 -4,22 -8,26"
+      fill="none" stroke="#ff4088" stroke-width="1.5" filter="url(#glow-pink)" opacity="0.5"/>
+
+    <!-- Right hemisphere gyri (mirrored) -->
+    <!-- Frontal lobe folds -->
+    <polyline points="26,-8 20,-10 16,-6 20,-2"
+      fill="none" stroke="#4488ff" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.7"/>
+    <polyline points="24,-14 18,-16 14,-12 18,-8"
+      fill="none" stroke="#4488ff" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.7"/>
+    <polyline points="20,-20 14,-22 10,-18 14,-14"
+      fill="none" stroke="#4488ff" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.6"/>
+
+    <!-- Parietal lobe folds -->
+    <polyline points="26,2 20,0 16,4 20,8"
+      fill="none" stroke="#00ffff" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.7"/>
+    <polyline points="24,10 18,8 14,12 18,16"
+      fill="none" stroke="#00ffff" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.7"/>
+
+    <!-- Temporal lobe folds -->
+    <polyline points="22,18 16,16 12,20 16,24"
+      fill="none" stroke="#ff4088" stroke-width="1.5" filter="url(#glow-pink)" opacity="0.6"/>
+    <polyline points="10,22 6,18 4,22 8,26"
+      fill="none" stroke="#ff4088" stroke-width="1.5" filter="url(#glow-pink)" opacity="0.5"/>
+
+    <!-- Inner brain structures (thalamus/brainstem hint) -->
+    <polyline points="-8,5 -4,8 0,5 4,8 8,5"
+      fill="none" stroke="#ff4088" stroke-width="1" filter="url(#glow-pink)" opacity="0.5"/>
+    <polyline points="-6,-5 -2,-2 2,-5 6,-2"
+      fill="none" stroke="#4488ff" stroke-width="1" filter="url(#glow-cyan)" opacity="0.5"/>
+
+    <!-- Neural activity pulses (animated dots) -->
+    <circle cx="-15" cy="-10" r="2" fill="#00ffff" filter="url(#glow-cyan)">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="15" cy="-10" r="2" fill="#00ffff" filter="url(#glow-cyan)">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="-12" cy="8" r="2" fill="#ff4088" filter="url(#glow-pink)">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="8" r="2" fill="#ff4088" filter="url(#glow-pink)">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.7s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="0" cy="-18" r="2" fill="#4488ff" filter="url(#glow-cyan)">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="0" cy="15" r="2" fill="#ff4088" filter="url(#glow-pink)">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.9s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Synaptic connections (small animated lines) -->
+    <line x1="-15" y1="-10" x2="-8" y2="-5" stroke="#00ffff" stroke-width="0.5" opacity="0.4">
+      <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2s" repeatCount="indefinite"/>
+    </line>
+    <line x1="15" y1="-10" x2="8" y2="-5" stroke="#00ffff" stroke-width="0.5" opacity="0.4">
+      <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2.3s" repeatCount="indefinite"/>
+    </line>
+    <line x1="-12" y1="8" x2="-4" y2="5" stroke="#ff4088" stroke-width="0.5" opacity="0.4">
+      <animate attributeName="opacity" values="0.2;0.8;0.2" dur="1.8s" repeatCount="indefinite"/>
+    </line>
+    <line x1="12" y1="8" x2="4" y2="5" stroke="#ff4088" stroke-width="0.5" opacity="0.4">
+      <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2.1s" repeatCount="indefinite"/>
+    </line>
+  </g>
+</svg>
