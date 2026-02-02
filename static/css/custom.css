@@ -54,6 +54,31 @@ body {
   background-repeat: no-repeat !important;
 }
 
+.hero-image .container {
+  align-items: center;
+}
+
+.hero-text {
+  text-align: center;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 0%, transparent 70%);
+  padding: 3rem 2rem;
+  border-radius: 20px;
+}
+
+.hero-text h1 {
+  color: var(--tron-cyan) !important;
+  text-shadow:
+    0 0 10px var(--tron-cyan),
+    0 2px 4px rgba(0, 0, 0, 0.8);
+  width: 100% !important;
+}
+
+.hero-text p {
+  color: var(--tron-text) !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  width: 100% !important;
+}
+
 /* ===== CONTENT ===== */
 .content h1, .content h2 {
   color: var(--tron-text) !important;
