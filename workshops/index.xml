@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Workshops on larmic.de</title><link>https://larmic.de/workshops/</link><description>Recent content in Workshops on larmic.de</description><generator>Hugo -- 0.155.1</generator><language>de</language><lastBuildDate>Tue, 21 Mar 2023 20:45:26 +0100</lastBuildDate><atom:link href="https://larmic.de/workshops/index.xml" rel="self" type="application/rss+xml"/><item><title>Event Storming</title><link>https://larmic.de/workshops/event_storming/</link><pubDate>Tue, 21 Mar 2023 20:45:26 +0100</pubDate><guid>https://larmic.de/workshops/event_storming/</guid><description>&lt;p&gt;Event Storming ist eine kollaborative Workshop-Methode, die in der Softwareentwicklung eingesetzt wird, um komplexe
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Workshops on larmic.de</title><link>https://larmic.de/workshops/</link><description>Recent content in Workshops on larmic.de</description><generator>Hugo</generator><language>de</language><lastBuildDate>Tue, 21 Mar 2023 20:45:26 +0100</lastBuildDate><atom:link href="https://larmic.de/workshops/index.xml" rel="self" type="application/rss+xml"/><item><title>Event Storming</title><link>https://larmic.de/workshops/event_storming/</link><pubDate>Tue, 21 Mar 2023 20:45:26 +0100</pubDate><guid>https://larmic.de/workshops/event_storming/</guid><description>&lt;p&gt;Event Storming ist eine kollaborative Workshop-Methode, die in der Softwareentwicklung eingesetzt wird, um komplexe
 Geschäftsprozesse oder Anforderungen zu visualisieren und zu verstehen. Dabei werden alle beteiligten Personen,
 wie z.B. Entwickler, Projektmanager, Productowner und Domainexperten, eingebunden.&lt;/p&gt;
 &lt;p&gt;Im Workshop wird auf einer großen Wandtafel, Brownpaper oder einem Whiteboard ein visuelles Modell erstellt, das den
@@ -8,7 +8,7 @@ Reihenfolge dargestellt.&lt;/p&gt;</description></item><item><title>Domain Drive
 fachlichen Aspekte in den Vordergrund. Die hexagonale Architektur greift dieses Konzept auf und integriert die
 fachlichen Inhalte in den Kern der Anwendung. Die konkrete technische Umsetzung (wie beispielsweise Datenbank oder
 MQ-Systeme) spielt dabei eine untergeordnete Rolle.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Workshop" loading="lazy" src="https://larmic.de/workshop/ddd_hex_architecture.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://larmic.de/workshop/ddd_hex_architecture.png" alt="Workshop"&gt;&lt;/p&gt;
 &lt;p&gt;Ich biete einen &lt;a href="https://it-bildungshaus.de/weiterbildung/seminar-ddd-domain-driven-design"&gt;regelmäßigen Workshop&lt;/a&gt;
 zum Thema DDD und wie man das in hexagonaler Architektur umsetzt an. Alternativ komme ich auch gerne zu euch
 in die Firma.&lt;/p&gt;</description></item></channel></rss>
