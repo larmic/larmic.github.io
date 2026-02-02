@@ -47,6 +47,9 @@
   <script type="text/javascript" src="{{ ($scripts | minify | fingerprint).RelPermalink }}"></script>
   {{ end }}
 
+  <!-- Workshop Cards Animation -->
+  <script type="text/javascript" src="{{ "js/workshop-cards.js" | relURL }}"></script>
+
   {{ partial "google-analytics.html" . }}
 
 </body>
