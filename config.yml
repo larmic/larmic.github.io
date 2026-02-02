@@ -1,78 +1,33 @@
 baseURL: https://larmic.de
 languageCode: de
-defaultContentLanguage: de
 title: larmic.de
-theme: "PaperMod"
+theme: "hugo-hero-theme"
 
 enableRobotsTXT: true
 
-languages:
-  de:
-    weight: 2
-    params:
-      languageAltTitle: German
-    menu:
-      main:
-        - name: Videos
-          url: "/videos/"
-          weight: 3
-        - name: Workshops
-          url: "/workshops/"
-          weight: 2
-        - name: Über mich
-          url: "/about"
-          weight: 1
-  en:
-    params:
-      languageAltTitle: English
-    menu:
-      main:
-        - name: Videos
-          url: "/videos/"
-          weight: 3
-        - name: Workshops
-          url: "/workshops/"
-          weight: 2
-        - name: About me
-          url: "/about"
-          weight: 1
+menu:
+  main:
+    - name: Videos
+      url: "/videos/"
+      weight: 3
+    - name: Workshops
+      url: "/workshops/"
+      weight: 2
+    - name: Über mich
+      url: "/about/"
+      weight: 1
 
 params:
-  env: production # to enable google analytics, opengraph, twitter-cards and schema.
-
-  defaultTheme: auto
-  disableThemeToggle: true
-
-  profileMode:
-    enabled: true
-    title: "Lars Michaelis"
-    subtitle: "️🧑‍💻 Developer | 🎙️ Speaker | 🤵 Consultant"
-    imageUrl: "https://avatars.githubusercontent.com/larmic"
-    imageWidth: 240 # custom size
-    imageHeight: 240 # custom size
+  env: production
 
   favicon: "/favicon.ico"
   favicon16x16: "/favicon16x16.png"
   favicon32x32: "/favicon32x32.png"
 
-  socialIcons: # optional
-    - name: "twitter"
-      url: "https://twitter.com/larmicDE"
-    - name: "mastodon"
-      url: "https://mastodon.social/@larmic"
-    - name: "github"
-      url: "https://github.com/larmic"
-    - name: "linkedin"
-      url: "https://www.linkedin.com/in/lars-michaelis-6778761b3/"
-    - name: "xing"
-      url: "https://www.xing.com/profile/Lars_Michaelis2/cv"
-    - name: "youtube"
-      url: "https://www.youtube.com/channel/UCuJB-Eqjil4ZTGCK2UeDl9g"
-
 markup:
   goldmark:
     renderer:
-      unsafe: true  # enable embedd html content
+      unsafe: true
 
 privacy:
   youtube:

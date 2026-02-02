@@ -1,11 +1,25 @@
-{{- if not (.Param "hideFooter") }}
-<footer class="footer">
-    {{- if .Site.Copyright }}
-    <span>{{ .Site.Copyright | markdownify }}</span>
-    {{- else }}
-    <span>&copy; {{ now.Year }} <a href="{{ "" | absLangURL }}">{{ .Site.Title }}</a></span>
-    {{- end }}
-    &
-    <a href="/impressum">Impressum</a>
-</footer>
-{{- end }}
+<div class="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="footer-inner">
+          {{ with .Site.Data.social }}
+          <ul class="social">
+            {{ range . }}
+            <li>
+              <a href="{{ .link }}" target="_blank" rel="noopener">
+                <img width="20" height="20" src="{{ .image | relURL }}" alt="{{ .name }}"/>
+              </a>
+            </li>
+            {{ end }}
+          </ul>
+          {{ end }}
+          <ul class="footer-menu">
+            <li><a href="{{ .Site.BaseURL }}impressum/">Impressum</a></li>
+          </ul>
+          <div class="copyright">&copy; {{ now.Format "2006" }} {{ .Site.Title }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

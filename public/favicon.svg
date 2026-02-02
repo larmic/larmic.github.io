@@ -1,0 +1,48 @@
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Dark background -->
+  <rect width="32" height="32" fill="#121212" rx="4"/>
+
+  <g transform="translate(16, 16) scale(0.45)">
+    <!-- Brain outline - left hemisphere -->
+    <polyline points="-3,28 -8,26 -14,23 -20,18 -25,12 -28,5 -28,-3 -27,-10 -24,-16 -20,-21 -14,-25 -8,-27 0,-28"
+      fill="none" stroke="#00ffff" stroke-width="3" filter="url(#glow)"/>
+
+    <!-- Brain outline - right hemisphere -->
+    <polyline points="3,28 8,26 14,23 20,18 25,12 28,5 28,-3 27,-10 24,-16 20,-21 14,-25 8,-27 0,-28"
+      fill="none" stroke="#00ffff" stroke-width="3" filter="url(#glow)"/>
+
+    <!-- Brain bottom connection -->
+    <polyline points="-3,28 0,30 3,28" fill="none" stroke="#00ffff" stroke-width="3" filter="url(#glow)"/>
+
+    <!-- Corpus callosum (center) - pink -->
+    <polyline points="0,-28 -2,-16 2,-4 -2,8 2,20 0,28"
+      fill="none" stroke="#ff4088" stroke-width="2.5" filter="url(#glow)"/>
+
+    <!-- Simplified brain folds - left -->
+    <polyline points="-24,-10 -18,-12 -14,-8"
+      fill="none" stroke="#4488ff" stroke-width="2" opacity="0.8"/>
+    <polyline points="-22,6 -16,4 -12,8"
+      fill="none" stroke="#00ffff" stroke-width="2" opacity="0.8"/>
+
+    <!-- Simplified brain folds - right -->
+    <polyline points="24,-10 18,-12 14,-8"
+      fill="none" stroke="#4488ff" stroke-width="2" opacity="0.8"/>
+    <polyline points="22,6 16,4 12,8"
+      fill="none" stroke="#00ffff" stroke-width="2" opacity="0.8"/>
+
+    <!-- Key neural dots -->
+    <circle cx="-14" cy="-8" r="2.5" fill="#00ffff" filter="url(#glow)"/>
+    <circle cx="14" cy="-8" r="2.5" fill="#00ffff" filter="url(#glow)"/>
+    <circle cx="0" cy="0" r="2.5" fill="#ff4088" filter="url(#glow)"/>
+  </g>
+</svg>

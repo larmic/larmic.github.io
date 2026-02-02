@@ -1,0 +1,8 @@
+[
+  {"name": "Twitter", "link": "https://twitter.com/larmicDE", "image": "images/social/twitter.svg"},
+  {"name": "Mastodon", "link": "https://mastodon.social/@larmic", "image": "images/social/mastodon.svg"},
+  {"name": "Github", "link": "https://github.com/larmic", "image": "images/social/github.svg"},
+  {"name": "LinkedIn", "link": "https://www.linkedin.com/in/lars-michaelis-6778761b3/", "image": "images/social/linkedin.svg"},
+  {"name": "Xing", "link": "https://www.xing.com/profile/Lars_Michaelis2/cv", "image": "images/social/xing.svg"},
+  {"name": "YouTube", "link": "https://www.youtube.com/channel/UCuJB-Eqjil4ZTGCK2UeDl9g", "image": "images/social/youtube.svg"}
+]
