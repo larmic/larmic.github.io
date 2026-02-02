@@ -90,116 +90,116 @@
 
   <rect width="400" height="400" fill="#121212"></rect>
 
-  <!-- Static base lines (12 original + 3 new = 15 total, ~20% more) -->
+  <!-- Static base lines (asymmetrisch für organischen Look) -->
   <polyline points="0,0 35,20 70,20 100,45 140,45 175,85" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
-  <polyline points="400,0 365,20 330,20 300,45 260,45 225,85" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="400,0 358,25 322,15 292,52 252,38 225,85" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
   <polyline points="0,200 35,180 70,180 100,155 140,155 175,115" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
-  <polyline points="400,200 365,180 330,180 300,155 260,155 225,115" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="400,200 372,175 338,185 308,148 268,162 225,115" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
   <polyline points="120,0 135,25 160,25 192,72" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
-  <polyline points="280,0 265,25 240,25 208,72" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="280,0 258,32 232,18 208,72" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
   <polyline points="120,200 135,175 160,175 195,125" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
-  <polyline points="280,200 265,175 240,175 205,125" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="280,200 272,168 248,182 205,125" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
   <polyline points="0,50 40,65 80,65 120,80 172,95" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
-  <polyline points="0,150 40,135 80,135 120,120 172,105" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
-  <polyline points="400,50 360,65 320,65 280,80 228,95" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
-  <polyline points="400,150 360,135 320,135 280,120 228,105" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
-  <!-- New static lines (distributed: left-center, right-center, top-center) -->
-  <polyline points="0,100 50,100 100,100 150,100 172,100" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
-  <polyline points="400,100 350,100 300,100 250,100 228,100" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
-  <polyline points="200,0 200,30 200,50 200,72" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="0,150 45,128 85,142 125,115 172,105" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="400,50 352,72 312,58 272,88 228,95" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="400,150 355,128 315,142 275,115 228,105" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <!-- Mittellinien (gewellt statt gerade) -->
+  <polyline points="0,100 55,94 105,106 150,96 172,100" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="400,100 345,106 295,94 248,104 228,100" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  <polyline points="200,0 195,35 206,52 200,72" fill="none" stroke="currentColor" stroke-width="2" opacity="0.4"/>
 
-  <!-- Animated paths (12 original + 3 new = 15 total, ~20% more, all 10% slower) -->
-  <!-- Top-left to brain, then clockwise on brain -->
+  <!-- Animated paths (asymmetrisch für organischen Look) -->
+  <!-- Top-left to brain -->
   <path class="line-path" d="M0,0 L35,20 L70,20 L100,45 L140,45 L175,85 L185,78 L192,72 L200,72 L208,72 L218,78 L228,95 L228,105 L225,115"
     fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="27"/>
 
-  <!-- Top-right to brain, then counter-clockwise -->
-  <path class="line-path" d="M400,0 L365,20 L330,20 L300,45 L260,45 L225,85 L215,78 L208,72 L200,72 L192,72 L182,78 L172,95 L172,105 L175,115"
+  <!-- Top-right to brain (andere Zwischenpunkte) -->
+  <path class="line-path" d="M400,0 L358,25 L322,15 L292,52 L252,38 L225,85 L215,78 L208,72 L200,72 L192,72 L182,78 L172,95 L172,105 L175,115"
     fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="11" data-delay="0.5"/>
 
-  <!-- Bottom-left to brain, then counter-clockwise -->
+  <!-- Bottom-left to brain -->
   <path class="line-path" d="M0,200 L35,180 L70,180 L100,155 L140,155 L175,115 L185,122 L195,125 L200,125 L205,125 L215,122 L225,115 L228,105 L228,95"
     fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="22" data-delay="1"/>
 
-  <!-- Bottom-right to brain, then clockwise -->
-  <path class="line-path" d="M400,200 L365,180 L330,180 L300,155 L260,155 L225,115 L215,122 L205,125 L200,125 L195,125 L185,122 L175,115 L172,105 L172,95"
+  <!-- Bottom-right to brain (andere Zwischenpunkte) -->
+  <path class="line-path" d="M400,200 L372,175 L338,185 L308,148 L268,162 L225,115 L215,122 L205,125 L200,125 L195,125 L185,122 L175,115 L172,105 L172,95"
     fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-delay="1.5"/>
 
-  <!-- Top-center-left to brain, then clockwise -->
+  <!-- Top-center-left to brain -->
   <path class="line-path" d="M120,0 L135,25 L160,25 L192,72 L200,72 L208,72 L218,78 L225,85 L228,95 L228,105 L225,115"
     fill="none" stroke="url(#pink-to-blue-v-down)" stroke-width="3" data-delay="2"/>
 
-  <!-- Top-center-right to brain, then counter-clockwise -->
-  <path class="line-path" d="M280,0 L265,25 L240,25 L208,72 L200,72 L192,72 L182,78 L175,85 L172,95 L172,105 L175,115"
+  <!-- Top-center-right to brain (andere Zwischenpunkte) -->
+  <path class="line-path" d="M280,0 L258,32 L232,18 L208,72 L200,72 L192,72 L182,78 L175,85 L172,95 L172,105 L175,115"
     fill="none" stroke="url(#pink-to-blue-v-down)" stroke-width="3" data-animation-duration="27" data-delay="0.25"/>
 
-  <!-- Bottom-center-left to brain, then counter-clockwise -->
+  <!-- Bottom-center-left to brain -->
   <path class="line-path" d="M120,200 L135,175 L160,175 L195,125 L200,125 L205,125 L215,122 L225,115 L228,105 L228,95 L225,85"
     fill="none" stroke="url(#pink-to-blue-v-up)" stroke-width="3" data-animation-duration="16" data-delay="0.75"/>
 
-  <!-- Bottom-center-right to brain, then clockwise -->
-  <path class="line-path" d="M280,200 L265,175 L240,175 L205,125 L200,125 L195,125 L185,122 L175,115 L172,105 L172,95 L175,85"
+  <!-- Bottom-center-right to brain (andere Zwischenpunkte) -->
+  <path class="line-path" d="M280,200 L272,168 L248,182 L205,125 L200,125 L195,125 L185,122 L175,115 L172,105 L172,95 L175,85"
     fill="none" stroke="url(#pink-to-blue-v-up)" stroke-width="3" data-animation-duration="22" data-delay="1.25"/>
 
-  <!-- Left-upper to brain, then counter-clockwise -->
+  <!-- Left-upper to brain -->
   <path class="line-path" d="M0,50 L40,65 L80,65 L120,80 L172,95 L172,105 L175,115 L185,122 L195,125 L205,125 L215,122 L225,115"
     fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="11" data-delay="1.75"/>
 
-  <!-- Left-lower to brain, then clockwise -->
-  <path class="line-path" d="M0,150 L40,135 L80,135 L120,120 L172,105 L172,95 L175,85 L182,78 L192,72 L200,72 L208,72 L218,78"
+  <!-- Left-lower to brain (andere Zwischenpunkte) -->
+  <path class="line-path" d="M0,150 L45,128 L85,142 L125,115 L172,105 L172,95 L175,85 L182,78 L192,72 L200,72 L208,72 L218,78"
     fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="16" data-delay="2.25"/>
 
-  <!-- Right-upper to brain, then clockwise -->
-  <path class="line-path" d="M400,50 L360,65 L320,65 L280,80 L228,95 L228,105 L225,115 L215,122 L205,125 L195,125 L185,122 L175,115"
+  <!-- Right-upper to brain (andere Zwischenpunkte) -->
+  <path class="line-path" d="M400,50 L352,72 L312,58 L272,88 L228,95 L228,105 L225,115 L215,122 L205,125 L195,125 L185,122 L175,115"
     fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="27" data-delay="2.75"/>
 
-  <!-- Right-lower to brain, then counter-clockwise -->
-  <path class="line-path" d="M400,150 L360,135 L320,135 L280,120 L228,105 L228,95 L225,85 L218,78 L208,72 L200,72 L192,72 L182,78"
+  <!-- Right-lower to brain (andere Zwischenpunkte) -->
+  <path class="line-path" d="M400,150 L355,128 L315,142 L275,115 L228,105 L228,95 L225,85 L218,78 L208,72 L200,72 L192,72 L182,78"
     fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="11" data-delay="3.25"/>
 
-  <!-- NEW: Additional line from left center -->
-  <path class="line-path" d="M0,100 L50,100 L100,100 L150,100 L172,100 L175,115 L185,122 L195,125 L205,125 L215,122 L225,115 L228,105"
+  <!-- Left center (Welle nach oben) -->
+  <path class="line-path" d="M0,100 L55,94 L105,106 L150,96 L172,100 L175,115 L185,122 L195,125 L205,125 L215,122 L225,115 L228,105"
     fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="16" data-delay="3.5"/>
 
-  <!-- NEW: Additional line from right center -->
-  <path class="line-path" d="M400,100 L350,100 L300,100 L250,100 L228,100 L225,115 L215,122 L205,125 L195,125 L185,122 L175,115 L172,105"
+  <!-- Right center (Welle nach unten) -->
+  <path class="line-path" d="M400,100 L345,106 L295,94 L248,104 L228,100 L225,115 L215,122 L205,125 L195,125 L185,122 L175,115 L172,105"
     fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="22" data-delay="3.75"/>
 
-  <!-- NEW: Additional line from top center -->
-  <path class="line-path" d="M200,0 L200,30 L200,50 L200,72 L208,72 L218,78 L225,85 L228,95 L228,105 L225,115 L215,122"
+  <!-- Top center (S-Kurve) -->
+  <path class="line-path" d="M200,0 L195,35 L206,52 L200,72 L208,72 L218,78 L225,85 L228,95 L228,105 L225,115 L215,122"
     fill="none" stroke="url(#pink-to-blue-v-down)" stroke-width="3" data-animation-duration="27" data-delay="4"/>
 
-  <!-- PARALLEL POINTS: Same lines, different speeds (50% more = 8 additional) -->
-  <!-- Parallel on top-left line (faster) -->
+  <!-- PARALLEL POINTS: Gleiche Linien, andere Geschwindigkeiten -->
+  <!-- Parallel top-left (schneller) -->
   <path class="line-path" d="M0,0 L35,20 L70,20 L100,45 L140,45 L175,85 L185,78 L192,72 L200,72 L208,72 L218,78 L228,95 L228,105 L225,115"
     fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="16" data-delay="4.25"/>
 
-  <!-- Parallel on top-right line (faster) -->
-  <path class="line-path" d="M400,0 L365,20 L330,20 L300,45 L260,45 L225,85 L215,78 L208,72 L200,72 L192,72 L182,78 L172,95 L172,105 L175,115"
+  <!-- Parallel top-right (schneller) -->
+  <path class="line-path" d="M400,0 L358,25 L322,15 L292,52 L252,38 L225,85 L215,78 L208,72 L200,72 L192,72 L182,78 L172,95 L172,105 L175,115"
     fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="19" data-delay="4.5"/>
 
-  <!-- Parallel on bottom-left line (slower) -->
+  <!-- Parallel bottom-left (langsamer) -->
   <path class="line-path" d="M0,200 L35,180 L70,180 L100,155 L140,155 L175,115 L185,122 L195,125 L200,125 L205,125 L215,122 L225,115 L228,105 L228,95"
     fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="13" data-delay="4.75"/>
 
-  <!-- Parallel on bottom-right line (faster) -->
-  <path class="line-path" d="M400,200 L365,180 L330,180 L300,155 L260,155 L225,115 L215,122 L205,125 L200,125 L195,125 L185,122 L175,115 L172,105 L172,95"
+  <!-- Parallel bottom-right (schneller) -->
+  <path class="line-path" d="M400,200 L372,175 L338,185 L308,148 L268,162 L225,115 L215,122 L205,125 L200,125 L195,125 L185,122 L175,115 L172,105 L172,95"
     fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="11" data-delay="0.3"/>
 
-  <!-- Parallel on left-upper line (slower) -->
+  <!-- Parallel left-upper (langsamer) -->
   <path class="line-path" d="M0,50 L40,65 L80,65 L120,80 L172,95 L172,105 L175,115 L185,122 L195,125 L205,125 L215,122 L225,115"
     fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="22" data-delay="0.8"/>
 
-  <!-- Parallel on right-upper line (faster) -->
-  <path class="line-path" d="M400,50 L360,65 L320,65 L280,80 L228,95 L228,105 L225,115 L215,122 L205,125 L195,125 L185,122 L175,115"
+  <!-- Parallel right-upper (schneller) -->
+  <path class="line-path" d="M400,50 L352,72 L312,58 L272,88 L228,95 L228,105 L225,115 L215,122 L205,125 L195,125 L185,122 L175,115"
     fill="none" stroke="url(#blue-to-pink-h)" stroke-width="3" data-animation-duration="16" data-delay="1.3"/>
 
-  <!-- Parallel on left-center line (faster) -->
-  <path class="line-path" d="M0,100 L50,100 L100,100 L150,100 L172,100 L175,115 L185,122 L195,125 L205,125 L215,122 L225,115 L228,105"
+  <!-- Parallel left-center (schneller) -->
+  <path class="line-path" d="M0,100 L55,94 L105,106 L150,96 L172,100 L175,115 L185,122 L195,125 L205,125 L215,122 L225,115 L228,105"
     fill="none" stroke="url(#pink-to-blue-h)" stroke-width="3" data-animation-duration="25" data-delay="1.8"/>
 
-  <!-- Parallel on top-center line (faster) -->
-  <path class="line-path" d="M200,0 L200,30 L200,50 L200,72 L208,72 L218,78 L225,85 L228,95 L228,105 L225,115 L215,122"
+  <!-- Parallel top-center (schneller) -->
+  <path class="line-path" d="M200,0 L195,35 L206,52 L200,72 L208,72 L218,78 L225,85 L228,95 L228,105 L225,115 L215,122"
     fill="none" stroke="url(#pink-to-blue-v-down)" stroke-width="3" data-animation-duration="16" data-delay="2.3"/>
 
   <!-- Brain structure (Tron-style with glow and colors) -->
