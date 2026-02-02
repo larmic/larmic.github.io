@@ -18,42 +18,10 @@
   <div class="container">
     <h2 class="section-title">Angebote</h2>
     <div class="workshop-grid">
-      <article class="workshop-card" style="--card-index: 0">
-        <div class="workshop-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-            <polyline points="2 17 12 22 22 17"></polyline>
-            <polyline points="2 12 12 17 22 12"></polyline>
-          </svg>
-        </div>
-        <h3 class="workshop-title">DDD & Hexagonale Architektur</h3>
-        <p class="workshop-description">Fachliche Aspekte im Kern, Technik drumherum – Domain-Driven Design und hexagonale Architektur für wartbaren Code.</p>
-        <a href="/workshops/ddd_hexagonal_architecture_for_devs/" class="workshop-link">Mehr erfahren →</a>
-      </article>
-      <article class="workshop-card" style="--card-index: 1">
-        <div class="workshop-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-        </div>
-        <h3 class="workshop-title">Event Storming</h3>
-        <p class="workshop-description">Kollaborative Methode zur Prozessvisualisierung – gemeinsam komplexe Geschäftsprozesse verstehen und modellieren.</p>
-        <a href="/workshops/event_storming/" class="workshop-link">Mehr erfahren →</a>
-      </article>
-      <article class="workshop-card" style="--card-index: 2">
-        <div class="workshop-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="23 7 16 12 23 17 23 7"></polygon>
-            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-          </svg>
-        </div>
-        <h3 class="workshop-title">Video-Tutorials</h3>
-        <p class="workshop-description">Praxisnahe Coding-Videos zu Testcontainers, hexagonaler Architektur und modernen Entwicklungspraktiken.</p>
-        <a href="/videos/" class="workshop-link">Videos ansehen →</a>
-      </article>
+      {{ $featured := where .Site.Pages ".Params.featured" true }}
+      {{ range sort $featured ".Params.weight" }}
+        {{ partial "workshop-card.html" . }}
+      {{ end }}
     </div>
   </div>
 </section>

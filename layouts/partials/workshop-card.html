@@ -1,0 +1,8 @@
+<article class="workshop-card" style="--card-index: {{ sub .Params.weight 1 }}">
+  <div class="workshop-icon">
+    {{ partial (printf "icons/%s.html" .Params.icon) . }}
+  </div>
+  <h3 class="workshop-title">{{ with .Params.title_short }}{{ . }}{{ else }}{{ .Title }}{{ end }}</h3>
+  <p class="workshop-description">{{ .Params.description_short }}</p>
+  <a href="{{ .RelPermalink }}" class="workshop-link">{{ with .Params.link_text }}{{ . }}{{ else }}Mehr erfahren →{{ end }}</a>
+</article>

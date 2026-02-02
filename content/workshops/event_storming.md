@@ -1,5 +1,9 @@
 ---
 title: "Event Storming"
+description_short: "Kollaborative Methode zur Prozessvisualisierung – gemeinsam komplexe Geschäftsprozesse verstehen und modellieren."
+icon: "users"
+weight: 2
+featured: true
 date: 2023-03-21T20:45:26+01:00
 draft: false
 ---

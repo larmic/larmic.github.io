@@ -1,5 +1,10 @@
 ---
 title: "Domain Driven Design und hexagonale Architektur (für Entwickler:innen)"
+title_short: "DDD & Hexagonale Architektur"
+description_short: "Fachliche Aspekte im Kern, Technik drumherum – Domain-Driven Design und hexagonale Architektur für wartbaren Code."
+icon: "layers"
+weight: 1
+featured: true
 date: 2023-03-12T20:45:26+01:00
 draft: false
 ---
