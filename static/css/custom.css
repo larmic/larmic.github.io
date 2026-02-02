@@ -60,22 +60,23 @@ body {
 
 .hero-text {
   text-align: center;
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 0%, transparent 70%);
-  padding: 3rem 2rem;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 80%);
+  padding: 4rem 3rem;
   border-radius: 20px;
 }
 
 .hero-text h1 {
   color: var(--tron-cyan) !important;
   text-shadow:
-    0 0 10px var(--tron-cyan),
-    0 2px 4px rgba(0, 0, 0, 0.8);
+    0 0 15px var(--tron-cyan),
+    0 0 30px rgba(0, 255, 255, 0.5),
+    0 2px 8px rgba(0, 0, 0, 1);
   width: 100% !important;
 }
 
 .hero-text p {
   color: var(--tron-text) !important;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 1);
   width: 100% !important;
 }
 
