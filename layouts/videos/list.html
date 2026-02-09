@@ -1,0 +1,46 @@
+{{ define "header_css" }}{{ end }}
+{{ define "body_classes" }}page-videos{{ end }}
+{{ define "header_classes" }}{{ end }}
+
+{{ define "main" }}
+
+<section class="workshop-section">
+  <div class="workshops-list">
+    <h1 class="section-title">{{ .Title }}</h1>
+
+    {{/* Sentinel element for sticky detection */}}
+    <div id="workshop-nav-sentinel"></div>
+
+    {{/* Pill navigation */}}
+    <nav class="workshop-nav" aria-label="Video-Navigation">
+      <div class="workshop-nav-pills">
+        {{ range .Pages.ByDate.Reverse }}
+        <a class="workshop-nav-pill" href="#video-{{ .File.ContentBaseName }}" data-target="video-{{ .File.ContentBaseName }}">
+          {{ with .Params.icon }}
+          <span class="workshop-nav-icon">
+            {{ partial (printf "icons/%s.html" .) . }}
+          </span>
+          {{ end }}
+          <span>{{ with .Params.title_short }}{{ . }}{{ else }}{{ .Title }}{{ end }}</span>
+        </a>
+        {{ end }}
+      </div>
+    </nav>
+
+    {{ range $index, $page := .Pages.ByDate.Reverse }}
+    <article class="workshop-card" id="video-{{ $page.File.ContentBaseName }}" style="--card-index: {{ $index }}">
+      {{ with $page.Params.icon }}
+      <div class="workshop-icon">
+        {{ partial (printf "icons/%s.html" .) . }}
+      </div>
+      {{ end }}
+      <h2 class="workshop-title">{{ $page.Title }}</h2>
+      <div class="workshop-content">
+        {{ $page.Content }}
+      </div>
+    </article>
+    {{ end }}
+  </div>
+</section>
+
+{{ end }}
