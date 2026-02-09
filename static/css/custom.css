@@ -269,3 +269,53 @@ a:hover {
   color: var(--tron-pink) !important;
   gap: 0.5rem;
 }
+
+/* ===== WORKSHOP LIST PAGE ===== */
+.workshops-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.workshops-list .workshop-card {
+  padding: 2.25rem;
+}
+
+.workshops-list .workshop-content {
+  color: var(--tron-text-muted);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.workshops-list .workshop-content h2 {
+  color: var(--tron-cyan) !important;
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+}
+
+.workshops-list .workshop-content p {
+  color: var(--tron-text-muted) !important;
+  margin-bottom: 0.75rem;
+}
+
+.workshops-list .workshop-content img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.workshops-list .workshop-content ul {
+  color: var(--tron-text-muted);
+  padding-left: 1.25rem;
+}
+
+.workshops-list .workshop-content a {
+  color: var(--tron-cyan) !important;
+}
+
+.workshops-list .workshop-content a:hover {
+  color: var(--tron-pink) !important;
+}

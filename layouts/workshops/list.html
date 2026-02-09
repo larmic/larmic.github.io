@@ -1,0 +1,26 @@
+{{ define "header_css" }}{{ end }}
+{{ define "body_classes" }}page-workshops{{ end }}
+{{ define "header_classes" }}{{ end }}
+
+{{ define "main" }}
+
+<section class="workshop-section">
+  <div class="workshops-list">
+    <h1 class="section-title">{{ .Title }}</h1>
+    {{ range sort .Pages ".Params.weight" }}
+    <article class="workshop-card" style="--card-index: {{ with .Params.weight }}{{ sub . 1 }}{{ else }}0{{ end }}">
+      {{ with .Params.icon }}
+      <div class="workshop-icon">
+        {{ partial (printf "icons/%s.html" .) . }}
+      </div>
+      {{ end }}
+      <h2 class="workshop-title">{{ .Title }}</h2>
+      <div class="workshop-content">
+        {{ .Content }}
+      </div>
+    </article>
+    {{ end }}
+  </div>
+</section>
+
+{{ end }}
