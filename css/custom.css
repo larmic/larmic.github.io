@@ -150,6 +150,10 @@ a:hover {
   background-color: var(--tron-bg);
 }
 
+.workshop-section + .workshop-section {
+  padding-top: 0;
+}
+
 .workshop-section .section-title {
   color: var(--tron-cyan) !important;
   text-align: center;
