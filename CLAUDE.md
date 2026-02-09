@@ -29,7 +29,7 @@ hugo --minify
 - `content/_index.md` - Homepage
 - `content/about.md` - Personal bio
 - `content/videos/` - Technical video content (testcontainers, hexagonal architecture, event storming, unit vs integration testing)
-- `content/workshops/` - Workshop descriptions (DDD, hexagonal architecture, event storming)
+- `content/workshops/` - Workshop descriptions (DDD, hexagonal architecture, event storming). All workshop content is rendered on the list page (`/workshops/`) with anchor IDs (`#workshop-<basename>`). Individual single pages redirect to the list page anchor via `layouts/workshops/single.html`.
 - `content/impressum.md` - Legal page (required in Germany)
 
 ## Theme Submodule
