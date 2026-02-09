@@ -21,6 +21,16 @@
     cardObserver.observe(card);
   });
 
+  // === Card click → update URL anchor ===
+  cards.forEach(card => {
+    if (card.id) {
+      card.addEventListener('click', function(e) {
+        if (e.target.closest('a')) return;
+        history.replaceState(null, '', '#' + this.id);
+      });
+    }
+  });
+
   // === Pill Navigation ===
   const nav = document.querySelector('.workshop-nav');
   const pills = document.querySelectorAll('.workshop-nav-pill');
@@ -36,6 +46,7 @@
       if (targetCard) {
         targetCard.classList.add('visible');
         targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', '#' + targetId);
       }
     });
   });
