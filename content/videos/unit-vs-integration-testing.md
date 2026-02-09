@@ -1,8 +1,10 @@
 ---
 title: "Unit vs Integration Testing"
 title_short: "Unit vs Integration Testing"
+description_short: "Verschiedene Sichtweisen auf die Unterscheidung von Unit- und Integrationstests."
 icon: "video"
 date: 2023-02-22T21:28:19+01:00
+weight: 4
 draft: false
 ---
 

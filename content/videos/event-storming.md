@@ -1,8 +1,10 @@
 ---
 title: "Event Storming"
 title_short: "Event Storming"
+description_short: "Kollaborative Workshop-Methode zur Visualisierung komplexer Geschäftsprozesse."
 icon: "video"
 date: 2023-02-22T21:25:16+01:00
+weight: 3
 draft: false
 ---
 

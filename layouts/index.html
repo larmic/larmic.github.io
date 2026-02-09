@@ -8,10 +8,22 @@
 
 <section id="workshops" class="workshop-section">
   <div class="container">
-    <h2 class="section-title">Angebote</h2>
+    <h2 class="section-title">Workshops</h2>
     <div class="workshop-grid">
-      {{ $featured := where .Site.Pages ".Params.featured" true }}
-      {{ range sort $featured ".Params.weight" }}
+      {{ $workshops := where (where .Site.Pages ".Section" "workshops") ".Params.featured" true }}
+      {{ range sort $workshops ".Params.weight" }}
+        {{ partial "workshop-card.html" . }}
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<section id="videos" class="workshop-section">
+  <div class="container">
+    <h2 class="section-title">Videos</h2>
+    <div class="workshop-grid">
+      {{ $videos := where (where .Site.Pages ".Section" "videos") ".Kind" "page" }}
+      {{ range sort $videos ".Params.weight" }}
         {{ partial "workshop-card.html" . }}
       {{ end }}
     </div>
