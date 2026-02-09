@@ -6,6 +6,8 @@
   <p class="workshop-description">{{ .Params.description_short }}</p>
   {{ if eq .Section "workshops" }}
   <a href="/workshops/#workshop-{{ .File.ContentBaseName }}" class="workshop-link">{{ with .Params.link_text }}{{ . }}{{ else }}Mehr erfahren →{{ end }}</a>
+  {{ else if and (eq .Section "videos") (not .IsSection) }}
+  <a href="/videos/#video-{{ .File.ContentBaseName }}" class="workshop-link">{{ with .Params.link_text }}{{ . }}{{ else }}Mehr erfahren →{{ end }}</a>
   {{ else }}
   <a href="{{ .RelPermalink }}" class="workshop-link">{{ with .Params.link_text }}{{ . }}{{ else }}Mehr erfahren →{{ end }}</a>
   {{ end }}

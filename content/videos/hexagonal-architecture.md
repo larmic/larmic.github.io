@@ -1,5 +1,7 @@
 ---
 title: "Einstieg in die Hexagonale Architektur"
+title_short: "Hexagonale Architektur"
+icon: "video"
 date: 2023-02-22T19:41:47+01:00
 draft: false
 ---
