@@ -153,7 +153,7 @@ a:hover {
 .workshop-section .section-title {
   color: var(--tron-cyan) !important;
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 0;
   font-size: 2rem;
   font-weight: 600;
 }
@@ -181,6 +181,7 @@ a:hover {
 
 /* Workshop Cards */
 .workshop-card {
+  cursor: pointer;
   --card-index: 0;
   background: var(--tron-bg-light);
   border: 1px solid #2a2a2a;
@@ -310,6 +311,11 @@ a:hover {
 .workshops-list .workshop-content ul {
   color: var(--tron-text-muted);
   padding-left: 1.25rem;
+  list-style-type: disc;
+}
+
+.workshops-list .workshop-content ul li::marker {
+  color: var(--tron-cyan);
 }
 
 .workshops-list .workshop-content a {
@@ -387,6 +393,12 @@ a:hover {
 /* Scroll offset for anchored cards */
 .workshop-card[id] {
   scroll-margin-top: 80px;
+}
+
+/* YouTube embeds within cards */
+.workshops-list .workshop-content iframe {
+  border-radius: 8px;
+  margin: 1rem 0;
 }
 
 /* Mobile: pills stacked, not sticky */
