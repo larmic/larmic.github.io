@@ -414,9 +414,23 @@ def generate_svg():
     parts.append("\n".join(css_lines))
     parts.append('  <rect width="400" height="200" fill="#121212"/>')
 
+    # Radial fade mask — bright center, dark edges
+    parts.append('  <defs>')
+    parts.append('    <radialGradient id="center-fade" cx="200" cy="100" r="200" gradientUnits="userSpaceOnUse">')
+    parts.append('      <stop offset="0%" stop-color="white" stop-opacity="1"/>')
+    parts.append('      <stop offset="25%" stop-color="white" stop-opacity="0.9"/>')
+    parts.append('      <stop offset="50%" stop-color="white" stop-opacity="0.4"/>')
+    parts.append('      <stop offset="75%" stop-color="white" stop-opacity="0.12"/>')
+    parts.append('      <stop offset="100%" stop-color="white" stop-opacity="0.04"/>')
+    parts.append('    </radialGradient>')
+    parts.append('    <mask id="fade-mask">')
+    parts.append('      <rect width="400" height="200" fill="url(#center-fade)"/>')
+    parts.append('    </mask>')
+    parts.append('  </defs>')
+
     # Box grid
     parts.append("  <!-- Glowing box grid -->")
-    parts.append("  <g>")
+    parts.append('  <g mask="url(#fade-mask)">')
 
     strand_count = 0
     ambient_count = 0

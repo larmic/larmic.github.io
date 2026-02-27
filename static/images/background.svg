@@ -165,8 +165,20 @@
       }
     </style>
   <rect width="400" height="200" fill="#121212"/>
+  <defs>
+    <radialGradient id="center-fade" cx="200" cy="100" r="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="white" stop-opacity="1"/>
+      <stop offset="25%" stop-color="white" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="white" stop-opacity="0.4"/>
+      <stop offset="75%" stop-color="white" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0.04"/>
+    </radialGradient>
+    <mask id="fade-mask">
+      <rect width="400" height="200" fill="url(#center-fade)"/>
+    </mask>
+  </defs>
   <!-- Glowing box grid -->
-  <g>
+  <g mask="url(#fade-mask)">
     <rect x="1.0" y="1.0" width="8" height="8" rx="1" fill="#ff4088" class="bs c22 sn108"/>
     <rect x="11.0" y="1.0" width="8" height="8" rx="1" fill="#00ffff" class="bs c22 sn105"/>
     <rect x="21.0" y="1.0" width="8" height="8" rx="1" fill="#00ffff" class="ba ad270 an65"/>
