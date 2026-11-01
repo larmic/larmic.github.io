@@ -1,0 +1,27 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { MATERIALS } from '../data/materials';
+import VoxelIcon from './VoxelIcon.astro';
+interface Props {
+  entry: CollectionEntry<'workshops'>;
+}
+const { entry } = Astro.props;
+const d = entry.data;
+const m = MATERIALS[d.material];
+---
+
+<article class={`pxsm wcard th-${d.material}`}>
+  <div class="cardhead">
+    <VoxelIcon block={m.block} color={m.icon} />
+    <h2>{d.short}</h2>
+  </div>
+  <p>{d.teaser}</p>
+  <p class="wfacts">
+    {d.duration} · {d.level}
+  </p>
+  <div class="wbtn">
+    <a class="pxbtn small" href={`/workshops/${entry.id}/`}>
+      Details zum Workshop<span class="sr-only">: {d.short}</span>
+    </a>
+  </div>
+</article>

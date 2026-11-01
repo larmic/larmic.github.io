@@ -1,0 +1,29 @@
+---
+// Seiten ohne Insel (Impressum, Datenschutz, 404): Himmel mit Zurück-Button und Titel, darunter der Inhalt auf Papier.
+import BaseLayout from './BaseLayout.astro';
+import SubHero from '../components/SubHero.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  title: string; // Seitentitel im Browser-Tab
+  heading?: string; // Überschrift auf der Seite, falls anders als der Titel
+  description?: string;
+  noindex?: boolean;
+}
+const { title, heading = title, description, noindex } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} noindex={noindex}>
+  <SubHero title={heading} />
+  <div class="grass-edge" aria-hidden="true"></div>
+  <main id="inhalt" tabindex="-1" class="ground">
+    <div class="doc">
+      <article class="entry pxbox paper">
+        <div class="prose">
+          <slot />
+        </div>
+      </article>
+    </div>
+  </main>
+  <SiteFooter />
+</BaseLayout>

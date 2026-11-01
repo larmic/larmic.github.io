@@ -1,0 +1,24 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { MATERIALS } from '../data/materials';
+interface Props {
+  entry: CollectionEntry<'videos'>;
+}
+const { entry } = Astro.props;
+const d = entry.data;
+---
+
+<article class={`pxsm vcard th-${d.material}`}>
+  <div class="thumb">
+    <svg width="56" height="56" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true">
+      <path d="M3 1h1v6h-1z M4 2h1v4h-1z M5 3h1v2h-1z" fill={MATERIALS[d.material].play}></path>
+    </svg>
+  </div>
+  <div class="vbody">
+    <h2>{d.short}</h2>
+    <p>{d.teaser}</p>
+    <a href={`/videos/${entry.id}/`}>
+      Video ansehen<span class="sr-only">: {d.short}</span>
+    </a>
+  </div>
+</article>

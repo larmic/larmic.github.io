@@ -1,0 +1,32 @@
+---
+// Private Mail-Adresse, die einfache Crawler nicht finden: Im HTML steht kein mailto, der Link entsteht erst im Browser.
+// Ohne JavaScript steht „mail[at]larmic.de“ als Text da bzw. das Label verweist auf das Impressum.
+import { SITE } from '../data/site';
+
+interface Props {
+  label?: string;
+}
+const { label } = Astro.props;
+const [user, domain] = SITE.mail.split('@');
+---
+
+<a
+  class="mail-link"
+  href="/impressum/"
+  data-mail-user={user}
+  data-mail-domain={domain}
+  data-mail-show={label ? undefined : ''}
+>
+  {label ?? `${user}[at]${domain}`}
+</a>
+
+<script>
+  // Nach jedem Seitenwechsel neu, weil der Inhalt getauscht wird
+  document.addEventListener('astro:page-load', () => {
+    for (const a of document.querySelectorAll<HTMLAnchorElement>('a.mail-link[data-mail-user]')) {
+      const address = `${a.dataset.mailUser}@${a.dataset.mailDomain}`;
+      a.href = `mailto:${address}`;
+      if (a.hasAttribute('data-mail-show')) a.textContent = address;
+    }
+  });
+</script>

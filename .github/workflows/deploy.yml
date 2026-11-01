@@ -1,0 +1,86 @@
+name: Build und Deploy
+
+# Prüfen: jeder Pull Request (auch von Renovate) und jeder Push auf main – mit allen Guard-Gates.
+# Veröffentlichen: nur Pushes auf main, in einem eigenen Job über GitHub Pages (Quelle „GitHub Actions“, kein gh-pages-Branch).
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - 'CLAUDE.md'
+      - 'docs/**'
+  pull_request:
+  workflow_dispatch:
+
+# Actions sind auf Commit-SHAs gepinnt (Tags lassen sich umhängen); Renovate hält die SHAs aktuell.
+# Standard: nur lesen. Install-Skripte frisch aktualisierter Pakete (Renovate) laufen damit ohne Schreib-Token.
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    name: Guard-Gates und Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: gates-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Guard-Gate – Formatierung (Prettier)
+        run: npm run format:check
+
+      - name: Guard-Gate – Lint (ESLint)
+        run: npm run lint
+
+      - name: Guard-Gate – Architekturregeln (dependency-cruiser)
+        run: npm run arch
+
+      - name: Guard-Gate – Typen und Inhalte prüfen
+        run: npm run check
+
+      - name: Guard-Gate – Unit-Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Guard-Gate – HTML und interne Links der fertigen Seite
+        run: npm run verify
+
+      - name: Fertige Seite für den Deploy-Job bereitstellen
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist/
+          retention-days: 1
+
+  deploy:
+    name: Deploy auf GitHub Pages
+    needs: gates
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Nur dieser Job darf veröffentlichen – ohne Schreibrechte aufs Repo. Er baut nichts und installiert nichts.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Deploys nie abbrechen, nacheinander ausführen
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

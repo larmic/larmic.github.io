@@ -1,0 +1,68 @@
+---
+// Jede Seite mit Insel: oben Name, Intro und Insel (bleibt beim Seitenwechsel stehen), darunter der Inhalt der Seite.
+// `rest` ist der Block der Seite, z. B. `about`, `workshops` oder `workshops/event_storming`: Dort steht die Figur.
+// `cta` ersetzt den Button im Kopf (auf Workshop-Seiten: „Workshop anfragen“).
+import BaseLayout from './BaseLayout.astro';
+import type { RestId } from '../data/island-layout';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Clouds from '../components/Clouds.astro';
+import NameTiles from '../components/NameTiles.astro';
+import Island from '../components/Island.astro';
+import { particleCss } from '../lib/voxel/world';
+
+interface Props {
+  title?: string;
+  description?: string;
+  rest: RestId;
+  cta?: { label: string; href: string };
+  jsonLd?: object;
+}
+const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/workshops/' }, jsonLd } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <Fragment slot="head" set:html={`<style>${particleCss()}</style>`} />
+  <header class="sky" transition:persist="hero">
+    <Clouds />
+    <SiteHeader />
+    <div class="hero">
+      <div class="hero-text">
+        <NameTiles />
+        <p class="subtitle">Entwickler, Architekt, Speaker und Berater</p>
+        <p class="intro">
+          Ich baue Software mit fachlichem Kern – heute oft gemeinsam mit KI, aber mit klaren Leitplanken. Dazu gebe ich
+          Workshops zu Domain-Driven Design, Event Storming und Microservices und spreche auf Konferenzen über
+          Architektur und Testing.
+        </p>
+        <div class="cta">
+          <a href={cta.href} class="pxbtn">
+            {cta.label}
+          </a>
+        </div>
+      </div>
+      <Island rest={rest} />
+    </div>
+  </header>
+  <div class="grass-edge" aria-hidden="true"></div>
+  <main id="inhalt" tabindex="-1" class="ground" data-rest={rest} data-cta-label={cta.label} data-cta-href={cta.href}>
+    <div class="panel pxbox reveal">
+      <slot />
+    </div>
+  </main>
+  <SiteFooter />
+
+  <script>
+    // Nach dem Seitenwechsel: Die Figur läuft zum Block der neuen Seite, der Button im (stehen gebliebenen) Kopf passt sich an
+    document.addEventListener('astro:after-swap', () => {
+      const main = document.querySelector<HTMLElement>('main[data-rest]');
+      if (!main) return;
+      document.querySelector('larmic-island')?.select(main.dataset.rest!);
+      const button = document.querySelector<HTMLAnchorElement>('.hero .cta a');
+      if (button && main.dataset.ctaHref) {
+        button.href = main.dataset.ctaHref;
+        button.textContent = main.dataset.ctaLabel ?? '';
+      }
+    });
+  </script>
+</BaseLayout>

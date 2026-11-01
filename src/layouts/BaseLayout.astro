@@ -1,0 +1,77 @@
+---
+// Grundgerüst jeder Seite: Schriften (lokal gebündelt, keine Google-Server, nur lateinische Zeichen), Styles,
+// Texturen als CSS-Variablen und die Würfel-Symbole für <use href="#v-…">.
+// ClientRouter: Seitenwechsel ohne Neuladen, damit die Insel stehen bleibt und die Figur sichtbar läuft.
+import '@fontsource/pixelify-sans/latin-500.css';
+import '@fontsource/pixelify-sans/latin-700.css';
+import '@fontsource/nunito/latin-400.css';
+import '@fontsource/nunito/latin-600.css';
+import '@fontsource/nunito/latin-800.css';
+import '../styles/global.css';
+import '../styles/sections.css';
+import { SITE } from '../data/site';
+import { ClientRouter } from 'astro:transitions';
+import { cubeDefs, textureCss } from '../lib/voxel/world';
+import { AVATAR } from '../data/avatar';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean; // z. B. 404: nicht indexieren, kein canonical
+  jsonLd?: object; // strukturierte Daten (schema.org) für Suchmaschinen
+}
+const { title, description = SITE.description, noindex = false, jsonLd } = Astro.props;
+// Startseite: Name und Rolle statt nur der Domain
+const fullTitle = title ? `${title} – ${SITE.title}` : 'Lars Michaelis – Entwickler, Architekt, Speaker und Berater';
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#79c7ea" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Voxel-Insel im Himmel, darauf Lars als Pixel-Figur – larmic.de" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <Fragment set:html={`<style>${textureCss()}</style>`} />
+    {jsonLd && (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd).replaceAll('<', '\\u003c')} />
+    )}
+    <slot name="head" />
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip-link" href="#inhalt">
+      Zum Inhalt springen
+    </a>
+    <svg aria-hidden="true" class="svg-defs">
+      <defs set:html={cubeDefs(AVATAR)} />
+    </svg>
+    <div class="page">
+      <slot />
+    </div>
+    <script>
+      // Nach einem Seitenwechsel ohne Neuladen: Fokus auf den neuen Inhalt, damit Tastatur und Screenreader dort
+      // weitermachen statt auf dem angeklickten Block im (stehen gebliebenen) Kopf. Den Titel sagt Astro selbst an.
+      document.addEventListener('astro:after-swap', () => {
+        document.querySelector<HTMLElement>('main')?.focus({ preventScroll: true });
+      });
+    </script>
+  </body>
+</html>

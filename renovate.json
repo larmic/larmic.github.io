@@ -1,20 +1,43 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base"],
-  "git-submodules": {
-    "enabled": true
-  },
-  "github-actions": {
-    "enabled": true
-  },
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "timezone": "Europe/Berlin",
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor", "patch"],
+      "description": "Kleine Updates automatisch übernehmen, sobald der Build grün ist",
+      "matchUpdateTypes": ["minor", "patch", "digest"],
       "automerge": true
     },
     {
+      "description": "Major-Updates immer manuell prüfen",
       "matchUpdateTypes": ["major"],
       "automerge": false
+    },
+    {
+      "description": "Astro und offizielle Integrationen gemeinsam aktualisieren",
+      "matchPackageNames": ["astro", "@astrojs/**"],
+      "groupName": "Astro"
+    },
+    {
+      "description": "Lokal gebündelte Schriften gemeinsam aktualisieren",
+      "matchPackageNames": ["@fontsource/**"],
+      "groupName": "Schriften"
+    },
+    {
+      "description": "GitHub Actions gemeinsam aktualisieren",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "@astrojs/check unterstützt aktuell nur TypeScript 5 und 6",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
     }
-  ]
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  }
 }

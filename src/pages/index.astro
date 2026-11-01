@@ -1,0 +1,64 @@
+---
+import IslandPage from '../layouts/IslandPage.astro';
+import VoxelIcon from '../components/VoxelIcon.astro';
+import Kit from '../components/Kit.astro';
+import MailLink from '../components/MailLink.astro';
+import { FOCUS, KITS } from '../data/site';
+import { personLd } from '../data/structured-data';
+---
+
+<IslandPage rest="about" jsonLd={personLd()}>
+  <script is:inline>
+    // Alte Anker der Startseite zeigen auf die eigenen Seiten der Bereiche
+    {
+      const to = { '#workshops': '/workshops/', '#videos': '/videos/' }[location.hash];
+      if (to) location.replace(to);
+    }
+  </script>
+  <div class="panel-head">
+    <VoxelIcon block="head" size={64} />
+    <div>
+      <h1>Über mich</h1>
+      <p>Entwicklung, Architektur und KI mit Leitplanken.</p>
+    </div>
+  </div>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>
+        Ich baue Software von der Datenbank bis zum Button – und bringe sie sicher in Produktion. Fullstack also, mit
+        einer ordentlichen Portion DevSecOps. Seit über 20 Jahren bei{' '}
+        <a href="https://www.team-neusta.de/de">team neusta</a>.
+      </p>
+      <p>
+        Am liebsten entwerfe ich Architekturen mit fachlichem Kern: Domain-Driven Design, hexagonale Architektur,
+        Microservices. Und mit Event Storming hole ich alle an einen Tisch.
+      </p>
+      <p>
+        Dann kam die KI. Erst habe ich einfach mit ihr programmiert, heute arbeite ich spec-driven nach eigenem Prozess.
+        Die KI darf viel, aber nicht alles: Sie bekommt Leitplanken und harte Guard-Gates – deterministische Regeln, an
+        denen kein Prompt vorbeikommt.
+      </p>
+      <p>
+        Die Programmiersprache wird dabei immer unwichtiger. Was zählt, ist richtig gute Software – mit fachlichem Kern
+        und sauberer Architektur, egal ob ein Mensch oder eine KI tippt. Genau darum geht es in meinen Workshops.
+      </p>
+      <p>
+        Lust auf einen Workshop oder Beratung für dein Team? Alles dazu unter <a href="/workshops/">Workshops</a>. Für
+        alles andere: Schreib mir an <MailLink />.
+      </p>
+    </div>
+    <div class="about-side">
+      <h2>Schwerpunkte</h2>
+      <ul class="chips">
+        {FOCUS.map((f) => (
+          <li class="chip">{f}</li>
+        ))}
+      </ul>
+    </div>
+  </div>
+  <div class="kits">
+    {KITS.map((k) => (
+      <Kit kit={k} />
+    ))}
+  </div>
+</IslandPage>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://larmic.de/sitemap-index.xml

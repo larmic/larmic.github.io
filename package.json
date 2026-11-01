@@ -1,0 +1,46 @@
+{
+  "name": "larmic-de",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "arch": "depcruise src --config .dependency-cruiser.cjs",
+    "verify:html": "html-validate \"dist/**/*.html\"",
+    "verify:links": "linkinator dist --recurse --skip \"^https?://(?!localhost|127\\\\.0\\\\.0\\\\.1)\"",
+    "verify": "npm run verify:html && npm run verify:links",
+    "gates": "npm run format:check && npm run lint && npm run arch && npm run check && npm test && npm run build && npm run verify",
+    "prepare": "git config core.hooksPath .githooks || true"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource/nunito": "^5.3.0",
+    "@fontsource/pixelify-sans": "^5.3.0",
+    "astro": "^7.4.4",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@eslint/js": "^10.0.1",
+    "dependency-cruiser": "^18.7.0",
+    "eslint": "^10.14.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "html-validate": "^11.18.0",
+    "linkinator": "^8.1.0",
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=22.23.4"
+  }
+}

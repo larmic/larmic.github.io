@@ -1,0 +1,13 @@
+---
+import PlainPage from '../layouts/PlainPage.astro';
+import { figureSvg } from '../lib/voxel/figure';
+import { AVATAR } from '../data/avatar';
+const fig = figureSvg(AVATAR);
+---
+
+<PlainPage title="Seite nicht gefunden" heading="404 – Seite nicht gefunden" noindex>
+  <div class="notfound">
+    <div class="notfound-fig" set:html={fig.svg} />
+    <p>Hier ist noch kein Block gesetzt. Zurück auf die Insel?</p>
+  </div>
+</PlainPage>

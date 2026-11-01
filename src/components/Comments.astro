@@ -1,0 +1,58 @@
+---
+// Kommentare über giscus (GitHub Discussions), erst nach Klick geladen.
+// Aktiv, sobald GISCUS in src/data/site.ts ausgefüllt ist.
+import { GISCUS } from '../data/site';
+const enabled = Boolean(GISCUS.repo && GISCUS.repoId && GISCUS.category && GISCUS.categoryId);
+---
+
+{enabled && (
+  <section
+    class="entry pxsm th-hw comments"
+    aria-labelledby="h-comments"
+    data-repo={GISCUS.repo}
+    data-repo-id={GISCUS.repoId}
+    data-category={GISCUS.category}
+    data-category-id={GISCUS.categoryId}
+  >
+    <h2 id="h-comments">Kommentare</h2>
+    <div class="giscus-slot">
+      <p>
+        Die Kommentare liegen in GitHub Discussions. Beim Laden wird eine Verbindung zu giscus.app und GitHub aufgebaut.
+      </p>
+      <button type="button" class="pxbtn small">
+        Kommentare laden
+      </button>
+    </div>
+  </section>
+)}
+<script>
+  // Ein Handler für alle Kommentarbereiche, auch nach einem Seitenwechsel ohne Neuladen
+  document.addEventListener('click', (e) => {
+    const sec = (e.target as Element).closest<HTMLElement>('.comments');
+    if (!sec || !(e.target as Element).closest('.giscus-slot button')) return;
+    const s = document.createElement('script');
+    s.src = 'https://giscus.app/client.js';
+    s.async = true;
+    s.crossOrigin = 'anonymous';
+    const attrs: Record<string, string> = {
+      'data-repo': sec.dataset.repo!,
+      'data-repo-id': sec.dataset.repoId!,
+      'data-category': sec.dataset.category!,
+      'data-category-id': sec.dataset.categoryId!,
+      'data-mapping': 'pathname',
+      'data-strict': '1',
+      'data-reactions-enabled': '1',
+      'data-emit-metadata': '0',
+      'data-input-position': 'top',
+      'data-theme': 'light',
+      'data-lang': 'de',
+      'data-loading': 'lazy',
+    };
+    for (const [k, v] of Object.entries(attrs)) s.setAttribute(k, v);
+    const slot = sec.querySelector('.giscus-slot')!;
+    slot.replaceChildren();
+    const target = document.createElement('div');
+    target.className = 'giscus';
+    slot.append(target, s);
+  });
+</script>

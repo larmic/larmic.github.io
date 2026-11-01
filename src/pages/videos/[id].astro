@@ -1,0 +1,36 @@
+---
+import { getCollection, render } from 'astro:content';
+import IslandPage from '../../layouts/IslandPage.astro';
+import VoxelIcon from '../../components/VoxelIcon.astro';
+import YouTube from '../../components/YouTube.astro';
+import Comments from '../../components/Comments.astro';
+import RecordingNote from '../../components/RecordingNote.astro';
+import { MATERIALS } from '../../data/materials';
+
+export async function getStaticPaths() {
+  const videos = await getCollection('videos');
+  return videos.map((v) => ({ params: { id: v.id }, props: { v } }));
+}
+const { v } = Astro.props;
+const { Content } = await render(v);
+const m = MATERIALS[v.data.material];
+---
+
+<IslandPage title={`${v.data.title} – Video`} description={v.data.teaser} rest={`videos/${v.id}`}>
+  <div class="panel-head">
+    <VoxelIcon block={m.block} color={m.icon} size={64} />
+    <div>
+      <h1>{v.data.title}</h1>
+      <p>{v.data.teaser}</p>
+    </div>
+  </div>
+  <YouTube id={v.data.youtube} title={v.data.title} />
+  <div class="prose">
+    <Content />
+  </div>
+  <RecordingNote recording={v.data.recording} />
+  <Comments />
+  <a class="backlink" href="/videos/">
+    Alle Videos
+  </a>
+</IslandPage>

@@ -1,0 +1,115 @@
+---
+import { CUBE_OUTLINE, CUBE_VIEWBOX } from '../lib/voxel/cube';
+// Die Inselwelt: statisches SVG aus dem Voxel-Generator (beim Build) + Web Component für die Interaktion.
+// Alle Ziele sind Links, nur der Blog ist ein Button (er hat keine Seite, die Figur fällt).
+// `rest` ist der Block dessen, was gerade angezeigt wird, z. B. `about`, `workshops` oder `workshops/event_storming`.
+// Dort steht die Figur. Die Kisten eines Bereichs sind sichtbar, solange er offen ist.
+import { islandScene } from '../data/island';
+import type { RestId } from '../data/island-layout';
+
+interface Props {
+  rest: RestId;
+}
+const { rest } = Astro.props;
+const w = await islandScene();
+const d = w.data;
+const sparks = ['#ffffff', '#f0a531', '#ffffff', '#f0a531', '#ffffff', '#f0a531'];
+const section = rest.split('/')[0];
+// Startbild ohne JavaScript: Die Figur steht schon auf ihrem Block, die Brücken dorthin stehen
+const route = d.routes[rest];
+const at = route[route.length - 1];
+const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
+---
+
+<nav class="island-nav" aria-label="Hauptnavigation">
+  <larmic-island
+    data-world={JSON.stringify({ home: d.home, routes: d.routes, rest })}
+    style={`--home-x: ${d.home.x}%; --home-y: ${d.home.y}%`}
+  >
+    <div class="isle" style={`aspect-ratio: ${w.aspect}`}>
+      <Fragment set:html={w.sceneSvg} />
+      <div class="bridges">
+        {d.bridges.map((b, k) => (
+          <div
+            class={`brk${built.has(k) ? '' : ' off'}`}
+            data-k={k}
+            style={`left: ${b.x}%; top: ${b.y}%; width: ${b.w}%; z-index: ${b.z}`}
+          >
+            <svg viewBox={CUBE_VIEWBOX} aria-hidden="true">
+              <use href="#v-plank"></use>
+            </svg>
+          </div>
+        ))}
+      </div>
+      <!-- Inselblöcke, die vor Brücken oder Zielblöcken stehen: darüber gezeichnet, damit sie sie verdecken -->
+      <div class="front" aria-hidden="true">
+        {d.front.map((b) => (
+          <div class="isle-front" style={`left: ${b.x}%; top: ${b.y}%; width: ${b.w}%; z-index: ${b.z}`}>
+            <svg viewBox={CUBE_VIEWBOX}>
+              <use href={`#v-${b.kind}`}></use>
+            </svg>
+          </div>
+        ))}
+      </div>
+      {d.eggs.map((e) => (
+        <span
+          class="egg"
+          data-egg={e.id}
+          aria-hidden="true"
+          style={`left: ${e.x}%; top: ${e.y}%; width: ${e.w}%; height: ${e.h}%`}
+        ></span>
+      ))}
+      <div
+        class="figpos"
+        style={`left: ${at.x}%; top: ${at.y}%; width: ${w.fig.w}%; transform: translate(-${w.fig.tx}%, -${w.fig.ty}%)`}
+      >
+        <p class={`bubble pxf${rest.includes('/') ? ' off' : ''}`} aria-hidden="true">
+          Hi! Zeig auf einen Block.
+        </p>
+        {sparks.map((c) => (
+          <span class="sp" style={`background: ${c}`}></span>
+        ))}
+        <div class={`figflip${at.f === 'R' ? ' flip' : ''}`}>
+          <div class="figspawn">
+            <div class="figw">
+              <div class="fighop" set:html={w.figureSvg} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="blkrow">
+      {d.nav.map((n) => {
+        const Tag = n.href ? 'a' : 'button';
+        const on = n.id === rest || rest.startsWith(`${n.id}/`);
+        const closed = n.parent !== undefined && n.parent !== section;
+        return (
+          <Tag
+            type={n.href ? undefined : 'button'}
+            href={n.href}
+            class={`blk${n.parent ? ' child' : ''}${on ? ' on' : ''}${closed ? ' closed' : ''}`}
+            data-id={n.id}
+            data-parent={n.parent}
+            aria-current={n.id === rest ? 'page' : undefined}
+            aria-label={n.href ? undefined : `${n.label} – gibt es noch nicht`}
+            style={`left: ${n.x}%; top: ${n.y}%; width: ${n.w}%; z-index: ${n.z}${n.color ? `; color: ${n.color}` : ''}`}
+          >
+            <span class="bob" style={`animation-delay: ${n.delay}`}>
+              <svg viewBox={CUBE_VIEWBOX} aria-hidden="true">
+                <use href={`#v-${n.sym}`}></use>
+                <polygon class="outline" points={CUBE_OUTLINE} fill="none" stroke="#1d2838" stroke-width="3"></polygon>
+              </svg>
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <span class="px" style={`background: ${i % 2 ? n.p2 : n.p1}`}></span>
+              ))}
+            </span>
+            <span class={`tag tag${n.tag}`}>{n.label}</span>
+          </Tag>
+        );
+      })}
+    </div>
+  </larmic-island>
+</nav>
+<script>
+  import '../scripts/larmic-island';
+</script>
