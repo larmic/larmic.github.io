@@ -13,7 +13,9 @@ const { id, title } = Astro.props;
     <svg width="64" height="64" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true">
       <path d="M3 1h1v6h-1z M4 2h1v4h-1z M5 3h1v2h-1z" fill="#ee4b3e"></path>
     </svg>
-    Video abspielen
+    <span>
+      Video abspielen<span class="sr-only">: {title}</span>
+    </span>
     <small>Lädt das Video von YouTube (Google)</small>
   </button>
 </div>
@@ -29,9 +31,11 @@ const { id, title } = Astro.props;
     if (!el || !(e.target as Element).closest('.yt button')) return;
     const frame = document.createElement('iframe');
     frame.src = `https://www.youtube-nocookie.com/embed/${el.dataset.yt}?autoplay=1`;
-    frame.title = el.dataset.title || 'YouTube-Video';
+    frame.title = `YouTube-Video: ${el.dataset.title ?? ''}`;
     frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
     frame.allowFullscreen = true;
     el.replaceChildren(frame);
+    // Der Button ist weg: Fokus auf den Player, damit Tastatur und Screenreader nicht im Nichts landen
+    frame.focus();
   });
 </script>

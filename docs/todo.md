@@ -89,7 +89,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [x] Nach dem Seitenwechsel liegt der Fokus auf `main` (ohne Scrollen); den Titel sagt Astros Router an.
 - [x] Sprechblase ist Dekoration und für Screenreader ausgeblendet (keine wiederholten Ansagen mehr).
 - [x] Blog-Button heißt für Screenreader „Blog – gibt es noch nicht“; Tastaturfokus allein löst keinen Sturz mehr aus.
-- [ ] YouTube-Button: Fokus nach dem Klick auf das iframe setzen, Videotitel in den Button-Namen.
+- [x] YouTube-Button nennt für Screenreader den Videotitel; nach dem Klick liegt der Fokus auf dem Player.
 - [ ] Überschriftenhierarchie (Karten `h3` direkt unter `h1`, `h4` in Videotexten).
 - [x] 404-Seite hat jetzt eine `main`-Landmark (über `PlainPage`).
 - [ ] `prefers-reduced-motion`: Die Figur sollte direkt aufs Ziel springen statt Schritt für Schritt zu laufen. Hover-Vorschau abschalten.
