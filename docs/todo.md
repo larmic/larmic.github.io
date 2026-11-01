@@ -40,12 +40,12 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 - [x] **Speicherleck der Insel behoben:** globale Listener per AbortController, `cancelAnimationFrame` beim Entfernen.
 - [ ] **Livegang-Checkliste:**
   - [ ] Merge `relaunch` → `main` per Pull Request, ersten Deploy-Lauf prüfen.
-  - [ ] Der Deploy ersetzt `gh-pages` komplett. Diese alten Adressen werden 404, Entscheidung pro Adresse (weiterleiten, neu anbieten oder bewusst aufgeben):
-    - `/index.xml`, `/videos/index.xml`, `/workshops/index.xml` (RSS; ggf. `@astrojs/rss`)
-    - `/sitemap.xml`
-    - `/tags/`, `/categories/`
-    - `/favicon.ico`, `/favicon-16x16.png`, `/favicon-32x32.png`
-    - `/workshop/ddd_hex_architecture.png`, `/workshop/event_storming.png` (jetzt `.webp`)
+  - [x] Alte Adressen, die der Deploy sonst auf 404 setzt:
+    - `/favicon.ico`, `/favicon-16x16.png`, `/favicon-32x32.png` werden beim Build erzeugt
+    - `/workshop/ddd_hex_architecture.png`, `/workshop/event_storming.png` entstehen beim Build aus den WebP-Dateien (verkleinert, 0,5 bzw. 0,3 MB statt 13,8 bzw. 9 MB)
+    - `/tags/`, `/categories/` leiten auf die Startseite um
+    - `/sitemap.xml` ist ein Sitemap-Index, der auf die neue Sitemap zeigt
+    - RSS (`/index.xml`, `/videos/index.xml`, `/workshops/index.xml`) entfällt bewusst, solange es keinen Blog gibt
   - [ ] Pages-Einstellungen: Quelle, Custom Domain `larmic.de`, „Enforce HTTPS“.
   - [ ] Stichprobe der alten Adressen nach dem Deploy (`/about/`, `/#workshops`, `/workshops/#workshop-…`, `/videos/#video-…`).
   - [ ] Search Console: `sitemap-index.xml` einreichen, alte `sitemap.xml` entfernen.
@@ -124,7 +124,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `ast
 
 - [ ] **Schriften:** nur das Latin-Subset importieren. Kyrillische Pixelify-Glyphen stehen heute als Base64 im render-blockierenden CSS (ca. 57 % des CSS-Transfers). Dazu 47 Fontdateien mit 471 KB in `dist`.
 - [ ] **Strukturierte Daten:** `Person`, `Course` für Workshops, `VideoObject` für Videos.
-- [ ] **Icons:** `favicon.ico`/PNG, `apple-touch-icon`, `theme-color`.
+- [x] **Icons:** `favicon.ico`, PNG-Icons, `apple-touch-icon` (180 × 180) und `theme-color`.
 - [ ] 404-Seite: kein `canonical`, dafür `noindex`.
 - [ ] Workshop-Bilder mit `width`/`height`, `loading="lazy"` und kleineren Größen (heute 1600 px), z. B. über `astro:assets`.
 - [ ] 28 KB Würfel-Symbole und Textur-CSS stehen in jeder Seite. Als cachebare Datei auslagern.
