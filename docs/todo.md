@@ -24,17 +24,13 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 ### Inhalt
 
 - [x] **Sichtbarer Kontaktweg:** Workshops und Beratung über neusta (`l.michaelis@neusta.de`, auf den Workshop-Seiten), alles andere privat an `mail@larmic.de` (Footer „Kontakt“ und Ende von „Über mich“, Adresse erst per JavaScript zusammengesetzt).
-- [ ] **Button „Workshops ansehen“** führt auf `/workshops/` ins Leere. Je nach Seite wechseln (z. B. „Workshop anfragen“).
-- [ ] **Positionierung schärfen:** Hero-Intro, Unterzeile von „Über mich“ und Description auf dieselbe Kernaussage bringen, inklusive „KI mit Leitplanken“.
+- [x] **Button im Kopf:** auf `/workshops/` und Workshop-Seiten „Workshop anfragen“ (Mail an neusta, mit Workshop im Betreff), sonst „Workshops ansehen“.
+- [x] **Positionierung:** Hero-Intro und Description nennen jetzt auch „KI mit Leitplanken“.
 - [x] „Screencasts“ aus den Texten entfernt, „Architekt“ in Untertitel und Description aufgenommen. Die Talks auf `/videos/` sind auch die Konferenzvorträge, eine eigene Liste braucht es nicht.
-- [ ] **„Wie das geht, zeige ich in Workshops und Talks“** folgt auf den KI-Absatz, es gibt aber kein KI-Angebot. Etwas verlinken oder umformulieren. Den Eintrag „KI“ in der KI-Werkzeugkiste durch etwas Konkretes ersetzen.
-- [ ] **Videotexte aufräumen:**
-  - „Team Neusta“ → „team neusta“, Artikel korrigieren („Veranstaltung bei team neusta“).
-  - „**Hinweis**“ → „**Hinweis:**“.
-  - Den viermal kopierten Freitagsfrühstück-Block zentral rendern (Frontmatter-Feld plus Komponente).
-  - Überschriften `####` → `##`.
-  - „ein Framework, dass“ → „das“, testcontainers.org → testcontainers.com.
-  - Feld `date` mit echten Daten füllen und anzeigen, oder entfernen.
+- [x] Satz nach dem KI-Absatz umformuliert (Bezug auf die Workshops).
+- [ ] Eintrag „KI“ in der KI-Werkzeugkiste durch ein konkretes Werkzeug oder eine Praxis ersetzen (Entscheidung offen).
+- [x] **Videotexte aufgeräumt:** „team neusta“, Freitagsfrühstück-Hinweis zentral (`RecordingNote.astro`), Überschriften, Grammatik.
+- [ ] Feld `date` der Videos: überall „2023-02-22“ und nicht angezeigt. Echte Daten eintragen und anzeigen oder Feld entfernen.
 
 ### Technik und Betrieb
 
@@ -91,7 +87,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `ast
   - Typen zwischen Generator und Client teilen.
   - `rest` als Union-Typ statt freier String.
 - [ ] **Toten Code entfernen:** ungenutzte Exporte und Prototyp-Reste in `textures.ts`/`render.ts`, Token `--font-mono`.
-- [ ] Das `<script>` aus `IslandPage.astro` landet hinter `</html>` (ungültiges HTML). In `Island.astro` verschieben.
+- [x] Skript in `IslandPage.astro` steht jetzt im Dokument (vorher hinter `</html>`).
 - [ ] **Brücken-Verdeckung im Browser prüfen:** Brücken liegen als HTML über dem ganzen Insel-SVG und werden vor Inselblöcken gezeichnet, die eigentlich davor liegen (z. B. erste Brücke zu „Über mich“). Ggf. Brücken mit Tiefensortierung ins Szenen-SVG übernehmen.
 - [ ] **Fokus-Listener der Blöcke** nur bei `:focus-visible` auslösen. Sonst stürzt die Figur erneut, wenn man nach einem Klick auf „Blog“ in den Tab zurückkehrt.
 - [ ] Auf dem Handy läuft die Zustandsmaschine unsichtbar weiter, obwohl die Figur festgenagelt ist.

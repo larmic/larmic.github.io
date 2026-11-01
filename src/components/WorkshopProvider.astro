@@ -1,4 +1,5 @@
 ---
 // Wer Workshops und Beratung anbietet: Lars als Mitarbeiter, Vertragspartner ist die neusta GmbH (§ 6 DDG: Anbieter erkennbar)
+import { SITE, workshopMailto } from '../data/site';
 ---
-<p class="provider">Workshops und Beratung biete ich als Mitarbeiter von <a href="https://www.team-neusta.de/de">team neusta</a> an. Vertragspartner ist die neusta GmbH. Anfragen gern an <a href="mailto:l.michaelis@neusta.de?subject=Anfrage%20Workshop%20oder%20Beratung">l.michaelis@neusta.de</a>.</p>
+<p class="provider">Workshops und Beratung biete ich als Mitarbeiter von <a href="https://www.team-neusta.de/de">team neusta</a> an. Vertragspartner ist die neusta GmbH. Anfragen gern an <a href={workshopMailto()}>{SITE.workshopMail}</a>.</p>

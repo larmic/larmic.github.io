@@ -1,9 +1,10 @@
 // Zentrale Seitendaten. Texte der Startseite stehen direkt in den Komponenten unter src/components/.
 export const SITE = {
   title: 'larmic.de',
-  description: 'Lars Michaelis – Entwickler, Architekt, Speaker und Berater. Workshops zu Domain-Driven Design, Event Storming und Microservices.',
+  description: 'Lars Michaelis – Entwickler, Architekt, Speaker und Berater. Software mit fachlichem Kern und KI mit Leitplanken; Workshops zu Domain-Driven Design, Event Storming und Microservices.',
   url: 'https://larmic.de',
-  mail: 'mail@larmic.de',
+  mail: 'mail@larmic.de', // privat, nur per JavaScript als Link (MailLink.astro)
+  workshopMail: 'l.michaelis@neusta.de', // Workshops und Beratung laufen über team neusta
 };
 
 export const SOCIALS = [
@@ -20,6 +21,9 @@ export const BUBBLES = {
   videos: 'Popcorn bereit? Hier sind meine Talks.',
   tree: 'Schöne Aussicht!', // Easter Egg: oben im Baum
 };
+
+/** Mail-Link für Workshop- und Beratungsanfragen, optional mit Betreff */
+export const workshopMailto = (subject = 'Anfrage Workshop oder Beratung') => `mailto:${SITE.workshopMail}?subject=${encodeURIComponent(subject)}`;
 
 export const FOCUS = ['Domain-Driven Design', 'Hexagonale Architektur', 'Event Storming', 'Microservices', 'DevSecOps'];
 

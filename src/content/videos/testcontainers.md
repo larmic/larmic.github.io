@@ -6,25 +6,15 @@ material: "ops"
 order: 1
 youtube: "LYnmbkBfeZA"
 date: "2023-02-22"
+recording: "freitagsfruehstueck"
 ---
 
-[Testcontainers](https://www.testcontainers.org/) ist ein Framework, dass 
-es im Test ermöglicht, eine Datenbank oder andere Dinge während der 
-Testausführung zu nutzen.
+[Testcontainers](https://testcontainers.com/) ist ein Framework, mit dem man im Test echte Datenbanken oder andere Dienste nutzen kann, die während der Testausführung in Containern laufen.
 
-Testcontainers nutzt dafür das [Docker Environment](https://www.docker.com/).
+Testcontainers nutzt dafür [Docker](https://www.docker.com/).
 
-#### Vorteile
+## Vorteile
 
-* Es wird ein freier Port gesucht und genutzt
-* Der Docker-Sidecar [ryuk](https://hub.docker.com/r/testcontainers/ryuk) sorgt anschließend für das Abräumen der Container
-* Das Framework wird mittlerweile von allen gängigen Programmiersprachen unterstützt
-
-#### Team Neusta Freitagsfrühstück
-
-> **Hinweis** Dieses Video ist im Rahmen eines _Freitagsfrühstücks_ aufgenommen worden.
-> Das _Freitagsfrühstück_ ist eine regelmäßige Veranstaltung der
-> [Team Neusta](https://www.team-neusta.de/) und dient der Weiterbildung
-> und dem technischen Austausch untereinander.
->
-> Die anschließende Diskussion wurde nicht in das öffentliche Video übernommen.
+* Es wird automatisch ein freier Port gesucht und genutzt
+* Der Sidecar-Container [Ryuk](https://hub.docker.com/r/testcontainers/ryuk) räumt die Container anschließend wieder ab
+* Testcontainers gibt es inzwischen für alle gängigen Programmiersprachen

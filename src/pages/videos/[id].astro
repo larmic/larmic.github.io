@@ -4,6 +4,7 @@ import IslandPage from '../../layouts/IslandPage.astro';
 import VoxelIcon from '../../components/VoxelIcon.astro';
 import YouTube from '../../components/YouTube.astro';
 import Comments from '../../components/Comments.astro';
+import RecordingNote from '../../components/RecordingNote.astro';
 import { MATERIALS } from '../../data/site';
 
 export async function getStaticPaths() {
@@ -21,6 +22,7 @@ const m = MATERIALS[v.data.material];
   </div>
   <YouTube id={v.data.youtube} title={v.data.title} />
   <div class="prose"><Content /></div>
+  <RecordingNote recording={v.data.recording} />
   <Comments />
   <a class="backlink" href="/videos/">Alle Videos</a>
 </IslandPage>

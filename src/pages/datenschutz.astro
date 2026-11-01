@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubHero from '../components/SubHero.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import { SITE } from '../data/site';
 ---
 <BaseLayout title="Datenschutz" description="Datenschutzerklärung von larmic.de">
   <SubHero title="Datenschutz" />
@@ -25,7 +26,7 @@ import SiteFooter from '../components/SiteFooter.astro';
 
           <h2>Kontakt per E-Mail oder Telefon</h2>
           <p>Wenn du mir schreibst oder mich anrufst, verarbeite ich deine Angaben, um deine Anfrage zu beantworten – etwa zu einem Workshop. Rechtsgrundlage ist die Anbahnung oder Durchführung eines Vertrags (Art. 6 Abs. 1 lit. b DSGVO) oder mein berechtigtes Interesse, Anfragen zu beantworten (Art. 6 Abs. 1 lit. f DSGVO). Ich lösche die Daten, sobald sie dafür nicht mehr gebraucht werden und keine gesetzlichen Aufbewahrungspflichten bestehen.</p>
-          <p>Workshops und Beratung biete ich als Mitarbeiter von team neusta an, Vertragspartner ist die neusta GmbH. Anfragen an meine geschäftliche Adresse bei neusta (l.michaelis@neusta.de) landen deshalb auf den Systemen von team neusta und werden dort verarbeitet. Dafür gilt die <a href="https://www.team-neusta.de/datenschutzerklaerung">Datenschutzerklärung von team neusta</a>.</p>
+          <p>Workshops und Beratung biete ich als Mitarbeiter von team neusta an, Vertragspartner ist die neusta GmbH. Anfragen an meine geschäftliche Adresse bei neusta ({SITE.workshopMail}) landen deshalb auf den Systemen von team neusta und werden dort verarbeitet. Dafür gilt die <a href="https://www.team-neusta.de/datenschutzerklaerung">Datenschutzerklärung von team neusta</a>.</p>
 
           <h2>Links zu anderen Seiten</h2>
           <p>Links etwa zu GitHub, LinkedIn, YouTube oder Xing sind einfache Links. Es werden keine Inhalte dieser Dienste eingebunden und keine Daten an sie übertragen, solange du nicht draufklickst. Danach gelten die Datenschutzbestimmungen des jeweiligen Anbieters.</p>

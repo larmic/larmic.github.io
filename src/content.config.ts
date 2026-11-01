@@ -29,6 +29,7 @@ const videos = defineCollection({
     order: z.number().int(),
     youtube: z.string().min(5),
     date: z.coerce.date(),
+    recording: z.enum(['freitagsfruehstueck']).optional(), // Wo das Video aufgenommen wurde: Hinweis unter dem Video
   }),
 });
 
