@@ -5,7 +5,7 @@ import VoxelIcon from '../../components/VoxelIcon.astro';
 import YouTube from '../../components/YouTube.astro';
 import Comments from '../../components/Comments.astro';
 import RecordingNote from '../../components/RecordingNote.astro';
-import { MATERIALS } from '../../data/site';
+import { MATERIALS } from '../../data/materials';
 
 export async function getStaticPaths() {
   const videos = await getCollection('videos');
@@ -18,7 +18,7 @@ const m = MATERIALS[v.data.material];
 
 <IslandPage title={`${v.data.title} – Video`} description={v.data.teaser} rest={`videos/${v.id}`}>
   <div class="panel-head">
-    <VoxelIcon block={m.block} color={m.icon || undefined} size={64} />
+    <VoxelIcon block={m.block} color={m.icon} size={64} />
     <div>
       <h1>{v.data.title}</h1>
       <p>{v.data.teaser}</p>

@@ -74,7 +74,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 
 - [x] **Zustandsmaschine aus der Web Component gelöst:** reines Modul mit sprechenden Feldnamen, `sel` und der nie leere Weg entfernt, `msg` durch `show404` ersetzt. Die Komponente macht nur noch DOM, Takt und Kopfblick.
 - [x] **Schichtung:** Avatar ist Parameter des Generators, die konkrete Insel liegt in `src/data/island-layout.ts`, `world.ts` ist nur noch die generische Szenen-Engine.
-- [ ] **Eine Quelle für Material- und Themenfarben:** heute `MATERIALS` in `site.ts`, `tokens.css` und das Enum im Schema.
+- [x] **Eine Quelle für Materialien:** `src/data/materials.ts` (Block, Icon- und Play-Farbe); Schema-Enum, Werkzeugkisten und Karten nutzen sie, die ungenutzten `--*-icon`-Tokens sind weg.
 - [ ] **Geometrie zentral:**
   - Würfelmaße (80 × 84,8, 40/20/44,8) und Projektionskonstanten an einer Stelle.
   - Typen zwischen Generator und Client teilen.

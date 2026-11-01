@@ -46,6 +46,7 @@ src/
   lib/voxel/          Voxel-Generator (generisch): Blöcke, Szenen-Engine, Figur und Kopf als SVG
   data/
     site.ts           Adressen, Social Links, Sprechblasen, Werkzeugkisten, Schwerpunkte, giscus
+    materials.ts      Materialien (Holz, Metall, Kristall, Gras): Block und Farben je Thema
     island-layout.ts  die konkrete Insel: Wege, Kisten-Plätze, Baum (rein, getestet)
     island.ts         lädt Workshops und Videos und baut daraus die Insel
     avatar.ts         Aussehen der Figur

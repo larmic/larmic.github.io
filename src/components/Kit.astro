@@ -1,15 +1,17 @@
 ---
 import type { Kit } from '../data/site';
+import { MATERIALS } from '../data/materials';
 interface Props {
   kit: Kit;
 }
 const { kit } = Astro.props;
+const { block, icon } = MATERIALS[kit.id];
 ---
 
 <section class={`kit ${kit.id} pxsm`} aria-labelledby={`kit-${kit.id}`}>
   <div class="kithead">
-    <svg width="34" height="36" viewBox="0 0 80 84.8" aria-hidden="true" style={`color: ${kit.icon}`}>
-      <use href={`#v-${kit.block}`}></use>
+    <svg width="34" height="36" viewBox="0 0 80 84.8" aria-hidden="true" style={`color: ${icon}`}>
+      <use href={`#v-${block}`}></use>
     </svg>
     <h3 id={`kit-${kit.id}`}>{kit.title}</h3>
   </div>
@@ -18,7 +20,7 @@ const { kit } = Astro.props;
     {kit.items.map((it) => (
       <li class="item">
         <svg viewBox="0 0 80 84.8" aria-hidden="true" style={`color: ${it.color}`}>
-          <use href={`#v-${kit.block}`}></use>
+          <use href={`#v-${block}`}></use>
         </svg>
         <span class="lbl">{it.label}</span>
       </li>

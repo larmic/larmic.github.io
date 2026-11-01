@@ -3,9 +3,9 @@ import { getCollection } from 'astro:content';
 import type { Scene } from '../lib/voxel/world';
 import { AVATAR } from './avatar';
 import { buildWorld } from './island-layout';
-import { MATERIALS } from './site';
+import { MATERIALS, type Material } from './materials';
 
-type Entry = { id: string; data: { short: string; material: keyof typeof MATERIALS; order: number } };
+type Entry = { id: string; data: { short: string; material: Material; order: number } };
 
 const items = (section: 'workshops' | 'videos', entries: Entry[]) =>
   entries
@@ -14,7 +14,7 @@ const items = (section: 'workshops' | 'videos', entries: Entry[]) =>
       id: e.id,
       label: e.data.short,
       block: MATERIALS[e.data.material].block,
-      color: MATERIALS[e.data.material].icon || undefined,
+      color: MATERIALS[e.data.material].icon,
       href: `/${section}/${e.id}/`,
     }));
 

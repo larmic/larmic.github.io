@@ -1,3 +1,5 @@
+import type { Material } from './materials';
+
 // Zentrale Seitendaten. Texte der Startseite stehen direkt in den Komponenten unter src/components/.
 export const SITE = {
   title: 'larmic.de',
@@ -30,11 +32,9 @@ export const workshopMailto = (subject = 'Anfrage Workshop oder Beratung') =>
 export const FOCUS = ['Domain-Driven Design', 'Hexagonale Architektur', 'Event Storming', 'Microservices', 'DevSecOps'];
 
 export type Kit = {
-  id: 'hw' | 'ops' | 'ki';
+  id: Exclude<Material, 'gr'>; // Material der Kiste: Block und Farbe kommen aus MATERIALS
   title: string;
   sub: string;
-  block: 'crate' | 'metal' | 'crystal';
-  icon: string;
   items: { label: string; color: string }[];
 };
 
@@ -44,8 +44,6 @@ export const KITS: Kit[] = [
     id: 'hw',
     title: 'Werkzeugkiste',
     sub: 'Das Handwerk: solide Software bauen.',
-    block: 'crate',
-    icon: '#a0703f',
     items: [
       { label: 'Kotlin', color: '#7f52ff' },
       { label: 'Spring Boot', color: '#6db33f' },
@@ -59,8 +57,6 @@ export const KITS: Kit[] = [
     id: 'ops',
     title: 'DevOps-Kiste',
     sub: 'Vom Commit bis in Produktion.',
-    block: 'metal',
-    icon: '#7d8ea3',
     items: [
       { label: 'Kubernetes', color: '#326ce5' },
       { label: 'K9s', color: '#8fb8de' },
@@ -74,8 +70,6 @@ export const KITS: Kit[] = [
     id: 'ki',
     title: 'KI-Werkzeugkiste',
     sub: 'Damit die KI nicht nur schnell, sondern auch richtig baut.',
-    block: 'crystal',
-    icon: '#b48cf0',
     items: [
       { label: 'KI', color: '#b48cf0' },
       { label: 'Claude Code', color: '#e0855f' },
@@ -86,14 +80,6 @@ export const KITS: Kit[] = [
     ],
   },
 ];
-
-// Materialien der Karten: Fläche + Block-Icon
-export const MATERIALS = {
-  hw: { block: 'crate', icon: '#a0703f', play: '#f0a531' },
-  ops: { block: 'metal', icon: '#7d8ea3', play: '#6b9bff' },
-  ki: { block: 'crystal', icon: '#b48cf0', play: '#b48cf0' },
-  gr: { block: 'grass', icon: '', play: '#6cc46f' },
-} as const;
 
 // Kommentare über giscus (GitHub Discussions). Werte von https://giscus.app eintragen,
 // dann erscheinen Kommentare unter jeder Videoseite. Leer = keine Kommentare.

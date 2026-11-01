@@ -3,7 +3,8 @@ import { getCollection, render } from 'astro:content';
 import IslandPage from '../../layouts/IslandPage.astro';
 import VoxelIcon from '../../components/VoxelIcon.astro';
 import WorkshopProvider from '../../components/WorkshopProvider.astro';
-import { MATERIALS, workshopMailto } from '../../data/site';
+import { workshopMailto } from '../../data/site';
+import { MATERIALS } from '../../data/materials';
 
 export async function getStaticPaths() {
   const workshops = await getCollection('workshops', ({ data }) => !data.draft);
@@ -21,7 +22,7 @@ const m = MATERIALS[w.data.material];
   cta={{ label: 'Workshop anfragen', href: workshopMailto(`Workshop: ${w.data.short}`) }}
 >
   <div class="panel-head">
-    <VoxelIcon block={m.block} color={m.icon || undefined} size={64} />
+    <VoxelIcon block={m.block} color={m.icon} size={64} />
     <div>
       <h1>{w.data.title}</h1>
       <p>{w.data.teaser}</p>

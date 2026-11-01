@@ -16,23 +16,19 @@
   --dirt-shade: rgba(43, 26, 15, 0.4);
   --stone-shade: rgba(20, 22, 28, 0.62);
 
-  /* Materialien: Fläche, Slot, Rahmen – stehen für Themen */
+  /* Materialien: Fläche, Slot, Rahmen – stehen für Themen. Block und Icon-Farben: src/data/materials.ts */
   --wood-bg: #f3ead6; /* Holz: Handwerk, Architektur */
   --wood-slot: #e2d5ba;
   --wood-frame: #b3a385;
-  --wood-icon: #a0703f;
   --metal-bg: #e6eaf0; /* Metall: DevOps, Infrastruktur */
   --metal-slot: #d3dae4;
   --metal-frame: #9aa6b6;
-  --metal-icon: #7d8ea3;
   --crystal-bg: #2a2342; /* Kristall: KI (und Event Storming) */
   --crystal-slot: #1b1630;
   --crystal-frame: #4a3f70;
   --crystal-text: #f1ecff;
   --crystal-link: #d9c6ff;
-  --crystal-icon: #b48cf0;
   --grass-bg: #e3ecd2; /* Gras: Testing */
-  --grass-icon: #6cc46f;
 
   /* Schriften */
   --font-pixel: 'Pixelify Sans', 'Courier New', monospace;

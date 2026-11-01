@@ -2,8 +2,9 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { MATERIAL_IDS } from './data/materials';
 
-const material = z.enum(['hw', 'ops', 'ki', 'gr']);
+const material = z.enum(MATERIAL_IDS);
 
 const workshops = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/workshops' }),

@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { MATERIALS } from '../data/site';
+import { MATERIALS } from '../data/materials';
 import VoxelIcon from './VoxelIcon.astro';
 interface Props {
   entry: CollectionEntry<'workshops'>;
@@ -12,7 +12,7 @@ const m = MATERIALS[d.material];
 
 <article class={`pxsm wcard th-${d.material}`}>
   <div class="cardhead">
-    <VoxelIcon block={m.block} color={m.icon || undefined} />
+    <VoxelIcon block={m.block} color={m.icon} />
     <h3>{d.short}</h3>
   </div>
   <p>{d.teaser}</p>
