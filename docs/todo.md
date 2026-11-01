@@ -18,8 +18,8 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 
 ### Barrierefreiheit (Muss)
 
-- [ ] **Kisten-Links haben am Desktop keinen zugänglichen Namen.** Das Etikett ist per `display: none` versteckt (`.blk.child .tag` in `global.css`) und damit auch für Screenreader weg. Stattdessen optisch verstecken (wie `.sr-only`) oder `aria-label` setzen.
-- [ ] **Fokusrahmen auf dunklen Flächen unsichtbar:** Tinte auf Kristall 1,0:1, auf dem Footer-Stein ca. 1,6:1. Fokusfarbe je Fläche anpassen (z. B. Weiß oder Gold) oder einen doppelten Ring verwenden.
+- [x] **Kisten-Links haben einen zugänglichen Namen:** Etikett nur noch per `opacity` versteckt, nicht mehr per `display: none`.
+- [x] **Fokusrahmen auf dunklen Flächen:** im Footer und auf Kristall weiß (14,8:1 bzw. mind. 6,6:1).
 
 ### Inhalt
 

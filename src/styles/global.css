@@ -6,6 +6,8 @@ body { margin: 0; font-family: var(--font-body); color: var(--ink); background: 
 a { color: #1d4f8a; }
 a:hover { color: #0f345f; }
 a:focus-visible, button:focus-visible { outline: 3px dashed var(--ink); outline-offset: 6px; }
+/* Auf dunklen Flächen (Footer-Stein, Kristall) wäre Tinte unsichtbar */
+.site-footer a:focus-visible, .th-ki a:focus-visible { outline-color: #ffffff; }
 .page { container-type: inline-size; container-name: larmic; overflow-x: hidden; min-height: 100vh; }
 .pxf { font-family: var(--font-pixel); }
 .pxbox { box-shadow: var(--px-4), 12px 12px 0 0 rgba(20, 12, 6, 0.4); }
@@ -108,11 +110,12 @@ larmic-island { display: block; position: relative; flex: 1.35 1 480px; min-widt
 .held .bob { animation: none; }
 a.blk { text-decoration: none; }
 
-/* Kisten der Einträge: poppen auf, solange ihr Bereich offen ist. Etikett nur beim Zeigen und an der gewählten Kiste. */
+/* Kisten der Einträge: poppen auf, solange ihr Bereich offen ist. Etikett nur beim Zeigen und an der gewählten Kiste.
+   Unsichtbar nur per opacity: Das Etikett ist der Name des Links und muss für Screenreader erhalten bleiben. */
 .blk.closed { display: none !important; }
 .blk.child { transform-origin: 50% 100%; animation: childpop 0.42s steps(6); }
-.blk.child .tag { display: none; white-space: normal; width: max-content; max-width: 10em; text-align: center; }
-.blk.child:hover .tag, .blk.child:focus-visible .tag, .blk.child.on .tag { display: block; z-index: 1; }
+.blk.child .tag { opacity: 0; pointer-events: none; white-space: normal; width: max-content; max-width: 10em; text-align: center; }
+.blk.child:hover .tag, .blk.child:focus-visible .tag, .blk.child.on .tag { opacity: 1; z-index: 1; }
 @keyframes childpop { 0% { opacity: 0; transform: translateY(24px) scale(0.3); } 60% { opacity: 1; transform: translateY(-6px) scale(1.12); } 100% { opacity: 1; transform: none; } }
 .px { position: absolute; left: 45%; top: 42%; width: 10%; height: 10%; opacity: 0; pointer-events: none; }
 @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
@@ -131,7 +134,7 @@ a.blk { text-decoration: none; }
   .blk.child { order: 1; }
   .blk .bob { width: 74%; }
   .blk .tag { position: static; transform: none; display: inline-block; margin-top: 6px; font-size: 13px; padding: 4px 6px; white-space: normal; max-width: 100%; text-align: center; }
-  .blk.child .tag { display: inline-block; }
+  .blk.child .tag { opacity: 1; }
   .bridges, .egg { display: none; }
   .figpos { left: var(--home-x) !important; top: var(--home-y) !important; }
 }
