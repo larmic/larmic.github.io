@@ -34,6 +34,9 @@ jobs:
       - name: Guard-Gate – Typen und Inhalte prüfen
         run: npm run check
 
+      - name: Guard-Gate – Unit-Tests
+        run: npm test
+
       - name: Build
         run: npm run build
 

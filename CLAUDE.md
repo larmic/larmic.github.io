@@ -7,10 +7,11 @@ Persönliche Website von Lars Michaelis (larmic.de) im Voxel-Stil „Inselwelt�
 ```bash
 npm run dev      # Entwicklungsserver auf http://localhost:4321
 npm run check    # Guard-Gate: Typen und Inhalts-Schemas prüfen – muss grün sein
+npm test         # Guard-Gate: Unit-Tests (Vitest) – muss grün sein
 npm run build    # statische Seite nach dist/
 ```
 
-Vor jedem Commit `npm run check` und `npm run build` ausführen.
+Vor jedem Commit `npm run check`, `npm test` und `npm run build` ausführen.
 
 ## Aufbau
 

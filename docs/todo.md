@@ -59,11 +59,8 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 
 Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `astro check` das einzige Gate. Wer den Code liest, sollte genau das wiederfinden:
 
-- [ ] **Vitest** mit Tests für die reine Logik:
-  - Zustandsmaschine der Figur: Brückenbau, Rückweg bis zur Abzweigung, Blog-Sturz, Baum.
-  - `headView` (Sichtbarkeit der Seiten).
-  - `cellsToRects`.
-  - `buildWorld` (Slot-Grenze, Geometrie-Invarianten: keine Überlappung, Brücken benachbart).
+- [x] **Vitest** mit Tests für den Voxel-Generator: `headView`, `gridSvg` (Pixel-Abdeckung aller Texturen), `buildWorld` (Determinismus, Baum-Wege, Nachbarschaft der Schritte, keine Überlappung, Slot-Grenze). Läuft als Gate in der Pipeline.
+- [ ] **Zustandsmaschine der Figur** als reine Funktion herauslösen und testen (Brückenbau, Rückweg bis zur Abzweigung, Blog-Sturz, Baum).
 - [ ] **ESLint und Prettier**, viele überlange Zeilen umbrechen.
 - [ ] **Architekturregeln** mit dependency-cruiser als ArchUnit-Gegenstück, z. B. „`src/lib/voxel` importiert nicht aus `src/data`“.
 - [ ] **Link- und HTML-Check** auf `dist` im CI (z. B. lychee, html-validate).
