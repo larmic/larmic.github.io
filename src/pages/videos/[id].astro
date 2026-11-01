@@ -1,0 +1,36 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Clouds from '../../components/Clouds.astro';
+import YouTube from '../../components/YouTube.astro';
+import Comments from '../../components/Comments.astro';
+
+export async function getStaticPaths() {
+  const videos = await getCollection('videos');
+  return videos.map((v) => ({ params: { id: v.id }, props: { v } }));
+}
+const { v } = Astro.props;
+const { Content } = await render(v);
+---
+<BaseLayout title={v.data.title} description={v.data.teaser}>
+  <section class="sky subhero">
+    <Clouds />
+    <SiteHeader nav current="videos" />
+    <h1>{v.data.title}</h1>
+    <p class="lead">{v.data.teaser}</p>
+  </section>
+  <div class="grass-edge" aria-hidden="true"></div>
+  <main class="ground">
+    <div class="doc">
+      <article class={`entry pxbox th-${v.data.material}`}>
+        <YouTube id={v.data.youtube} title={v.data.title} />
+        <div class="prose"><Content /></div>
+        <a class="backlink" href="/videos/">Alle Videos</a>
+      </article>
+      <Comments />
+    </div>
+  </main>
+  <SiteFooter />
+</BaseLayout>

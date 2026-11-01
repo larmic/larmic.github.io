@@ -1,0 +1,108 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Clouds from '../components/Clouds.astro';
+import NameTiles from '../components/NameTiles.astro';
+import Island from '../components/Island.astro';
+import VoxelIcon from '../components/VoxelIcon.astro';
+import Kit from '../components/Kit.astro';
+import WorkshopCard from '../components/WorkshopCard.astro';
+import VideoCard from '../components/VideoCard.astro';
+import { FOCUS, KITS } from '../data/site';
+
+const workshops = (await getCollection('workshops', ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
+const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.data.order);
+---
+<BaseLayout>
+  <section class="sky">
+    <Clouds />
+    <SiteHeader />
+    <div class="hero">
+      <div class="hero-text">
+        <NameTiles />
+        <p class="subtitle">Fullstack-Entwickler, Speaker und Berater</p>
+        <p class="intro">Ich baue Software mit fachlichem Kern, gebe Workshops zu Domain-Driven Design, Event Storming und Microservices und spreche auf Konferenzen über Architektur und Testing.</p>
+        <div class="cta"><a href="#workshops" class="pxbtn" data-select="workshops">Workshops ansehen</a></div>
+      </div>
+      <Island />
+    </div>
+  </section>
+  <div class="grass-edge" aria-hidden="true"></div>
+
+  <main id="inhalt" class="ground">
+    <div class="panel pxbox">
+      <section id="ueber-mich" class="panel-section" data-panel="about" aria-labelledby="h-about">
+        <div class="panel-head">
+          <VoxelIcon block="head" size={64} />
+          <div><h2 id="h-about">Über mich</h2><p>Fullstack, Architektur und KI mit Leitplanken.</p></div>
+        </div>
+        <div class="about-grid">
+          <div class="about-text">
+            <p>Ich baue Software von der Datenbank bis zum Button – und bringe sie sicher in Produktion. Fullstack also, mit einer ordentlichen Portion DevSecOps. Seit über 20 Jahren bei <a href="https://www.team-neusta.de/de">team neusta</a>.</p>
+            <p>Am liebsten entwerfe ich Architekturen mit fachlichem Kern: Domain-Driven Design, hexagonale Architektur, Microservices. Und mit Event Storming hole ich alle an einen Tisch.</p>
+            <p>Dann kam die KI. Erst habe ich einfach mit ihr programmiert, heute arbeite ich spec-driven nach eigenem Prozess. Die KI darf viel, aber nicht alles: Sie bekommt Leitplanken und harte Guard-Gates – deterministische Regeln, an denen kein Prompt vorbeikommt.</p>
+            <p>Die Programmiersprache wird dabei immer unwichtiger. Was zählt, ist richtig gute Software. Wie das geht, zeige ich in Workshops und Talks.</p>
+          </div>
+          <div class="about-side">
+            <h3>Schwerpunkte</h3>
+            <ul class="chips">{FOCUS.map((f) => <li class="chip">{f}</li>)}</ul>
+          </div>
+        </div>
+        <div class="kits">{KITS.map((k) => <Kit kit={k} />)}</div>
+      </section>
+
+      <section id="workshops" class="panel-section" data-panel="workshops" aria-labelledby="h-workshops">
+        <div class="panel-head">
+          <VoxelIcon block="board" size={64} />
+          <div><h2 id="h-workshops">Workshops</h2><p>Für Teams, die Fachlichkeit und Architektur zusammenbringen wollen.</p></div>
+        </div>
+        <div class="cards">{workshops.map((w) => <WorkshopCard entry={w} />)}</div>
+      </section>
+
+      <section id="videos" class="panel-section" data-panel="videos" aria-labelledby="h-videos">
+        <div class="panel-head">
+          <VoxelIcon block="screen" size={64} />
+          <div><h2 id="h-videos">Videos</h2><p>Talks und Screencasts zum Nachschauen.</p></div>
+        </div>
+        <div class="cards videos">{videos.map((v) => <VideoCard entry={v} />)}</div>
+      </section>
+    </div>
+  </main>
+  <SiteFooter />
+</BaseLayout>
+
+<script>
+  // Ohne JavaScript stehen alle drei Bereiche untereinander. Mit JavaScript ist immer einer sichtbar.
+  const island = document.querySelector('larmic-island');
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-panel]')];
+  const byHash: Record<string, string> = { 'ueber-mich': 'about', workshops: 'workshops', videos: 'videos' };
+  document.documentElement.classList.add('js');
+
+  function show(id: string, scroll = false) {
+    for (const p of panels) {
+      const on = p.dataset.panel === id;
+      p.hidden = !on;
+      if (on) {
+        p.classList.remove('reveal');
+        void p.offsetWidth;
+        p.classList.add('reveal');
+      }
+    }
+    const target = panels.find((p) => p.dataset.panel === id);
+    if (scroll && target && target.getBoundingClientRect().top > window.innerHeight * 0.85) target.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  island?.addEventListener('larmic:select', (e) => show((e as CustomEvent<{ id: string }>).detail.id, true));
+  for (const el of document.querySelectorAll<HTMLElement>('[data-select]')) {
+    el.addEventListener('click', () => {
+      const id = el.dataset.select!;
+      show(id);
+      island?.select(id);
+    });
+  }
+  const initial = byHash[location.hash.slice(1)] ?? 'about';
+  show(initial);
+  if (initial !== 'about') island?.select(initial);
+</script>

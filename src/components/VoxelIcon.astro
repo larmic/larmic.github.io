@@ -1,0 +1,10 @@
+---
+// Kleiner Würfel aus den Symbolen in BaseLayout. `color` tönt crate/crystal/metal.
+interface Props {
+  block: string;
+  size?: number;
+  color?: string;
+}
+const { block, size = 40, color } = Astro.props;
+---
+<svg width={size} height={Math.round(size * 1.06)} viewBox="0 0 80 84.8" aria-hidden="true" style={color ? `color: ${color}` : undefined}><use href={`#v-${block}`}></use></svg>

@@ -1,0 +1,20 @@
+---
+interface Props {
+  nav?: boolean;
+  current?: 'workshops' | 'videos';
+}
+const { nav = false, current } = Astro.props;
+---
+<header class="site-header">
+  <a class="logo" href="/">
+    <svg width="34" height="36" viewBox="0 0 80 84.8" aria-hidden="true"><use href="#v-grass"></use></svg>
+    <span>larmic.de</span>
+  </a>
+  {nav && (
+    <nav class="navlinks" aria-label="Hauptnavigation">
+      <a class="navlink" href="/#ueber-mich">Über mich</a>
+      <a class="navlink" href="/workshops/" aria-current={current === 'workshops' ? 'page' : undefined}>Workshops</a>
+      <a class="navlink" href="/videos/" aria-current={current === 'videos' ? 'page' : undefined}>Videos</a>
+    </nav>
+  )}
+</header>

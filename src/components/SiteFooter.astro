@@ -1,0 +1,13 @@
+---
+import { SOCIALS } from '../data/site';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="inner">
+    <p class="pxf" style="font-size: 24px">larmic.de</p>
+    <nav aria-label="Profile">
+      {SOCIALS.map((s) => <a href={s.href}>{s.name}</a>)}
+    </nav>
+    <p><a href="/impressum/">Impressum</a><span style="margin-left: 16px">© {year} larmic.de</span></p>
+  </div>
+</footer>

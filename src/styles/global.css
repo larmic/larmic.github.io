@@ -1,0 +1,128 @@
+@import './tokens.css';
+
+/* ---------- Basis ---------- */
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: var(--font-body); color: var(--ink); background: var(--dirt); }
+a { color: #1d4f8a; }
+a:hover { color: #0f345f; }
+a:focus-visible, button:focus-visible { outline: 3px dashed var(--ink); outline-offset: 6px; }
+.page { container-type: inline-size; container-name: larmic; overflow-x: hidden; min-height: 100vh; }
+.pxf { font-family: var(--font-pixel); }
+.pxbox { box-shadow: var(--px-4), 12px 12px 0 0 rgba(20, 12, 6, 0.4); }
+.pxsm { box-shadow: var(--px-3); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Buttons ---------- */
+.pxbtn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 24px; font-family: var(--font-pixel); font-size: 20px; font-weight: 700; text-decoration: none; color: var(--ink); background: var(--gold); border: 0; cursor: pointer; box-shadow: var(--px-4), inset 0 -6px 0 0 rgba(0, 0, 0, 0.2), inset 0 4px 0 0 rgba(255, 255, 255, 0.45); }
+.pxbtn:hover { color: var(--ink); filter: brightness(1.06); }
+.pxbtn:active { transform: translateY(3px); box-shadow: var(--px-4), inset 0 4px 0 0 rgba(0, 0, 0, 0.2); }
+.pxbtn.small { min-height: 46px; font-size: 17px; padding: 0 20px; }
+
+/* ---------- Himmel, Kopfzeile, Hero ---------- */
+.sky { position: relative; overflow: hidden; padding: 0 24px 16px; background: linear-gradient(var(--sky-1) 0 36%, var(--sky-2) 36% 68%, var(--sky-3) 68% 100%); }
+.cloud { position: absolute; height: 28px; background: #ffffff; opacity: 0.92; animation: drift 26s ease-in-out infinite alternate; }
+.cloud span { position: absolute; background: #ffffff; }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(60px); } }
+.site-header { position: relative; max-width: 1240px; margin: 0 auto; padding: 22px 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; }
+.logo { display: flex; align-items: center; gap: 12px; color: var(--ink); text-decoration: none; }
+.logo:hover { color: var(--ink); }
+.logo span { font-family: var(--font-pixel); font-size: 28px; font-weight: 700; }
+.navlinks { display: flex; flex-wrap: wrap; gap: 6px; }
+.navlink { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; font-family: var(--font-pixel); font-size: 18px; color: var(--ink); text-decoration: none; }
+.navlink:hover { color: var(--ink); background: rgba(255, 255, 255, 0.5); }
+.navlink[aria-current='page'] { background: var(--ink); color: #ffffff; }
+.hero { position: relative; max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 24px 40px; }
+.hero-text { flex: 1 1 360px; max-width: 520px; padding: 16px 0 32px; }
+.subtitle { margin: 22px 0 0; font-size: 22px; font-weight: 800; }
+.intro { margin: 14px 0 0; font-size: 18px; line-height: 1.6; }
+.cta { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 32px; }
+.grass-edge { height: 48px; background: var(--tex-grass) repeat-x; background-size: 48px 48px; image-rendering: pixelated; }
+
+/* ---------- Name aus Buchstabenblöcken ---------- */
+.name { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 0; font-weight: 400; }
+.nrow { display: flex; gap: 3px; }
+.ltw { display: block; animation: drop 0.36s steps(4) both; }
+.lt { display: flex; align-items: center; justify-content: center; width: clamp(26px, 7.4cqw, 34px); aspect-ratio: 1; font-family: var(--font-pixel); font-weight: 700; font-size: clamp(16px, 4.6cqw, 21px); line-height: 1; color: var(--ink); background: var(--wood-slot); box-shadow: inset 0 0 0 2px var(--wood-frame); transition: opacity 0.15s steps(2); }
+.lt.hi { background: var(--gold); box-shadow: inset 0 3px 0 0 var(--gold-light), inset 0 -3px 0 0 var(--gold-dark); }
+.name:hover .lt.hi { animation: hiHop 0.45s steps(5); }
+.name:hover .lt:not(.hi) { opacity: 0.45; }
+@keyframes drop { 0% { opacity: 0; transform: translateY(-28px); } 60% { opacity: 1; transform: translateY(3px); } 100% { opacity: 1; transform: none; } }
+@keyframes hiHop { 0% { transform: none; } 40% { transform: translateY(-9px); } 100% { transform: none; } }
+
+/* ---------- Insel ---------- */
+larmic-island { display: block; position: relative; flex: 1.35 1 480px; min-width: 0; }
+.isle { position: relative; }
+.isle-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.brk { position: absolute; pointer-events: none; animation: place 0.2s steps(4); }
+.brk svg, .blk svg { display: block; width: 100%; height: auto; overflow: visible; }
+.brk.off { display: none; }
+.brk.gone { animation: crumble 0.36s steps(4) forwards; }
+@keyframes place { 0% { opacity: 0.4; transform: translateY(-16px) scale(0.7); } 70% { opacity: 1; transform: translateY(2px) scale(1.04); } 100% { opacity: 1; transform: none; } }
+@keyframes crumble { 0% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(28px) scale(0.55) rotate(10deg); } }
+
+/* Figur: Position (figpos) › Blickrichtung (figflip) › Respawn (figspawn) › Sprung/Sturz (figw) › Schritt (fighop) */
+.figpos { position: absolute; z-index: 200; pointer-events: none; transition: left 0.13s linear, top 0.13s linear; }
+.figpos.tp { transition: none; }
+.fig-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.figflip, .figspawn, .figw, .fighop { transform-origin: 50% 100%; }
+.figflip.flip { transform: scaleX(-1); }
+.stepA { animation: hopA 0.13s ease-out; }
+.stepB { animation: hopB 0.13s ease-out; }
+@keyframes hopA { 50% { transform: translateY(-9%); } }
+@keyframes hopB { 50% { transform: translateY(-9%); } }
+.jumpA { animation: jumpA 0.6s ease-out; }
+.jumpB { animation: jumpB 0.6s ease-out; }
+@keyframes jumpA { 20% { transform: scale(1.06, 0.9); } 50% { transform: translateY(-18%) scale(0.95, 1.06); } 80% { transform: scale(1.04, 0.95); } }
+@keyframes jumpB { 20% { transform: scale(1.06, 0.9); } 50% { transform: translateY(-18%) scale(0.95, 1.06); } 80% { transform: scale(1.04, 0.95); } }
+.falling { animation: fall 0.8s steps(8) forwards; }
+@keyframes fall { 0% { opacity: 1; transform: none; } 20% { opacity: 1; transform: translateY(-8%); } 100% { opacity: 0; transform: translateY(240%) rotate(28deg); } }
+.spawnA .figspawn { animation: spawnA 0.5s steps(6); }
+.spawnB .figspawn { animation: spawnB 0.5s steps(6); }
+@keyframes spawnA { 0% { opacity: 0; transform: scale(0.3, 1.5); } 45% { opacity: 1; transform: scale(1.15, 0.85); } 75% { transform: scale(0.96, 1.04); } 100% { opacity: 1; transform: none; } }
+@keyframes spawnB { 0% { opacity: 0; transform: scale(0.3, 1.5); } 45% { opacity: 1; transform: scale(1.15, 0.85); } 75% { transform: scale(0.96, 1.04); } 100% { opacity: 1; transform: none; } }
+.fig-arm-r { transform-box: fill-box; transform-origin: 50% 8%; }
+.placeA .fig-arm-r { animation: swingA 0.22s ease-out; }
+.placeB .fig-arm-r { animation: swingB 0.22s ease-out; }
+@keyframes swingA { 45% { transform: rotate(-80deg); } }
+@keyframes swingB { 45% { transform: rotate(-80deg); } }
+.fig-blink { opacity: 0; animation: blink 6s steps(1, end) infinite; }
+@keyframes blink { 0% { opacity: 0; } 94% { opacity: 1; } 97% { opacity: 0; } 100% { opacity: 0; } }
+.sp { position: absolute; left: 44%; top: 52%; width: 12%; aspect-ratio: 1; opacity: 0; pointer-events: none; }
+
+.bubble { position: absolute; left: 50%; bottom: calc(100% + 22px); transform: translateX(-50%); width: max-content; max-width: 240px; margin: 0; padding: 10px 14px; background: #ffffff; color: var(--ink); font-size: 17px; line-height: 1.3; text-align: center; box-shadow: var(--px-3); }
+.bubble.off { display: none; }
+.bubble.err { color: var(--error); }
+.bubble::after { content: ''; position: absolute; left: 50%; bottom: -12px; width: 12px; height: 12px; margin-left: -6px; background: #ffffff; box-shadow: -3px 0 0 0 var(--ink), 3px 0 0 0 var(--ink), 0 3px 0 0 var(--ink); }
+
+/* Navigationsblöcke */
+.blkrow { position: absolute; inset: 0; pointer-events: none; }
+.blk { position: absolute; display: block; padding: 0; margin: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; pointer-events: auto; }
+.bob { position: relative; display: block; width: 100%; animation: bob 3.4s ease-in-out infinite; }
+.blk svg { transition: transform 0.15s steps(3); }
+.blk:hover svg { transform: translateY(-5px); }
+.blk .outline { opacity: 0; }
+.blk.on .outline { opacity: 1; }
+.blk .tag { position: absolute; padding: 5px 10px; background: var(--ink); color: #ffffff; font-family: var(--font-pixel); font-size: 15px; line-height: 1.2; white-space: nowrap; }
+.blk.on .tag { background: var(--gold); color: var(--ink); }
+.tagB { left: 50%; top: calc(100% + 8px); transform: translateX(-50%); }
+.tagL { right: calc(100% + 10px); top: 42%; transform: translateY(-50%); }
+.tagR { left: calc(100% + 10px); top: 42%; transform: translateY(-50%); }
+.held .bob { animation: none; }
+.px { position: absolute; left: 45%; top: 42%; width: 10%; height: 10%; opacity: 0; pointer-events: none; }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+.popA svg { animation: popA 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3); }
+.popB svg { animation: popB 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3); }
+@keyframes popA { 35% { transform: translateY(-16px) scale(1.15) rotate(-8deg); } 70% { transform: scale(0.94) rotate(4deg); } }
+@keyframes popB { 35% { transform: translateY(-16px) scale(1.15) rotate(-8deg); } 70% { transform: scale(0.94) rotate(4deg); } }
+
+/* Handy: Blöcke als Reihe unter der Insel, keine Brücken */
+@container larmic (max-width: 700px) {
+  larmic-island { overflow: hidden; }
+  .isle { width: 142%; margin-left: -21%; }
+  .blkrow { position: static; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 6px; padding-bottom: 8px; }
+  .blk { position: relative !important; left: auto !important; top: auto !important; width: auto !important; z-index: auto !important; display: flex; flex-direction: column; align-items: center; }
+  .blk .bob { width: 74%; }
+  .blk .tag { position: static; transform: none; display: inline-block; margin-top: 6px; font-size: 13px; padding: 4px 6px; }
+  .bridges { display: none; }
+  .figpos { left: var(--home-x) !important; top: var(--home-y) !important; }
+}

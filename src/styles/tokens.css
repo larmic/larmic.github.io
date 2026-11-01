@@ -1,0 +1,45 @@
+/* Design-Tokens der Inselwelt. Ausführlich erklärt in docs/design-system.md */
+:root {
+  /* Grundfarben */
+  --ink: #1d2838;            /* Text und alle Pixel-Rahmen */
+  --sky-1: #79c7ea;          /* Himmel, drei harte Stufen von oben nach unten */
+  --sky-2: #8dd0ee;
+  --sky-3: #a6dbf2;
+  --gold: #f0a531;           /* einzige Aktionsfarbe: Buttons, Goldblöcke, Auswahl */
+  --gold-light: #ffd47e;
+  --gold-dark: #b46a0c;
+  --paper: #fffdf7;          /* Inhaltspanel */
+  --green: #3f7f27;          /* Chips (weiße Schrift) */
+  --muted: #4b5563;          /* Unterzeilen */
+  --error: #a3221b;          /* 404-Sprechblase */
+  --dirt: #6e4a30;           /* Fallback hinter der Erdtextur */
+  --dirt-shade: rgba(43, 26, 15, 0.4);
+  --stone-shade: rgba(20, 22, 28, 0.62);
+
+  /* Materialien: Fläche, Slot, Rahmen – stehen für Themen */
+  --wood-bg: #f3ead6;        /* Holz: Handwerk, Architektur */
+  --wood-slot: #e2d5ba;
+  --wood-frame: #b3a385;
+  --wood-icon: #a0703f;
+  --metal-bg: #e6eaf0;       /* Metall: DevOps, Infrastruktur */
+  --metal-slot: #d3dae4;
+  --metal-frame: #9aa6b6;
+  --metal-icon: #7d8ea3;
+  --crystal-bg: #2a2342;     /* Kristall: KI (und Event Storming) */
+  --crystal-slot: #1b1630;
+  --crystal-frame: #4a3f70;
+  --crystal-text: #f1ecff;
+  --crystal-link: #d9c6ff;
+  --crystal-icon: #b48cf0;
+  --grass-bg: #e3ecd2;       /* Gras: Testing */
+  --grass-icon: #6cc46f;
+
+  /* Schriften */
+  --font-pixel: 'Pixelify Sans', 'Courier New', monospace;
+  --font-body: 'Nunito', 'Trebuchet MS', sans-serif;
+  --font-mono: 'JetBrains Mono', Consolas, monospace;
+
+  /* Pixel-Rahmen: vier Schatten statt border, dadurch fehlen die Eckpixel */
+  --px-4: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink);
+  --px-3: 0 -3px 0 0 var(--ink), 0 3px 0 0 var(--ink), -3px 0 0 0 var(--ink), 3px 0 0 0 var(--ink);
+}

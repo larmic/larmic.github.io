@@ -1,0 +1,40 @@
+---
+// Die Inselwelt: statisches SVG aus dem Voxel-Generator (beim Build) + Web Component für die Interaktion.
+import { buildWorld } from '../lib/voxel/world';
+const w = buildWorld();
+const d = w.data;
+const outline = '40,1.5 78.5,20.7 78.5,64.4 40,83.4 1.5,64.4 1.5,20.7';
+const sparks = ['#ffffff', '#f0a531', '#ffffff', '#f0a531', '#ffffff', '#f0a531'];
+---
+<larmic-island data-world={JSON.stringify({ home: d.home, routes: d.routes })} style={`--home-x: ${d.home.x}%; --home-y: ${d.home.y}%`}>
+  <div class="isle" style={`aspect-ratio: ${w.aspect}`}>
+    <Fragment set:html={w.islandSvg} />
+    <div class="bridges">
+      {d.bridges.map((b) => (
+        <div class="brk off" data-route={b.route} data-idx={b.idx} style={`left: ${b.x}%; top: ${b.y}%; width: ${b.w}%; z-index: ${b.z}`}>
+          <svg viewBox="0 0 80 84.8" aria-hidden="true"><use href="#v-plank"></use></svg>
+        </div>
+      ))}
+    </div>
+    <div class="figpos" style={`left: ${d.home.x}%; top: ${d.home.y}%; width: ${w.fig.w}%; transform: translate(-${w.fig.tx}%, -${w.fig.ty}%)`}>
+      <p class="bubble pxf" aria-live="polite">Hi! Zeig auf einen Block.</p>
+      {sparks.map((c) => <span class="sp" style={`background: ${c}`}></span>)}
+      <div class="figflip"><div class="figspawn"><div class="figw"><div class="fighop" set:html={w.figureSvg}></div></div></div></div>
+    </div>
+  </div>
+  <div class="blkrow">
+    {d.nav.map((n) => (
+      <button type="button" class="blk" data-id={n.id} aria-pressed="false" aria-label={n.id === 'blog' ? 'Blog' : `${n.label} anzeigen`} style={`left: ${n.x}%; top: ${n.y}%; width: ${n.w}%; z-index: ${n.z}`}>
+        <span class="bob" style={`animation-delay: ${n.delay}`}>
+          <svg viewBox="0 0 80 84.8" aria-hidden="true"><use href={`#v-${n.sym}`}></use><polygon class="outline" points={outline} fill="none" stroke="#1d2838" stroke-width="3"></polygon></svg>
+          {[0, 1, 2, 3, 4, 5].map((i) => <span class="px" style={`background: ${i % 2 ? n.p2 : n.p1}`}></span>)}
+        </span>
+        <span class={`tag tag${n.tag}`}>{n.label}</span>
+      </button>
+    ))}
+  </div>
+</larmic-island>
+<Fragment set:html={`<style>${w.particles}</style>`} />
+<script>
+  import '../scripts/larmic-island';
+</script>

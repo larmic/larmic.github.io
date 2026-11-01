@@ -1,0 +1,27 @@
+---
+// YouTube erst nach Klick laden: vorher keine Verbindung zu YouTube.
+interface Props {
+  id: string;
+  title: string;
+}
+const { id, title } = Astro.props;
+---
+<div class="yt" data-yt={id} data-title={title}>
+  <button type="button">
+    <svg width="64" height="64" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path d="M3 1h1v6h-1z M4 2h1v4h-1z M5 3h1v2h-1z" fill="#ee4b3e"></path></svg>
+    Video abspielen
+    <small>Beim Abspielen wird das Video von YouTube (youtube-nocookie.com) geladen.</small>
+  </button>
+</div>
+<script>
+  for (const el of document.querySelectorAll<HTMLElement>('.yt')) {
+    el.querySelector('button')?.addEventListener('click', () => {
+      const frame = document.createElement('iframe');
+      frame.src = `https://www.youtube-nocookie.com/embed/${el.dataset.yt}?autoplay=1`;
+      frame.title = el.dataset.title || 'YouTube-Video';
+      frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      frame.allowFullscreen = true;
+      el.replaceChildren(frame);
+    });
+  }
+</script>
