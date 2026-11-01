@@ -19,7 +19,7 @@ Vor jedem Commit `npm run check` und `npm run build` ausführen.
 - `src/content/` – Workshops und Videos als Markdown, Schema in `src/content.config.ts`
 - `src/components/` – Astro-Komponenten, die Insel in `Island.astro`, der Kopf ohne Insel (Impressum) in `SubHero.astro`
 - `src/scripts/larmic-island.ts` – Web Component für Figur, Brückenbau und Blog-Sturz (ohne Framework)
-- `src/lib/voxel/` – Voxel-Generator, läuft beim Build: `textures.ts` (Pixel-Raster), `render.ts`, `figure.ts`, `world.ts` (Insel, Wege, Plätze der Kisten)
+- `src/lib/voxel/` – Voxel-Generator, läuft beim Build: `textures.ts` (Pixel-Raster), `render.ts`, `figure.ts`, `world.ts` (Insel, Wege, Plätze der Kisten, Baum-Easter-Egg), `head.ts` (drehbarer Kopf, auch im Browser genutzt)
 - `src/data/` – `site.ts` (Links, Werkzeugkisten, Sprechblasen, giscus), `avatar.ts` (Aussehen der Figur), `island.ts` (Insel mit Kisten aus Workshops und Videos)
 - `src/styles/` – `tokens.css` (Design-Tokens), `global.css`, `sections.css`
 - `docs/design-system.md` – Farben, Materialien, Typografie, Interaktionen

@@ -91,6 +91,10 @@ Die Sprechblase erscheint nur, wenn die Figur auf einem Bereichs-Block steht (au
 
 Takt der Figur: 130 ms. Auf schmalen Bildschirmen (unter 700 px Containerbreite) stehen die Blöcke als Reihe unter der Insel, offene Kisten reihen sich dazu, Brücken entfallen.
 
+**Easter Egg Baum:** Zeigt man auf das Blätterdach, läuft die Figur zum Baum, stapelt zwei Blöcke, klettert in die Krone und sagt „Schöne Aussicht!“. Maus weg: Die Blöcke zerbröseln, sie läuft zurück. Nicht klickbar, nicht per Tastatur erreichbar, auf dem Handy nicht vorhanden.
+
+**Blick zum Cursor:** Steht die Figur, schaut sie zum Mauszeiger. Ist er deutlich auf der anderen Seite, dreht sich die ganze Figur um; den Rest macht der Kopf: drehen (15°-Stufen, von „schaut nach links“ über „schaut dich an“ bis zur Ohrseite) und nicken (10°-Stufen, nach oben oder zum Text darunter). Der Kopf ist ein echter Würfel mit fünf Seiten (`src/lib/voxel/head.ts`), dieselbe Rechnung erzeugt beim Build das Startbild. Beim Laufen, Bauen und Fallen schaut sie geradeaus; ohne Maus und bei reduzierter Bewegung gar nicht.
+
 **Plätze für Kisten:** drei an Workshops, vier an Videos (`CHILD_SLOTS` in `world.ts`). Ein weiterer Eintrag bricht den Build mit einer Meldung ab – dann braucht es einen neuen Platz.
 
 ## Voxel-Technik

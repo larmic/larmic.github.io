@@ -65,14 +65,18 @@ function islandBlocks(): Map<string, { c: Cell; kind: string }> {
 // (z. B. Insel → Workshops → Workshop-Kiste). Gleiche Felder teilen sich einen Brückenblock.
 type Tag = 'L' | 'R' | 'B';
 type Blocks = Map<string, { c: Cell; kind: string }>;
-type RouteDef = { walk: [number, number][]; bridge: Cell[]; target: Cell; tag: Tag; fall?: Cell; via?: string };
+// walk: Felder auf der Insel · bridge: Blöcke, die die Figur setzt · climb: vorhandene Blöcke, auf die sie steigt
+type RouteDef = { walk: [number, number][]; bridge: Cell[]; climb?: Cell[]; target: Cell; tag: Tag; fall?: Cell; via?: string };
 type NavMeta = { label: string; sym: string; delay: string; p1: string; p2: string; color?: string; href?: string; parent?: string };
+// Easter Egg: Weg ohne Block und Link, ausgelöst durch Hover über eine Fläche aus vorhandenen Blöcken
+type EggDef = { route: RouteDef; area: Cell[] };
 type SceneDef = {
   blocks: Blocks;
   home: Cell;
   routes: Record<string, RouteDef>;
   meta: Record<string, NavMeta>;
   bubbles: string[]; // Ziele mit Sprechblase – brauchen Platz darüber
+  eggs?: Record<string, EggDef>;
 };
 
 export type RouteNode = { x: number; y: number; f: 'L' | 'R'; b: boolean; k?: number; fall?: boolean };
@@ -82,6 +86,7 @@ export type WorldData = {
   routes: Record<string, RouteNode[]>;
   bridges: { x: number; y: number; w: number; z: number }[];
   nav: NavItem[];
+  eggs: { id: string; x: number; y: number; w: number; h: number }[];
 };
 export type Scene = ReturnType<typeof buildScene>;
 
@@ -112,10 +117,13 @@ function buildScene(def: SceneDef) {
   const [hx, hy] = footpt(...def.home);
   headroom([hx, hy]);
 
+  const allRoutes: Record<string, RouteDef> = { ...def.routes, ...Object.fromEntries(Object.entries(def.eggs ?? {}).map(([id, e]) => [id, e.route])) };
   const steps = (rid: string): Step[] => {
-    const d = def.routes[rid];
+    const d = allRoutes[rid];
     const start: Step[] = d.via ? steps(d.via) : d.walk.map(([i, j]) => ({ c: [i, j, 0] as Cell, b: false, fall: false }));
-    const own: Step[] = d.fall ? [{ c: d.fall, b: false, fall: true }] : [...d.bridge.map((c) => ({ c, b: true, fall: false })), { c: d.target, b: false, fall: false }];
+    const own: Step[] = d.fall
+      ? [{ c: d.fall, b: false, fall: true }]
+      : [...d.bridge.map((c) => ({ c, b: true, fall: false })), ...(d.climb ?? []).map((c) => ({ c, b: false, fall: false })), { c: d.target, b: false, fall: false }];
     return [...start, ...own];
   };
 
@@ -123,7 +131,7 @@ function buildScene(def: SceneDef) {
   const bridgesRaw: { X: number; Y: number; d: number }[] = [];
   const nodesRaw: Record<string, { fx: number; fy: number; f: 'L' | 'R'; b: boolean; k?: number; fall?: boolean }[]> = {};
   const targets: Record<string, { X: number; Y: number; d: number; tag: Tag }> = {};
-  for (const [rid, d] of Object.entries(def.routes)) {
+  for (const [rid, d] of Object.entries(allRoutes)) {
     let prev = def.home;
     nodesRaw[rid] = steps(rid).map(({ c, b, fall }) => {
       const dx = (c[0] - prev[0]) - (c[1] - prev[1]);
@@ -145,6 +153,7 @@ function buildScene(def: SceneDef) {
       return { fx, fy, f: dx > 0 ? 'R' : 'L', b, ...(k !== undefined ? { k } : {}), ...(fall ? { fall: true } : {}) } as const;
     });
     if (def.bubbles.includes(rid)) headroom(footpt(...d.target));
+    if (!def.routes[rid]) continue; // Easter Egg: kein Zielblock, kein Etikett
 
     const [X, Y] = pos(...d.target);
     targets[rid] = { X, Y, d: d.target[0] + d.target[1] + d.target[2], tag: d.tag };
@@ -176,6 +185,13 @@ function buildScene(def: SceneDef) {
     nav: Object.keys(def.routes).map((id) => ({
       id, ...def.meta[id], x: px(targets[id].X), y: py(targets[id].Y), w: W, z: zi(targets[id].d, 1), tag: targets[id].tag,
     })),
+    // Hover-Fläche des Easter Eggs: Umriss der Blöcke, die es auslösen (oben ohne die schrägen Ecken)
+    eggs: Object.entries(def.eggs ?? {}).map(([id, e]) => {
+      const bx = e.area.map((c) => pos(...c));
+      const [ax0, ay0] = [Math.min(...bx.map((b) => b[0])), Math.min(...bx.map((b) => b[1]))];
+      const [ax1, ay1] = [Math.max(...bx.map((b) => b[0])) + 80, Math.max(...bx.map((b) => b[1])) + 84.8];
+      return { id, x: px(ax0), y: py(ay0 + 10), w: Number(f(((ax1 - ax0) / sw) * 100)), h: Number(f(((ay1 - ay0 - 20) / sh) * 100)) };
+    }),
   };
 
   const [fx0, fy0, fw, fh] = fig.box;
@@ -222,6 +238,12 @@ const CHILD_SLOTS: Record<Section, Pick<RouteDef, 'bridge' | 'target' | 'tag'>[]
 
 export type ChildItem = { id: string; label: string; block: string; color?: string; href: string };
 
+// Easter Egg: Hover über das Blätterdach → die Figur läuft zum Baum, stapelt zwei Blöcke und klettert in die Krone
+const TREE_EGG: EggDef = {
+  route: { walk: [[3, 2], [3, 1]], bridge: [[2, 1, 1], [2, 1, 2]], climb: [[2, 0, 3]], target: [1, 0, 4], tag: 'B' },
+  area: [[0, 0, 3], [2, 0, 3], [1, -1, 3], [1, 1, 3], [1, 0, 4]],
+};
+
 export function buildWorld(children: Record<Section, ChildItem[]>): Scene {
   const routes: Record<string, RouteDef> = {};
   const meta: Record<string, NavMeta> = {};
@@ -237,5 +259,5 @@ export function buildWorld(children: Record<Section, ChildItem[]>): Scene {
       meta[cid] = { label: it.label, sym: it.block, delay: `${f(-0.4 - 0.7 * n)}s`, p1: it.color ?? '#f0a531', p2: '#ffffff', color: it.color, href: it.href, parent: id };
     });
   }
-  return buildScene({ blocks: islandBlocks(), home: HOME, routes, meta, bubbles: Object.keys(ROUTES) });
+  return buildScene({ blocks: islandBlocks(), home: HOME, routes, meta, bubbles: [...Object.keys(ROUTES), 'tree'], eggs: { tree: TREE_EGG } });
 }

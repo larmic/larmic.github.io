@@ -20,9 +20,10 @@ export const BUBBLES = {
   about: 'Das bin ich. Fullstack, Architektur und KI mit Leitplanken.',
   workshops: 'Lass uns gemeinsam modellieren!',
   videos: 'Popcorn bereit? Hier sind meine Talks.',
+  tree: 'Schöne Aussicht!', // Easter Egg: oben im Baum
 };
 
-export const FOCUS =['Domain-Driven Design', 'Hexagonale Architektur', 'Event Storming', 'Microservices', 'DevSecOps'];
+export const FOCUS = ['Domain-Driven Design', 'Hexagonale Architektur', 'Event Storming', 'Microservices', 'DevSecOps'];
 
 export type Kit = { id: 'hw' | 'ops' | 'ki'; title: string; sub: string; block: 'crate' | 'metal' | 'crystal'; icon: string; items: { label: string; color: string }[] };
 

@@ -6,8 +6,11 @@
 // und baut die neue Brücke. Maus weg → zurück auf den Ruheblock.
 // Blog → die Figur fällt ins Leere und spawnt auf ihrem Ruheblock mit „404 – Kein Blog gefunden“.
 // Die Blöcke sind Links. Beim Seitenwechsel bleibt die Insel erhalten (transition:persist), die Seite ruft `select()`.
+// Easter Egg: Hover über das Blätterdach → die Figur stapelt zwei Blöcke und klettert in die Krone.
+// Steht die Figur, schaut sie zum Cursor: Der Körper dreht sich zur Seite, der Kopf dreht und nickt in 15°/10°-Stufen.
 
 import { BUBBLES as SITE_BUBBLES } from '../data/site';
+import { headView } from '../lib/voxel/head';
 
 type RouteNode = { x: number; y: number; f: 'L' | 'R'; b: boolean; k?: number; fall?: boolean };
 type World = { home: { x: number; y: number }; routes: Record<string, RouteNode[]>; rest: string };
@@ -41,6 +44,10 @@ class LarmicIsland extends HTMLElement {
   private bridges: HTMLElement[] = [];
   private blocks: HTMLElement[] = [];
   private rest = 'about'; // Ruheblock der Figur: der Block dessen, was gerade angezeigt wird
+  private faces: SVGGElement[] = []; // Kopfseiten in der Reihenfolge von HEAD_FACES
+  private look: { x: number; y: number } | null = null; // letzte Cursor-Position
+  private headKey = '0,0';
+  private raf = 0;
 
   connectedCallback() {
     // Beim Seitenwechsel wird die Insel in die neue Seite umgehängt: Zustand behalten, nur weiterlaufen
@@ -66,6 +73,19 @@ class LarmicIsland extends HTMLElement {
       b.addEventListener('blur', () => this.leave(id));
       // Links navigieren selbst, nur der Blog-Button löst den Sturz aus
       if (b instanceof HTMLButtonElement) b.addEventListener('click', () => this.aim(id));
+    }
+    for (const e of this.querySelectorAll<HTMLElement>('.egg')) {
+      e.addEventListener('mouseenter', () => this.aim(e.dataset.egg!));
+      e.addEventListener('mouseleave', () => this.leave(e.dataset.egg!));
+    }
+    this.faces = [...this.querySelectorAll<SVGGElement>('.fig-head .fh')];
+    // Blick zum Cursor nur mit Maus und ohne Wunsch nach reduzierter Bewegung
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const follow = () => {
+        if (!this.raf) this.raf = requestAnimationFrame(() => { this.raf = 0; this.aimHead(); });
+      };
+      document.addEventListener('pointermove', (e) => { this.look = { x: e.clientX, y: e.clientY }; follow(); }, { passive: true });
+      window.addEventListener('scroll', follow, { passive: true });
     }
     this.st = { sel: this.rest, n: 0, goal: null, ...this.restPose(), m: 0, pl: 0, t: 0, crumbs: [], fall: 0, spawn: 0, spawnT: -1, msg: null, done404: false };
     this.render();
@@ -191,7 +211,45 @@ class LarmicIsland extends HTMLElement {
     this.render();
     route = st.r ? this.w.routes[st.r] : [];
     const arrived = st.r !== null && this.target() === st.r && st.p >= route.length && !route[route.length - 1].fall;
-    if (arrived && st.crumbs.length === 0) this.stop();
+    if (arrived && st.crumbs.length === 0) {
+      this.stop();
+      this.aimHead();
+    }
+  }
+
+  /** Kopf zum Cursor drehen, solange die Figur steht. Beim Laufen schaut sie geradeaus in Laufrichtung. */
+  private aimHead() {
+    if (!this.look || this.timer !== undefined || this.st.fall) return this.setHead(0, 0);
+    const box = this.figpos.getBoundingClientRect();
+    const dx = this.look.x - (box.left + box.width / 2);
+    const dy = this.look.y - (box.top + box.height * 0.2);
+    // Deutlich auf der anderen Seite: ganze Figur dreht sich um
+    if (Math.abs(dx) > 48) {
+      const face = dx > 0 ? 'R' : 'L';
+      if (face !== this.st.face) {
+        this.st.face = face;
+        this.flip.className = 'figflip' + (face === 'R' ? ' flip' : '');
+      }
+    }
+    // In Blickrichtung der Figur gerechnet: −1 weit zur Seite, 0 genau darunter oder darüber (schaut dich an)
+    const h = Math.max(-1, Math.min(1, (this.st.face === 'R' ? -dx : dx) / 260));
+    const yaw = h < 0 ? -45 - 75 * h : -45 - 45 * h;
+    const v = Math.max(-1, Math.min(1, dy / 320));
+    this.setHead(Math.round(yaw / 15) * 15, Math.round((v * (v < 0 ? 20 : 25)) / 10) * 10);
+  }
+
+  private setHead(yaw: number, pitch: number) {
+    const key = `${yaw},${pitch}`;
+    if (key === this.headKey || this.faces.length === 0) return;
+    this.headKey = key;
+    headView(yaw, pitch).forEach((view, i) => {
+      const g = this.faces[i];
+      if (view.matrix) {
+        g.setAttribute('transform', `matrix(${view.matrix.map((n) => n.toFixed(3)).join(',')})`);
+        g.style.display = '';
+      } else g.style.display = 'none';
+      g.querySelector('.fhs')?.setAttribute('opacity', view.shade.toFixed(3));
+    });
   }
 
   private render() {
@@ -207,6 +265,7 @@ class LarmicIsland extends HTMLElement {
     this.flip.className = 'figflip' + (st.face === 'R' ? ' flip' : '');
     this.jump.className = 'figw' + (st.fall > 0 ? ' falling' : st.n ? ` jump${ab}` : '');
     this.hop.className = 'fighop' + (st.m ? (st.m % 2 ? ' stepA' : ' stepB') : '') + (st.pl ? (st.pl % 2 ? ' placeA' : ' placeB') : '');
+    if (this.timer !== undefined) this.setHead(0, 0);
 
     const standing = new Set(route.slice(0, st.built).flatMap((n) => (n.k === undefined ? [] : [n.k])));
     const crumbs = new Set(st.crumbs.map((c) => c.k));
@@ -233,12 +292,15 @@ class LarmicIsland extends HTMLElement {
 
     // Sprechblase nur, wenn die Figur auf ihrem Ruheblock steht und nirgendwo anders hin will.
     // Auf Bereichen spricht sie zum Bereich (beim ersten Aufruf der Startseite begrüßt sie), auf Kisten schweigt sie.
+    // Oben im Baum: eigener Spruch.
     const pose = this.restPose();
     const atRest = st.r === pose.r && st.p === pose.p && st.fall === 0 && this.target() === this.rest;
+    const inTree = st.r === 'tree' && st.p === this.w.routes.tree?.length && this.target() === 'tree';
     const err = st.msg === '404';
-    const text = err ? BUBBLE_404 : this.rest.includes('/') ? '' : st.n === 0 && this.rest === 'about' ? BUBBLE_IDLE : BUBBLES[this.rest] ?? BUBBLE_IDLE;
+    const text = inTree ? BUBBLES.tree
+      : err ? BUBBLE_404 : this.rest.includes('/') ? '' : st.n === 0 && this.rest === 'about' ? BUBBLE_IDLE : BUBBLES[this.rest] ?? BUBBLE_IDLE;
     this.bubble.textContent = text;
-    this.bubble.className = 'bubble pxf' + (err ? ' err' : '') + (atRest && text ? '' : ' off');
+    this.bubble.className = 'bubble pxf' + (err && !inTree ? ' err' : '') + ((atRest || inTree) && text ? '' : ' off');
   }
 }
 

@@ -52,6 +52,8 @@ larmic-island { display: block; position: relative; flex: 1.35 1 480px; min-widt
 .brk { position: absolute; pointer-events: none; animation: place 0.2s steps(4); }
 .brk svg, .blk svg { display: block; width: 100%; height: auto; overflow: visible; }
 .brk.off { display: none; }
+/* Easter Egg: unsichtbare Hover-Fläche über dem Blätterdach */
+.egg { position: absolute; z-index: 25; }
 .brk.gone { animation: crumble 0.36s steps(4) forwards; }
 @keyframes place { 0% { opacity: 0.4; transform: translateY(-16px) scale(0.7); } 70% { opacity: 1; transform: translateY(2px) scale(1.04); } 100% { opacity: 1; transform: none; } }
 @keyframes crumble { 0% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(28px) scale(0.55) rotate(10deg); } }
@@ -128,6 +130,6 @@ a.blk { text-decoration: none; }
   .blk .bob { width: 74%; }
   .blk .tag { position: static; transform: none; display: inline-block; margin-top: 6px; font-size: 13px; padding: 4px 6px; white-space: normal; max-width: 100%; text-align: center; }
   .blk.child .tag { display: inline-block; }
-  .bridges { display: none; }
+  .bridges, .egg { display: none; }
   .figpos { left: var(--home-x) !important; top: var(--home-y) !important; }
 }
