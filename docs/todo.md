@@ -11,13 +11,9 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 ### Recht und Datenschutz
 
 - [x] **Rolle von team neusta geklärt:** Workshops laufen über team neusta, Vertragspartner ist die neusta GmbH. Steht auf `/workshops/`, auf jeder Workshop-Seite und in der Datenschutzerklärung. Für Anfragen an `l.michaelis@neusta.de` gilt die Datenschutzerklärung der team neusta SE (verlinkt).
-- [ ] **Datenschutzerklärung nachziehen:**
-  - „Schriften und Grafiken liegen auf dem eigenen Server“ ist ungenau (GitHub Pages hostet). Besser: „werden mit der Seite ausgeliefert, nichts wird von Dritten nachgeladen“.
-  - Speicherdauer der Server-Logs bei GitHub nennen.
-  - Widerspruchsrecht nach Art. 21 DSGVO getrennt und hervorgehoben aufführen.
-  - Hinweis, dass keine Pflicht zur Bereitstellung besteht und keine automatisierten Entscheidungen stattfinden.
-  - Danach prüfen lassen (Generator-Abgleich oder neusta).
-- [ ] **YouTube-Platzhalter:** im Text vor dem Klick Google/USA nennen und auf `/datenschutz/` verlinken (informierte Einwilligung).
+- [x] **Datenschutzerklärung nachgezogen:** Formulierung zur Auslieferung, Speicherdauer der GitHub-Logs (GitHub nennt keine Frist), Widerspruchsrecht hervorgehoben, Pflicht zur Bereitstellung und automatisierte Entscheidungen.
+- [ ] **Datenschutzerklärung prüfen lassen** (Generator-Abgleich oder neusta).
+- [x] **YouTube-Platzhalter:** Hinweis auf Google/USA mit Link zur Datenschutzerklärung und direkter Link zu YouTube unter jedem Video.
 - [ ] Vor dem Aktivieren von giscus: eigener Abschnitt in der Datenschutzerklärung. Die Aussage „keine Cookies, keine Speicherung“ gilt dann nicht mehr uneingeschränkt.
 
 ### Barrierefreiheit (Muss)
@@ -49,7 +45,7 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
   - Seitenliste ohne `/datenschutz/` ergänzen.
   - Node-Version vereinheitlichen (`.nvmrc` 24, engines `>=22.23.4`, README „22.23“).
 - [ ] **Vorschaubild beim Teilen:** `og:image` (1200×630, z. B. Insel mit Figur), `og:site_name`, `og:locale`, `twitter:card`. Für LinkedIn ist das die Visitenkarte.
-- [ ] **Videos ohne JavaScript erreichbar:** im Platzhalter zusätzlich ein normaler Link „Auf YouTube ansehen“ (`youtube.com/watch?v=…`).
+- [x] **Videos ohne JavaScript erreichbar:** Link „direkt auf YouTube ansehen“ unter jedem Video.
 - [ ] **Speicherleck der Insel beheben:** `pointermove`- und `scroll`-Listener werden nie entfernt. Bei jedem Weg Insel → Impressum/Datenschutz/404 → Insel bleibt eine alte Insel im Speicher. AbortController verwenden und `cancelAnimationFrame` in `disconnectedCallback` aufrufen.
 - [ ] **Livegang-Checkliste:**
   - [ ] Merge `relaunch` → `main` per Pull Request, ersten Deploy-Lauf prüfen.

@@ -1,5 +1,6 @@
 ---
-// YouTube erst nach Klick laden: vorher keine Verbindung zu YouTube.
+// YouTube erst nach Klick laden: vorher keine Verbindung zu YouTube. Darunter der Hinweis für eine informierte
+// Einwilligung und ein normaler Link zu YouTube (funktioniert auch ohne JavaScript).
 interface Props {
   id: string;
   title: string;
@@ -10,9 +11,10 @@ const { id, title } = Astro.props;
   <button type="button">
     <svg width="64" height="64" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path d="M3 1h1v6h-1z M4 2h1v4h-1z M5 3h1v2h-1z" fill="#ee4b3e"></path></svg>
     Video abspielen
-    <small>Beim Abspielen wird das Video von YouTube (youtube-nocookie.com) geladen.</small>
+    <small>Lädt das Video von YouTube (Google)</small>
   </button>
 </div>
+<p class="yt-note">Beim Abspielen werden Daten an Google übertragen, auch in die USA – mehr dazu in der <a href="/datenschutz/">Datenschutzerklärung</a>. Lieber ohne Einbettung? Dann <a href={`https://www.youtube.com/watch?v=${id}`}>direkt auf YouTube ansehen</a>.</p>
 <script>
   // Ein Handler für alle Videos, auch nach einem Seitenwechsel ohne Neuladen
   document.addEventListener('click', (e) => {
