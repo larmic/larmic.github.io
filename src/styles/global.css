@@ -274,8 +274,13 @@ larmic-island {
   pointer-events: none;
   animation: place 0.2s steps(4);
 }
+.isle-front {
+  position: absolute;
+  pointer-events: none; /* Hover und Klicks gehen an die Blöcke darunter */
+}
 .brk svg,
-.blk svg {
+.blk svg,
+.isle-front svg {
   display: block;
   width: 100%;
   height: auto;
@@ -731,6 +736,7 @@ a.blk {
     opacity: 1;
   }
   .bridges,
+  .front,
   .egg {
     display: none;
   }

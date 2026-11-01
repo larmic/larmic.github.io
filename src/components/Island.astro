@@ -40,6 +40,16 @@ const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
         </div>
       ))}
     </div>
+    <!-- Inselblöcke, die vor Brücken oder Zielblöcken stehen: darüber gezeichnet, damit sie sie verdecken -->
+    <div class="front" aria-hidden="true">
+      {d.front.map((b) => (
+        <div class="isle-front" style={`left: ${b.x}%; top: ${b.y}%; width: ${b.w}%; z-index: ${b.z}`}>
+          <svg viewBox={CUBE_VIEWBOX}>
+            <use href={`#v-${b.kind}`}></use>
+          </svg>
+        </div>
+      ))}
+    </div>
     {d.eggs.map((e) => (
       <span
         class="egg"

@@ -52,7 +52,7 @@ stateDiagram-v2
 | Was | Regel |
 | --- | --- |
 | Position | Fuß auf dem zuletzt betretenen Feld, vor dem ersten Schritt die Inselmitte |
-| Brücken | Brückenfelder des aktuellen Weges, die stehen; bröckelnde sind kurz noch sichtbar |
+| Brücken | Brückenfelder des aktuellen Weges, die stehen; bröckelnde sind kurz noch sichtbar. Inselblöcke, die davor stehen, verdecken sie (Vordergrund-Ebene in Tiefenreihenfolge) |
 | Kisten eines Bereichs | sichtbar, solange der Bereich (oder eine seiner Kisten) Ruheblock ist oder die Figur noch auf den Brücken des Bereichs unterwegs ist |
 | Wippen | Blöcke, über die die Figur gerade geht oder auf denen sie steht, wippen nicht |
 | Markierung | Ruheblock und sein Bereich sind markiert, der Ruheblock-Link trägt `aria-current="page"` |

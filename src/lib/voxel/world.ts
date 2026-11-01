@@ -94,18 +94,23 @@ export type WorldData = {
   routes: Record<string, RouteNode[]>;
   bridges: { x: number; y: number; w: number; z: number }[];
   nav: NavItem[];
+  // Inselblöcke, die vor einer Brücke oder einem Zielblock stehen: noch einmal darüber gezeichnet, damit sie verdecken
+  front: { kind: string; x: number; y: number; w: number; z: number }[];
   eggs: { id: string; x: number; y: number; w: number; h: number }[];
 };
 export type Scene = ReturnType<typeof buildScene>;
 
 type Step = { c: Cell; b: boolean; fall: boolean };
 
+// Zeichenreihenfolge von hinten nach vorn: erst nach i + j + k, dann nach Höhe, dann nach i
+const depthOrder = (a: Cell, b: Cell) => a[0] + a[1] + a[2] - (b[0] + b[1] + b[2]) || a[2] - b[2] || a[0] - b[0];
+
 export function buildScene(def: SceneDef, avatar: Avatar) {
   const has = (i: number, j: number, k: number) => def.blocks.has(key([i, j, k]));
   const vis = [...def.blocks.values()].filter(
     ({ c: [i, j, k] }) => !(has(i + 1, j, k) && has(i, j + 1, k) && has(i, j, k + 1)),
   );
-  vis.sort((a, b) => a.c[0] + a.c[1] + a.c[2] - (b.c[0] + b.c[1] + b.c[2]) || a.c[2] - b.c[2] || a.c[0] - b.c[0]);
+  vis.sort((a, b) => depthOrder(a.c, b.c));
   const xs: number[] = [];
   const ys: number[] = [];
   const uses = vis
@@ -149,10 +154,10 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
   };
 
   const bridgeAt = new Map<string, number>();
-  const bridgesRaw: { X: number; Y: number; d: number }[] = [];
+  const bridgesRaw: { X: number; Y: number; c: Cell }[] = [];
   const nodesRaw: Record<string, { fx: number; fy: number; f: 'L' | 'R'; b: boolean; k?: number; fall?: boolean }[]> =
     {};
-  const targets: Record<string, { X: number; Y: number; d: number; tag: Tag }> = {};
+  const targets: Record<string, { X: number; Y: number; c: Cell; tag: Tag }> = {};
   for (const [rid, d] of Object.entries(allRoutes)) {
     let prev = def.home;
     nodesRaw[rid] = steps(rid).map(({ c, b, fall }) => {
@@ -165,7 +170,7 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
         k = bridgeAt.get(key(c));
         if (k === undefined) {
           const [X, Y] = pos(...c);
-          k = bridgesRaw.push({ X, Y, d: c[0] + c[1] + c[2] }) - 1;
+          k = bridgesRaw.push({ X, Y, c }) - 1;
           bridgeAt.set(key(c), k);
           xs.push(X, X + CUBE_W);
           ys.push(Y, Y + CUBE_H);
@@ -185,7 +190,7 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
     if (!def.routes[rid]) continue; // Easter Egg: kein Zielblock, kein Etikett
 
     const [X, Y] = pos(...d.target);
-    targets[rid] = { X, Y, d: d.target[0] + d.target[1] + d.target[2], tag: d.tag };
+    targets[rid] = { X, Y, c: d.target, tag: d.tag };
     xs.push(X, X + CUBE_W);
     ys.push(Y, Y + CUBE_H);
     // Platz für das Etikett. Kisten zeigen ihres nur beim Zeigen und dürfen dann über den Rand ragen.
@@ -208,7 +213,32 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
   const px = (v: number) => Number(f(((v - sx0) / sw) * 100));
   const py = (v: number) => Number(f(((v - sy0) / sh) * 100));
   const W = Number(f((CUBE_W / sw) * 100));
-  const zi = (dd: number, t = 0) => 30 + 2 * (dd + 12) + t;
+  // Ebenen über dem Insel-SVG (Brücken, Zielblöcke, Vordergrund) bekommen ihren z-index aus der Zeichenreihenfolge.
+  // Inselblöcke, die vor einer dieser Ebenen stehen und sich mit ihr überschneiden, kommen als Vordergrund dazu.
+  const dynamic = [...bridgesRaw.map((b) => b.c), ...Object.values(targets).map((t) => t.c)];
+  const overlaps = (a: Cell, b: Cell) => {
+    const [ax, ay] = pos(...a);
+    const [bx, by] = pos(...b);
+    return Math.abs(ax - bx) < CUBE_W && Math.abs(ay - by) < CUBE_H;
+  };
+  // Mit dazu kommen alle Inselblöcke, die wiederum vor einem Vordergrund-Block stehen – sonst zeigte er Seiten,
+  // die im Insel-SVG von Nachbarn verdeckt sind.
+  const inFront = (c: Cell, of: Cell[]) => of.some((d) => depthOrder(c, d) > 0 && overlaps(c, d));
+  const front = vis.filter(({ c }) => inFront(c, dynamic));
+  for (let grown = true; grown;) {
+    const more = vis.filter(
+      (b) =>
+        !front.includes(b) &&
+        inFront(
+          b.c,
+          front.map((f) => f.c),
+        ),
+    );
+    front.push(...more);
+    grown = more.length > 0;
+  }
+  const layered = [...dynamic, ...front.map((b) => b.c)].sort(depthOrder).map(key);
+  const zi = (c: Cell, t = 0) => 30 + 2 * layered.indexOf(key(c)) + t; // unter der Figur (z-index 200)
 
   const data: WorldData = {
     home: { x: px(hx), y: py(hy) },
@@ -218,16 +248,20 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
         ns.map(({ fx, fy, ...n }) => ({ x: px(fx), y: py(fy), ...n })),
       ]),
     ),
-    bridges: bridgesRaw.map((b) => ({ x: px(b.X), y: py(b.Y), w: W, z: zi(b.d) })),
+    bridges: bridgesRaw.map((b) => ({ x: px(b.X), y: py(b.Y), w: W, z: zi(b.c) })),
     nav: Object.keys(def.routes).map((id) => ({
       id,
       ...def.meta[id],
       x: px(targets[id].X),
       y: py(targets[id].Y),
       w: W,
-      z: zi(targets[id].d, 1),
+      z: zi(targets[id].c, 1),
       tag: targets[id].tag,
     })),
+    front: front.map(({ c, kind }) => {
+      const [X, Y] = pos(...c);
+      return { kind, x: px(X), y: py(Y), w: W, z: zi(c) };
+    }),
     // Hover-Fläche des Easter Eggs: Umriss der Blöcke, die es auslösen (oben ohne die schrägen Ecken)
     eggs: Object.entries(def.eggs ?? {}).map(([id, e]) => {
       const bx = e.area.map((c) => pos(...c));

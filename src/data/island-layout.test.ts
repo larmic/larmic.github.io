@@ -82,6 +82,30 @@ describe('buildWorld', () => {
     }
   });
 
+  it('lässt Inselblöcke, die vor einer Brücke stehen, die Brücke verdecken (Vordergrund mit höherem z-index)', () => {
+    const scene = full();
+    const at = units(scene);
+    for (const id of ['about', 'workshops']) {
+      // erste Brücke direkt an der Inselkante: Der Inselblock davor muss darüber liegen
+      const first = scene.data.routes[id].find((n) => n.b)!;
+      const bridge = scene.data.bridges[first.k!];
+      const b = at(bridge);
+      const covering = scene.data.front.filter((f) => {
+        const p = at(f);
+        return Math.abs(p.X - b.X) < CUBE_W && Math.abs(p.Y - b.Y) < CUBE_H && f.z > bridge.z;
+      });
+      expect(covering.length, `${id}: Vordergrund vor der ersten Brücke`).toBeGreaterThan(0);
+    }
+  });
+
+  it('hält alle Ebenen unter der Figur (z-index 200) und über der Hover-Fläche des Baums (25)', () => {
+    const { bridges, nav, front } = full().data;
+    for (const z of [...bridges, ...nav, ...front].map((e) => e.z)) {
+      expect(z).toBeGreaterThan(25);
+      expect(z).toBeLessThan(200);
+    }
+  });
+
   it('bricht bei mehr Einträgen als Plätzen mit einer Meldung ab, die sagt, was zu tun ist', () => {
     expect(() => buildWorld({ workshops: items('workshops', 5), videos: [] }, AVATAR)).toThrow(
       /CHILD_SLOTS.*draft: true/,
