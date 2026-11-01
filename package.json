@@ -11,7 +11,8 @@
     "test": "vitest run",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "arch": "depcruise src --config .dependency-cruiser.cjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "@eslint/js": "^10.0.1",
+    "dependency-cruiser": "^18.7.0",
     "eslint": "^10.14.0",
     "eslint-plugin-astro": "^3.2.1",
     "prettier": "^3.9.10",

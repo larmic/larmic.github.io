@@ -37,6 +37,9 @@ jobs:
       - name: Guard-Gate – Lint (ESLint)
         run: npm run lint
 
+      - name: Guard-Gate – Architekturregeln (dependency-cruiser)
+        run: npm run arch
+
       - name: Guard-Gate – Typen und Inhalte prüfen
         run: npm run check
 

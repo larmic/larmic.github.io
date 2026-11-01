@@ -4,7 +4,8 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import Clouds from '../components/Clouds.astro';
 import { figureSvg } from '../lib/voxel/figure';
-const fig = figureSvg();
+import { AVATAR } from '../data/avatar';
+const fig = figureSvg(AVATAR);
 ---
 
 <BaseLayout title="Seite nicht gefunden">

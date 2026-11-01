@@ -23,6 +23,7 @@ Die Seite läuft dann unter http://localhost:4321 und lädt Änderungen sofort n
 | `npm test` | Unit-Tests (Vitest) für Voxel-Generator und Logik. Ebenfalls Guard-Gate |
 | `npm run lint` | ESLint für TypeScript und Astro. Guard-Gate |
 | `npm run format` / `format:check` | Prettier formatiert bzw. prüft den Code. `format:check` ist Guard-Gate |
+| `npm run arch` | Architekturregeln (dependency-cruiser, `.dependency-cruiser.cjs`): Schichten `lib` → `data` → Oberfläche, Browser-Code ohne Build-Code. Guard-Gate |
 | `npm run build` | Erzeugt die fertige Seite in `dist/` |
 | `npm run preview` | Zeigt den gebauten Stand aus `dist/` lokal an |
 
@@ -52,7 +53,7 @@ docs/todo.md          Offene Punkte (Livegang-Checkliste, Review-Ergebnisse)
 
 ## Inhalte pflegen
 
-**Workshop hinzufügen:** neue Datei in `src/content/workshops/`, jeder Workshop bekommt eine eigene Seite unter `/workshops/<dateiname>/` und eine Kiste an der Insel. `short` ist die Beschriftung der Kiste. An Workshops gibt es vier Plätze; ein weiterer Workshop bricht den Build mit einer Meldung ab, dann braucht es einen neuen Platz in `CHILD_SLOTS` (`src/lib/voxel/world.ts`).
+**Workshop hinzufügen:** neue Datei in `src/content/workshops/`, jeder Workshop bekommt eine eigene Seite unter `/workshops/<dateiname>/` und eine Kiste an der Insel. `short` ist die Beschriftung der Kiste. An Workshops gibt es vier Plätze; ein weiterer Workshop bricht den Build mit einer Meldung ab, dann braucht es einen neuen Platz in `CHILD_SLOTS` (`src/data/island-layout.ts`).
 
 ```markdown
 ---

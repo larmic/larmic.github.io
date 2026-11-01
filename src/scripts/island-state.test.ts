@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildWorld } from '../lib/voxel/world';
+import { AVATAR } from '../data/avatar';
+import { buildWorld } from '../data/island-layout';
 import {
   BUBBLE_404,
   BUBBLE_IDLE,
@@ -17,10 +18,13 @@ import {
 
 const entries = (section: string, ids: string[]) =>
   ids.map((id) => ({ id, label: id, block: 'crate', href: `/${section}/${id}/` }));
-const world: World = buildWorld({
-  workshops: entries('workshops', ['ddd', 'es', 'ms']),
-  videos: entries('videos', ['tc', 'hex', 'es', 'unit']),
-}).data;
+const world: World = buildWorld(
+  {
+    workshops: entries('workshops', ['ddd', 'es', 'ms']),
+    videos: entries('videos', ['tc', 'hex', 'es', 'unit']),
+  },
+  AVATAR,
+).data;
 const BUBBLES = { about: 'A', workshops: 'W', videos: 'V', tree: 'T' };
 
 /** Takte bis zur Ruhe; liefert den Endzustand und alle Orte, an denen die Figur dabei stand. */

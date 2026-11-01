@@ -12,6 +12,7 @@ import '../styles/sections.css';
 import { SITE } from '../data/site';
 import { ClientRouter } from 'astro:transitions';
 import { cubeDefs, textureCss } from '../lib/voxel/world';
+import { AVATAR } from '../data/avatar';
 
 interface Props {
   title?: string;
@@ -50,7 +51,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden">
-      <defs set:html={cubeDefs()} />
+      <defs set:html={cubeDefs(AVATAR)} />
     </svg>
     <div class="page">
       <slot />

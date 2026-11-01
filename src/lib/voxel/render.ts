@@ -1,7 +1,6 @@
 // Voxel-Renderer: macht aus Pixel-Rastern (siehe textures.ts) statisches SVG.
 // Läuft nur beim Build. Ergebnis wird per set:html in die Seiten eingesetzt.
 import type { Grid, Palette } from './textures';
-import { AVATAR } from '../../data/avatar';
 
 export type Matrix = [number, number, number, number, number, number];
 
@@ -12,9 +11,7 @@ export function f(v: number): string {
 }
 
 function resolve(fill: string): string {
-  if (fill === '$hair') return AVATAR.hair;
-  if (fill === '$skin') return AVATAR.skin;
-  if (fill === '$shirt') return AVATAR.shirt;
+  if (fill.startsWith('$')) throw new Error(`Palette mit Avatar-Platzhalter ${fill}: vorher mit dress() einkleiden`);
   return fill;
 }
 

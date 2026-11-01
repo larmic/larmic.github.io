@@ -1,6 +1,8 @@
 // Die Insel mit allen Kisten: Workshops und Videos aus den Inhalten, jede Kiste in ihrer Themenfarbe.
 import { getCollection } from 'astro:content';
-import { buildWorld, type Scene } from '../lib/voxel/world';
+import type { Scene } from '../lib/voxel/world';
+import { AVATAR } from './avatar';
+import { buildWorld } from './island-layout';
 import { MATERIALS } from './site';
 
 type Entry = { id: string; data: { short: string; material: keyof typeof MATERIALS; order: number } };
@@ -19,9 +21,12 @@ const items = (section: 'workshops' | 'videos', entries: Entry[]) =>
 let cached: Scene | undefined;
 
 export async function islandScene(): Promise<Scene> {
-  cached ??= buildWorld({
-    workshops: items('workshops', await getCollection('workshops', ({ data }) => !data.draft)),
-    videos: items('videos', await getCollection('videos')),
-  });
+  cached ??= buildWorld(
+    {
+      workshops: items('workshops', await getCollection('workshops', ({ data }) => !data.draft)),
+      videos: items('videos', await getCollection('videos')),
+    },
+    AVATAR,
+  );
   return cached;
 }

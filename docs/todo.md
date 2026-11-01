@@ -62,7 +62,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `ast
 - [x] **Vitest** mit Tests für den Voxel-Generator: `headView`, `gridSvg` (Pixel-Abdeckung aller Texturen), `buildWorld` (Determinismus, Baum-Wege, Nachbarschaft der Schritte, keine Überlappung, Slot-Grenze). Läuft als Gate in der Pipeline.
 - [x] **Zustandsmaschine der Figur** als reines Modul `src/scripts/island-state.ts` mit Tests (Brückenbau, Rückweg bis zur Abzweigung, gemeinsame Brücken, Zielwechsel, Blog-Sturz, Baum, alle Kombinationen von Ruheblock und Ziel).
 - [x] **ESLint und Prettier** als Gates in der Pipeline. Formatieren hat am Ergebnis nichts geändert (gebaute Seiten zeichengenau gleich).
-- [ ] **Architekturregeln** mit dependency-cruiser als ArchUnit-Gegenstück, z. B. „`src/lib/voxel` importiert nicht aus `src/data`“.
+- [x] **Architekturregeln** mit dependency-cruiser (`npm run arch`): `lib` generisch, `data` ohne Oberfläche, Browser-Code nur mit `head.ts`, keine Zyklen. Gate in der Pipeline. `.astro`-Dateien prüft dependency-cruiser nicht.
 - [ ] **Link- und HTML-Check** auf `dist` im CI (z. B. lychee, html-validate).
 - [ ] Kurze **Spec** der Insel-Zustandsmaschine unter `docs/specs/`.
 - [ ] Alle Gates als eigene Schritte im Workflow und im README beschreiben.
@@ -70,7 +70,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `ast
 ### Code und Architektur
 
 - [x] **Zustandsmaschine aus der Web Component gelöst:** reines Modul mit sprechenden Feldnamen, `sel` und der nie leere Weg entfernt, `msg` durch `show404` ersetzt. Die Komponente macht nur noch DOM, Takt und Kopfblick.
-- [ ] **Schichtung:** `lib/voxel` generisch halten. Konkrete Szene (Routen, Kisten-Plätze, Baum) nach `src/data`. `render.ts` nicht mehr an die Avatar-Daten koppeln.
+- [x] **Schichtung:** Avatar ist Parameter des Generators, die konkrete Insel liegt in `src/data/island-layout.ts`, `world.ts` ist nur noch die generische Szenen-Engine.
 - [ ] **Eine Quelle für Material- und Themenfarben:** heute `MATERIALS` in `site.ts`, `tokens.css` und das Enum im Schema.
 - [ ] **Geometrie zentral:**
   - Würfelmaße (80 × 84,8, 40/20/44,8) und Projektionskonstanten an einer Stelle.

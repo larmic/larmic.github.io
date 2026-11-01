@@ -2,7 +2,7 @@
 import { face, gridSvg, overlay, f, type Matrix } from './render';
 import * as T from './textures';
 import { C, V, HEAD_FACES, headView } from './head';
-import { AVATAR } from '../../data/avatar';
+import { dress, type Avatar } from './avatar';
 const P = (x: number, y: number, z: number): [number, number] => [(x - y) * C, ((x + y) * C) / 2 - z * V];
 const topM = (x0: number, y0: number, z1: number): Matrix => [
   C,
@@ -29,46 +29,39 @@ const rightM = (x1: number, y1: number, z1: number): Matrix => [
   ((x1 + y1) * C) / 2 - z1 * V,
 ];
 
-function headExtraL(): string {
-  return (
-    overlay(T.BLINK_L, T.PAL_BLINK, 'fig-blink') +
-    (AVATAR.beard ? overlay(T.BEARD_L, T.PAL_BEARD) : '') +
-    (AVATAR.glasses ? overlay(T.GLASS_L, T.PAL_GLASS) : '')
-  );
-}
-function headExtraR(): string {
-  return (
-    (AVATAR.beard ? overlay(T.BEARD_R, T.PAL_BEARD) : '') + (AVATAR.glasses ? overlay(T.GLASS_R, T.PAL_GLASS) : '')
-  );
-}
 const mirror = (g: T.Grid): T.Grid => g.map((row) => [...row].reverse().join(''));
 
-// Texturen der fünf Kopfseiten (Reihenfolge wie HEAD_FACES in head.ts). Hinterkopf = Haar wie oben,
-// linke Seite = rechte Seite gespiegelt.
-const HEAD_TEX: { grid: T.Grid; extra: string }[] = [
-  { grid: T.HEAD_T, extra: '' },
-  { grid: T.HEAD_L, extra: headExtraL() },
-  { grid: T.HEAD_R, extra: headExtraR() },
-  { grid: T.HEAD_T, extra: '' },
-  {
-    grid: mirror(T.HEAD_R),
-    extra:
-      (AVATAR.beard ? overlay(mirror(T.BEARD_R), T.PAL_BEARD) : '') +
-      (AVATAR.glasses ? overlay(mirror(T.GLASS_R), T.PAL_GLASS) : ''),
-  },
-];
+// Bart und Brille als Überlagerung einer Kopfseite
+function extras(avatar: Avatar, beard: T.Grid, glasses: T.Grid): string {
+  return (
+    (avatar.beard ? overlay(beard, dress(T.PAL_BEARD, avatar)) : '') +
+    (avatar.glasses ? overlay(glasses, T.PAL_GLASS) : '')
+  );
+}
 
 // Drehbarer Kopf: alle fünf Seiten im Markup, abgewandte ausgeblendet. Das Skript setzt Matrizen und Schatten neu.
-function headSvg(): string {
+// Texturen in der Reihenfolge von HEAD_FACES: Hinterkopf = Haar wie oben, linke Seite = rechte Seite gespiegelt.
+function headSvg(avatar: Avatar): string {
+  const pal = dress(T.PAL_FIG, avatar);
+  const tex: { grid: T.Grid; extra: string }[] = [
+    { grid: T.HEAD_T, extra: '' },
+    {
+      grid: T.HEAD_L,
+      extra: overlay(T.BLINK_L, dress(T.PAL_BLINK, avatar), 'fig-blink') + extras(avatar, T.BEARD_L, T.GLASS_L),
+    },
+    { grid: T.HEAD_R, extra: extras(avatar, T.BEARD_R, T.GLASS_R) },
+    { grid: T.HEAD_T, extra: '' },
+    { grid: mirror(T.HEAD_R), extra: extras(avatar, mirror(T.BEARD_R), mirror(T.GLASS_R)) },
+  ];
   return (
     '<g class="fig-head">' +
     headView(0, 0)
       .map((v, i) => {
-        const { grid, extra } = HEAD_TEX[i];
+        const { grid, extra } = tex[i];
         const id = HEAD_FACES[i].id;
         const m = v.matrix ? ` transform="matrix(${v.matrix.map(f).join(',')})"` : ' style="display: none"';
         const shade = `<rect class="fhs" width="${grid[0].length}" height="${grid.length}" fill="${id === 'top' ? '#ffffff' : '#000'}" opacity="${f(v.shade)}"/>`;
-        return `<g class="fh" data-face="${id}"${m}>${gridSvg(grid, T.PAL_FIG)}${extra}${shade}</g>`;
+        return `<g class="fh" data-face="${id}"${m}>${gridSvg(grid, pal)}${extra}${shade}</g>`;
       })
       .join('') +
     '</g>'
@@ -96,16 +89,17 @@ const PARTS: Part[] = [
 
 export type FigureSvg = { svg: string; box: [number, number, number, number]; foot: [number, number] };
 
-export function figureSvg(): FigureSvg {
+export function figureSvg(avatar: Avatar): FigureSvg {
+  const pal = dress(T.PAL_FIG, avatar);
   const out: string[] = [];
   const pts: [number, number][] = [];
   for (const p of PARTS) {
     const [x0, x1, y0, y1, z0, z1] = p.box;
-    if (p.head) out.push(headSvg());
+    if (p.head) out.push(headSvg(avatar));
     else {
-      let g = face(topM(x0, y0, z1), p.T, T.PAL_FIG, ['#ffffff', 0.06]);
-      g += face(leftM(x0, y1, z1), p.L, T.PAL_FIG, ['#000', 0.05]);
-      g += face(rightM(x1, y1, z1), p.R, T.PAL_FIG, ['#000', 0.22]);
+      let g = face(topM(x0, y0, z1), p.T, pal, ['#ffffff', 0.06]);
+      g += face(leftM(x0, y1, z1), p.L, pal, ['#000', 0.05]);
+      g += face(rightM(x1, y1, z1), p.R, pal, ['#000', 0.22]);
       out.push(p.cls ? `<g class="${p.cls}">${g}</g>` : g);
     }
     for (const x of [x0, x1]) for (const y of [y0, y1]) for (const z of [z0, z1]) pts.push(P(x, y, z));

@@ -1,24 +1,24 @@
-// Die Inselwelt: Würfel-Symbole, Insel-Szene, Brücken-Routen und Positionen der Navigationsblöcke.
-// Raster: i nach rechts unten, j nach links unten, k nach oben. Bounding-Box eines Blocks:
+// Szenen-Engine der Voxel-Welt: Würfel-Symbole, Hintergrund-Texturen und `buildScene`, das aus festen Blöcken,
+// Startfeld und Wegen die Szene samt Navigationszielen berechnet. Welche Insel gebaut wird, steht in
+// src/data/island-layout.ts. Raster: i nach rechts unten, j nach links unten, k nach oben. Bounding-Box eines Blocks:
 //   X = (i − j)·40,  Y = (i + j)·20 − k·44,8   (Würfel-viewBox 0 0 80 84.8)
 import { cube, overlay, f, particlesCss, tileDataUri } from './render';
 import { figureSvg } from './figure';
+import { dress, type Avatar } from './avatar';
 import * as T from './textures';
-import { AVATAR } from '../../data/avatar';
 
-type Cell = [number, number, number];
-const key = (c: Cell) => c.join(',');
+export type Cell = [number, number, number];
+export const key = (c: Cell) => c.join(',');
 export const pos = (i: number, j: number, k: number): [number, number] => [(i - j) * 40, (i + j) * 20 - k * 44.8];
 const footpt = (i: number, j: number, k: number): [number, number] => [(i - j) * 40 + 40, (i + j) * 20 + 20 - k * 44.8];
 
 // ---------- Würfel-Symbole ----------
-export function cubeDefs(prefix = 'v'): string {
+export function cubeDefs(avatar: Avatar, prefix = 'v'): string {
+  const beard = dress(T.PAL_BEARD, avatar);
   const headL =
-    (AVATAR.beard ? overlay(T.HB_BEARD_L, T.PAL_BEARD) : '') +
-    (AVATAR.glasses ? overlay(T.HB_GLASS_L, T.PAL_GLASS) : '');
+    (avatar.beard ? overlay(T.HB_BEARD_L, beard) : '') + (avatar.glasses ? overlay(T.HB_GLASS_L, T.PAL_GLASS) : '');
   const headR =
-    (AVATAR.beard ? overlay(T.HB_BEARD_R, T.PAL_BEARD) : '') +
-    (AVATAR.glasses ? overlay(T.HB_GLASS_R, T.PAL_GLASS) : '');
+    (avatar.beard ? overlay(T.HB_BEARD_R, beard) : '') + (avatar.glasses ? overlay(T.HB_GLASS_R, T.PAL_GLASS) : '');
   const id = (n: string) => `${prefix}-${n}`;
   return [
     cube(id('grass'), T.GRASS_TOP, T.GRASS_SIDE, T.GRASS_SIDE, T.PAL_GRASS),
@@ -26,7 +26,7 @@ export function cubeDefs(prefix = 'v'): string {
     cube(id('stone'), T.STONE, T.STONE, T.STONE, T.PAL_STONE),
     cube(id('log'), T.LOG_TOP, T.LOG_SIDE, T.LOG_SIDE, T.PAL_LOG),
     cube(id('leaves'), T.LEAVES, T.LEAVES, T.LEAVES, T.PAL_LEAVES),
-    cube(id('head'), T.HB_T, T.HB_L, T.HB_R, T.PAL_FIG, headL, headR),
+    cube(id('head'), T.HB_T, T.HB_L, T.HB_R, dress(T.PAL_FIG, avatar), headL, headR),
     cube(id('board'), T.PLANKS, T.BOARD_L, T.BOARD_R, T.PAL_BOARD),
     cube(id('screen'), T.SCREEN_T, T.SCREEN_L, T.SCREEN_R, T.PAL_SCREEN),
     cube(id('shelf'), T.PLANKS, T.SHELF_L, T.SHELF_R, T.PAL_SHELF),
@@ -43,46 +43,13 @@ export function textureCss(): string {
   return `:root { --tex-grass: ${tileDataUri(T.GRASS_SIDE, T.PAL_GRASS)}; --tex-dirt: ${tileDataUri(T.DIRT, T.PAL_GRASS)}; --tex-stone: ${tileDataUri(T.STONE, T.PAL_STONE)}; }`;
 }
 
-// ---------- Insel ----------
-function islandBlocks(): Map<string, { c: Cell; kind: string }> {
-  const B = new Map<string, { c: Cell; kind: string }>();
-  const put = (c: Cell, kind: string) => B.set(key(c), { c, kind });
-  for (let i = 0; i < 5; i++)
-    for (let j = 0; j < 5; j++) {
-      if ((i === 0 && j === 4) || (i === 4 && j === 0)) continue;
-      put([i, j, 0], 'grass');
-      put([i, j, -1], 'dirt');
-    }
-  for (let i = 1; i < 4; i++) for (let j = 1; j < 4; j++) put([i, j, -2], 'stone');
-  for (const [i, j] of [
-    [2, 3],
-    [3, 2],
-    [3, 3],
-  ])
-    put([i, j, -3], 'stone');
-  put([3, 3, -4], 'stone');
-  const [ti, tj] = [1, 0];
-  put([ti, tj, 1], 'log');
-  put([ti, tj, 2], 'log');
-  for (const [di, dj] of [
-    [0, 0],
-    [-1, 0],
-    [1, 0],
-    [0, -1],
-    [0, 1],
-  ])
-    put([ti + di, tj + dj, 3], 'leaves');
-  put([ti, tj, 4], 'leaves');
-  return B;
-}
-
 // ---------- Szene: feste Blöcke, Startfeld der Figur, Wege zu den Navigationszielen ----------
 // Die Ziele bilden einen Baum: Ein Weg mit `via` beginnt mit dem kompletten Weg seines Elternblocks
 // (z. B. Insel → Workshops → Workshop-Kiste). Gleiche Felder teilen sich einen Brückenblock.
-type Tag = 'L' | 'R' | 'B';
-type Blocks = Map<string, { c: Cell; kind: string }>;
+export type Tag = 'L' | 'R' | 'B';
+export type Blocks = Map<string, { c: Cell; kind: string }>;
 // walk: Felder auf der Insel · bridge: Blöcke, die die Figur setzt · climb: vorhandene Blöcke, auf die sie steigt
-type RouteDef = {
+export type RouteDef = {
   walk: [number, number][];
   bridge: Cell[];
   climb?: Cell[];
@@ -91,7 +58,7 @@ type RouteDef = {
   fall?: Cell;
   via?: string;
 };
-type NavMeta = {
+export type NavMeta = {
   label: string;
   sym: string;
   delay: string;
@@ -102,8 +69,8 @@ type NavMeta = {
   parent?: string;
 };
 // Easter Egg: Weg ohne Block und Link, ausgelöst durch Hover über eine Fläche aus vorhandenen Blöcken
-type EggDef = { route: RouteDef; area: Cell[] };
-type SceneDef = {
+export type EggDef = { route: RouteDef; area: Cell[] };
+export type SceneDef = {
   blocks: Blocks;
   home: Cell;
   routes: Record<string, RouteDef>;
@@ -125,7 +92,7 @@ export type Scene = ReturnType<typeof buildScene>;
 
 type Step = { c: Cell; b: boolean; fall: boolean };
 
-function buildScene(def: SceneDef) {
+export function buildScene(def: SceneDef, avatar: Avatar) {
   const has = (i: number, j: number, k: number) => def.blocks.has(key([i, j, k]));
   const vis = [...def.blocks.values()].filter(
     ({ c: [i, j, k] }) => !(has(i + 1, j, k) && has(i, j + 1, k) && has(i, j, k + 1)),
@@ -142,7 +109,7 @@ function buildScene(def: SceneDef) {
     })
     .join('');
 
-  const fig = figureSvg();
+  const fig = figureSvg(avatar);
   const s = 1.9;
   const figH = (fig.foot[1] - fig.box[1]) * s;
   const figHW = (fig.box[2] * s) / 2;
@@ -281,145 +248,4 @@ function buildScene(def: SceneDef) {
     },
     particles: particlesCss(1234, 'pop', '.px', 'p', 46, 64) + '\n' + particlesCss(98765, 'spawn', '.sp', 's', 50, 78),
   };
-}
-
-// ---------- Die Insel ----------
-const HOME: Cell = [3, 3, 0];
-const ROUTES: Record<string, RouteDef> = {
-  about: {
-    walk: [
-      [2, 3],
-      [1, 3],
-      [0, 3],
-    ],
-    bridge: [
-      [-1, 3, 0],
-      [-2, 3, 1],
-    ],
-    target: [-3, 3, 2],
-    tag: 'L',
-  },
-  workshops: {
-    walk: [
-      [3, 2],
-      [3, 1],
-      [3, 0],
-    ],
-    bridge: [
-      [3, -1, 0],
-      [3, -2, 1],
-    ],
-    target: [3, -3, 2],
-    tag: 'R',
-  },
-  videos: {
-    walk: [[3, 4]],
-    bridge: [
-      [3, 5, 0],
-      [3, 6, 0],
-    ],
-    target: [3, 7, -1],
-    tag: 'B',
-  },
-  blog: { walk: [[4, 3]], bridge: [], target: [7, 3, -2], tag: 'B', fall: [5, 3, 0] },
-};
-const NAV_META: Record<string, NavMeta> = {
-  about: { label: 'Über mich', sym: 'head', delay: '0s', p1: AVATAR.skin, p2: AVATAR.hair, href: '/' },
-  workshops: { label: 'Workshops', sym: 'board', delay: '-1.1s', p1: '#f39a3d', p2: '#5aa6e8', href: '/workshops/' },
-  videos: { label: 'Videos', sym: 'screen', delay: '-2.2s', p1: '#ee4b3e', p2: '#454b59', href: '/videos/' },
-  blog: { label: 'Blog', sym: 'shelf', delay: '-0.6s', p1: '#c0453a', p2: '#3f6fb5' },
-};
-
-// Kisten der Einträge: feste Plätze rund um ihren Bereichs-Block, Weg = Brücke(n) vom Bereichs-Block aus
-type Section = 'workshops' | 'videos';
-const CHILD_SLOTS: Record<Section, Pick<RouteDef, 'bridge' | 'target' | 'tag'>[]> = {
-  workshops: [
-    { bridge: [[3, -4, 3]], target: [3, -5, 4], tag: 'R' }, // oben rechts, Treppe hoch
-    { bridge: [[2, -3, 3]], target: [1, -3, 4], tag: 'L' }, // oben links, Treppe hoch
-    { bridge: [[4, -3, 2]], target: [5, -3, 1], tag: 'R' }, // rechts, Stufe runter
-    {
-      bridge: [
-        [3, -4, 2],
-        [4, -4, 2],
-      ],
-      target: [4, -5, 2],
-      tag: 'R',
-    }, // rechts, zwischen erster und dritter Kiste (Reserve)
-  ],
-  videos: [
-    { bridge: [[2, 7, -1]], target: [1, 7, 0], tag: 'L' }, // links, Stufe hoch
-    { bridge: [[3, 8, -1]], target: [3, 9, -1], tag: 'L' }, // unten links
-    { bridge: [[4, 7, -1]], target: [5, 7, -2], tag: 'B' }, // unten rechts, Stufe runter (unter der Steinspitze vorbei)
-    {
-      bridge: [
-        [4, 7, -1],
-        [4, 8, -2],
-      ],
-      target: [4, 9, -3],
-      tag: 'B',
-    }, // ganz unten, Treppe runter
-  ],
-};
-
-export type ChildItem = { id: string; label: string; block: string; color?: string; href: string };
-
-// Easter Egg: Hover über das Blätterdach → die Figur läuft zum Baum, stapelt zwei Blöcke und klettert in die Krone
-const TREE_EGG: EggDef = {
-  route: {
-    walk: [
-      [3, 2],
-      [3, 1],
-    ],
-    bridge: [
-      [2, 1, 1],
-      [2, 1, 2],
-    ],
-    climb: [[2, 0, 3]],
-    target: [1, 0, 4],
-    tag: 'B',
-  },
-  area: [
-    [0, 0, 3],
-    [2, 0, 3],
-    [1, -1, 3],
-    [1, 1, 3],
-    [1, 0, 4],
-  ],
-};
-
-export function buildWorld(children: Record<Section, ChildItem[]>): Scene {
-  const routes: Record<string, RouteDef> = {};
-  const meta: Record<string, NavMeta> = {};
-  for (const id of Object.keys(ROUTES)) {
-    routes[id] = ROUTES[id];
-    meta[id] = NAV_META[id];
-    if (id !== 'workshops' && id !== 'videos') continue;
-    const slots = CHILD_SLOTS[id];
-    if (children[id].length > slots.length)
-      throw new Error(
-        `Insel: Für ${id} gibt es ${slots.length} Plätze, gefunden: ${children[id].length} Einträge. Einen Platz in CHILD_SLOTS (src/lib/voxel/world.ts) ergänzen oder einen Eintrag auf draft: true setzen.`,
-      );
-    children[id].forEach((it, n) => {
-      const cid = `${id}/${it.id}`;
-      routes[cid] = { walk: [], via: id, ...slots[n] };
-      meta[cid] = {
-        label: it.label,
-        sym: it.block,
-        delay: `${f(-0.4 - 0.7 * n)}s`,
-        p1: it.color ?? '#f0a531',
-        p2: '#ffffff',
-        color: it.color,
-        href: it.href,
-        parent: id,
-      };
-    });
-  }
-  return buildScene({
-    blocks: islandBlocks(),
-    home: HOME,
-    routes,
-    meta,
-    bubbles: [...Object.keys(ROUTES), 'tree'],
-    eggs: { tree: TREE_EGG },
-  });
 }

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { buildWorld, type ChildItem, type Scene } from './world';
+import type { Scene } from '../lib/voxel/world';
+import { AVATAR } from './avatar';
+import { buildWorld, type ChildItem } from './island-layout';
 
 const items = (section: string, n: number): ChildItem[] =>
   Array.from({ length: n }, (_, i) => ({
@@ -10,7 +12,7 @@ const items = (section: string, n: number): ChildItem[] =>
   }));
 
 // So viele Einträge, wie es Plätze gibt: Hier müssen Geometrie und Wege noch stimmen
-const full = () => buildWorld({ workshops: items('workshops', 4), videos: items('videos', 4) });
+const full = () => buildWorld({ workshops: items('workshops', 4), videos: items('videos', 4) }, AVATAR);
 
 /** Prozentangaben der Szene zurück in Szenen-Einheiten (Würfel 80 × 84,8) */
 function units(scene: Scene) {
@@ -80,8 +82,10 @@ describe('buildWorld', () => {
   });
 
   it('bricht bei mehr Einträgen als Plätzen mit einer Meldung ab, die sagt, was zu tun ist', () => {
-    expect(() => buildWorld({ workshops: items('workshops', 5), videos: [] })).toThrow(/CHILD_SLOTS.*draft: true/);
-    expect(() => buildWorld({ workshops: [], videos: items('videos', 5) })).toThrow(/Plätze/);
+    expect(() => buildWorld({ workshops: items('workshops', 5), videos: [] }, AVATAR)).toThrow(
+      /CHILD_SLOTS.*draft: true/,
+    );
+    expect(() => buildWorld({ workshops: [], videos: items('videos', 5) }, AVATAR)).toThrow(/Plätze/);
   });
 
   it('hat für den Baum eine Hover-Fläche und einen Weg ohne Sturz', () => {

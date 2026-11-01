@@ -3,6 +3,7 @@
 import sharp from 'sharp';
 import { islandScene } from '../data/island';
 import { cubeDefs } from '../lib/voxel/world';
+import { AVATAR } from '../data/avatar';
 
 const W = 1200;
 const H = 630;
@@ -45,7 +46,7 @@ export async function GET() {
     `<g fill="#ffffff" opacity="0.92"><rect x="${x}" y="${y}" width="${w}" height="28"/><rect x="${x + w * 0.2}" y="${y - 22}" width="${w * 0.5}" height="22"/></g>`;
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-<defs>${cubeDefs()}</defs>
+<defs>${cubeDefs(AVATAR)}</defs>
 <style>.fig-blink { opacity: 0; }</style>
 <rect width="${W}" height="${H * 0.36}" fill="#79c7ea"/>
 <rect y="${H * 0.36}" width="${W}" height="${H * 0.32}" fill="#8dd0ee"/>
