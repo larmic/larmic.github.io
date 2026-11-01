@@ -60,7 +60,7 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `astro check` das einzige Gate. Wer den Code liest, sollte genau das wiederfinden:
 
 - [x] **Vitest** mit Tests für den Voxel-Generator: `headView`, `gridSvg` (Pixel-Abdeckung aller Texturen), `buildWorld` (Determinismus, Baum-Wege, Nachbarschaft der Schritte, keine Überlappung, Slot-Grenze). Läuft als Gate in der Pipeline.
-- [ ] **Zustandsmaschine der Figur** als reine Funktion herauslösen und testen (Brückenbau, Rückweg bis zur Abzweigung, Blog-Sturz, Baum).
+- [x] **Zustandsmaschine der Figur** als reines Modul `src/scripts/island-state.ts` mit Tests (Brückenbau, Rückweg bis zur Abzweigung, gemeinsame Brücken, Zielwechsel, Blog-Sturz, Baum, alle Kombinationen von Ruheblock und Ziel).
 - [ ] **ESLint und Prettier**, viele überlange Zeilen umbrechen.
 - [ ] **Architekturregeln** mit dependency-cruiser als ArchUnit-Gegenstück, z. B. „`src/lib/voxel` importiert nicht aus `src/data`“.
 - [ ] **Link- und HTML-Check** auf `dist` im CI (z. B. lychee, html-validate).
@@ -69,10 +69,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `ast
 
 ### Code und Architektur
 
-- [ ] **Zustandsmaschine aus der Web Component lösen:**
-  - Reine Funktion `step(state, world)` in eigenem Modul, die Komponente macht nur DOM und Timer.
-  - Sprechende Feldnamen statt `r`, `p`, `m`, `pl`, `n`.
-  - Toten Zustand entfernen (`r` ist nie null, `sel` ist immer gleich `rest`) und `msg` als String-Flag ersetzen.
+- [x] **Zustandsmaschine aus der Web Component gelöst:** reines Modul mit sprechenden Feldnamen, `sel` und der nie leere Weg entfernt, `msg` durch `show404` ersetzt. Die Komponente macht nur noch DOM, Takt und Kopfblick.
 - [ ] **Schichtung:** `lib/voxel` generisch halten. Konkrete Szene (Routen, Kisten-Plätze, Baum) nach `src/data`. `render.ts` nicht mehr an die Avatar-Daten koppeln.
 - [ ] **Eine Quelle für Material- und Themenfarben:** heute `MATERIALS` in `site.ts`, `tokens.css` und das Enum im Schema.
 - [ ] **Geometrie zentral:**
