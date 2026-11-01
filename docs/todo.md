@@ -63,7 +63,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `ast
 - [x] **Zustandsmaschine der Figur** als reines Modul `src/scripts/island-state.ts` mit Tests (Brückenbau, Rückweg bis zur Abzweigung, gemeinsame Brücken, Zielwechsel, Blog-Sturz, Baum, alle Kombinationen von Ruheblock und Ziel).
 - [x] **ESLint und Prettier** als Gates in der Pipeline. Formatieren hat am Ergebnis nichts geändert (gebaute Seiten zeichengenau gleich).
 - [x] **Architekturregeln** mit dependency-cruiser (`npm run arch`): `lib` generisch, `data` ohne Oberfläche, Browser-Code nur mit `head.ts`, keine Zyklen. Gate in der Pipeline. `.astro`-Dateien prüft dependency-cruiser nicht.
-- [ ] **Link- und HTML-Check** auf `dist` im CI (z. B. lychee, html-validate).
+- [x] **Link- und HTML-Check** auf `dist` als Gate nach dem Build (html-validate, linkinator für interne Links). Dabei gefunden und behoben: `<style>` im Body (Partikel jetzt im `<head>`) und zu lange Seitentitel.
 - [ ] Kurze **Spec** der Insel-Zustandsmaschine unter `docs/specs/`.
 - [ ] Alle Gates als eigene Schritte im Workflow und im README beschreiben.
 
@@ -102,7 +102,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `ast
 
 - [ ] **Workshop-Eckdaten einheitlich** (Zielgruppe, Dauer, Format, Gruppengröße, Schwierigkeitsgrad, Ort), am besten als Frontmatter-Felder. „Anspruchsvoller“ → „Anspruchsvoll“.
 - [ ] **Schreibweisen vereinheitlichen** (Domain-Driven Design, hexagonale Architektur, z. B.), Gendern konsistent.
-- [ ] Event-Storming-Video und -Workshop haben fast gleiche Titel und Texte. Klarer unterscheiden.
+- [x] Seitentitel unterscheiden Workshop und Video („Event Storming – Workshop“ / „– Video“). Die Texte von Event-Storming-Video und -Workshop ähneln sich weiter.
 
 ### Build, CI und Abhängigkeiten
 

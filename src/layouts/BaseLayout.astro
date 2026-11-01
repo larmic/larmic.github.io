@@ -47,6 +47,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:image:alt" content="Voxel-Insel im Himmel, darauf Lars als Pixel-Figur – larmic.de" />
     <meta name="twitter:card" content="summary_large_image" />
     <Fragment set:html={`<style>${textureCss()}</style>`} />
+    <slot name="head" />
     <ClientRouter />
   </head>
   <body>

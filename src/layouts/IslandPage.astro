@@ -8,6 +8,7 @@ import SiteFooter from '../components/SiteFooter.astro';
 import Clouds from '../components/Clouds.astro';
 import NameTiles from '../components/NameTiles.astro';
 import Island from '../components/Island.astro';
+import { particleCss } from '../lib/voxel/world';
 
 interface Props {
   title?: string;
@@ -19,6 +20,7 @@ const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/wo
 ---
 
 <BaseLayout title={title} description={description}>
+  <Fragment slot="head" set:html={`<style>${particleCss()}</style>`} />
   <section class="sky" transition:persist="hero">
     <Clouds />
     <SiteHeader />

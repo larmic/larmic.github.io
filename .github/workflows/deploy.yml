@@ -49,6 +49,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Guard-Gate – HTML und interne Links der fertigen Seite
+        run: npm run verify
+
       # … aber nur main wird veröffentlicht
       - name: Deploy auf GitHub Pages
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

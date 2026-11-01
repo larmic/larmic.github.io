@@ -25,6 +25,7 @@ Die Seite läuft dann unter http://localhost:4321 und lädt Änderungen sofort n
 | `npm run format` / `format:check` | Prettier formatiert bzw. prüft den Code. `format:check` ist Guard-Gate |
 | `npm run arch` | Architekturregeln (dependency-cruiser, `.dependency-cruiser.cjs`): Schichten `lib` → `data` → Oberfläche, Browser-Code ohne Build-Code. Guard-Gate |
 | `npm run build` | Erzeugt die fertige Seite in `dist/` |
+| `npm run verify` | Prüft die fertige Seite in `dist/`: gültiges HTML (html-validate) und keine toten internen Links (linkinator). Guard-Gate nach dem Build |
 | `npm run preview` | Zeigt den gebauten Stand aus `dist/` lokal an |
 
 ## Projektstruktur

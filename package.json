@@ -12,7 +12,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "arch": "depcruise src --config .dependency-cruiser.cjs"
+    "arch": "depcruise src --config .dependency-cruiser.cjs",
+    "verify:html": "html-validate \"dist/**/*.html\"",
+    "verify:links": "linkinator dist --recurse --skip \"^https?://(?!localhost|127\\\\.0\\\\.0\\\\.1)\"",
+    "verify": "npm run verify:html && npm run verify:links"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -27,6 +30,8 @@
     "dependency-cruiser": "^18.7.0",
     "eslint": "^10.14.0",
     "eslint-plugin-astro": "^3.2.1",
+    "html-validate": "^11.18.0",
+    "linkinator": "^8.1.0",
     "prettier": "^3.9.10",
     "prettier-plugin-astro": "^1.1.2",
     "typescript": "^6.0.3",

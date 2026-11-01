@@ -15,7 +15,7 @@ const m = MATERIALS[w.data.material];
 ---
 
 <IslandPage
-  title={w.data.title}
+  title={`${w.data.short} – Workshop`}
   description={w.data.teaser}
   rest={`workshops/${w.id}`}
   cta={{ label: 'Workshop anfragen', href: workshopMailto(`Workshop: ${w.data.short}`) }}

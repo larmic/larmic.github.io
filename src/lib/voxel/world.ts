@@ -38,6 +38,11 @@ export function cubeDefs(avatar: Avatar, prefix = 'v'): string {
   ].join('');
 }
 
+// ---------- Partikel: Flugbahnen für Block-Pop und Respawn (fester Seed, gehört in den <head>) ----------
+export function particleCss(): string {
+  return particlesCss(1234, 'pop', '.px', 'p', 46, 64) + '\n' + particlesCss(98765, 'spawn', '.sp', 's', 50, 78);
+}
+
 // ---------- Hintergrund-Texturen als CSS-Variablen ----------
 export function textureCss(): string {
   return `:root { --tex-grass: ${tileDataUri(T.GRASS_SIDE, T.PAL_GRASS)}; --tex-dirt: ${tileDataUri(T.DIRT, T.PAL_GRASS)}; --tex-stone: ${tileDataUri(T.STONE, T.PAL_STONE)}; }`;
@@ -246,6 +251,5 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
       tx: f(((fig.foot[0] - fx0) / fw) * 100),
       ty: f(((fig.foot[1] - fy0) / fh) * 100),
     },
-    particles: particlesCss(1234, 'pop', '.px', 'p', 46, 64) + '\n' + particlesCss(98765, 'spawn', '.sp', 's', 50, 78),
   };
 }
