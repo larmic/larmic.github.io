@@ -34,14 +34,10 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 
 ### Technik und Betrieb
 
-- [ ] **README aktualisieren:**
-  - Abschnitt zum Zip-Umstieg (Branch `astro-redesign`) streichen.
-  - Aussagen zu Impressum und Datenschutz sind falsch: Die Seite gibt es, das Impressum steht auf DDG.
-  - Seitenliste ohne `/datenschutz/` ergänzen.
-  - Node-Version vereinheitlichen (`.nvmrc` 24, engines `>=22.23.4`, README „22.23“).
-- [ ] **Vorschaubild beim Teilen:** `og:image` (1200×630, z. B. Insel mit Figur), `og:site_name`, `og:locale`, `twitter:card`. Für LinkedIn ist das die Visitenkarte.
+- [x] **README aktualisiert:** Zip-Umstieg entfernt, Recht und Datenschutz, Seitenliste, Node-Version, Insel-Beschreibung.
+- [x] **Vorschaubild beim Teilen:** `/og.png` (1200 × 630) wird beim Build aus der Insel-Szene gerendert, dazu `og:site_name`, `og:locale`, `twitter:card`.
 - [x] **Videos ohne JavaScript erreichbar:** Link „direkt auf YouTube ansehen“ unter jedem Video.
-- [ ] **Speicherleck der Insel beheben:** `pointermove`- und `scroll`-Listener werden nie entfernt. Bei jedem Weg Insel → Impressum/Datenschutz/404 → Insel bleibt eine alte Insel im Speicher. AbortController verwenden und `cancelAnimationFrame` in `disconnectedCallback` aufrufen.
+- [x] **Speicherleck der Insel behoben:** globale Listener per AbortController, `cancelAnimationFrame` beim Entfernen.
 - [ ] **Livegang-Checkliste:**
   - [ ] Merge `relaunch` → `main` per Pull Request, ersten Deploy-Lauf prüfen.
   - [ ] Der Deploy ersetzt `gh-pages` komplett. Diese alten Adressen werden 404, Entscheidung pro Adresse (weiterleiten, neu anbieten oder bewusst aufgeben):
@@ -55,7 +51,7 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
   - [ ] Search Console: `sitemap-index.xml` einreichen, alte `sitemap.xml` entfernen.
   - [ ] Branch `relaunch` löschen.
 - [ ] **Mobiles Design prüfen**, auch sehr schmale und sehr breite Bildschirme.
-- [ ] **Kisten-Plätze:** Alle Plätze sind belegt (3 Workshops, 4 Videos). Der Entwurf „DDD für Nicht-Techniker:innen“ würde den Build abbrechen. Reserveplätze anlegen. Die Fehlermeldung sollte sagen, was zu tun ist.
+- [x] **Kisten-Plätze:** vierter Workshop-Platz als Reserve (für „DDD für Nicht-Techniker:innen“), Fehlermeldung sagt, was zu tun ist. Videos haben weiterhin vier Plätze.
 
 ## Bald nach dem Livegang
 

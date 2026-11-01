@@ -227,6 +227,7 @@ const CHILD_SLOTS: Record<Section, Pick<RouteDef, 'bridge' | 'target' | 'tag'>[]
     { bridge: [[3, -4, 3]], target: [3, -5, 4], tag: 'R' }, // oben rechts, Treppe hoch
     { bridge: [[2, -3, 3]], target: [1, -3, 4], tag: 'L' }, // oben links, Treppe hoch
     { bridge: [[4, -3, 2]], target: [5, -3, 1], tag: 'R' }, // rechts, Stufe runter
+    { bridge: [[3, -4, 2], [4, -4, 2]], target: [4, -5, 2], tag: 'R' }, // rechts, zwischen erster und dritter Kiste (Reserve)
   ],
   videos: [
     { bridge: [[2, 7, -1]], target: [1, 7, 0], tag: 'L' }, // links, Stufe hoch
@@ -252,7 +253,7 @@ export function buildWorld(children: Record<Section, ChildItem[]>): Scene {
     meta[id] = NAV_META[id];
     if (id !== 'workshops' && id !== 'videos') continue;
     const slots = CHILD_SLOTS[id];
-    if (children[id].length > slots.length) throw new Error(`Insel: Für ${id} gibt es ${slots.length} Plätze, gefunden: ${children[id].length} Einträge`);
+    if (children[id].length > slots.length) throw new Error(`Insel: Für ${id} gibt es ${slots.length} Plätze, gefunden: ${children[id].length} Einträge. Einen Platz in CHILD_SLOTS (src/lib/voxel/world.ts) ergänzen oder einen Eintrag auf draft: true setzen.`);
     children[id].forEach((it, n) => {
       const cid = `${id}/${it.id}`;
       routes[cid] = { walk: [], via: id, ...slots[n] };

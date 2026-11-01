@@ -48,8 +48,10 @@ class LarmicIsland extends HTMLElement {
   private look: { x: number; y: number } | null = null; // letzte Cursor-Position
   private headKey = '0,0';
   private raf = 0;
+  private globals: AbortController | null = null; // Listener auf document/window, leben nur, solange die Insel im DOM ist
 
   connectedCallback() {
+    this.listenGlobally();
     // Beim Seitenwechsel wird die Insel in die neue Seite umgehängt: Zustand behalten, nur weiterlaufen
     if (this.ready) {
       this.start();
@@ -79,20 +81,30 @@ class LarmicIsland extends HTMLElement {
       e.addEventListener('mouseleave', () => this.leave(e.dataset.egg!));
     }
     this.faces = [...this.querySelectorAll<SVGGElement>('.fig-head .fh')];
-    // Blick zum Cursor nur mit Maus und ohne Wunsch nach reduzierter Bewegung
-    if (matchMedia('(hover: hover) and (pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const follow = () => {
-        if (!this.raf) this.raf = requestAnimationFrame(() => { this.raf = 0; this.aimHead(); });
-      };
-      document.addEventListener('pointermove', (e) => { this.look = { x: e.clientX, y: e.clientY }; follow(); }, { passive: true });
-      window.addEventListener('scroll', follow, { passive: true });
-    }
     this.st = { sel: this.rest, n: 0, goal: null, ...this.restPose(), m: 0, pl: 0, t: 0, crumbs: [], fall: 0, spawn: 0, spawnT: -1, msg: null, done404: false };
     this.render();
   }
 
   disconnectedCallback() {
     this.stop();
+    // Ohne das bliebe jede verlassene Insel über ihre document-/window-Listener im Speicher
+    this.globals?.abort();
+    this.globals = null;
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = 0;
+  }
+
+  /** Blick zum Cursor: nur mit Maus und ohne Wunsch nach reduzierter Bewegung. */
+  private listenGlobally() {
+    if (this.globals) return;
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    this.globals = new AbortController();
+    const opts = { passive: true, signal: this.globals.signal };
+    const follow = () => {
+      if (!this.raf) this.raf = requestAnimationFrame(() => { this.raf = 0; this.aimHead(); });
+    };
+    document.addEventListener('pointermove', (e) => { this.look = { x: e.clientX, y: e.clientY }; follow(); }, opts);
+    window.addEventListener('scroll', follow, opts);
   }
 
   /** Neuer Inhalt wird angezeigt: Sein Block wird gewählt und zum Ruheblock, die Figur läuft hin. */
