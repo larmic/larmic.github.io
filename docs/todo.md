@@ -44,7 +44,7 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
   - [ ] Settings → Pages → Source auf „GitHub Actions“ stellen und den Deploy-Job neu starten („Re-run failed jobs“). So ist die Seite höchstens Sekunden weg.
   - [x] Alte Adressen, die mit dem Umstieg sonst auf 404 laufen:
     - `/favicon.ico`, `/favicon-16x16.png`, `/favicon-32x32.png` werden beim Build erzeugt
-    - `/workshop/ddd_hex_architecture.png`, `/workshop/event_storming.png` entstehen beim Build aus den WebP-Dateien (verkleinert, 0,5 bzw. 0,3 MB statt 13,8 bzw. 9 MB)
+    - `/workshop/ddd_hex_architecture.png`, `/workshop/event_storming.png` entstehen beim Build aus den WebP-Dateien in `src/assets/workshops/` (verkleinert, 0,5 bzw. 0,3 MB statt 13,8 bzw. 9 MB)
     - `/tags/`, `/categories/` leiten auf die Startseite um
     - `/sitemap.xml` ist ein Sitemap-Index, der auf die neue Sitemap zeigt
     - RSS (`/index.xml`, `/videos/index.xml`, `/workshops/index.xml`) entfällt bewusst, solange es keinen Blog gibt
@@ -119,7 +119,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [ ] **Strukturierte Daten:** `Person`, `Course` für Workshops, `VideoObject` für Videos.
 - [x] **Icons:** `favicon.ico`, PNG-Icons, `apple-touch-icon` (180 × 180) und `theme-color`.
 - [x] 404-Seite: kein `canonical`, dafür `noindex`.
-- [ ] Workshop-Bilder mit `width`/`height`, `loading="lazy"` und kleineren Größen (heute 1600 px), z. B. über `astro:assets`.
+- [x] Workshop-Bilder über `astro:assets` (`src/assets/workshops/`, `image.layout: constrained`): `width`/`height`, `loading="lazy"`, `srcset` von 640 bis 1600 px.
 - [ ] 28 KB Würfel-Symbole und Textur-CSS stehen in jeder Seite. Als cachebare Datei auslagern.
 - [ ] Sitemap mit `lastmod`, Titel und Descriptions eindeutiger machen.
 

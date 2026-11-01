@@ -15,4 +15,4 @@ Im Workshop wird ein visuelles Modell erstellt, das den Geschäftsprozess oder d
 
 Das Ziel: Ein gemeinsames Verständnis des Prozesses oder der Anforderung, das als Grundlage für die weitere Entwicklung dient.
 
-![Event-Storming-Wand: zwei Bahnen Packpapier voller beschrifteter Haftnotizen in Orange, Grün, Blau und Pink, von links nach rechts ein Ablauf bis „Prüfung bestanden“](/workshop/event_storming.webp)
+![Event-Storming-Wand: zwei Bahnen Packpapier voller beschrifteter Haftnotizen in Orange, Grün, Blau und Pink, von links nach rechts ein Ablauf bis „Prüfung bestanden“](../../assets/workshops/event_storming.webp)

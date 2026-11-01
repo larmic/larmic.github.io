@@ -51,7 +51,8 @@ src/
     island.ts         lädt Workshops und Videos und baut daraus die Insel
     avatar.ts         Aussehen der Figur
   styles/             tokens.css (Design-Tokens), global.css, sections.css
-public/               robots.txt, Bilder
+public/               robots.txt
+src/assets/workshops/ Workshop-Fotos (beim Build in passenden Größen ausgeliefert)
 docs/design-system.md Farben, Materialien, Typografie, Interaktionen
 docs/specs/insel.md   Spec der Figur auf der Insel (Regeln, Invarianten, Tests)
 docs/todo.md          Offene Punkte (Livegang-Checkliste, Review-Ergebnisse)

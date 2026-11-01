@@ -1,9 +1,11 @@
 // Alte Bild-Adressen der Hugo-Seite (/workshop/<name>.png) bleiben erreichbar: PNG aus dem WebP-Original,
 // verkleinert und mit Farbpalette (die alten PNGs hatten zusammen 22 MB).
 import { readdirSync } from 'node:fs';
+import { resolve } from 'node:path';
 import sharp from 'sharp';
 
-const DIR = new URL('../../../public/workshop/', import.meta.url);
+// Vom Projektordner aus: import.meta.url zeigt beim Build auf den gebündelten Code in dist/
+const DIR = resolve('src/assets/workshops');
 
 export function getStaticPaths() {
   return readdirSync(DIR)
@@ -12,7 +14,7 @@ export function getStaticPaths() {
 }
 
 export async function GET({ params }: { params: { name: string } }) {
-  const png = await sharp(new URL(`${params.name}.webp`, DIR).pathname)
+  const png = await sharp(resolve(DIR, `${params.name}.webp`))
     .resize({ width: 1200, withoutEnlargement: true })
     .png({ palette: true })
     .toBuffer();
