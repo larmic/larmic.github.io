@@ -63,7 +63,7 @@ const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
         class="figpos"
         style={`left: ${at.x}%; top: ${at.y}%; width: ${w.fig.w}%; transform: translate(-${w.fig.tx}%, -${w.fig.ty}%)`}
       >
-        <p class={`bubble pxf${rest.includes('/') ? ' off' : ''}`} aria-live="polite">
+        <p class={`bubble pxf${rest.includes('/') ? ' off' : ''}`} aria-hidden="true">
           Hi! Zeig auf einen Block.
         </p>
         {sparks.map((c) => (
@@ -91,6 +91,7 @@ const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
             data-id={n.id}
             data-parent={n.parent}
             aria-current={n.id === rest ? 'page' : undefined}
+            aria-label={n.href ? undefined : `${n.label} – gibt es noch nicht`}
             style={`left: ${n.x}%; top: ${n.y}%; width: ${n.w}%; z-index: ${n.z}${n.color ? `; color: ${n.color}` : ''}`}
           >
             <span class="bob" style={`animation-delay: ${n.delay}`}>

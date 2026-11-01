@@ -17,7 +17,7 @@ Die Insel ist die Navigation der Seite. Eine Figur zeigt, wo man gerade ist, und
 
 | Ereignis | Auslöser | Wirkung |
 | --- | --- | --- |
-| `aim(id)` | Hover oder Tastatur-Fokus (`:focus-visible`) auf einen Block, Klick auf den Blog | `hover = id`, Blog-Sperre aufheben, 404-Meldung löschen (außer bei `blog`) |
+| `aim(id)` | Hover oder Tastatur-Fokus (`:focus-visible`) auf einen Block – beim Blog nur Hover, Klick oder Enter | `hover = id`, Blog-Sperre aufheben, 404-Meldung löschen (außer bei `blog`) |
 | `leave(id)` | Maus weg, Fokus verlassen | `hover = null`, falls `id` der gezeigte Block war |
 | `select(id)` | Seitenwechsel (nach `astro:after-swap`) | `id` wird Ruheblock, 404-Meldung löschen, Hüpf-Animation. Unbekannte Ziele und der aktuelle Ruheblock ändern nichts |
 | `step` | Takt alle 130 ms, solange die Figur nicht zur Ruhe gekommen ist | ein Schritt nach den Regeln unten |
@@ -56,7 +56,7 @@ stateDiagram-v2
 | Kisten eines Bereichs | sichtbar, solange der Bereich (oder eine seiner Kisten) Ruheblock ist oder die Figur noch auf den Brücken des Bereichs unterwegs ist |
 | Wippen | Blöcke, über die die Figur gerade geht oder auf denen sie steht, wippen nicht |
 | Markierung | Ruheblock und sein Bereich sind markiert, der Ruheblock-Link trägt `aria-current="page"` |
-| Sprechblase | nur, wenn die Figur auf ihrem Ruheblock steht und nirgendwo anders hin will. Auf Bereichen spricht sie zum Bereich, beim ersten Aufruf der Startseite begrüßt sie („Hi! Zeig auf einen Block.“), auf Kisten schweigt sie. Die 404-Meldung erscheint überall und bleibt, bis man woanders hinzeigt. Oben im Baum: „Schöne Aussicht!“ |
+| Sprechblase | Dekoration, für Screenreader ausgeblendet (`aria-hidden`); dass es den Blog nicht gibt, steht im Namen des Blog-Buttons. Sichtbar nur, wenn die Figur auf ihrem Ruheblock steht und nirgendwo anders hin will. Auf Bereichen spricht sie zum Bereich, beim ersten Aufruf der Startseite begrüßt sie („Hi! Zeig auf einen Block.“), auf Kisten schweigt sie. Die 404-Meldung erscheint überall und bleibt, bis man woanders hinzeigt. Oben im Baum: „Schöne Aussicht!“ |
 
 *Tests: „steht beim Start auf dem Block der Seite …“, „läuft nach select zum neuen Ruheblock, öffnet dessen Bereich …“, „spricht nach einer Auswahl zum Bereich …“, „klettert beim Baum …“*
 

@@ -66,9 +66,10 @@ class LarmicIsland extends HTMLElement {
       const id = b.dataset.id!;
       b.addEventListener('mouseenter', () => this.update(aim(this.state, id)));
       b.addEventListener('mouseleave', () => this.update(leave(this.state, id)));
-      // Nur Tastatur-Fokus: Fokus durch Mausklick oder beim Zurückkehren in den Tab soll die Figur nicht losschicken
+      // Nur Tastatur-Fokus: Fokus durch Mausklick oder beim Zurückkehren in den Tab soll die Figur nicht losschicken.
+      // Den Blog nur per Klick oder Enter – beim Durchtabben soll niemand stürzen.
       b.addEventListener('focus', () => {
-        if (b.matches(':focus-visible')) this.update(aim(this.state, id));
+        if (id !== 'blog' && b.matches(':focus-visible')) this.update(aim(this.state, id));
       });
       b.addEventListener('blur', () => this.update(leave(this.state, id)));
       // Links navigieren selbst, nur der Blog-Button löst den Sturz aus
