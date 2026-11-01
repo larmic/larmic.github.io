@@ -37,7 +37,6 @@
   /* Schriften */
   --font-pixel: 'Pixelify Sans', 'Courier New', monospace;
   --font-body: 'Nunito', 'Trebuchet MS', sans-serif;
-  --font-mono: 'JetBrains Mono', Consolas, monospace;
 
   /* Pixel-Rahmen: vier Schatten statt border, dadurch fehlen die Eckpixel */
   --px-4: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink);

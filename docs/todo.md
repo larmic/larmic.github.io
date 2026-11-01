@@ -79,7 +79,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
   - Würfelmaße (80 × 84,8, 40/20/44,8) und Projektionskonstanten an einer Stelle.
   - Typen zwischen Generator und Client teilen.
   - `rest` als Union-Typ statt freier String.
-- [ ] **Toten Code entfernen:** ungenutzte Exporte und Prototyp-Reste in `textures.ts`/`render.ts`, Token `--font-mono`.
+- [x] **Toten Code entfernt:** Prototyp-Texturen und -Paletten (`BED`, `CRACK`, `DEEP`, `ORE`, `PSTONE`, `palOre`) und das Token `--font-mono`.
 - [x] Skript in `IslandPage.astro` steht jetzt im Dokument (vorher hinter `</html>`).
 - [ ] **Brücken-Verdeckung im Browser prüfen:** Brücken liegen als HTML über dem ganzen Insel-SVG und werden vor Inselblöcken gezeichnet, die eigentlich davor liegen (z. B. erste Brücke zu „Über mich“). Ggf. Brücken mit Tiefensortierung ins Szenen-SVG übernehmen.
 - [ ] **Fokus-Listener der Blöcke** nur bei `:focus-visible` auslösen. Sonst stürzt die Figur erneut, wenn man nach einem Klick auf „Blog“ in den Tab zurückkehrt.
