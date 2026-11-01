@@ -94,8 +94,9 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [x] 404-Seite hat jetzt eine `main`-Landmark (über `PlainPage`).
 - [x] `prefers-reduced-motion`: keine Vorschau-Wege beim Zeigen, die Figur steht nach einem Seitenwechsel sofort am Ziel (`settle`).
 - [x] Linktexte „Details zum Workshop“ und „Video ansehen“ nennen für Screenreader den Titel (`sr-only`).
-- [ ] Alt-Texte der Workshop-Fotos aussagekräftig machen.
-- [ ] Schriftgrößen in `rem` statt `px`. Englische Titel mit `lang="en"`.
+- [x] Alt-Texte der Workshop-Fotos beschreiben, was zu sehen ist.
+- [x] Schriftgrößen in `rem` statt `px` (folgen der Schriftgröße im Browser).
+- [ ] Englische Titel mit `lang="en"`.
 - [ ] Dauerbewegung (Wolken, wippende Blöcke) pausierbar machen oder dezenter.
 
 ### Inhalt (weitere)

@@ -8,7 +8,7 @@ order: 1
 
 Domain Driven Design (kurz DDD) ist ein Ansatz zur Modellierung komplexer Software und stellt dabei die fachlichen Aspekte in den Vordergrund. Die hexagonale Architektur greift dieses Konzept auf und integriert die fachlichen Inhalte in den Kern der Anwendung. Die konkrete technische Umsetzung (wie beispielsweise Datenbank oder MQ-Systeme) spielt dabei eine untergeordnete Rolle. Im Zuge von KI-gestützter Softwareentwicklung gewinnt dieses Architekturpattern gerade noch mehr an Bedeutung.
 
-![Workshop](/workshop/ddd_hex_architecture.webp)
+![Workshop-Runde: Teilnehmende mit Laptops an einem langen Konferenztisch, vorne auf der Leinwand eine User Story als Übungsaufgabe](/workshop/ddd_hex_architecture.webp)
 
 **Schwierigkeitsgrad**: Anspruchsvoller
 
