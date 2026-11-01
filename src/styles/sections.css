@@ -79,15 +79,9 @@ html.js .panel-section + .panel-section { margin-top: 0; }
 .subhero .subhero-text h1 { margin: 26px 0 0; }
 .subhero .subhero-text .lead { margin: 14px 0 0; max-width: 40em; }
 .back { gap: 10px; }
-
-/* Figur auf ihrem Zielblock: Fußmitte auf der Mitte der Blockoberseite (20 / 84,8 der Blockhöhe) */
-.perch { flex: 0 0 120px; margin-right: 72px; }
-.perch-spot { position: relative; }
-.perch-block { display: block; width: 100%; height: auto; }
-.perch-fig { position: absolute; left: 50%; top: 23.585%; }
-@container larmic (max-width: 700px) {
-  .perch { flex-basis: 96px; margin: 0 auto; }
-}
+/* Mit Ebene 2: Text links, Szene rechts – wie der Hero der Startseite */
+.subhero-row.has-level { max-width: 1240px; align-items: center; gap: 24px 40px; }
+.has-level .subhero-text { flex: 1 1 360px; max-width: 520px; padding: 16px 0 32px; }
 .doc { max-width: 900px; margin: 0 auto; }
 .entry { scroll-margin-top: 24px; padding: 34px clamp(22px, 4vw, 44px) 38px; }
 .entry + .entry { margin-top: 44px; }

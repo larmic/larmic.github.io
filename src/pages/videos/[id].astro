@@ -5,7 +5,7 @@ import SubHero from '../../components/SubHero.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import YouTube from '../../components/YouTube.astro';
 import Comments from '../../components/Comments.astro';
-import { BUBBLES } from '../../data/site';
+import { sectionLevel } from '../../data/levels';
 
 export async function getStaticPaths() {
   const videos = await getCollection('videos');
@@ -13,10 +13,11 @@ export async function getStaticPaths() {
 }
 const { v } = Astro.props;
 const { Content } = await render(v);
+const level = await sectionLevel('videos');
 const back = { href: '/#videos', label: 'Zurück zur Insel' };
 ---
 <BaseLayout title={v.data.title} description={v.data.teaser}>
-  <SubHero title={v.data.title} lead={v.data.teaser} back={back} perch={{ block: 'screen', bubble: BUBBLES.videos }} />
+  <SubHero title={v.data.title} lead={v.data.teaser} level={{ ...level, rest: v.id }} />
   <div class="grass-edge" aria-hidden="true"></div>
   <main class="ground">
     <div class="doc">

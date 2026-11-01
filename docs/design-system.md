@@ -54,22 +54,37 @@ Animationen nutzen meist `steps()` für den Pixel-Look. Beim Laden fallen nur di
 
 ## Interaktionen auf der Startseite
 
+Die Figur steht immer auf dem Block des Bereichs, der gerade angezeigt wird. Beim Aufruf ist das „Über mich“, mit `/#workshops` oder `/#videos` direkt der jeweilige Block. Jeder Bereich hat diese eigene Adresse: Ein Klick setzt sie, die Zurück-Taste des Browsers wechselt zurück und die Figur läuft mit.
+
 | Aktion | Wirkung |
 | --- | --- |
-| Hover oder Fokus auf einen Block | Die Figur läuft zum Inselrand, setzt Holzblöcke und steigt auf den Zielblock |
-| Maus weg oder Fokus verlassen | Die Figur läuft zurück, hinter ihr zerbröselt die Brücke |
-| Klick auf Über mich, Workshops, Videos | Wechselt den Inhaltsbereich, Block springt mit Partikeln, Figur hüpft |
-| Hover oder Klick auf Blog | Figur holt aus, hat keinen Block, fällt, spawnt mit „404 – Kein Blog gefunden“ |
+| Hover oder Fokus auf einen anderen Block | Die Figur läuft über die Inselmitte hin: Die alte Brücke zerbröselt hinter ihr, die neue setzt sie Block für Block |
+| Maus weg oder Fokus verlassen | Die Figur läuft zurück auf den Block des angezeigten Bereichs |
+| Klick auf Über mich, Workshops, Videos | Wechselt den Inhaltsbereich, Block springt mit Partikeln, Figur hüpft und bleibt dort stehen |
+| Hover oder Klick auf Blog | Figur holt aus, hat keinen Block, fällt und spawnt auf dem Block des angezeigten Bereichs mit „404 – Kein Blog gefunden“ |
+
+Die Sprechblase erscheint nur, wenn die Figur auf ihrem Block steht. Bis zur ersten Auswahl begrüßt sie („Hi! Zeig auf einen Block.“), danach spricht sie zum gewählten Bereich. Die 404-Meldung bleibt, bis man auf einen anderen Block zeigt.
 
 Takt der Figur: 130 ms. Auf schmalen Bildschirmen (unter 700 px Containerbreite) stehen die Blöcke als Reihe unter der Insel, Brücken entfallen.
 
-## Unterseiten
+## Unterseiten: Ebene 2
 
-Jeder Workshop und jedes Video hat eine eigene Seite. Die Insel bleibt die einzige Navigation, Unterseiten haben deshalb keine Text-Navigation.
+Jeder Workshop und jedes Video hat eine eigene Seite. Die Inselwelt bleibt dort die Navigation, eine Ebene tiefer:
 
-- **Zurück-Button:** goldener Button „Zurück zur Insel“ über dem Titel. Er führt auf den passenden Bereich der Startseite (`/#workshops`, `/#videos`), unten im Inhalt steht derselbe Link noch einmal.
-- **Figur auf dem Zielblock:** Rechts im Himmel steht die Figur auf dem Block des Bereichs (Tafel für Workshops, Bildschirm für Videos), als wäre sie über die Brücke angekommen. Sie hüpft beim Laden einmal, die Sprechblase zeigt denselben Satz wie auf der Insel.
-- **Ein Inhalt pro Seite:** Wer weiterschauen will, geht zurück zur Insel.
+```
+                                ▣ Eintrag 1 (oben rechts)
+                               ╱
+  ▒Insel▒ ── [Bereichs-Block] ── ▣ Eintrag 2 (rechts)
+  (klein)       ╱          ╲
+   ▣ Eintrag 4               ▣ Eintrag 3 (unten rechts)
+```
+
+- **Bereichs-Block in der Mitte:** Tafel für Workshops, Bildschirm für Videos. Er ist der Verteiler: Jeder Weg führt über ihn.
+- **Einträge als Kisten in ihrer Themenfarbe:** Holz, Metall, Kristall, Gras. Höchstens vier pro Ebene, sonst bricht der Build ab.
+- **Die Figur steht auf der Kiste der aktuellen Seite.** Die Kiste ist markiert, Kiste und Figur hüpfen beim Laden einmal. Zeigt man auf eine andere Kiste, läuft die Figur zurück zum Bereichs-Block (die Brücke zerbröselt) und baut die neue Brücke. Maus weg: Sie kehrt auf ihre Kiste zurück.
+- **Die kleine Insel links ist der Rückweg.** Sie führt auf die Startseite mit geöffnetem Bereich (`/#workshops`, `/#videos`).
+- **Keine Text-Navigation.** Unten im Inhalt steht „Zurück zur Insel“ als Textlink für alle, die nach dem Lesen nicht hochscrollen wollen.
+- **Handy:** Die Ziele stehen als Reihe unter der Szene, die Insel dort als Grasblock. Brücken entfallen, die Figur bleibt auf dem Bereichs-Block.
 
 ## Voxel-Technik
 

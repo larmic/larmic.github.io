@@ -59,32 +59,33 @@ function islandBlocks(): Map<string, { c: Cell; kind: string }> {
   return B;
 }
 
-// ---------- Routen zu den Navigationsblöcken ----------
-type RouteDef = { walk: [number, number][]; bridge: Cell[]; target: Cell; tag: 'L' | 'R' | 'B'; fall?: Cell };
-const HOME: Cell = [3, 3, 0];
-const ROUTES: Record<string, RouteDef> = {
-  about: { walk: [[2, 3], [1, 3], [0, 3]], bridge: [[-1, 3, 0], [-2, 3, 1]], target: [-3, 3, 2], tag: 'L' },
-  workshops: { walk: [[3, 2], [3, 1], [3, 0]], bridge: [[3, -1, 0], [3, -2, 1]], target: [3, -3, 2], tag: 'R' },
-  videos: { walk: [[3, 4]], bridge: [[3, 5, 0], [3, 6, 0]], target: [3, 7, -1], tag: 'B' },
-  blog: { walk: [[4, 3]], bridge: [], target: [7, 3, -2], tag: 'B', fall: [5, 3, 0] },
-};
-const NAV_META: Record<string, { label: string; sym: string; delay: string; p1: string; p2: string }> = {
-  about: { label: 'Über mich', sym: 'head', delay: '0s', p1: AVATAR.skin, p2: AVATAR.hair },
-  workshops: { label: 'Workshops', sym: 'board', delay: '-1.1s', p1: '#f39a3d', p2: '#5aa6e8' },
-  videos: { label: 'Videos', sym: 'screen', delay: '-2.2s', p1: '#ee4b3e', p2: '#454b59' },
-  blog: { label: 'Blog', sym: 'shelf', delay: '-0.6s', p1: '#c0453a', p2: '#3f6fb5' },
+
+// ---------- Szenen: feste Blöcke, Startfeld der Figur, Wege zu den Navigationszielen ----------
+type Tag = 'L' | 'R' | 'B';
+type Blocks = Map<string, { c: Cell; kind: string }>;
+type RouteDef = { walk: [number, number][]; bridge: Cell[]; target: Cell; tag: Tag; fall?: Cell };
+type NavMeta = { label: string; sym: string; delay: string; p1: string; p2: string; color?: string; href?: string };
+type SceneDef = {
+  blocks: Blocks;
+  home: Cell;
+  routes: Record<string, RouteDef>;
+  meta: Record<string, NavMeta>;
+  rests?: string[]; // Ziele, auf denen die Figur stehen bleiben kann – brauchen Platz für die Sprechblase
+  groups?: Record<string, Blocks>; // Blockgruppe statt eines einzelnen Zielblocks (die kleine Insel auf Ebene 2)
 };
 
 export type RouteNode = { x: number; y: number; f: 'L' | 'R'; b: boolean; fall?: boolean };
+export type NavItem = NavMeta & { id: string; x: number; y: number; w: number; z: number; tag: Tag; svg?: string };
 export type WorldData = {
   home: { x: number; y: number };
   routes: Record<string, RouteNode[]>;
   bridges: { route: string; idx: number; x: number; y: number; w: number; z: number }[];
-  nav: { id: string; label: string; sym: string; delay: string; p1: string; p2: string; x: number; y: number; w: number; z: number; tag: string }[];
+  nav: NavItem[];
 };
+export type Scene = ReturnType<typeof buildScene>;
 
-export function buildWorld() {
-  const B = islandBlocks();
+// Sichtbare Blöcke von hinten nach vorn als <use>, dazu ihre Bounding-Box
+function blockUses(B: Blocks) {
   const has = (i: number, j: number, k: number) => B.has(key([i, j, k]));
   const vis = [...B.values()].filter(({ c: [i, j, k] }) => !(has(i + 1, j, k) && has(i, j + 1, k) && has(i, j, k + 1)));
   vis.sort((a, b) => (a.c[0] + a.c[1] + a.c[2]) - (b.c[0] + b.c[1] + b.c[2]) || a.c[2] - b.c[2] || a.c[0] - b.c[0]);
@@ -96,20 +97,30 @@ export function buildWorld() {
     ys.push(Y, Y + 84.8);
     return `<use href="#v-${kind}" x="${f(X)}" y="${f(Y)}" width="80" height="84.8"/>`;
   }).join('');
+  return { uses, xs, ys };
+}
+
+function buildScene(def: SceneDef) {
+  const { uses, xs, ys } = blockUses(def.blocks);
 
   const fig = figureSvg();
   const s = 1.9;
   const figH = (fig.foot[1] - fig.box[1]) * s;
   const figHW = (fig.box[2] * s) / 2;
-  const [hx, hy] = footpt(...HOME);
-  xs.push(hx - 130, hx + 130);
-  ys.push(hy - figH - 80);
+  // Platz für Figur und Sprechblase überall, wo die Figur stehen bleibt
+  const headroom = ([hx, hy]: [number, number]) => {
+    xs.push(hx - 130, hx + 130);
+    ys.push(hy - figH - 80);
+  };
+  const [hx, hy] = footpt(...def.home);
+  headroom([hx, hy]);
 
   const nodesRaw: Record<string, { fx: number; fy: number; f: 'L' | 'R'; b: boolean; fall?: boolean }[]> = {};
   const bridgesRaw: { route: string; idx: number; X: number; Y: number; d: number }[] = [];
-  const targets: Record<string, { X: number; Y: number; d: number; tag: string }> = {};
-  for (const [rid, d] of Object.entries(ROUTES)) {
-    let prev = HOME;
+  const targets: Record<string, { X: number; Y: number; d: number; tag: Tag }> = {};
+  const groups: Record<string, { uses: string; x0: number; y0: number; x1: number; y1: number }> = {};
+  for (const [rid, d] of Object.entries(def.routes)) {
+    let prev = def.home;
     const cells: { c: Cell; b: boolean; fall: boolean }[] = d.walk.map(([i, j]) => ({ c: [i, j, 0] as Cell, b: false, fall: false }));
     if (d.fall) cells.push({ c: d.fall, b: false, fall: true });
     else {
@@ -130,13 +141,26 @@ export function buildWorld() {
       prev = c;
       return { fx, fy, f: dx > 0 ? 'R' : 'L', b, ...(fall ? { fall: true } : {}) } as const;
     }) as any;
-    const [X, Y] = pos(...d.target);
+    if (def.rests?.includes(rid)) headroom(footpt(...d.target));
+
+    const group = def.groups?.[rid];
+    let [X, Y] = pos(...d.target);
+    let W = 80;
+    let H = 84.8;
+    if (group) {
+      const g = blockUses(group);
+      groups[rid] = { uses: g.uses, x0: Math.min(...g.xs), y0: Math.min(...g.ys), x1: Math.max(...g.xs), y1: Math.max(...g.ys) };
+      [X, Y, W, H] = [groups[rid].x0, groups[rid].y0, groups[rid].x1 - groups[rid].x0, groups[rid].y1 - groups[rid].y0];
+    }
     targets[rid] = { X, Y, d: d.target[0] + d.target[1] + d.target[2], tag: d.tag };
-    xs.push(X, X + 80);
-    ys.push(Y, Y + 84.8);
-    if (d.tag === 'B') { ys.push(Y + 84.8 + 46); xs.push(X - 20, X + 100); }
-    if (d.tag === 'L') xs.push(X - 125);
-    if (d.tag === 'R') xs.push(X + 80 + 125);
+    xs.push(X, X + W);
+    ys.push(Y, Y + H);
+    // Platz für das Etikett, lange Namen brechen höchstens auf zwei Zeilen um
+    const tw = Math.max(125, Math.min(190, def.meta[rid].label.length * 10 + 30));
+    const half = Math.max(60, (tw - 5) / 2);
+    if (d.tag === 'B') { ys.push(Y + H + 46); xs.push(X + W / 2 - half, X + W / 2 + half); }
+    if (d.tag === 'L') xs.push(X - tw);
+    if (d.tag === 'R') xs.push(X + W + tw);
   }
 
   const sx0 = Math.min(...xs) - 14;
@@ -145,25 +169,93 @@ export function buildWorld() {
   const sh = Math.max(...ys) + 14 - sy0;
   const px = (v: number) => Number(f(((v - sx0) / sw) * 100));
   const py = (v: number) => Number(f(((v - sy0) / sh) * 100));
-  const W = Number(f((80 / sw) * 100));
   const zi = (dd: number, t = 0) => 30 + 2 * (dd + 12) + t;
 
   const data: WorldData = {
     home: { x: px(hx), y: py(hy) },
     routes: Object.fromEntries(Object.entries(nodesRaw).map(([rid, ns]) => [rid, ns.map((n) => ({ x: px(n.fx), y: py(n.fy), f: n.f, b: n.b, ...(n.fall ? { fall: true } : {}) }))])),
-    bridges: bridgesRaw.map((b) => ({ route: b.route, idx: b.idx, x: px(b.X), y: py(b.Y), w: W, z: zi(b.d) })),
-    nav: ['about', 'workshops', 'videos', 'blog'].map((id) => ({
-      id, ...NAV_META[id], x: px(targets[id].X), y: py(targets[id].Y), w: W, z: zi(targets[id].d, 1), tag: targets[id].tag,
-    })),
+    bridges: bridgesRaw.map((b) => ({ route: b.route, idx: b.idx, x: px(b.X), y: py(b.Y), w: Number(f((80 / sw) * 100)), z: zi(b.d) })),
+    nav: Object.keys(def.routes).map((id) => {
+      const t = targets[id];
+      const g = groups[id];
+      return {
+        id, ...def.meta[id], x: px(t.X), y: py(t.Y), z: zi(t.d, g ? -1 : 1), tag: t.tag,
+        w: Number(f(((g ? g.x1 - g.x0 : 80) / sw) * 100)),
+        ...(g ? { svg: `<svg viewBox="${[g.x0, g.y0, g.x1 - g.x0, g.y1 - g.y0].map(f).join(' ')}" aria-hidden="true">${g.uses}</svg>` } : {}),
+      };
+    }),
   };
 
   const [fx0, fy0, fw, fh] = fig.box;
   return {
     data,
-    islandSvg: `<svg viewBox="${[sx0, sy0, sw, sh].map(f).join(' ')}" aria-hidden="true" class="isle-svg">${uses}</svg>`,
+    sceneSvg: `<svg viewBox="${[sx0, sy0, sw, sh].map(f).join(' ')}" aria-hidden="true" class="isle-svg">${uses}</svg>`,
     figureSvg: fig.svg,
     aspect: `${f(sw)} / ${f(sh)}`,
     fig: { w: f((fw * s / sw) * 100), tx: f(((fig.foot[0] - fx0) / fw) * 100), ty: f(((fig.foot[1] - fy0) / fh) * 100) },
     particles: particlesCss(1234, 'pop', '.px', 'p', 46, 64) + '\n' + particlesCss(98765, 'spawn', '.sp', 's', 50, 78),
   };
+}
+
+// ---------- Ebene 1: die Insel der Startseite ----------
+const HOME: Cell = [3, 3, 0];
+const ROUTES: Record<string, RouteDef> = {
+  about: { walk: [[2, 3], [1, 3], [0, 3]], bridge: [[-1, 3, 0], [-2, 3, 1]], target: [-3, 3, 2], tag: 'L' },
+  workshops: { walk: [[3, 2], [3, 1], [3, 0]], bridge: [[3, -1, 0], [3, -2, 1]], target: [3, -3, 2], tag: 'R' },
+  videos: { walk: [[3, 4]], bridge: [[3, 5, 0], [3, 6, 0]], target: [3, 7, -1], tag: 'B' },
+  blog: { walk: [[4, 3]], bridge: [], target: [7, 3, -2], tag: 'B', fall: [5, 3, 0] },
+};
+const NAV_META: Record<string, NavMeta> = {
+  about: { label: 'Über mich', sym: 'head', delay: '0s', p1: AVATAR.skin, p2: AVATAR.hair },
+  workshops: { label: 'Workshops', sym: 'board', delay: '-1.1s', p1: '#f39a3d', p2: '#5aa6e8' },
+  videos: { label: 'Videos', sym: 'screen', delay: '-2.2s', p1: '#ee4b3e', p2: '#454b59' },
+  blog: { label: 'Blog', sym: 'shelf', delay: '-0.6s', p1: '#c0453a', p2: '#3f6fb5' },
+};
+
+export function buildWorld(): Scene {
+  return buildScene({ blocks: islandBlocks(), home: HOME, routes: ROUTES, meta: NAV_META });
+}
+
+// ---------- Ebene 2: ein Bereich (Workshops, Videos) ----------
+// Der Bereichs-Block schwebt in der Mitte, die Einträge liegen als Kisten auf festen Plätzen drumherum.
+// Links schwebt eine kleine Insel: der Weg zurück zur Startseite.
+const LEVEL_HOME: Cell = [0, 0, 0];
+const LEVEL_SLOTS: Omit<RouteDef, 'walk'>[] = [
+  { bridge: [[0, -1, 0], [0, -2, 1]], target: [0, -3, 2], tag: 'R' }, // oben rechts, Treppe hoch
+  { bridge: [[1, 0, 0], [1, -1, 0], [2, -1, 0], [2, -2, 0]], target: [3, -2, 0], tag: 'R' }, // rechts
+  { bridge: [[1, 0, 0], [2, 0, -1]], target: [3, 0, -2], tag: 'R' }, // unten rechts, Treppe runter
+  { bridge: [[0, 1, 0], [0, 2, -1]], target: [0, 3, -2], tag: 'L' }, // unten links, Treppe runter
+];
+export const LEVEL_BACK = 'insel';
+
+function isletBlocks(): Blocks {
+  const B: Blocks = new Map();
+  const put = (c: Cell, kind: string) => B.set(key(c), { c, kind });
+  for (const i of [-5, -4]) for (const j of [-1, 0]) {
+    put([i, j, 0], 'grass');
+    put([i, j, -1], 'dirt');
+  }
+  put([-4, 0, -2], 'stone');
+  put([-5, -1, 1], 'log');
+  put([-5, -1, 2], 'log');
+  for (const [di, dj] of [[0, 0], [-1, 0], [1, 0], [0, -1], [0, 1]]) put([-5 + di, -1 + dj, 3], 'leaves');
+  put([-5, -1, 4], 'leaves');
+  return B;
+}
+
+export type LevelItem = { id: string; label: string; block: string; color?: string; href: string };
+
+export function buildLevel(hub: string, items: LevelItem[], back: { label: string; href: string }): Scene {
+  if (items.length > LEVEL_SLOTS.length) throw new Error(`Ebene „${hub}“: höchstens ${LEVEL_SLOTS.length} Einträge möglich, gefunden: ${items.length}`);
+  if (items.some((it) => it.id === LEVEL_BACK)) throw new Error(`Ebene „${hub}“: die ID „${LEVEL_BACK}“ ist für die Insel reserviert`);
+  const routes: Record<string, RouteDef> = {};
+  const meta: Record<string, NavMeta> = {};
+  items.forEach((it, n) => {
+    routes[it.id] = { walk: [], ...LEVEL_SLOTS[n] };
+    meta[it.id] = { label: it.label, sym: it.block, delay: `${f(-0.3 - 0.9 * n)}s`, p1: it.color ?? '#f0a531', p2: '#ffffff', color: it.color, href: it.href };
+  });
+  routes[LEVEL_BACK] = { walk: [], bridge: [[-1, 0, 0], [-2, 0, 0], [-3, 0, 0]], target: [-4, 0, 0], tag: 'B' };
+  meta[LEVEL_BACK] = { label: back.label, sym: 'grass', delay: '0s', p1: '#6dbd47', p2: '#9b6a43', href: back.href };
+  const blocks: Blocks = new Map([[key(LEVEL_HOME), { c: LEVEL_HOME, kind: hub }]]);
+  return buildScene({ blocks, home: LEVEL_HOME, routes, meta, rests: items.map((it) => it.id), groups: { [LEVEL_BACK]: isletBlocks() } });
 }

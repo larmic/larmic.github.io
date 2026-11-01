@@ -45,7 +45,7 @@ docs/design-system.md Farben, Materialien, Typografie, Interaktionen
 
 ## Inhalte pflegen
 
-**Workshop hinzufügen:** neue Datei in `src/content/workshops/`, jeder Workshop bekommt eine eigene Seite unter `/workshops/<dateiname>/`.
+**Workshop hinzufügen:** neue Datei in `src/content/workshops/`, jeder Workshop bekommt eine eigene Seite unter `/workshops/<dateiname>/` und eine Kiste auf Ebene 2. `short` ist die Beschriftung der Kiste. Pro Ebene passen höchstens vier Kisten, beim fünften Eintrag bricht der Build mit einer Meldung ab.
 
 ```markdown
 ---
@@ -62,7 +62,7 @@ draft: false          # true = nicht veröffentlichen
 Beschreibung in Markdown.
 ```
 
-**Video hinzufügen:** neue Datei in `src/content/videos/` mit `title`, `short`, `teaser`, `material`, `order`, `youtube` (Video-ID) und `date`. Jedes Video bekommt eine eigene Seite unter `/videos/<dateiname>/`.
+**Video hinzufügen:** neue Datei in `src/content/videos/` mit `title`, `short`, `teaser`, `material`, `order`, `youtube` (Video-ID) und `date`. Jedes Video bekommt eine eigene Seite unter `/videos/<dateiname>/` und eine Kiste auf Ebene 2, auch hier höchstens vier.
 
 Fehlt ein Pflichtfeld oder hat es den falschen Typ, bricht `npm run check` ab. So landet kein kaputter Inhalt online.
 

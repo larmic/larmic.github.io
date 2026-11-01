@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SubHero from '../../components/SubHero.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
-import { BUBBLES } from '../../data/site';
+import { sectionLevel } from '../../data/levels';
 
 export async function getStaticPaths() {
   const workshops = await getCollection('workshops', ({ data }) => !data.draft);
@@ -11,10 +11,11 @@ export async function getStaticPaths() {
 }
 const { w } = Astro.props;
 const { Content } = await render(w);
+const level = await sectionLevel('workshops');
 const back = { href: '/#workshops', label: 'Zurück zur Insel' };
 ---
 <BaseLayout title={w.data.title} description={w.data.teaser}>
-  <SubHero title={w.data.title} lead={w.data.teaser} back={back} perch={{ block: 'board', bubble: BUBBLES.workshops }} />
+  <SubHero title={w.data.title} lead={w.data.teaser} level={{ ...level, rest: w.id }} />
   <div class="grass-edge" aria-hidden="true"></div>
   <main class="ground">
     <div class="doc">

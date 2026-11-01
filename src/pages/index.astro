@@ -26,7 +26,7 @@ const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.d
         <p class="intro">Ich baue Software mit fachlichem Kern, gebe Workshops zu Domain-Driven Design, Event Storming und Microservices und spreche auf Konferenzen über Architektur und Testing.</p>
         <div class="cta"><a href="#workshops" class="pxbtn" data-select="workshops">Workshops ansehen</a></div>
       </div>
-      <Island />
+      <Island rest="about" />
     </div>
   </section>
   <div class="grass-edge" aria-hidden="true"></div>
@@ -94,15 +94,31 @@ const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.d
     if (scroll && target && target.getBoundingClientRect().top > window.innerHeight * 0.85) target.scrollIntoView({ behavior: 'smooth' });
   }
 
-  island?.addEventListener('larmic:select', (e) => show((e as CustomEvent<{ id: string }>).detail.id, true));
+  // Jeder Bereich hat eine eigene Adresse: / (Über mich), /#workshops, /#videos. pushState statt location.hash,
+  // damit die Seite nicht zum Anker springt. Die Zurück-Taste wechselt den Bereich, die Figur läuft mit.
+  const hashOf: Record<string, string> = { about: '', workshops: '#workshops', videos: '#videos' };
+  const fromUrl = () => byHash[location.hash.slice(1)] ?? 'about';
+  function go(id: string, scroll = false) {
+    show(id, scroll);
+    if (fromUrl() !== id || location.hash !== hashOf[id]) history.pushState(null, '', location.pathname + location.search + hashOf[id]);
+  }
+
+  island?.addEventListener('larmic:select', (e) => go((e as CustomEvent<{ id: string }>).detail.id, true));
   for (const el of document.querySelectorAll<HTMLElement>('[data-select]')) {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
       const id = el.dataset.select!;
-      show(id);
+      go(id, true);
       island?.select(id);
     });
   }
-  const initial = byHash[location.hash.slice(1)] ?? 'about';
+  window.addEventListener('popstate', () => {
+    const id = fromUrl();
+    show(id);
+    island?.select(id);
+  });
+  // Mit #anker direkt den Bereich zeigen, die Figur steht ohne Weg auf seinem Block
+  const initial = fromUrl();
   show(initial);
-  if (initial !== 'about') island?.select(initial);
+  if (initial !== 'about') island?.select(initial, true);
 </script>

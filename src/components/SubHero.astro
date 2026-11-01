@@ -1,47 +1,28 @@
 ---
-// Kopf der Unterseiten: Himmel, Logo und Zurück-Button statt Text-Navigation – die Insel bleibt die einzige Navigation.
-// Mit `perch` steht die Figur auf ihrem Zielblock, als wäre sie gerade über die Brücke angekommen.
+// Kopf der Unterseiten: Himmel, Logo, Titel. Es gibt keine Text-Navigation, die Insel ist die Navigation.
+// Mit `level` steht rechts die Ebene 2 (Workshops oder Videos) mit der Figur auf der Kiste der aktuellen Seite.
+// Ohne `level` (z. B. Impressum) führt ein Zurück-Button zur Startseite.
 import SiteHeader from './SiteHeader.astro';
 import Clouds from './Clouds.astro';
-import { figureSvg } from '../lib/voxel/figure';
-import { f } from '../lib/voxel/render';
+import Island from './Island.astro';
+import type { Scene } from '../lib/voxel/world';
 
 interface Props {
   title: string;
   lead?: string;
-  back?: { href: string; label: string };
-  perch?: { block: string; bubble: string };
+  level?: { scene: Scene; rest: string; idle: string };
 }
-const { title, lead, back = { href: '/', label: 'Zurück zur Insel' }, perch } = Astro.props;
-
-// Wie auf der Insel: Figur mit Faktor 1,9, Fußmitte auf der Mitte der Blockoberseite (40, 20)
-const fig = figureSvg();
-const [fx0, fy0, fw, fh] = fig.box;
-const s = 1.9;
-const figStyle = `width: ${f(((fw * s) / 80) * 100)}%; transform: translate(-${f(((fig.foot[0] - fx0) / fw) * 100)}%, -${f(((fig.foot[1] - fy0) / fh) * 100)}%)`;
-// Platz über dem Block für die Figur in % der Blockbreite, dazu Platz für die Sprechblase
-const headroom = `calc(${f((((fig.foot[1] - fy0) * s - 20) / 80) * 100)}% + 110px)`;
+const { title, lead, level } = Astro.props;
 ---
 <section class="sky subhero">
   <Clouds />
   <SiteHeader />
-  <div class="subhero-row">
+  <div class:list={['subhero-row', { 'has-level': level }]}>
     <div class="subhero-text">
-      <a class="pxbtn small back" href={back.href}><svg width="16" height="16" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path d="M2 3h1v2h-1z M3 2h1v4h-1z M4 1h1v6h-1z" fill="currentColor"></path></svg>{back.label}</a>
+      {!level && <a class="pxbtn small back" href="/"><svg width="16" height="16" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path d="M2 3h1v2h-1z M3 2h1v4h-1z M4 1h1v6h-1z" fill="currentColor"></path></svg>Zurück zur Insel</a>}
       <h1>{title}</h1>
       {lead && <p class="lead">{lead}</p>}
     </div>
-    {perch && (
-      <div class="perch" aria-hidden="true">
-        <div style={`padding-top: ${headroom}`}></div>
-        <div class="perch-spot">
-          <svg class="perch-block" viewBox="0 0 80 84.8"><use href={`#v-${perch.block}`}></use></svg>
-          <div class="perch-fig" style={figStyle}>
-            <p class="bubble pxf">{perch.bubble}</p>
-            <div class="figw jumpA" set:html={fig.svg}></div>
-          </div>
-        </div>
-      </div>
-    )}
+    {level && <Island scene={level.scene} rest={level.rest} idle={level.idle} arrive />}
   </div>
 </section>
