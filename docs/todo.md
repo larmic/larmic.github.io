@@ -115,7 +115,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 
 ### SEO und Performance
 
-- [ ] **Schriften:** nur das Latin-Subset importieren. Kyrillische Pixelify-Glyphen stehen heute als Base64 im render-blockierenden CSS (ca. 57 % des CSS-Transfers). Dazu 47 Fontdateien mit 471 KB in `dist`.
+- [x] **Schriften:** nur das Latin-Subset (deckt Umlaute, „“, – und … ab). CSS gezippt 12,7 → 4,9 KB, kein Base64 mehr, `_astro` 616 → 216 KB (10 statt 40 Fontdateien).
 - [ ] **Strukturierte Daten:** `Person`, `Course` für Workshops, `VideoObject` für Videos.
 - [x] **Icons:** `favicon.ico`, PNG-Icons, `apple-touch-icon` (180 × 180) und `theme-color`.
 - [x] 404-Seite: kein `canonical`, dafür `noindex`.
