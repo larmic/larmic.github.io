@@ -79,7 +79,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [x] **Toten Code entfernt:** Prototyp-Texturen und -Paletten (`BED`, `CRACK`, `DEEP`, `ORE`, `PSTONE`, `palOre`) und das Token `--font-mono`.
 - [x] Skript in `IslandPage.astro` steht jetzt im Dokument (vorher hinter `</html>`).
 - [ ] **Brücken-Verdeckung im Browser prüfen:** Brücken liegen als HTML über dem ganzen Insel-SVG und werden vor Inselblöcken gezeichnet, die eigentlich davor liegen (z. B. erste Brücke zu „Über mich“). Ggf. Brücken mit Tiefensortierung ins Szenen-SVG übernehmen.
-- [ ] **Fokus-Listener der Blöcke** nur bei `:focus-visible` auslösen. Sonst stürzt die Figur erneut, wenn man nach einem Klick auf „Blog“ in den Tab zurückkehrt.
+- [x] **Fokus-Listener der Blöcke** reagieren nur auf Tastatur-Fokus (`:focus-visible`); kein zweiter Blog-Sturz mehr nach Tab-Wechsel.
 - [ ] Auf dem Handy läuft die Zustandsmaschine unsichtbar weiter, obwohl die Figur festgenagelt ist.
 - [ ] Inline-Styles in Seiten (z. B. 404) in CSS, gemeinsames Layout für Inhaltsseiten ohne Insel.
 

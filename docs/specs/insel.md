@@ -17,7 +17,7 @@ Die Insel ist die Navigation der Seite. Eine Figur zeigt, wo man gerade ist, und
 
 | Ereignis | Auslöser | Wirkung |
 | --- | --- | --- |
-| `aim(id)` | Hover oder Fokus auf einen Block, Klick auf den Blog | `hover = id`, Blog-Sperre aufheben, 404-Meldung löschen (außer bei `blog`) |
+| `aim(id)` | Hover oder Tastatur-Fokus (`:focus-visible`) auf einen Block, Klick auf den Blog | `hover = id`, Blog-Sperre aufheben, 404-Meldung löschen (außer bei `blog`) |
 | `leave(id)` | Maus weg, Fokus verlassen | `hover = null`, falls `id` der gezeigte Block war |
 | `select(id)` | Seitenwechsel (nach `astro:after-swap`) | `id` wird Ruheblock, 404-Meldung löschen, Hüpf-Animation. Unbekannte Ziele und der aktuelle Ruheblock ändern nichts |
 | `step` | Takt alle 130 ms, solange die Figur nicht zur Ruhe gekommen ist | ein Schritt nach den Regeln unten |
