@@ -38,10 +38,10 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 - [x] **Vorschaubild beim Teilen:** `/og.png` (1200 × 630) wird beim Build aus der Insel-Szene gerendert, dazu `og:site_name`, `og:locale`, `twitter:card`.
 - [x] **Videos ohne JavaScript erreichbar:** Link „direkt auf YouTube ansehen“ unter jedem Video.
 - [x] **Speicherleck der Insel behoben:** globale Listener per AbortController, `cancelAnimationFrame` beim Entfernen.
-- [ ] **Livegang-Checkliste:**
-  - [ ] Pull Request `relaunch` → `main` öffnen. Der Workflow prüft ihn mit allen Gates (erster echter Lauf in GitHub).
-  - [ ] Merge. Der alte Stand bleibt online, solange Pages noch aus dem Branch `gh-pages` veröffentlicht; der Deploy-Job schlägt dann vermutlich fehl, weil die Quelle noch nicht „GitHub Actions“ ist.
-  - [ ] Settings → Pages → Source auf „GitHub Actions“ stellen und den Deploy-Job neu starten („Re-run failed jobs“). So ist die Seite höchstens Sekunden weg.
+- [ ] **Livegang-Checkliste** (live seit 1. November 2026):
+  - [x] Pull Request `relaunch` → `main` öffnen. Der Workflow prüft ihn mit allen Gates (erster echter Lauf in GitHub).
+  - [x] Merge. Der alte Stand bleibt online, solange Pages noch aus dem Branch `gh-pages` veröffentlicht; der Deploy-Job schlägt dann vermutlich fehl, weil die Quelle noch nicht „GitHub Actions“ ist.
+  - [x] Settings → Pages → Source auf „GitHub Actions“ stellen und den Deploy-Job neu starten („Re-run failed jobs“). So ist die Seite höchstens Sekunden weg.
   - [x] Alte Adressen, die mit dem Umstieg sonst auf 404 laufen:
     - `/favicon.ico`, `/favicon-16x16.png`, `/favicon-32x32.png` werden beim Build erzeugt
     - `/workshop/ddd_hex_architecture.png`, `/workshop/event_storming.png` entstehen beim Build aus den WebP-Dateien in `src/assets/workshops/` (verkleinert, 0,5 bzw. 0,3 MB statt 13,8 bzw. 9 MB)
@@ -49,8 +49,8 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
     - `/sitemap.xml` ist ein Sitemap-Index, der auf die neue Sitemap zeigt
     - RSS (`/index.xml`, `/videos/index.xml`, `/workshops/index.xml`) entfällt bewusst, solange es keinen Blog gibt
   - [ ] Branch-Schutz für `main`: Prüfung „Guard-Gates und Build“ als Pflicht, direkte Pushes nur per Pull Request.
-  - [ ] Pages-Einstellungen prüfen: Custom domain `larmic.de` steht weiter drin, „Enforce HTTPS“ an. Seite mit CSS und Insel ausgeliefert?
-  - [ ] Stichprobe der alten Adressen nach dem Deploy (`/about/`, `/#workshops`, `/workshops/#workshop-…`, `/videos/#video-…`).
+  - [x] Pages-Einstellungen prüfen: Custom domain `larmic.de` steht weiter drin, „Enforce HTTPS“ an. Seite mit CSS und Insel ausgeliefert?
+  - [x] Stichprobe der alten Adressen nach dem Deploy (`/about/`, `/#workshops`, `/workshops/#workshop-…`, `/videos/#video-…`).
   - [ ] Search Console: `sitemap-index.xml` einreichen, alte `sitemap.xml` entfernen.
   - [ ] Branches `relaunch` und `gh-pages` löschen (`gh-pages` wird nicht mehr gebraucht).
 - [ ] **Mobiles Design prüfen**, auch sehr schmale und sehr breite Bildschirme.
