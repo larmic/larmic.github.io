@@ -3,6 +3,7 @@
 import sharp from 'sharp';
 import { islandScene } from '../data/island';
 import { cubeDefs } from '../lib/voxel/world';
+import { CUBE_H, CUBE_W } from '../lib/voxel/cube';
 import { AVATAR } from '../data/avatar';
 
 const W = 1200;
@@ -22,7 +23,7 @@ export async function GET() {
     .filter((n) => !n.parent)
     .map((n) => {
       const [x, y] = at(n.x, n.y);
-      return `<use href="#v-${n.sym}" x="${x}" y="${y}" width="80" height="84.8"/>`;
+      return `<use href="#v-${n.sym}" x="${x}" y="${y}" width="${CUBE_W}" height="${CUBE_H}"/>`;
     })
     .join('');
 

@@ -3,6 +3,7 @@
 // `rest` ist der Block der Seite, z. B. `about`, `workshops` oder `workshops/event_storming`: Dort steht die Figur.
 // `cta` ersetzt den Button im Kopf (auf Workshop-Seiten: „Workshop anfragen“).
 import BaseLayout from './BaseLayout.astro';
+import type { RestId } from '../data/island-layout';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import Clouds from '../components/Clouds.astro';
@@ -13,7 +14,7 @@ import { particleCss } from '../lib/voxel/world';
 interface Props {
   title?: string;
   description?: string;
-  rest: string;
+  rest: RestId;
   cta?: { label: string; href: string };
 }
 const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/workshops/' } } = Astro.props;

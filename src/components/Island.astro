@@ -1,17 +1,18 @@
 ---
+import { CUBE_OUTLINE, CUBE_VIEWBOX } from '../lib/voxel/cube';
 // Die Inselwelt: statisches SVG aus dem Voxel-Generator (beim Build) + Web Component für die Interaktion.
 // Alle Ziele sind Links, nur der Blog ist ein Button (er hat keine Seite, die Figur fällt).
 // `rest` ist der Block dessen, was gerade angezeigt wird, z. B. `about`, `workshops` oder `workshops/event_storming`.
 // Dort steht die Figur. Die Kisten eines Bereichs sind sichtbar, solange er offen ist.
 import { islandScene } from '../data/island';
+import type { RestId } from '../data/island-layout';
 
 interface Props {
-  rest: string;
+  rest: RestId;
 }
 const { rest } = Astro.props;
 const w = await islandScene();
 const d = w.data;
-const outline = '40,1.5 78.5,20.7 78.5,64.4 40,83.4 1.5,64.4 1.5,20.7';
 const sparks = ['#ffffff', '#f0a531', '#ffffff', '#f0a531', '#ffffff', '#f0a531'];
 const section = rest.split('/')[0];
 // Startbild ohne JavaScript: Die Figur steht schon auf ihrem Block, die Brücken dorthin stehen
@@ -33,7 +34,7 @@ const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
           data-k={k}
           style={`left: ${b.x}%; top: ${b.y}%; width: ${b.w}%; z-index: ${b.z}`}
         >
-          <svg viewBox="0 0 80 84.8" aria-hidden="true">
+          <svg viewBox={CUBE_VIEWBOX} aria-hidden="true">
             <use href="#v-plank"></use>
           </svg>
         </div>
@@ -82,9 +83,9 @@ const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
           style={`left: ${n.x}%; top: ${n.y}%; width: ${n.w}%; z-index: ${n.z}${n.color ? `; color: ${n.color}` : ''}`}
         >
           <span class="bob" style={`animation-delay: ${n.delay}`}>
-            <svg viewBox="0 0 80 84.8" aria-hidden="true">
+            <svg viewBox={CUBE_VIEWBOX} aria-hidden="true">
               <use href={`#v-${n.sym}`}></use>
-              <polygon class="outline" points={outline} fill="none" stroke="#1d2838" stroke-width="3"></polygon>
+              <polygon class="outline" points={CUBE_OUTLINE} fill="none" stroke="#1d2838" stroke-width="3"></polygon>
             </svg>
             {[0, 1, 2, 3, 4, 5].map((i) => (
               <span class="px" style={`background: ${i % 2 ? n.p2 : n.p1}`}></span>

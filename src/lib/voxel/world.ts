@@ -1,16 +1,19 @@
 // Szenen-Engine der Voxel-Welt: Würfel-Symbole, Hintergrund-Texturen und `buildScene`, das aus festen Blöcken,
 // Startfeld und Wegen die Szene samt Navigationszielen berechnet. Welche Insel gebaut wird, steht in
-// src/data/island-layout.ts. Raster: i nach rechts unten, j nach links unten, k nach oben. Bounding-Box eines Blocks:
-//   X = (i − j)·40,  Y = (i + j)·20 − k·44,8   (Würfel-viewBox 0 0 80 84.8)
+// src/data/island-layout.ts. Raster und Würfelmaße: cube.ts.
 import { cube, overlay, f, particlesCss, tileDataUri } from './render';
 import { figureSvg } from './figure';
 import { dress, type Avatar } from './avatar';
 import * as T from './textures';
+import { CUBE_H, CUBE_W, HALF_W, footpt, pos } from './cube';
+export { pos };
 
 export type Cell = [number, number, number];
 export const key = (c: Cell) => c.join(',');
-export const pos = (i: number, j: number, k: number): [number, number] => [(i - j) * 40, (i + j) * 20 - k * 44.8];
-const footpt = (i: number, j: number, k: number): [number, number] => [(i - j) * 40 + 40, (i + j) * 20 + 20 - k * 44.8];
+
+// Platz über einer Figur mit Sprechblase und unter einem Block mit Etikett darunter (in Szenen-Einheiten)
+const BUBBLE_ROOM = 80;
+const TAG_ROOM = 46;
 
 // ---------- Würfel-Symbole ----------
 export function cubeDefs(avatar: Avatar, prefix = 'v'): string {
@@ -108,9 +111,9 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
   const uses = vis
     .map(({ c, kind }) => {
       const [X, Y] = pos(...c);
-      xs.push(X, X + 80);
-      ys.push(Y, Y + 84.8);
-      return `<use href="#v-${kind}" x="${f(X)}" y="${f(Y)}" width="80" height="84.8"/>`;
+      xs.push(X, X + CUBE_W);
+      ys.push(Y, Y + CUBE_H);
+      return `<use href="#v-${kind}" x="${f(X)}" y="${f(Y)}" width="${CUBE_W}" height="${CUBE_H}"/>`;
     })
     .join('');
 
@@ -121,7 +124,7 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
   // Platz für Figur und Sprechblase, wo die Figur mit Sprechblase stehen bleibt
   const headroom = ([x, y]: [number, number]) => {
     xs.push(x - 130, x + 130);
-    ys.push(y - figH - 80);
+    ys.push(y - figH - BUBBLE_ROOM);
   };
   const [hx, hy] = footpt(...def.home);
   headroom([hx, hy]);
@@ -164,8 +167,8 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
           const [X, Y] = pos(...c);
           k = bridgesRaw.push({ X, Y, d: c[0] + c[1] + c[2] }) - 1;
           bridgeAt.set(key(c), k);
-          xs.push(X, X + 80);
-          ys.push(Y, Y + 84.8);
+          xs.push(X, X + CUBE_W);
+          ys.push(Y, Y + CUBE_H);
         }
       }
       prev = c;
@@ -183,18 +186,18 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
 
     const [X, Y] = pos(...d.target);
     targets[rid] = { X, Y, d: d.target[0] + d.target[1] + d.target[2], tag: d.tag };
-    xs.push(X, X + 80);
-    ys.push(Y, Y + 84.8);
+    xs.push(X, X + CUBE_W);
+    ys.push(Y, Y + CUBE_H);
     // Platz für das Etikett. Kisten zeigen ihres nur beim Zeigen und dürfen dann über den Rand ragen.
     if (!def.meta[rid].parent) {
       const tw = Math.max(125, def.meta[rid].label.length * 10 + 30);
       const half = Math.max(60, (tw - 5) / 2);
       if (d.tag === 'B') {
-        ys.push(Y + 84.8 + 46);
-        xs.push(X + 40 - half, X + 40 + half);
+        ys.push(Y + CUBE_H + TAG_ROOM);
+        xs.push(X + HALF_W - half, X + HALF_W + half);
       }
       if (d.tag === 'L') xs.push(X - tw);
-      if (d.tag === 'R') xs.push(X + 80 + tw);
+      if (d.tag === 'R') xs.push(X + CUBE_W + tw);
     }
   }
 
@@ -204,7 +207,7 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
   const sh = Math.max(...ys) + 14 - sy0;
   const px = (v: number) => Number(f(((v - sx0) / sw) * 100));
   const py = (v: number) => Number(f(((v - sy0) / sh) * 100));
-  const W = Number(f((80 / sw) * 100));
+  const W = Number(f((CUBE_W / sw) * 100));
   const zi = (dd: number, t = 0) => 30 + 2 * (dd + 12) + t;
 
   const data: WorldData = {
@@ -229,7 +232,7 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
     eggs: Object.entries(def.eggs ?? {}).map(([id, e]) => {
       const bx = e.area.map((c) => pos(...c));
       const [ax0, ay0] = [Math.min(...bx.map((b) => b[0])), Math.min(...bx.map((b) => b[1]))];
-      const [ax1, ay1] = [Math.max(...bx.map((b) => b[0])) + 80, Math.max(...bx.map((b) => b[1])) + 84.8];
+      const [ax1, ay1] = [Math.max(...bx.map((b) => b[0])) + CUBE_W, Math.max(...bx.map((b) => b[1])) + CUBE_H];
       return {
         id,
         x: px(ax0),

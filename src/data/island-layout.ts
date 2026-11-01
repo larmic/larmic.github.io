@@ -95,7 +95,10 @@ const navMeta = (avatar: Avatar): Record<string, NavMeta> => ({
 });
 
 // Kisten der Einträge: feste Plätze rund um ihren Bereichs-Block, Weg = Brücke(n) vom Bereichs-Block aus
-type Section = 'workshops' | 'videos';
+export type Section = 'workshops' | 'videos';
+
+/** Ruheblock einer Seite: ein Bereich oder die Kiste eines Eintrags. Tippfehler fallen so schon bei `npm run check` auf. */
+export type RestId = 'about' | Section | `${Section}/${string}`;
 const CHILD_SLOTS: Record<Section, Pick<RouteDef, 'bridge' | 'target' | 'tag'>[]> = {
   workshops: [
     { bridge: [[3, -4, 3]], target: [3, -5, 4], tag: 'R' }, // oben rechts, Treppe hoch

@@ -3,8 +3,10 @@
 // Wege bilden einen Baum (Insel → Bereich → Kiste); die Figur läuft immer nur bis zur Abzweigung zurück.
 // Spezifikation: docs/specs/insel.md
 
-export type RouteNode = { x: number; y: number; f: 'L' | 'R'; b: boolean; k?: number; fall?: boolean };
-export type World = { home: { x: number; y: number }; routes: Record<string, RouteNode[]> };
+import type { RouteNode, WorldData } from '../lib/voxel/world';
+
+/** Was die Figur von der Insel braucht: Startfeld und Wege (vom Generator erzeugt, als JSON ins HTML geschrieben) */
+export type World = Pick<WorldData, 'home' | 'routes'>;
 
 export const FALL_TICKS = 7; // Dauer des Sturzes in Takten
 export const CRUMBLE_TICKS = 3; // so lange bleibt ein bröckelnder Brückenblock sichtbar

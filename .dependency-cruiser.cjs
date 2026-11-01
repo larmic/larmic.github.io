@@ -33,7 +33,8 @@ module.exports = {
       comment:
         'Browser-Code nutzt aus dem Generator nur den Kopf (head.ts). Alles andere ist Build-Code und gehört nicht ins Bundle.',
       from: { path: '^src/scripts/', pathNot: '\\.test\\.ts$' },
-      to: { path: '^src/lib/', pathNot: '^src/lib/voxel/head\\.ts$' },
+      // Reine Typ-Importe verschwinden beim Kompilieren und sind erlaubt
+      to: { path: '^src/lib/', pathNot: '^src/lib/voxel/head\\.ts$', dependencyTypesNot: ['type-only'] },
     },
     {
       name: 'no-node-in-client',

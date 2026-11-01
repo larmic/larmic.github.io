@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Scene } from '../lib/voxel/world';
+import { CUBE_H, CUBE_W, HALF_W, LEVEL, STEP_Y } from '../lib/voxel/cube';
 import { AVATAR } from './avatar';
 import { buildWorld, type ChildItem } from './island-layout';
 
@@ -14,7 +15,7 @@ const items = (section: string, n: number): ChildItem[] =>
 // So viele Einträge, wie es Plätze gibt: Hier müssen Geometrie und Wege noch stimmen
 const full = () => buildWorld({ workshops: items('workshops', 4), videos: items('videos', 4) }, AVATAR);
 
-/** Prozentangaben der Szene zurück in Szenen-Einheiten (Würfel 80 × 84,8) */
+/** Prozentangaben der Szene zurück in Szenen-Einheiten (Würfel CUBE_W × CUBE_H) */
 function units(scene: Scene) {
   const [x0, y0, w, h] = scene.sceneSvg
     .match(/viewBox="([^"]+)"/)![1]
@@ -46,11 +47,11 @@ describe('buildWorld', () => {
         const cur = at(node);
         const dx = cur.X - prev.X;
         const dy = cur.Y - prev.Y;
-        const pillar = Math.abs(dx) < 0.5 && Math.abs(dy + 44.8) < 0.5; // Baum: Block unter sich setzen und draufsteigen
+        const pillar = Math.abs(dx) < 0.5 && Math.abs(dy + LEVEL) < 0.5; // Baum: Block unter sich setzen und draufsteigen
         if (!node.fall && !pillar) {
-          expect(Math.abs(Math.abs(dx) - 40), `${id}: Schritt seitlich`).toBeLessThan(0.5);
+          expect(Math.abs(Math.abs(dx) - HALF_W), `${id}: Schritt seitlich`).toBeLessThan(0.5);
           // ein Feld weiter: ±20, dazu eine Stufe hoch (−44,8) oder runter (+44,8)
-          const level = [-20, 20].flatMap((s) => [s - 44.8, s, s + 44.8]).some((s) => Math.abs(dy - s) < 0.5);
+          const level = [-STEP_Y, STEP_Y].flatMap((s) => [s - LEVEL, s, s + LEVEL]).some((s) => Math.abs(dy - s) < 0.5);
           expect(level, `${id}: Schritt ${dx.toFixed(1)}/${dy.toFixed(1)}`).toBe(true);
           expect(cur.X > prev.X ? 'R' : 'L', `${id}: Blickrichtung`).toBe(node.f);
         }
@@ -74,7 +75,7 @@ describe('buildWorld', () => {
     }));
     const boxes = scene.data.nav.map((n) => ({ id: n.id, ...at(n) }));
     const overlap = (a: { X: number; Y: number }, b: { X: number; Y: number }) =>
-      a.X < b.X + 70 && b.X < a.X + 70 && a.Y < b.Y + 74.8 && b.Y < a.Y + 74.8; // 10 Einheiten Spiel für Kanten, die sich berühren
+      a.X < b.X + CUBE_W - 10 && b.X < a.X + CUBE_W - 10 && a.Y < b.Y + CUBE_H - 10 && b.Y < a.Y + CUBE_H - 10; // 10 Einheiten Spiel für Kanten, die sich berühren
     for (const [i, a] of boxes.entries()) {
       for (const b of boxes.slice(i + 1)) expect(overlap(a, b), `${a.id} / ${b.id}`).toBe(false);
       for (const c of cubes) expect(overlap(a, c), `${a.id} / Inselblock ${c.X},${c.Y}`).toBe(false);

@@ -2,7 +2,8 @@
 // Läuft nur beim Build. Ergebnis wird per set:html in die Seiten eingesetzt.
 import type { Grid, Palette } from './textures';
 
-export type Matrix = [number, number, number, number, number, number];
+import { CUBE_VIEWBOX, FACE_LEFT, FACE_RIGHT, FACE_TOP, type Matrix } from './cube';
+export type { Matrix };
 
 export function f(v: number): string {
   const r = Math.round(v * 1000) / 1000;
@@ -111,19 +112,17 @@ export function overlay(grid: Grid, pal: Palette, cls?: string): string {
   return `<g${cls ? ` class="${cls}"` : ''}>${gridSvg(grid, pal)}</g>`;
 }
 
-// Würfel in 2:1-Dimetrie: viewBox 0 0 80 84.8, Texturen 8×8
-const CT: Matrix = [5, 2.5, -5, 2.5, 40, 0];
-const CL: Matrix = [5, 2.5, 0, 5.6, 0, 20];
-const CR: Matrix = [5, -2.5, 0, 5.6, 40, 40];
+/** Die drei sichtbaren Flächen eines Würfels (8×8-Texturen), schattiert: oben hell, links leicht, rechts stärker dunkel */
+export function cubeFaces(T: Grid, L: Grid, R: Grid, pal: Palette, exL = '', exR = ''): string {
+  return (
+    face(FACE_TOP, T, pal, ['#ffffff', 0.05]) +
+    face(FACE_LEFT, L, pal, ['#000', 0.08], exL) +
+    face(FACE_RIGHT, R, pal, ['#000', 0.26], exR)
+  );
+}
 
 export function cube(id: string, T: Grid, L: Grid, R: Grid, pal: Palette, exL = '', exR = ''): string {
-  return (
-    `<symbol id="${id}" viewBox="0 0 80 84.8">` +
-    face(CT, T, pal, ['#ffffff', 0.05]) +
-    face(CL, L, pal, ['#000', 0.08], exL) +
-    face(CR, R, pal, ['#000', 0.26], exR) +
-    '</symbol>'
-  );
+  return `<symbol id="${id}" viewBox="${CUBE_VIEWBOX}">${cubeFaces(T, L, R, pal, exL, exR)}</symbol>`;
 }
 
 // Kachel als eigenständiges SVG (für CSS-Hintergründe)
