@@ -1,32 +1,13 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import SiteHeader from '../components/SiteHeader.astro';
-import SiteFooter from '../components/SiteFooter.astro';
-import Clouds from '../components/Clouds.astro';
+import PlainPage from '../layouts/PlainPage.astro';
 import { figureSvg } from '../lib/voxel/figure';
 import { AVATAR } from '../data/avatar';
 const fig = figureSvg(AVATAR);
 ---
 
-<BaseLayout title="Seite nicht gefunden">
-  <section class="sky subhero">
-    <Clouds />
-    <SiteHeader />
-    <div style="position: relative; max-width: 1180px; margin: 24px auto 0; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 24px 48px">
-      <div style="width: 120px" set:html={fig.svg} />
-      <div>
-        <h1 style="margin: 0">404 – Seite nicht gefunden</h1>
-        <p class="lead" style="margin-left: 0">
-          Hier ist noch kein Block gesetzt. Zurück auf die Insel?
-        </p>
-        <p>
-          <a class="pxbtn" href="/">
-            Zur Startseite
-          </a>
-        </p>
-      </div>
-    </div>
-  </section>
-  <div class="grass-edge" aria-hidden="true"></div>
-  <SiteFooter />
-</BaseLayout>
+<PlainPage title="Seite nicht gefunden" heading="404 – Seite nicht gefunden" noindex>
+  <div class="notfound">
+    <div class="notfound-fig" set:html={fig.svg} />
+    <p>Hier ist noch kein Block gesetzt. Zurück auf die Insel?</p>
+  </div>
+</PlainPage>

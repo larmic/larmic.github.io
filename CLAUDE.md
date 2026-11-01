@@ -22,6 +22,7 @@ Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run chec
 ## Aufbau
 
 - `src/pages/` – Seiten: `/` (Über mich), `/workshops/`, `/workshops/<id>/`, `/videos/`, `/videos/<id>/`, `/impressum/`, 404
+- `src/layouts/PlainPage.astro` – Layout der Seiten ohne Insel (Impressum, Datenschutz, 404)
 - `src/layouts/IslandPage.astro` – Layout aller Seiten mit Insel: Kopf bleibt beim Seitenwechsel stehen (`transition:persist`), `rest` sagt der Figur, wo sie steht
 - `src/content/` – Workshops und Videos als Markdown, Schema in `src/content.config.ts`
 - `src/components/` – Astro-Komponenten, die Insel in `Island.astro`, der Kopf ohne Insel (Impressum) in `SubHero.astro`

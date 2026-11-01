@@ -1,122 +1,105 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import SubHero from '../components/SubHero.astro';
-import SiteFooter from '../components/SiteFooter.astro';
+import PlainPage from '../layouts/PlainPage.astro';
 import { SITE } from '../data/site';
 ---
 
-<BaseLayout title="Datenschutz" description="Datenschutzerklärung von larmic.de">
-  <SubHero title="Datenschutz" />
-  <div class="grass-edge" aria-hidden="true"></div>
-  <main class="ground">
-    <div class="doc">
-      <article class="entry pxbox" style="background: var(--paper)">
-        <div class="prose">
-          <p>
-            Diese Seite ist bewusst sparsam: keine Cookies, kein Tracking, keine Statistik, keine Werbung. Schriften und
-            Grafiken werden mit der Seite selbst ausgeliefert, von anderen Anbietern wird nichts nachgeladen.
-            Personenbezogene Daten fallen nur dort an, wo es sich nicht vermeiden lässt – das steht hier.
-          </p>
+<PlainPage title="Datenschutz" description="Datenschutzerklärung von larmic.de">
+  <p>
+    Diese Seite ist bewusst sparsam: keine Cookies, kein Tracking, keine Statistik, keine Werbung. Schriften und
+    Grafiken werden mit der Seite selbst ausgeliefert, von anderen Anbietern wird nichts nachgeladen. Personenbezogene
+    Daten fallen nur dort an, wo es sich nicht vermeiden lässt – das steht hier.
+  </p>
 
-          <h2>Verantwortlich</h2>
-          <p>
-            Lars Michaelis
-            <br />
-            Langwedeler Str. 3A
-            <br />
-            28307 Bremen
-            <br />
-            E-Mail: mail[at]larmic.de
-          </p>
+  <h2>Verantwortlich</h2>
+  <p>
+    Lars Michaelis
+    <br />
+    Langwedeler Str. 3A
+    <br />
+    28307 Bremen
+    <br />
+    E-Mail: mail[at]larmic.de
+  </p>
 
-          <h2>Hosting bei GitHub Pages</h2>
-          <p>
-            Die Seite wird über GitHub Pages ausgeliefert, einen Dienst der GitHub, Inc., 88 Colin P. Kelly Jr. Street,
-            San Francisco, CA 94107, USA. Beim Aufruf verarbeitet GitHub technisch notwendige Daten, insbesondere die
-            IP-Adresse, Datum und Uhrzeit, die aufgerufene Seite und Angaben zum Browser. GitHub speichert die
-            IP-Adresse nach eigenen Angaben zu Sicherheitszwecken in Protokollen. Wie lange, legt GitHub fest; eine
-            konkrete Frist nennt GitHub nicht. Ich selbst habe keinen Zugriff auf diese Protokolle.
-          </p>
-          <p>
-            Rechtsgrundlage ist mein berechtigtes Interesse an einer sicheren und zuverlässigen Bereitstellung der Seite
-            (Art. 6 Abs. 1 lit. f DSGVO). Dabei können Daten in die USA übermittelt werden. GitHub ist unter dem EU-US
-            Data Privacy Framework zertifiziert, für die USA liegt damit ein Angemessenheitsbeschluss der EU-Kommission
-            vor (Art. 45 DSGVO). Mehr dazu in der{' '}
-            <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement">
-              Datenschutzerklärung von GitHub
-            </a>
-            .
-          </p>
+  <h2>Hosting bei GitHub Pages</h2>
+  <p>
+    Die Seite wird über GitHub Pages ausgeliefert, einen Dienst der GitHub, Inc., 88 Colin P. Kelly Jr. Street, San
+    Francisco, CA 94107, USA. Beim Aufruf verarbeitet GitHub technisch notwendige Daten, insbesondere die IP-Adresse,
+    Datum und Uhrzeit, die aufgerufene Seite und Angaben zum Browser. GitHub speichert die IP-Adresse nach eigenen
+    Angaben zu Sicherheitszwecken in Protokollen. Wie lange, legt GitHub fest; eine konkrete Frist nennt GitHub nicht.
+    Ich selbst habe keinen Zugriff auf diese Protokolle.
+  </p>
+  <p>
+    Rechtsgrundlage ist mein berechtigtes Interesse an einer sicheren und zuverlässigen Bereitstellung der Seite (Art. 6
+    Abs. 1 lit. f DSGVO). Dabei können Daten in die USA übermittelt werden. GitHub ist unter dem EU-US Data Privacy
+    Framework zertifiziert, für die USA liegt damit ein Angemessenheitsbeschluss der EU-Kommission vor (Art. 45 DSGVO).
+    Mehr dazu in der{' '}
+    <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement">
+      Datenschutzerklärung von GitHub
+    </a>
+    .
+  </p>
 
-          <h2>Videos von YouTube</h2>
-          <p>
-            Auf den Videoseiten steht zunächst nur ein Platzhalter; dabei besteht keine Verbindung zu YouTube. Darunter
-            gibt es einen normalen Link, um das Video direkt auf YouTube anzusehen. Erst wenn du auf „Video abspielen“
-            klickst, wird das Video über youtube-nocookie.com geladen. Anbieter ist die Google Ireland Limited, Gordon
-            House, Barrow Street, Dublin 4, Irland. Dabei erhält Google unter anderem deine IP-Adresse und Informationen
-            zur Nutzung des Videos; YouTube kann dann auch Daten auf deinem Gerät speichern.
-          </p>
-          <p>
-            Rechtsgrundlage ist deine Einwilligung durch den Klick (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG).
-            Daten können an die Google LLC in den USA übermittelt werden, die ebenfalls unter dem EU-US Data Privacy
-            Framework zertifiziert ist. Mehr dazu in der{' '}
-            <a href="https://policies.google.com/privacy?hl=de">Datenschutzerklärung von Google</a>.
-          </p>
+  <h2>Videos von YouTube</h2>
+  <p>
+    Auf den Videoseiten steht zunächst nur ein Platzhalter; dabei besteht keine Verbindung zu YouTube. Darunter gibt es
+    einen normalen Link, um das Video direkt auf YouTube anzusehen. Erst wenn du auf „Video abspielen“ klickst, wird das
+    Video über youtube-nocookie.com geladen. Anbieter ist die Google Ireland Limited, Gordon House, Barrow Street,
+    Dublin 4, Irland. Dabei erhält Google unter anderem deine IP-Adresse und Informationen zur Nutzung des Videos;
+    YouTube kann dann auch Daten auf deinem Gerät speichern.
+  </p>
+  <p>
+    Rechtsgrundlage ist deine Einwilligung durch den Klick (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG). Daten können
+    an die Google LLC in den USA übermittelt werden, die ebenfalls unter dem EU-US Data Privacy Framework zertifiziert
+    ist. Mehr dazu in der <a href="https://policies.google.com/privacy?hl=de">Datenschutzerklärung von Google</a>.
+  </p>
 
-          <h2>Kontakt per E-Mail oder Telefon</h2>
-          <p>
-            Wenn du mir schreibst oder mich anrufst, verarbeite ich deine Angaben, um deine Anfrage zu beantworten –
-            etwa zu einem Workshop. Rechtsgrundlage ist die Anbahnung oder Durchführung eines Vertrags (Art. 6 Abs. 1
-            lit. b DSGVO) oder mein berechtigtes Interesse, Anfragen zu beantworten (Art. 6 Abs. 1 lit. f DSGVO). Ich
-            lösche die Daten, sobald sie dafür nicht mehr gebraucht werden und keine gesetzlichen Aufbewahrungspflichten
-            bestehen.
-          </p>
-          <p>
-            Workshops und Beratung biete ich als Mitarbeiter von team neusta an, Vertragspartner ist die neusta GmbH.
-            Anfragen an meine geschäftliche Adresse bei neusta ({SITE.workshopMail}) landen deshalb auf den Systemen von
-            team neusta und werden dort verarbeitet. Dafür gilt die{' '}
-            <a href="https://www.team-neusta.de/datenschutzerklaerung">Datenschutzerklärung von team neusta</a>.
-          </p>
+  <h2>Kontakt per E-Mail oder Telefon</h2>
+  <p>
+    Wenn du mir schreibst oder mich anrufst, verarbeite ich deine Angaben, um deine Anfrage zu beantworten – etwa zu
+    einem Workshop. Rechtsgrundlage ist die Anbahnung oder Durchführung eines Vertrags (Art. 6 Abs. 1 lit. b DSGVO) oder
+    mein berechtigtes Interesse, Anfragen zu beantworten (Art. 6 Abs. 1 lit. f DSGVO). Ich lösche die Daten, sobald sie
+    dafür nicht mehr gebraucht werden und keine gesetzlichen Aufbewahrungspflichten bestehen.
+  </p>
+  <p>
+    Workshops und Beratung biete ich als Mitarbeiter von team neusta an, Vertragspartner ist die neusta GmbH. Anfragen
+    an meine geschäftliche Adresse bei neusta ({SITE.workshopMail}) landen deshalb auf den Systemen von team neusta und
+    werden dort verarbeitet. Dafür gilt die{' '}
+    <a href="https://www.team-neusta.de/datenschutzerklaerung">Datenschutzerklärung von team neusta</a>.
+  </p>
 
-          <h2>Links zu anderen Seiten</h2>
-          <p>
-            Links etwa zu GitHub, LinkedIn, YouTube oder Xing sind einfache Links. Es werden keine Inhalte dieser
-            Dienste eingebunden und keine Daten an sie übertragen, solange du nicht draufklickst. Danach gelten die
-            Datenschutzbestimmungen des jeweiligen Anbieters.
-          </p>
+  <h2>Links zu anderen Seiten</h2>
+  <p>
+    Links etwa zu GitHub, LinkedIn, YouTube oder Xing sind einfache Links. Es werden keine Inhalte dieser Dienste
+    eingebunden und keine Daten an sie übertragen, solange du nicht draufklickst. Danach gelten die
+    Datenschutzbestimmungen des jeweiligen Anbieters.
+  </p>
 
-          <h2>Deine Rechte</h2>
-          <p>
-            Du hast das Recht auf Auskunft über deine bei mir gespeicherten Daten (Art. 15 DSGVO), auf Berichtigung
-            (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18) und Datenübertragbarkeit (Art. 20).
-            Eine Einwilligung kannst du jederzeit für die Zukunft widerrufen (Art. 7 Abs. 3). Schreib mir dazu einfach
-            eine E-Mail.
-          </p>
-          <p>
-            <strong>Widerspruchsrecht:</strong> Verarbeite ich Daten auf Grundlage meines berechtigten Interesses (Art.
-            6 Abs. 1 lit. f DSGVO), kannst du dem aus Gründen, die sich aus deiner besonderen Situation ergeben,
-            jederzeit widersprechen (Art. 21 DSGVO).
-          </p>
-          <p>
-            Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren (Art. 77 DSGVO), zum Beispiel bei
-            der{' '}
-            <a href="https://www.datenschutz.bremen.de">
-              Landesbeauftragten für Datenschutz und Informationsfreiheit der Freien Hansestadt Bremen
-            </a>
-            .
-          </p>
+  <h2>Deine Rechte</h2>
+  <p>
+    Du hast das Recht auf Auskunft über deine bei mir gespeicherten Daten (Art. 15 DSGVO), auf Berichtigung (Art. 16),
+    Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18) und Datenübertragbarkeit (Art. 20). Eine Einwilligung
+    kannst du jederzeit für die Zukunft widerrufen (Art. 7 Abs. 3). Schreib mir dazu einfach eine E-Mail.
+  </p>
+  <p>
+    <strong>Widerspruchsrecht:</strong> Verarbeite ich Daten auf Grundlage meines berechtigten Interesses (Art. 6 Abs. 1
+    lit. f DSGVO), kannst du dem aus Gründen, die sich aus deiner besonderen Situation ergeben, jederzeit widersprechen
+    (Art. 21 DSGVO).
+  </p>
+  <p>
+    Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren (Art. 77 DSGVO), zum Beispiel bei der{' '}
+    <a href="https://www.datenschutz.bremen.de">
+      Landesbeauftragten für Datenschutz und Informationsfreiheit der Freien Hansestadt Bremen
+    </a>
+    .
+  </p>
 
-          <h2>Sonstiges</h2>
-          <p>
-            Du bist nicht verpflichtet, mir Daten zu geben. Ohne die technisch notwendigen Daten lässt sich die Seite
-            allerdings nicht ausliefern, und ohne Kontaktdaten kann ich nicht antworten. Eine automatisierte
-            Entscheidungsfindung oder Profilbildung findet nicht statt.
-          </p>
+  <h2>Sonstiges</h2>
+  <p>
+    Du bist nicht verpflichtet, mir Daten zu geben. Ohne die technisch notwendigen Daten lässt sich die Seite allerdings
+    nicht ausliefern, und ohne Kontaktdaten kann ich nicht antworten. Eine automatisierte Entscheidungsfindung oder
+    Profilbildung findet nicht statt.
+  </p>
 
-          <p>Stand: November 2026</p>
-        </div>
-      </article>
-    </div>
-  </main>
-  <SiteFooter />
-</BaseLayout>
+  <p>Stand: November 2026</p>
+</PlainPage>

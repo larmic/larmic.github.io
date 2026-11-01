@@ -17,8 +17,9 @@ import { AVATAR } from '../data/avatar';
 interface Props {
   title?: string;
   description?: string;
+  noindex?: boolean; // z. B. 404: nicht indexieren, kein canonical
 }
-const { title, description = SITE.description } = Astro.props;
+const { title, description = SITE.description, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} – ${SITE.title}` : `Lars Michaelis – ${SITE.title}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -30,7 +31,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -51,7 +52,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <ClientRouter />
   </head>
   <body>
-    <svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden">
+    <svg aria-hidden="true" class="svg-defs">
       <defs set:html={cubeDefs(AVATAR)} />
     </svg>
     <div class="page">

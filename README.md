@@ -35,7 +35,7 @@ Die Seite läuft dann unter http://localhost:4321 und lädt Änderungen sofort n
 src/
   pages/              / (Über mich), /workshops/, /workshops/<id>/, /videos/, /videos/<id>/,
                       /impressum/, /datenschutz/, 404, dazu favicon.svg und og.png (beim Build erzeugt)
-  layouts/            BaseLayout (Kopfdaten), IslandPage (Seiten mit Insel)
+  layouts/            BaseLayout (Kopfdaten), IslandPage (Seiten mit Insel), PlainPage (Seiten ohne Insel)
   content/
     workshops/        Workshops als Markdown
     videos/           Videos als Markdown (mit YouTube-ID)

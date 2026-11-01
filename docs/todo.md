@@ -81,7 +81,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [ ] **Brücken-Verdeckung im Browser prüfen:** Brücken liegen als HTML über dem ganzen Insel-SVG und werden vor Inselblöcken gezeichnet, die eigentlich davor liegen (z. B. erste Brücke zu „Über mich“). Ggf. Brücken mit Tiefensortierung ins Szenen-SVG übernehmen.
 - [x] **Fokus-Listener der Blöcke** reagieren nur auf Tastatur-Fokus (`:focus-visible`); kein zweiter Blog-Sturz mehr nach Tab-Wechsel.
 - [x] Schmale Ansicht: Die Figur springt mit `settle()` sofort ans Ziel, statt unsichtbar Takt für Takt zu laufen. Erkannt wird die Ansicht am CSS (Brücken ausgeblendet).
-- [ ] Inline-Styles in Seiten (z. B. 404) in CSS, gemeinsames Layout für Inhaltsseiten ohne Insel.
+- [x] Gemeinsames Layout `PlainPage.astro` für Impressum, Datenschutz und 404; statische Inline-Styles (Seiten, Footer, Symbol-SVG) als CSS-Klassen. Inline bleiben nur berechnete Werte und die Formen der Wolken.
 
 ### Barrierefreiheit (weitere)
 
@@ -91,7 +91,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [ ] Blog-Button: Der Name sollte die Funktion verraten. Tastaturfokus allein sollte den Sturz nicht auslösen.
 - [ ] YouTube-Button: Fokus nach dem Klick auf das iframe setzen, Videotitel in den Button-Namen.
 - [ ] Überschriftenhierarchie (Karten `h3` direkt unter `h1`, `h4` in Videotexten).
-- [ ] 404-Seite ohne `main`-Landmark.
+- [x] 404-Seite hat jetzt eine `main`-Landmark (über `PlainPage`).
 - [ ] `prefers-reduced-motion`: Die Figur sollte direkt aufs Ziel springen statt Schritt für Schritt zu laufen. Hover-Vorschau abschalten.
 - [ ] Mehrdeutige Linktexte („Video ansehen“, „Details zum Workshop“) mit dem Titel ergänzen, z. B. per `sr-only`.
 - [ ] Alt-Texte der Workshop-Fotos aussagekräftig machen.
@@ -117,7 +117,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [ ] **Schriften:** nur das Latin-Subset importieren. Kyrillische Pixelify-Glyphen stehen heute als Base64 im render-blockierenden CSS (ca. 57 % des CSS-Transfers). Dazu 47 Fontdateien mit 471 KB in `dist`.
 - [ ] **Strukturierte Daten:** `Person`, `Course` für Workshops, `VideoObject` für Videos.
 - [x] **Icons:** `favicon.ico`, PNG-Icons, `apple-touch-icon` (180 × 180) und `theme-color`.
-- [ ] 404-Seite: kein `canonical`, dafür `noindex`.
+- [x] 404-Seite: kein `canonical`, dafür `noindex`.
 - [ ] Workshop-Bilder mit `width`/`height`, `loading="lazy"` und kleineren Größen (heute 1600 px), z. B. über `astro:assets`.
 - [ ] 28 KB Würfel-Symbole und Textur-CSS stehen in jeder Seite. Als cachebare Datei auslagern.
 - [ ] Sitemap mit `lastmod`, Titel und Descriptions eindeutiger machen.

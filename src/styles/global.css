@@ -43,6 +43,12 @@ button:focus-visible {
 .pxsm {
   box-shadow: var(--px-3);
 }
+.svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+} /* Würfel-Symbole für <use> */
 .sr-only {
   position: absolute;
   width: 1px;

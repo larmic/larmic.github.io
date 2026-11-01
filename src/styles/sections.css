@@ -316,6 +316,14 @@
   color: #ffffff;
   font-weight: 700;
 }
+.footer-name {
+  font-size: 24px;
+}
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
 .site-footer nav {
   display: flex;
   flex-wrap: wrap;
@@ -503,4 +511,21 @@
   html {
     scroll-behavior: auto;
   }
+}
+
+/* Seiten ohne Insel (PlainPage) */
+.paper {
+  background: var(--paper);
+}
+.notfound {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 32px;
+}
+.notfound-fig {
+  width: 120px;
+}
+.notfound p {
+  margin: 0;
 }
