@@ -1,60 +1,57 @@
 ---
 // Die Inselwelt: statisches SVG aus dem Voxel-Generator (beim Build) + Web Component für die Interaktion.
-// Ohne `scene` die Insel der Startseite (Blöcke sind Buttons, die den Inhaltsbereich wechseln).
-// Mit `scene` eine Ebene 2 (Blöcke sind Links). `rest` ist der Block dessen, was gerade angezeigt wird: Dort steht die Figur.
-// `arrive`: Die Figur ist gerade angekommen, Block und Figur hüpfen beim Laden einmal.
-import { buildWorld, type Scene } from '../lib/voxel/world';
+// Alle Ziele sind Links, nur der Blog ist ein Button (er hat keine Seite, die Figur fällt).
+// `rest` ist der Block dessen, was gerade angezeigt wird, z. B. `about`, `workshops` oder `workshops/event_storming`.
+// Dort steht die Figur. Die Kisten eines Bereichs sind sichtbar, solange er offen ist.
+import { islandScene } from '../data/island';
 
 interface Props {
-  scene?: Scene;
-  rest?: string;
-  idle?: string;
-  arrive?: boolean;
+  rest: string;
 }
-const { scene, rest, idle = 'Hi! Zeig auf einen Block.', arrive = false } = Astro.props;
-const w = scene ?? buildWorld();
+const { rest } = Astro.props;
+const w = await islandScene();
 const d = w.data;
 const outline = '40,1.5 78.5,20.7 78.5,64.4 40,83.4 1.5,64.4 1.5,20.7';
 const sparks = ['#ffffff', '#f0a531', '#ffffff', '#f0a531', '#ffffff', '#f0a531'];
-// Startbild ohne JavaScript: Die Figur steht schon auf ihrem Block, die Brücke dorthin steht
-const restRoute = rest ? d.routes[rest] : undefined;
-const at = restRoute ? restRoute[restRoute.length - 1] : d.home;
-const flip = restRoute?.[restRoute.length - 1].f === 'R';
+const section = rest.split('/')[0];
+// Startbild ohne JavaScript: Die Figur steht schon auf ihrem Block, die Brücken dorthin stehen
+const route = d.routes[rest];
+const at = route[route.length - 1];
+const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
 ---
-<larmic-island data-world={JSON.stringify({ home: d.home, routes: d.routes, rest })} data-idle={idle} data-arrive={arrive ? '' : undefined} style={`--home-x: ${d.home.x}%; --home-y: ${d.home.y}%`}>
+<larmic-island data-world={JSON.stringify({ home: d.home, routes: d.routes, rest })} style={`--home-x: ${d.home.x}%; --home-y: ${d.home.y}%`}>
   <div class="isle" style={`aspect-ratio: ${w.aspect}`}>
     <Fragment set:html={w.sceneSvg} />
     <div class="bridges">
-      {d.bridges.map((b) => (
-        <div class={`brk${b.route === rest ? '' : ' off'}`} data-route={b.route} data-idx={b.idx} style={`left: ${b.x}%; top: ${b.y}%; width: ${b.w}%; z-index: ${b.z}`}>
+      {d.bridges.map((b, k) => (
+        <div class={`brk${built.has(k) ? '' : ' off'}`} data-k={k} style={`left: ${b.x}%; top: ${b.y}%; width: ${b.w}%; z-index: ${b.z}`}>
           <svg viewBox="0 0 80 84.8" aria-hidden="true"><use href="#v-plank"></use></svg>
         </div>
       ))}
     </div>
     <div class="figpos" style={`left: ${at.x}%; top: ${at.y}%; width: ${w.fig.w}%; transform: translate(-${w.fig.tx}%, -${w.fig.ty}%)`}>
-      <p class="bubble pxf" aria-live="polite">{idle}</p>
+      <p class={`bubble pxf${rest.includes('/') ? ' off' : ''}`} aria-live="polite">Hi! Zeig auf einen Block.</p>
       {sparks.map((c) => <span class="sp" style={`background: ${c}`}></span>)}
-      <div class={`figflip${flip ? ' flip' : ''}`}><div class="figspawn"><div class="figw"><div class="fighop" set:html={w.figureSvg}></div></div></div></div>
+      <div class={`figflip${at.f === 'R' ? ' flip' : ''}`}><div class="figspawn"><div class="figw"><div class="fighop" set:html={w.figureSvg}></div></div></div></div>
     </div>
   </div>
   <div class="blkrow">
     {d.nav.map((n) => {
       const Tag = n.href ? 'a' : 'button';
-      const current = n.id === rest;
+      const on = n.id === rest || rest.startsWith(`${n.id}/`);
+      const closed = n.parent !== undefined && n.parent !== section;
       return (
         <Tag
           type={n.href ? undefined : 'button'}
           href={n.href}
-          class={`blk${n.svg ? ' fixed' : ''}${current ? ' on' : ''}`}
+          class={`blk${n.parent ? ' child' : ''}${on ? ' on' : ''}${closed ? ' closed' : ''}`}
           data-id={n.id}
-          aria-pressed={n.href ? undefined : current ? 'true' : 'false'}
-          aria-current={current && n.href ? 'page' : undefined}
-          aria-label={n.href ? undefined : n.id === 'blog' ? 'Blog' : `${n.label} anzeigen`}
+          data-parent={n.parent}
+          aria-current={n.id === rest ? 'page' : undefined}
           style={`left: ${n.x}%; top: ${n.y}%; width: ${n.w}%; z-index: ${n.z}${n.color ? `; color: ${n.color}` : ''}`}
         >
           <span class="bob" style={`animation-delay: ${n.delay}`}>
-            {n.svg && <span class="group-big" set:html={n.svg}></span>}
-            <svg class={n.svg ? 'group-small' : undefined} viewBox="0 0 80 84.8" aria-hidden="true"><use href={`#v-${n.sym}`}></use><polygon class="outline" points={outline} fill="none" stroke="#1d2838" stroke-width="3"></polygon></svg>
+            <svg viewBox="0 0 80 84.8" aria-hidden="true"><use href={`#v-${n.sym}`}></use><polygon class="outline" points={outline} fill="none" stroke="#1d2838" stroke-width="3"></polygon></svg>
             {[0, 1, 2, 3, 4, 5].map((i) => <span class="px" style={`background: ${i % 2 ? n.p2 : n.p1}`}></span>)}
           </span>
           <span class={`tag tag${n.tag}`}>{n.label}</span>

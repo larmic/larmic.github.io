@@ -1,11 +1,10 @@
 ---
 import { getCollection, render } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import SubHero from '../../components/SubHero.astro';
-import SiteFooter from '../../components/SiteFooter.astro';
+import IslandPage from '../../layouts/IslandPage.astro';
+import VoxelIcon from '../../components/VoxelIcon.astro';
 import YouTube from '../../components/YouTube.astro';
 import Comments from '../../components/Comments.astro';
-import { sectionLevel } from '../../data/levels';
+import { MATERIALS } from '../../data/site';
 
 export async function getStaticPaths() {
   const videos = await getCollection('videos');
@@ -13,21 +12,15 @@ export async function getStaticPaths() {
 }
 const { v } = Astro.props;
 const { Content } = await render(v);
-const level = await sectionLevel('videos');
-const back = { href: '/#videos', label: 'Zurück zur Insel' };
+const m = MATERIALS[v.data.material];
 ---
-<BaseLayout title={v.data.title} description={v.data.teaser}>
-  <SubHero title={v.data.title} lead={v.data.teaser} level={{ ...level, rest: v.id }} />
-  <div class="grass-edge" aria-hidden="true"></div>
-  <main class="ground">
-    <div class="doc">
-      <article class={`entry pxbox th-${v.data.material}`}>
-        <YouTube id={v.data.youtube} title={v.data.title} />
-        <div class="prose"><Content /></div>
-        <a class="backlink" href={back.href}>{back.label}</a>
-      </article>
-      <Comments />
-    </div>
-  </main>
-  <SiteFooter />
-</BaseLayout>
+<IslandPage title={v.data.title} description={v.data.teaser} rest={`videos/${v.id}`}>
+  <div class="panel-head">
+    <VoxelIcon block={m.block} color={m.icon || undefined} size={64} />
+    <div><h1>{v.data.title}</h1><p>{v.data.teaser}</p></div>
+  </div>
+  <YouTube id={v.data.youtube} title={v.data.title} />
+  <div class="prose"><Content /></div>
+  <Comments />
+  <a class="backlink" href="/videos/">Alle Videos</a>
+</IslandPage>

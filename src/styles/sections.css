@@ -1,14 +1,11 @@
 /* ---------- Inhaltsbereich auf Erde ---------- */
 .ground { position: relative; padding: 72px 24px 104px; background-image: linear-gradient(var(--dirt-shade), var(--dirt-shade)), var(--tex-dirt); background-size: auto, 48px 48px; image-rendering: pixelated; }
 .panel { position: relative; max-width: 1180px; margin: 0 auto; background: var(--paper); padding: 44px clamp(22px, 4vw, 52px) 52px; }
-.panel-section { scroll-margin-top: 24px; }
-.panel-section + .panel-section { margin-top: 64px; }
-html.js .panel-section + .panel-section { margin-top: 0; }
 .reveal { animation: reveal 0.45s steps(5) both; }
 @keyframes reveal { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
 .panel-head { display: flex; align-items: center; gap: 18px; margin-bottom: 30px; }
 .panel-head svg { flex: 0 0 auto; }
-.panel-head h2 { margin: 0; font-family: var(--font-pixel); font-size: 44px; line-height: 1; font-weight: 700; }
+.panel-head h1 { margin: 0; font-family: var(--font-pixel); font-size: clamp(32px, 4.4vw, 44px); line-height: 1.05; font-weight: 700; }
 .panel-head p { margin: 8px 0 0; font-size: 18px; color: var(--muted); }
 
 /* ---------- Über mich ---------- */
@@ -17,7 +14,7 @@ html.js .panel-section + .panel-section { margin-top: 0; }
 .about-text p { margin: 0 0 18px; }
 .about-text p:last-child { margin-bottom: 0; }
 .about-side { flex: 1 1 280px; min-width: 0; }
-.about-side h3 { margin: 0 0 12px; font-family: var(--font-pixel); font-size: 22px; }
+.about-side h2 { margin: 0 0 12px; font-family: var(--font-pixel); font-size: 22px; }
 .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
 .chip { display: inline-flex; padding: 6px 12px; background: var(--green); color: #ffffff; font-size: 15px; font-weight: 700; }
 
@@ -79,9 +76,6 @@ html.js .panel-section + .panel-section { margin-top: 0; }
 .subhero .subhero-text h1 { margin: 26px 0 0; }
 .subhero .subhero-text .lead { margin: 14px 0 0; max-width: 40em; }
 .back { gap: 10px; }
-/* Mit Ebene 2: Text links, Szene rechts – wie der Hero der Startseite */
-.subhero-row.has-level { max-width: 1240px; align-items: center; gap: 24px 40px; }
-.has-level .subhero-text { flex: 1 1 360px; max-width: 520px; padding: 16px 0 32px; }
 .doc { max-width: 900px; margin: 0 auto; }
 .entry { scroll-margin-top: 24px; padding: 34px clamp(22px, 4vw, 44px) 38px; }
 .entry + .entry { margin-top: 44px; }
@@ -92,7 +86,8 @@ html.js .panel-section + .panel-section { margin-top: 0; }
 .prose blockquote { margin: 24px 0; padding: 16px 20px; background: rgba(0, 0, 0, 0.06); }
 .th-ki .prose blockquote { background: rgba(255, 255, 255, 0.08); }
 .prose ul { padding-left: 22px; }
-.backlink { display: inline-block; margin-top: 8px; font-family: var(--font-pixel); font-size: 17px; color: var(--ink); }
+.backlink { display: inline-block; margin-top: 24px; font-family: var(--font-pixel); font-size: 17px; color: var(--ink); }
+.panel .prose, .panel .yt { max-width: 46em; }
 
 /* YouTube erst nach Klick laden (kein Kontakt zu YouTube vorher) */
 .yt { position: relative; aspect-ratio: 16 / 9; background: #1c2130; margin: 24px 0; box-shadow: var(--px-3); }

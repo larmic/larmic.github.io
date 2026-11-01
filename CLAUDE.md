@@ -14,12 +14,13 @@ Vor jedem Commit `npm run check` und `npm run build` ausführen.
 
 ## Aufbau
 
-- `src/pages/` – Seiten: Startseite, `/workshops/<id>/`, `/videos/<id>/`, `/impressum/`, 404. `/workshops/` und `/videos/` sind nur Weiterleitungen (`HashRedirect.astro`)
+- `src/pages/` – Seiten: `/` (Über mich), `/workshops/`, `/workshops/<id>/`, `/videos/`, `/videos/<id>/`, `/impressum/`, 404
+- `src/layouts/IslandPage.astro` – Layout aller Seiten mit Insel: Kopf bleibt beim Seitenwechsel stehen (`transition:persist`), `rest` sagt der Figur, wo sie steht
 - `src/content/` – Workshops und Videos als Markdown, Schema in `src/content.config.ts`
-- `src/components/` – Astro-Komponenten. `Island.astro` zeigt jede Szene: die Insel der Startseite und Ebene 2 (`SubHero.astro`)
+- `src/components/` – Astro-Komponenten, die Insel in `Island.astro`, der Kopf ohne Insel (Impressum) in `SubHero.astro`
 - `src/scripts/larmic-island.ts` – Web Component für Figur, Brückenbau und Blog-Sturz (ohne Framework)
-- `src/lib/voxel/` – Voxel-Generator, läuft beim Build: `textures.ts` (Pixel-Raster), `render.ts`, `figure.ts`, `world.ts` (Szenen: `buildWorld()` für die Insel, `buildLevel()` für Ebene 2)
-- `src/data/` – `site.ts` (Links, Werkzeugkisten, Sprechblasen, giscus), `avatar.ts` (Aussehen der Figur), `levels.ts` (Ebene 2 aus Workshops und Videos)
+- `src/lib/voxel/` – Voxel-Generator, läuft beim Build: `textures.ts` (Pixel-Raster), `render.ts`, `figure.ts`, `world.ts` (Insel, Wege, Plätze der Kisten)
+- `src/data/` – `site.ts` (Links, Werkzeugkisten, Sprechblasen, giscus), `avatar.ts` (Aussehen der Figur), `island.ts` (Insel mit Kisten aus Workshops und Videos)
 - `src/styles/` – `tokens.css` (Design-Tokens), `global.css`, `sections.css`
 - `docs/design-system.md` – Farben, Materialien, Typografie, Interaktionen
 
@@ -31,5 +32,6 @@ Vor jedem Commit `npm run check` und `npm run build` ausführen.
 - Keine Logos, Figuren oder Texturen aus Minecraft oder Hytale – nur eigene Voxel-Grafik.
 - Keine externen Ressourcen ohne Klick des Nutzers (Schriften lokal, YouTube und Kommentare per Zwei-Klick).
 - Animationen respektieren `prefers-reduced-motion`.
-- Die Inselwelt ist die einzige Navigation. Detailseiten zeigen Ebene 2 (`src/data/levels.ts`), dort steht die Figur auf der Kiste der aktuellen Seite. Keine Text-Navigation einbauen.
-- Alte Adressen (`/workshops/#workshop-<id>`, `/videos/#video-<id>`, `/about/`) müssen funktionieren.
+- Die Insel ist auf allen Seiten die einzige Navigation. Neue Seiten mit Insel nutzen `IslandPage.astro` und setzen `rest`. Keine Text-Navigation einbauen.
+- Skripte laufen wegen der View Transitions nur einmal: Klicks über `document` delegieren, nicht an Elemente hängen.
+- Alte Adressen (`/#workshops`, `/#videos`, `/workshops/#workshop-<id>`, `/videos/#video-<id>`, `/about/`) müssen funktionieren.

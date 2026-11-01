@@ -1,6 +1,7 @@
 ---
 // Grundgerüst jeder Seite: Schriften (lokal gebündelt, keine Google-Server), Styles,
 // Texturen als CSS-Variablen und die Würfel-Symbole für <use href="#v-…">.
+// ClientRouter: Seitenwechsel ohne Neuladen, damit die Insel stehen bleibt und die Figur sichtbar läuft.
 import '@fontsource/pixelify-sans/500.css';
 import '@fontsource/pixelify-sans/700.css';
 import '@fontsource/nunito/400.css';
@@ -9,6 +10,7 @@ import '@fontsource/nunito/800.css';
 import '../styles/global.css';
 import '../styles/sections.css';
 import { SITE } from '../data/site';
+import { ClientRouter } from 'astro:transitions';
 import { cubeDefs, textureCss } from '../lib/voxel/world';
 
 interface Props {
@@ -33,6 +35,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:url" content={canonical} />
     <meta property="og:type" content="website" />
     <Fragment set:html={`<style>${textureCss()}</style>`} />
+    <ClientRouter />
   </head>
   <body>
     <svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden"><defs set:html={cubeDefs()} /></svg>

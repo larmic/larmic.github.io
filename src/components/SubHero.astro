@@ -1,28 +1,22 @@
 ---
-// Kopf der Unterseiten: Himmel, Logo, Titel. Es gibt keine Text-Navigation, die Insel ist die Navigation.
-// Mit `level` steht rechts die Ebene 2 (Workshops oder Videos) mit der Figur auf der Kiste der aktuellen Seite.
-// Ohne `level` (z. B. Impressum) führt ein Zurück-Button zur Startseite.
+// Kopf der Seiten ohne Insel (Impressum): Himmel, Logo, Zurück-Button und Titel.
 import SiteHeader from './SiteHeader.astro';
 import Clouds from './Clouds.astro';
-import Island from './Island.astro';
-import type { Scene } from '../lib/voxel/world';
 
 interface Props {
   title: string;
   lead?: string;
-  level?: { scene: Scene; rest: string; idle: string };
 }
-const { title, lead, level } = Astro.props;
+const { title, lead } = Astro.props;
 ---
 <section class="sky subhero">
   <Clouds />
   <SiteHeader />
-  <div class:list={['subhero-row', { 'has-level': level }]}>
+  <div class="subhero-row">
     <div class="subhero-text">
-      {!level && <a class="pxbtn small back" href="/"><svg width="16" height="16" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path d="M2 3h1v2h-1z M3 2h1v4h-1z M4 1h1v6h-1z" fill="currentColor"></path></svg>Zurück zur Insel</a>}
+      <a class="pxbtn small back" href="/"><svg width="16" height="16" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path d="M2 3h1v2h-1z M3 2h1v4h-1z M4 1h1v6h-1z" fill="currentColor"></path></svg>Zurück zur Insel</a>
       <h1>{title}</h1>
       {lead && <p class="lead">{lead}</p>}
     </div>
-    {level && <Island scene={level.scene} rest={level.rest} idle={level.idle} arrive />}
   </div>
 </section>

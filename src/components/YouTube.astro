@@ -14,14 +14,15 @@ const { id, title } = Astro.props;
   </button>
 </div>
 <script>
-  for (const el of document.querySelectorAll<HTMLElement>('.yt')) {
-    el.querySelector('button')?.addEventListener('click', () => {
-      const frame = document.createElement('iframe');
-      frame.src = `https://www.youtube-nocookie.com/embed/${el.dataset.yt}?autoplay=1`;
-      frame.title = el.dataset.title || 'YouTube-Video';
-      frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-      frame.allowFullscreen = true;
-      el.replaceChildren(frame);
-    });
-  }
+  // Ein Handler für alle Videos, auch nach einem Seitenwechsel ohne Neuladen
+  document.addEventListener('click', (e) => {
+    const el = (e.target as Element).closest<HTMLElement>('.yt');
+    if (!el || !(e.target as Element).closest('.yt button')) return;
+    const frame = document.createElement('iframe');
+    frame.src = `https://www.youtube-nocookie.com/embed/${el.dataset.yt}?autoplay=1`;
+    frame.title = el.dataset.title || 'YouTube-Video';
+    frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    frame.allowFullscreen = true;
+    el.replaceChildren(frame);
+  });
 </script>

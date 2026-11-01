@@ -1,5 +1,22 @@
 ---
-// Die Videos stehen auf der Startseite. Alte Links /videos/#video-<id> führen auf die Detailseite.
-import HashRedirect from '../../components/HashRedirect.astro';
+import { getCollection } from 'astro:content';
+import IslandPage from '../../layouts/IslandPage.astro';
+import VoxelIcon from '../../components/VoxelIcon.astro';
+import VideoCard from '../../components/VideoCard.astro';
+
+const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.data.order);
 ---
-<HashRedirect to="/#videos" prefix="video-" base="/videos/" />
+<IslandPage title="Videos" description="Talks und Screencasts von Lars Michaelis zu Testcontainers, hexagonaler Architektur, Event Storming und Testing." rest="videos">
+  <script is:inline>
+    // Alte Links /videos/#video-<id> führen auf die Seite des Videos
+    {
+      const id = location.hash.startsWith('#video-') ? location.hash.slice(7) : '';
+      if (/^[\w-]+$/.test(id)) location.replace(`/videos/${id}/`);
+    }
+  </script>
+  <div class="panel-head">
+    <VoxelIcon block="screen" size={64} />
+    <div><h1>Videos</h1><p>Talks und Screencasts zum Nachschauen.</p></div>
+  </div>
+  <div class="cards videos">{videos.map((v) => <VideoCard entry={v} />)}</div>
+</IslandPage>

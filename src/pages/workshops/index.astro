@@ -1,5 +1,22 @@
 ---
-// Die Workshops stehen auf der Startseite. Alte Links /workshops/#workshop-<id> führen auf die Detailseite.
-import HashRedirect from '../../components/HashRedirect.astro';
+import { getCollection } from 'astro:content';
+import IslandPage from '../../layouts/IslandPage.astro';
+import VoxelIcon from '../../components/VoxelIcon.astro';
+import WorkshopCard from '../../components/WorkshopCard.astro';
+
+const workshops = (await getCollection('workshops', ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
 ---
-<HashRedirect to="/#workshops" prefix="workshop-" base="/workshops/" />
+<IslandPage title="Workshops" description="Workshops von Lars Michaelis zu Domain-Driven Design, hexagonaler Architektur, Event Storming und Microservices." rest="workshops">
+  <script is:inline>
+    // Alte Links /workshops/#workshop-<id> führen auf die Seite des Workshops
+    {
+      const id = location.hash.startsWith('#workshop-') ? location.hash.slice(10) : '';
+      if (/^[\w-]+$/.test(id)) location.replace(`/workshops/${id}/`);
+    }
+  </script>
+  <div class="panel-head">
+    <VoxelIcon block="board" size={64} />
+    <div><h1>Workshops</h1><p>Für Teams, die Fachlichkeit und Architektur zusammenbringen wollen.</p></div>
+  </div>
+  <div class="cards">{workshops.map((w) => <WorkshopCard entry={w} />)}</div>
+</IslandPage>

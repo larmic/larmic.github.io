@@ -52,39 +52,46 @@ Beide Schriften sind über `@fontsource` lokal gebündelt.
 
 Animationen nutzen meist `steps()` für den Pixel-Look. Beim Laden fallen nur die Namenskacheln ein. Danach bewegen sich nur die Wolken und die schwebenden Blöcke leicht. Alles andere reagiert auf den Nutzer. Bei `prefers-reduced-motion` sind alle Animationen aus.
 
-## Interaktionen auf der Startseite
+## Die Insel als Navigation
 
-Die Figur steht immer auf dem Block des Bereichs, der gerade angezeigt wird. Beim Aufruf ist das „Über mich“, mit `/#workshops` oder `/#videos` direkt der jeweilige Block. Jeder Bereich hat diese eigene Adresse: Ein Klick setzt sie, die Zurück-Taste des Browsers wechselt zurück und die Figur läuft mit.
+Die Insel ist auf jeder Seite dieselbe und die einzige Navigation. Oben stehen Name, Intro und Insel, darunter der Inhalt der Seite. Beim Seitenwechsel bleibt der Kopf stehen (Astro View Transitions, `transition:persist`), nur der Inhalt wird getauscht. So sieht man die Figur laufen.
+
+```
+                         ▣ ▣ ▣  ← Workshop-Kisten, offen auf /workshops/…
+                        ╱
+                 [Workshops]
+                ╱
+  [Über mich] ☺ Insel        [Blog]
+                ╲
+                 [Videos]
+                  ╲
+                   ▣ ▣ ▣ ▣  ← Video-Kisten, offen auf /videos/…
+```
+
+Die Ziele bilden einen Baum: Insel → Bereich → Kiste. Jedes Ziel hat eine eigene Seite:
+
+| Ziel | Adresse |
+| --- | --- |
+| Über mich | `/` |
+| Workshops / ein Workshop | `/workshops/`, `/workshops/<id>/` |
+| Videos / ein Video | `/videos/`, `/videos/<id>/` |
+| Blog | keine – die Figur fällt |
+
+**Die Figur steht immer auf dem Block der angezeigten Seite.** Die Kisten eines Bereichs poppen auf, sobald er offen ist, und verschwinden, wenn die Figur ihn verlassen hat. Kisten haben die Themenfarbe ihres Eintrags; ihr Etikett erscheint beim Zeigen und an der gewählten Kiste.
 
 | Aktion | Wirkung |
 | --- | --- |
-| Hover oder Fokus auf einen anderen Block | Die Figur läuft über die Inselmitte hin: Die alte Brücke zerbröselt hinter ihr, die neue setzt sie Block für Block |
-| Maus weg oder Fokus verlassen | Die Figur läuft zurück auf den Block des angezeigten Bereichs |
-| Klick auf Über mich, Workshops, Videos | Wechselt den Inhaltsbereich, Block springt mit Partikeln, Figur hüpft und bleibt dort stehen |
-| Hover oder Klick auf Blog | Figur holt aus, hat keinen Block, fällt und spawnt auf dem Block des angezeigten Bereichs mit „404 – Kein Blog gefunden“ |
+| Hover oder Fokus auf einen anderen Block | Die Figur läuft zurück bis zur Abzweigung (die Brücke dahinter zerbröselt) und baut die neue Brücke. Von Kiste zu Kiste geht es über den Bereichs-Block, zu einem anderen Bereich über die Inselmitte |
+| Maus weg oder Fokus verlassen | Die Figur läuft zurück auf den Block der angezeigten Seite |
+| Klick auf einen Block oder eine Karte | Seitenwechsel ohne Neuladen. Der Block springt mit Partikeln, die Figur läuft hin und bleibt stehen |
+| Hover oder Klick auf Blog | Figur holt aus, hat keinen Block, fällt und spawnt auf ihrem Block mit „404 – Kein Blog gefunden“ |
+| Zurück-Taste des Browsers | Vorherige Seite, die Figur läuft mit |
 
-Die Sprechblase erscheint nur, wenn die Figur auf ihrem Block steht. Bis zur ersten Auswahl begrüßt sie („Hi! Zeig auf einen Block.“), danach spricht sie zum gewählten Bereich. Die 404-Meldung bleibt, bis man auf einen anderen Block zeigt.
+Die Sprechblase erscheint nur, wenn die Figur auf einem Bereichs-Block steht (auf Kisten schweigt sie) – außer der 404-Meldung, die überall erscheint und bleibt, bis man auf einen anderen Block zeigt. Beim ersten Aufruf der Startseite begrüßt sie („Hi! Zeig auf einen Block.“).
 
-Takt der Figur: 130 ms. Auf schmalen Bildschirmen (unter 700 px Containerbreite) stehen die Blöcke als Reihe unter der Insel, Brücken entfallen.
+Takt der Figur: 130 ms. Auf schmalen Bildschirmen (unter 700 px Containerbreite) stehen die Blöcke als Reihe unter der Insel, offene Kisten reihen sich dazu, Brücken entfallen.
 
-## Unterseiten: Ebene 2
-
-Jeder Workshop und jedes Video hat eine eigene Seite. Die Inselwelt bleibt dort die Navigation, eine Ebene tiefer:
-
-```
-                                ▣ Eintrag 1 (oben rechts)
-                               ╱
-  ▒Insel▒ ── [Bereichs-Block] ── ▣ Eintrag 2 (rechts)
-  (klein)       ╱          ╲
-   ▣ Eintrag 4               ▣ Eintrag 3 (unten rechts)
-```
-
-- **Bereichs-Block in der Mitte:** Tafel für Workshops, Bildschirm für Videos. Er ist der Verteiler: Jeder Weg führt über ihn.
-- **Einträge als Kisten in ihrer Themenfarbe:** Holz, Metall, Kristall, Gras. Höchstens vier pro Ebene, sonst bricht der Build ab.
-- **Die Figur steht auf der Kiste der aktuellen Seite.** Die Kiste ist markiert, Kiste und Figur hüpfen beim Laden einmal. Zeigt man auf eine andere Kiste, läuft die Figur zurück zum Bereichs-Block (die Brücke zerbröselt) und baut die neue Brücke. Maus weg: Sie kehrt auf ihre Kiste zurück.
-- **Die kleine Insel links ist der Rückweg.** Sie führt auf die Startseite mit geöffnetem Bereich (`/#workshops`, `/#videos`).
-- **Keine Text-Navigation.** Unten im Inhalt steht „Zurück zur Insel“ als Textlink für alle, die nach dem Lesen nicht hochscrollen wollen.
-- **Handy:** Die Ziele stehen als Reihe unter der Szene, die Insel dort als Grasblock. Brücken entfallen, die Figur bleibt auf dem Bereichs-Block.
+**Plätze für Kisten:** drei an Workshops, vier an Videos (`CHILD_SLOTS` in `world.ts`). Ein weiterer Eintrag bricht den Build mit einer Meldung ab – dann braucht es einen neuen Platz.
 
 ## Voxel-Technik
 

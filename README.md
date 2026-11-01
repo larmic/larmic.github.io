@@ -27,7 +27,7 @@ Die Seite läuft dann unter http://localhost:4321 und lädt Änderungen sofort n
 
 ```
 src/
-  pages/              Startseite, /workshops/<id>/, /videos/<id>/, /impressum/, 404
+  pages/              / (Über mich), /workshops/, /workshops/<id>/, /videos/, /videos/<id>/, /impressum/, 404
   content/
     workshops/        Workshops als Markdown
     videos/           Videos als Markdown (mit YouTube-ID)
@@ -45,7 +45,7 @@ docs/design-system.md Farben, Materialien, Typografie, Interaktionen
 
 ## Inhalte pflegen
 
-**Workshop hinzufügen:** neue Datei in `src/content/workshops/`, jeder Workshop bekommt eine eigene Seite unter `/workshops/<dateiname>/` und eine Kiste auf Ebene 2. `short` ist die Beschriftung der Kiste. Pro Ebene passen höchstens vier Kisten, beim fünften Eintrag bricht der Build mit einer Meldung ab.
+**Workshop hinzufügen:** neue Datei in `src/content/workshops/`, jeder Workshop bekommt eine eigene Seite unter `/workshops/<dateiname>/` und eine Kiste an der Insel. `short` ist die Beschriftung der Kiste. An Workshops gibt es drei Plätze; ein vierter Workshop bricht den Build mit einer Meldung ab, dann braucht es einen neuen Platz in `CHILD_SLOTS` (`src/lib/voxel/world.ts`).
 
 ```markdown
 ---
@@ -62,7 +62,7 @@ draft: false          # true = nicht veröffentlichen
 Beschreibung in Markdown.
 ```
 
-**Video hinzufügen:** neue Datei in `src/content/videos/` mit `title`, `short`, `teaser`, `material`, `order`, `youtube` (Video-ID) und `date`. Jedes Video bekommt eine eigene Seite unter `/videos/<dateiname>/` und eine Kiste auf Ebene 2, auch hier höchstens vier.
+**Video hinzufügen:** neue Datei in `src/content/videos/` mit `title`, `short`, `teaser`, `material`, `order`, `youtube` (Video-ID) und `date`. Jedes Video bekommt eine eigene Seite unter `/videos/<dateiname>/` und eine Kiste an der Insel. An Videos gibt es vier Plätze.
 
 Fehlt ein Pflichtfeld oder hat es den falschen Typ, bricht `npm run check` ab. So landet kein kaputter Inhalt online.
 
@@ -104,7 +104,7 @@ Die Pipeline baut den Branch, deployt ihn aber nicht. Nach dem Merge in `main` g
 
 Ein komplett leerer Branch (`git switch --orphan astro-redesign`) funktioniert auch. Weil er keine gemeinsame Historie mit `main` hat, lässt er sich aber nicht einfach als Pull Request mergen.
 
-Alte Adressen funktionieren weiter: `/workshops/#workshop-…` und `/videos/#video-…` leiten auf die jeweilige Detailseite um, `/workshops/` und `/videos/` auf den passenden Bereich der Startseite, `/about/` auf „Über mich“. Die Microservices-Folien unter `/workshop_microservices/slides/` kommen aus ihrem eigenen Repository und sind nicht betroffen.
+Alte Adressen funktionieren weiter: `/workshops/#workshop-…` und `/videos/#video-…` leiten auf die jeweilige Detailseite um, `/#workshops` und `/#videos` auf `/workshops/` und `/videos/`, `/about/` auf die Startseite. Die Microservices-Folien unter `/workshop_microservices/slides/` kommen aus ihrem eigenen Repository und sind nicht betroffen.
 
 ## Kommentare mit giscus
 

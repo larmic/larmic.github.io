@@ -1,0 +1,45 @@
+---
+// Jede Seite mit Insel: oben Name, Intro und Insel (bleibt beim Seitenwechsel stehen), darunter der Inhalt der Seite.
+// `rest` ist der Block der Seite, z. B. `about`, `workshops` oder `workshops/event_storming`: Dort steht die Figur.
+import BaseLayout from './BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Clouds from '../components/Clouds.astro';
+import NameTiles from '../components/NameTiles.astro';
+import Island from '../components/Island.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  rest: string;
+}
+const { title, description, rest } = Astro.props;
+---
+<BaseLayout title={title} description={description}>
+  <section class="sky" transition:persist="hero">
+    <Clouds />
+    <SiteHeader />
+    <div class="hero">
+      <div class="hero-text">
+        <NameTiles />
+        <p class="subtitle">Fullstack-Entwickler, Speaker und Berater</p>
+        <p class="intro">Ich baue Software mit fachlichem Kern, gebe Workshops zu Domain-Driven Design, Event Storming und Microservices und spreche auf Konferenzen über Architektur und Testing.</p>
+        <div class="cta"><a href="/workshops/" class="pxbtn">Workshops ansehen</a></div>
+      </div>
+      <Island rest={rest} />
+    </div>
+  </section>
+  <div class="grass-edge" aria-hidden="true"></div>
+  <main id="inhalt" class="ground" data-rest={rest}>
+    <div class="panel pxbox reveal"><slot /></div>
+  </main>
+  <SiteFooter />
+</BaseLayout>
+
+<script>
+  // Nach dem Seitenwechsel: Die Figur läuft zum Block der neuen Seite
+  document.addEventListener('astro:after-swap', () => {
+    const rest = document.querySelector<HTMLElement>('main[data-rest]')?.dataset.rest;
+    if (rest) document.querySelector('larmic-island')?.select(rest);
+  });
+</script>
