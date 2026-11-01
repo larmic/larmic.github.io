@@ -23,7 +23,8 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 
 ### Inhalt
 
-- [ ] **Sichtbarer Kontaktweg:** „Schreib mir“ im Footer und am Ende von „Über mich“, dazu eine Anfrage-CTA. Der Button „Workshops ansehen“ führt auf `/workshops/` ins Leere, er sollte je nach Seite wechseln (z. B. „Workshop anfragen“).
+- [x] **Sichtbarer Kontaktweg:** Workshops und Beratung über neusta (`l.michaelis@neusta.de`, auf den Workshop-Seiten), alles andere privat an `mail@larmic.de` (Footer „Kontakt“ und Ende von „Über mich“, Adresse erst per JavaScript zusammengesetzt).
+- [ ] **Button „Workshops ansehen“** führt auf `/workshops/` ins Leere. Je nach Seite wechseln (z. B. „Workshop anfragen“).
 - [ ] **Positionierung schärfen:**
   - „Architekt“ in Untertitel und Meta-Description aufnehmen (z. B. „Entwickler, Architekt und Speaker“).
   - Hero-Intro, Unterzeile von „Über mich“ und Description auf dieselbe Kernaussage bringen, inklusive „KI mit Leitplanken“.
@@ -91,7 +92,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `ast
   - Würfelmaße (80 × 84,8, 40/20/44,8) und Projektionskonstanten an einer Stelle.
   - Typen zwischen Generator und Client teilen.
   - `rest` als Union-Typ statt freier String.
-- [ ] **Toten Code entfernen:** ungenutzte Exporte und Prototyp-Reste in `textures.ts`/`render.ts`, `SITE.mail` (oder für den Kontaktweg nutzen), Token `--font-mono`.
+- [ ] **Toten Code entfernen:** ungenutzte Exporte und Prototyp-Reste in `textures.ts`/`render.ts`, Token `--font-mono`.
 - [ ] Das `<script>` aus `IslandPage.astro` landet hinter `</html>` (ungültiges HTML). In `Island.astro` verschieben.
 - [ ] **Brücken-Verdeckung im Browser prüfen:** Brücken liegen als HTML über dem ganzen Insel-SVG und werden vor Inselblöcken gezeichnet, die eigentlich davor liegen (z. B. erste Brücke zu „Über mich“). Ggf. Brücken mit Tiefensortierung ins Szenen-SVG übernehmen.
 - [ ] **Fokus-Listener der Blöcke** nur bei `:focus-visible` auslösen. Sonst stürzt die Figur erneut, wenn man nach einem Klick auf „Blog“ in den Tab zurückkehrt.
