@@ -1,6 +1,7 @@
 // Zustandsmaschine der Figur auf der Insel – rein, ohne DOM und ohne Timer.
 // Die Web Component (larmic-island.ts) ruft in jedem Takt `step` auf und zeichnet, was `view` beschreibt.
 // Wege bilden einen Baum (Insel → Bereich → Kiste); die Figur läuft immer nur bis zur Abzweigung zurück.
+// Spezifikation: docs/specs/insel.md
 
 export type RouteNode = { x: number; y: number; f: 'L' | 'R'; b: boolean; k?: number; fall?: boolean };
 export type World = { home: { x: number; y: number }; routes: Record<string, RouteNode[]> };

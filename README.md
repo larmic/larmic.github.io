@@ -49,6 +49,7 @@ src/
   styles/             tokens.css (Design-Tokens), global.css, sections.css
 public/               CNAME, robots.txt, .nojekyll, Bilder
 docs/design-system.md Farben, Materialien, Typografie, Interaktionen
+docs/specs/insel.md   Spec der Figur auf der Insel (Regeln, Invarianten, Tests)
 docs/todo.md          Offene Punkte (Livegang-Checkliste, Review-Ergebnisse)
 ```
 

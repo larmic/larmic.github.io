@@ -28,6 +28,7 @@ Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run chec
 - `src/data/` – `site.ts` (Links, Werkzeugkisten, Sprechblasen, giscus), `avatar.ts` (Aussehen der Figur), `island-layout.ts` (die konkrete Insel: Wege, Kisten-Plätze, Baum), `island.ts` (lädt Workshops und Videos dafür)
 - `src/styles/` – `tokens.css` (Design-Tokens), `global.css`, `sections.css`
 - `docs/design-system.md` – Farben, Materialien, Typografie, Interaktionen
+- `docs/specs/insel.md` – Spec der Figur auf der Insel (Ereignisse, Regeln, Invarianten, zugehörige Tests). Bei Änderungen am Verhalten Spec und Tests mitziehen
 
 ## Regeln
 
