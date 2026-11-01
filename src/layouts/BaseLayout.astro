@@ -21,6 +21,7 @@ const { title, description = SITE.description } = Astro.props;
 const fullTitle = title ? `${title} – ${SITE.title}` : `Lars Michaelis – ${SITE.title}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
+
 <!doctype html>
 <html lang="de">
   <head>
@@ -48,7 +49,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <ClientRouter />
   </head>
   <body>
-    <svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden"><defs set:html={cubeDefs()} /></svg>
-    <div class="page"><slot /></div>
+    <svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden">
+      <defs set:html={cubeDefs()} />
+    </svg>
+    <div class="page">
+      <slot />
+    </div>
   </body>
 </html>

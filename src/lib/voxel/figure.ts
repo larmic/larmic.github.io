@@ -4,17 +4,42 @@ import * as T from './textures';
 import { C, V, HEAD_FACES, headView } from './head';
 import { AVATAR } from '../../data/avatar';
 const P = (x: number, y: number, z: number): [number, number] => [(x - y) * C, ((x + y) * C) / 2 - z * V];
-const topM = (x0: number, y0: number, z1: number): Matrix => [C, C / 2, -C, C / 2, (x0 - y0) * C, ((x0 + y0) * C) / 2 - z1 * V];
-const leftM = (x0: number, y1: number, z1: number): Matrix => [C, C / 2, 0, V, (x0 - y1) * C, ((x0 + y1) * C) / 2 - z1 * V];
-const rightM = (x1: number, y1: number, z1: number): Matrix => [C, -C / 2, 0, V, (x1 - y1) * C, ((x1 + y1) * C) / 2 - z1 * V];
+const topM = (x0: number, y0: number, z1: number): Matrix => [
+  C,
+  C / 2,
+  -C,
+  C / 2,
+  (x0 - y0) * C,
+  ((x0 + y0) * C) / 2 - z1 * V,
+];
+const leftM = (x0: number, y1: number, z1: number): Matrix => [
+  C,
+  C / 2,
+  0,
+  V,
+  (x0 - y1) * C,
+  ((x0 + y1) * C) / 2 - z1 * V,
+];
+const rightM = (x1: number, y1: number, z1: number): Matrix => [
+  C,
+  -C / 2,
+  0,
+  V,
+  (x1 - y1) * C,
+  ((x1 + y1) * C) / 2 - z1 * V,
+];
 
 function headExtraL(): string {
-  return overlay(T.BLINK_L, T.PAL_BLINK, 'fig-blink')
-    + (AVATAR.beard ? overlay(T.BEARD_L, T.PAL_BEARD) : '')
-    + (AVATAR.glasses ? overlay(T.GLASS_L, T.PAL_GLASS) : '');
+  return (
+    overlay(T.BLINK_L, T.PAL_BLINK, 'fig-blink') +
+    (AVATAR.beard ? overlay(T.BEARD_L, T.PAL_BEARD) : '') +
+    (AVATAR.glasses ? overlay(T.GLASS_L, T.PAL_GLASS) : '')
+  );
 }
 function headExtraR(): string {
-  return (AVATAR.beard ? overlay(T.BEARD_R, T.PAL_BEARD) : '') + (AVATAR.glasses ? overlay(T.GLASS_R, T.PAL_GLASS) : '');
+  return (
+    (AVATAR.beard ? overlay(T.BEARD_R, T.PAL_BEARD) : '') + (AVATAR.glasses ? overlay(T.GLASS_R, T.PAL_GLASS) : '')
+  );
 }
 const mirror = (g: T.Grid): T.Grid => g.map((row) => [...row].reverse().join(''));
 
@@ -27,22 +52,37 @@ const HEAD_TEX: { grid: T.Grid; extra: string }[] = [
   { grid: T.HEAD_T, extra: '' },
   {
     grid: mirror(T.HEAD_R),
-    extra: (AVATAR.beard ? overlay(mirror(T.BEARD_R), T.PAL_BEARD) : '') + (AVATAR.glasses ? overlay(mirror(T.GLASS_R), T.PAL_GLASS) : ''),
+    extra:
+      (AVATAR.beard ? overlay(mirror(T.BEARD_R), T.PAL_BEARD) : '') +
+      (AVATAR.glasses ? overlay(mirror(T.GLASS_R), T.PAL_GLASS) : ''),
   },
 ];
 
 // Drehbarer Kopf: alle fünf Seiten im Markup, abgewandte ausgeblendet. Das Skript setzt Matrizen und Schatten neu.
 function headSvg(): string {
-  return '<g class="fig-head">' + headView(0, 0).map((v, i) => {
-    const { grid, extra } = HEAD_TEX[i];
-    const id = HEAD_FACES[i].id;
-    const m = v.matrix ? ` transform="matrix(${v.matrix.map(f).join(',')})"` : ' style="display: none"';
-    const shade = `<rect class="fhs" width="${grid[0].length}" height="${grid.length}" fill="${id === 'top' ? '#ffffff' : '#000'}" opacity="${f(v.shade)}"/>`;
-    return `<g class="fh" data-face="${id}"${m}>${gridSvg(grid, T.PAL_FIG)}${extra}${shade}</g>`;
-  }).join('') + '</g>';
+  return (
+    '<g class="fig-head">' +
+    headView(0, 0)
+      .map((v, i) => {
+        const { grid, extra } = HEAD_TEX[i];
+        const id = HEAD_FACES[i].id;
+        const m = v.matrix ? ` transform="matrix(${v.matrix.map(f).join(',')})"` : ' style="display: none"';
+        const shade = `<rect class="fhs" width="${grid[0].length}" height="${grid.length}" fill="${id === 'top' ? '#ffffff' : '#000'}" opacity="${f(v.shade)}"/>`;
+        return `<g class="fh" data-face="${id}"${m}>${gridSvg(grid, T.PAL_FIG)}${extra}${shade}</g>`;
+      })
+      .join('') +
+    '</g>'
+  );
 }
 
-type Part = { box: [number, number, number, number, number, number]; T: T.Grid; L: T.Grid; R: T.Grid; cls?: string; head?: boolean };
+type Part = {
+  box: [number, number, number, number, number, number];
+  T: T.Grid;
+  L: T.Grid;
+  R: T.Grid;
+  cls?: string;
+  head?: boolean;
+};
 
 // Reihenfolge = Zeichenreihenfolge (hinten nach vorn)
 const PARTS: Part[] = [

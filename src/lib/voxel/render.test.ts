@@ -16,11 +16,20 @@ function coverage(svg: string, W: number, H: number): Map<string, Set<string>> {
     if (tag.startsWith('<g')) group = tag.match(/fill="([^"]+)"/)![1] + (tag.match(/opacity="([^"]+)"/)?.[1] ?? '');
     else if (tag === '</g>') group = null;
     else if (tag.startsWith('<rect')) {
-      const fill = tag.match(/fill="([^"]+)"/) ? tag.match(/fill="([^"]+)"/)![1] + (tag.match(/opacity="([^"]+)"/)?.[1] ?? '') : group!;
+      const fill = tag.match(/fill="([^"]+)"/)
+        ? tag.match(/fill="([^"]+)"/)![1] + (tag.match(/opacity="([^"]+)"/)?.[1] ?? '')
+        : group!;
       add(fill, num(tag, 'x'), num(tag, 'y'), num(tag, 'width'), num(tag, 'height'));
     }
   }
-  expect([...out.values()].every((s) => [...s].every((c) => { const [x, y] = c.split(',').map(Number); return x < W && y < H; }))).toBe(true);
+  expect(
+    [...out.values()].every((s) =>
+      [...s].every((c) => {
+        const [x, y] = c.split(',').map(Number);
+        return x < W && y < H;
+      }),
+    ),
+  ).toBe(true);
   return out;
 }
 
@@ -39,18 +48,21 @@ describe('gridSvg', () => {
     expect(cov.get('#123456')).toEqual(new Set(['1,0']));
   });
 
-  it.each(Object.entries(T).filter(([k]) => !k.startsWith('PAL_') && Array.isArray((T as Record<string, unknown>)[k])) as [string, Grid][])(
-    'deckt bei %s jedes Pixel mit Palette ab und malt nichts außerhalb',
-    (_name, grid) => {
-      const pal: Palette = {};
-      for (const ch of new Set(grid.join(''))) if (ch !== '.') pal[ch] = [[`#${ch.charCodeAt(0).toString(16).padStart(6, '0')}`, 1]];
-      const W = grid[0].length;
-      const H = grid.length;
-      const cov = coverage(gridSvg(grid, pal), W, H);
-      const painted = new Set([...cov.values()].flatMap((s) => [...s]));
-      grid.forEach((row, y) => [...row].forEach((ch, x) => expect(painted.has(`${x},${y}`)).toBe(ch !== '.')));
-    },
-  );
+  it.each(
+    Object.entries(T).filter(([k]) => !k.startsWith('PAL_') && Array.isArray((T as Record<string, unknown>)[k])) as [
+      string,
+      Grid,
+    ][],
+  )('deckt bei %s jedes Pixel mit Palette ab und malt nichts außerhalb', (_name, grid) => {
+    const pal: Palette = {};
+    for (const ch of new Set(grid.join('')))
+      if (ch !== '.') pal[ch] = [[`#${ch.charCodeAt(0).toString(16).padStart(6, '0')}`, 1]];
+    const W = grid[0].length;
+    const H = grid.length;
+    const cov = coverage(gridSvg(grid, pal), W, H);
+    const painted = new Set([...cov.values()].flatMap((s) => [...s]));
+    grid.forEach((row, y) => [...row].forEach((ch, x) => expect(painted.has(`${x},${y}`)).toBe(ch !== '.')));
+  });
 
   it('wirft bei ungleich langen Zeilen', () => {
     expect(() => gridSvg(['ab', 'a'], { a: [['#000', 1]], b: [['#fff', 1]] })).toThrow(/falsche Länge/);

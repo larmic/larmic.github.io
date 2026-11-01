@@ -6,14 +6,19 @@ const words = [
   { text: 'MICHAELIS', gold: 3 },
 ];
 let delay = 0;
-const rows = words.map((w) => [...w.text].map((ch, k) => ({ ch, gold: k < w.gold, d: (0.04 + delay++ * 0.035).toFixed(2) })));
+const rows = words.map((w) =>
+  [...w.text].map((ch, k) => ({ ch, gold: k < w.gold, d: (0.04 + delay++ * 0.035).toFixed(2) })),
+);
 ---
+
 <p class="name">
   <span class="sr-only">Lars Michaelis</span>
   {rows.map((row) => (
     <span class="nrow" aria-hidden="true">
       {row.map((t) => (
-        <span class="ltw" style={`animation-delay: ${t.d}s`}><span class={t.gold ? 'lt hi' : 'lt'}>{t.ch}</span></span>
+        <span class="ltw" style={`animation-delay: ${t.d}s`}>
+          <span class={t.gold ? 'lt hi' : 'lt'}>{t.ch}</span>
+        </span>
       ))}
     </span>
   ))}

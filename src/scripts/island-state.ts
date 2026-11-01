@@ -40,8 +40,19 @@ export function restPose(world: World, rest: string): Pick<FigureState, 'route' 
 
 export function initialState(world: World, rest: string): FigureState {
   return {
-    rest, hover: null, ...restPose(world, rest), tick: 0, crumbling: [], falling: 0, respawns: 0, respawnedAt: -1,
-    blogBlocked: false, show404: false, picks: 0, steps: 0, placed: 0,
+    rest,
+    hover: null,
+    ...restPose(world, rest),
+    tick: 0,
+    crumbling: [],
+    falling: 0,
+    respawns: 0,
+    respawnedAt: -1,
+    blogBlocked: false,
+    show404: false,
+    picks: 0,
+    steps: 0,
+    placed: 0,
   };
 }
 
@@ -71,7 +82,8 @@ export function common(world: World, a: string, b: string): number {
   const ra = world.routes[a];
   const rb = world.routes[b];
   let n = 0;
-  while (n < ra.length && n < rb.length && !ra[n].fall && !rb[n].fall && ra[n].x === rb[n].x && ra[n].y === rb[n].y) n += 1;
+  while (n < ra.length && n < rb.length && !ra[n].fall && !rb[n].fall && ra[n].x === rb[n].x && ra[n].y === rb[n].y)
+    n += 1;
   return n;
 }
 
@@ -86,7 +98,15 @@ export function step(state: FigureState, world: World): FigureState {
     // Sturz läuft immer bis zum Respawn auf dem Ruheblock durch
     if (s.falling < FALL_TICKS) return { ...s, falling: s.falling + 1 };
     const stillAtBlog = !s.hover || s.hover === 'blog';
-    return { ...s, ...restPose(world, s.rest), falling: 0, respawns: s.respawns + 1, respawnedAt: tick, blogBlocked: true, show404: stillAtBlog };
+    return {
+      ...s,
+      ...restPose(world, s.rest),
+      falling: 0,
+      respawns: s.respawns + 1,
+      respawnedAt: tick,
+      blogBlocked: true,
+      show404: stillAtBlog,
+    };
   }
 
   if (goal === s.route) {
@@ -101,7 +121,11 @@ export function step(state: FigureState, world: World): FigureState {
   let built = s.built;
   while (built > s.pos && !route[built - 1].b) built -= 1;
   if (built > s.pos) {
-    return { ...s, built: built - 1, crumbling: [...s.crumbling, { bridge: route[built - 1].k!, until: tick + CRUMBLE_TICKS }] };
+    return {
+      ...s,
+      built: built - 1,
+      crumbling: [...s.crumbling, { bridge: route[built - 1].k!, until: tick + CRUMBLE_TICKS }],
+    };
   }
   if (s.pos > common(world, s.route, goal)) {
     return { ...s, built, pos: s.pos - 1, facing: route[s.pos - 1].f === 'L' ? 'R' : 'L', steps: s.steps + 1 };
@@ -113,7 +137,9 @@ export function step(state: FigureState, world: World): FigureState {
 /** Steht die Figur am Ziel und ist nichts mehr in Bewegung? Dann kann der Takt aufhören. */
 export function isSettled(state: FigureState, world: World): boolean {
   const route = world.routes[state.route];
-  return target(state) === state.route && state.pos >= route.length && !last(route).fall && state.crumbling.length === 0;
+  return (
+    target(state) === state.route && state.pos >= route.length && !last(route).fall && state.crumbling.length === 0
+  );
 }
 
 export type FigureView = {
@@ -133,23 +159,31 @@ export function view(state: FigureState, world: World, bubbles: Record<string, s
 
   // Kisten eines Bereichs: sichtbar, solange er angezeigt wird oder die Figur noch auf seinen Brücken unterwegs ist
   const openSections = new Set([section(state.rest)]);
-  if (state.route.includes('/') && state.pos > world.routes[section(state.route)].length) openSections.add(section(state.route));
+  if (state.route.includes('/') && state.pos > world.routes[section(state.route)].length)
+    openSections.add(section(state.route));
 
-  const held = new Set(Object.keys(world.routes).filter((id) => {
-    const r = world.routes[id];
-    return !last(r).fall && state.pos >= r.length && common(world, id, state.route) === r.length;
-  }));
+  const held = new Set(
+    Object.keys(world.routes).filter((id) => {
+      const r = world.routes[id];
+      return !last(r).fall && state.pos >= r.length && common(world, id, state.route) === r.length;
+    }),
+  );
 
   // Sprechblase nur, wenn die Figur auf ihrem Ruheblock steht und nirgendwo anders hin will. Auf Bereichen spricht sie
   // zum Bereich (beim ersten Aufruf der Startseite begrüßt sie), auf Kisten schweigt sie, oben im Baum hat sie einen Spruch.
   const pose = restPose(world, state.rest);
-  const atRest = state.route === pose.route && state.pos === pose.pos && state.falling === 0 && target(state) === state.rest;
+  const atRest =
+    state.route === pose.route && state.pos === pose.pos && state.falling === 0 && target(state) === state.rest;
   const inTree = state.route === 'tree' && state.pos === world.routes.tree?.length && target(state) === 'tree';
-  const text = inTree ? bubbles.tree
-    : state.show404 ? BUBBLE_404
-      : state.rest.includes('/') ? ''
-        : state.picks === 0 && state.rest === 'about' ? BUBBLE_IDLE
-          : bubbles[state.rest] ?? BUBBLE_IDLE;
+  const text = inTree
+    ? bubbles.tree
+    : state.show404
+      ? BUBBLE_404
+      : state.rest.includes('/')
+        ? ''
+        : state.picks === 0 && state.rest === 'about'
+          ? BUBBLE_IDLE
+          : (bubbles[state.rest] ?? BUBBLE_IDLE);
 
   return {
     at,

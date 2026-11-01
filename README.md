@@ -21,6 +21,8 @@ Die Seite läuft dann unter http://localhost:4321 und lädt Änderungen sofort n
 | `npm run dev` | Entwicklungsserver mit Live-Reload |
 | `npm run check` | Prüft Typen und Inhalts-Schemas. Läuft auch in der Pipeline als Guard-Gate |
 | `npm test` | Unit-Tests (Vitest) für Voxel-Generator und Logik. Ebenfalls Guard-Gate |
+| `npm run lint` | ESLint für TypeScript und Astro. Guard-Gate |
+| `npm run format` / `format:check` | Prettier formatiert bzw. prüft den Code. `format:check` ist Guard-Gate |
 | `npm run build` | Erzeugt die fertige Seite in `dist/` |
 | `npm run preview` | Zeigt den gebauten Stand aus `dist/` lokal an |
 

@@ -13,8 +13,12 @@ const footpt = (i: number, j: number, k: number): [number, number] => [(i - j) *
 
 // ---------- Würfel-Symbole ----------
 export function cubeDefs(prefix = 'v'): string {
-  const headL = (AVATAR.beard ? overlay(T.HB_BEARD_L, T.PAL_BEARD) : '') + (AVATAR.glasses ? overlay(T.HB_GLASS_L, T.PAL_GLASS) : '');
-  const headR = (AVATAR.beard ? overlay(T.HB_BEARD_R, T.PAL_BEARD) : '') + (AVATAR.glasses ? overlay(T.HB_GLASS_R, T.PAL_GLASS) : '');
+  const headL =
+    (AVATAR.beard ? overlay(T.HB_BEARD_L, T.PAL_BEARD) : '') +
+    (AVATAR.glasses ? overlay(T.HB_GLASS_L, T.PAL_GLASS) : '');
+  const headR =
+    (AVATAR.beard ? overlay(T.HB_BEARD_R, T.PAL_BEARD) : '') +
+    (AVATAR.glasses ? overlay(T.HB_GLASS_R, T.PAL_GLASS) : '');
   const id = (n: string) => `${prefix}-${n}`;
   return [
     cube(id('grass'), T.GRASS_TOP, T.GRASS_SIDE, T.GRASS_SIDE, T.PAL_GRASS),
@@ -43,22 +47,34 @@ export function textureCss(): string {
 function islandBlocks(): Map<string, { c: Cell; kind: string }> {
   const B = new Map<string, { c: Cell; kind: string }>();
   const put = (c: Cell, kind: string) => B.set(key(c), { c, kind });
-  for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) {
-    if ((i === 0 && j === 4) || (i === 4 && j === 0)) continue;
-    put([i, j, 0], 'grass');
-    put([i, j, -1], 'dirt');
-  }
+  for (let i = 0; i < 5; i++)
+    for (let j = 0; j < 5; j++) {
+      if ((i === 0 && j === 4) || (i === 4 && j === 0)) continue;
+      put([i, j, 0], 'grass');
+      put([i, j, -1], 'dirt');
+    }
   for (let i = 1; i < 4; i++) for (let j = 1; j < 4; j++) put([i, j, -2], 'stone');
-  for (const [i, j] of [[2, 3], [3, 2], [3, 3]]) put([i, j, -3], 'stone');
+  for (const [i, j] of [
+    [2, 3],
+    [3, 2],
+    [3, 3],
+  ])
+    put([i, j, -3], 'stone');
   put([3, 3, -4], 'stone');
   const [ti, tj] = [1, 0];
   put([ti, tj, 1], 'log');
   put([ti, tj, 2], 'log');
-  for (const [di, dj] of [[0, 0], [-1, 0], [1, 0], [0, -1], [0, 1]]) put([ti + di, tj + dj, 3], 'leaves');
+  for (const [di, dj] of [
+    [0, 0],
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ])
+    put([ti + di, tj + dj, 3], 'leaves');
   put([ti, tj, 4], 'leaves');
   return B;
 }
-
 
 // ---------- Szene: feste Blöcke, Startfeld der Figur, Wege zu den Navigationszielen ----------
 // Die Ziele bilden einen Baum: Ein Weg mit `via` beginnt mit dem kompletten Weg seines Elternblocks
@@ -66,8 +82,25 @@ function islandBlocks(): Map<string, { c: Cell; kind: string }> {
 type Tag = 'L' | 'R' | 'B';
 type Blocks = Map<string, { c: Cell; kind: string }>;
 // walk: Felder auf der Insel · bridge: Blöcke, die die Figur setzt · climb: vorhandene Blöcke, auf die sie steigt
-type RouteDef = { walk: [number, number][]; bridge: Cell[]; climb?: Cell[]; target: Cell; tag: Tag; fall?: Cell; via?: string };
-type NavMeta = { label: string; sym: string; delay: string; p1: string; p2: string; color?: string; href?: string; parent?: string };
+type RouteDef = {
+  walk: [number, number][];
+  bridge: Cell[];
+  climb?: Cell[];
+  target: Cell;
+  tag: Tag;
+  fall?: Cell;
+  via?: string;
+};
+type NavMeta = {
+  label: string;
+  sym: string;
+  delay: string;
+  p1: string;
+  p2: string;
+  color?: string;
+  href?: string;
+  parent?: string;
+};
 // Easter Egg: Weg ohne Block und Link, ausgelöst durch Hover über eine Fläche aus vorhandenen Blöcken
 type EggDef = { route: RouteDef; area: Cell[] };
 type SceneDef = {
@@ -94,16 +127,20 @@ type Step = { c: Cell; b: boolean; fall: boolean };
 
 function buildScene(def: SceneDef) {
   const has = (i: number, j: number, k: number) => def.blocks.has(key([i, j, k]));
-  const vis = [...def.blocks.values()].filter(({ c: [i, j, k] }) => !(has(i + 1, j, k) && has(i, j + 1, k) && has(i, j, k + 1)));
-  vis.sort((a, b) => (a.c[0] + a.c[1] + a.c[2]) - (b.c[0] + b.c[1] + b.c[2]) || a.c[2] - b.c[2] || a.c[0] - b.c[0]);
+  const vis = [...def.blocks.values()].filter(
+    ({ c: [i, j, k] }) => !(has(i + 1, j, k) && has(i, j + 1, k) && has(i, j, k + 1)),
+  );
+  vis.sort((a, b) => a.c[0] + a.c[1] + a.c[2] - (b.c[0] + b.c[1] + b.c[2]) || a.c[2] - b.c[2] || a.c[0] - b.c[0]);
   const xs: number[] = [];
   const ys: number[] = [];
-  const uses = vis.map(({ c, kind }) => {
-    const [X, Y] = pos(...c);
-    xs.push(X, X + 80);
-    ys.push(Y, Y + 84.8);
-    return `<use href="#v-${kind}" x="${f(X)}" y="${f(Y)}" width="80" height="84.8"/>`;
-  }).join('');
+  const uses = vis
+    .map(({ c, kind }) => {
+      const [X, Y] = pos(...c);
+      xs.push(X, X + 80);
+      ys.push(Y, Y + 84.8);
+      return `<use href="#v-${kind}" x="${f(X)}" y="${f(Y)}" width="80" height="84.8"/>`;
+    })
+    .join('');
 
   const fig = figureSvg();
   const s = 1.9;
@@ -117,24 +154,34 @@ function buildScene(def: SceneDef) {
   const [hx, hy] = footpt(...def.home);
   headroom([hx, hy]);
 
-  const allRoutes: Record<string, RouteDef> = { ...def.routes, ...Object.fromEntries(Object.entries(def.eggs ?? {}).map(([id, e]) => [id, e.route])) };
+  const allRoutes: Record<string, RouteDef> = {
+    ...def.routes,
+    ...Object.fromEntries(Object.entries(def.eggs ?? {}).map(([id, e]) => [id, e.route])),
+  };
   const steps = (rid: string): Step[] => {
     const d = allRoutes[rid];
-    const start: Step[] = d.via ? steps(d.via) : d.walk.map(([i, j]) => ({ c: [i, j, 0] as Cell, b: false, fall: false }));
+    const start: Step[] = d.via
+      ? steps(d.via)
+      : d.walk.map(([i, j]) => ({ c: [i, j, 0] as Cell, b: false, fall: false }));
     const own: Step[] = d.fall
       ? [{ c: d.fall, b: false, fall: true }]
-      : [...d.bridge.map((c) => ({ c, b: true, fall: false })), ...(d.climb ?? []).map((c) => ({ c, b: false, fall: false })), { c: d.target, b: false, fall: false }];
+      : [
+          ...d.bridge.map((c) => ({ c, b: true, fall: false })),
+          ...(d.climb ?? []).map((c) => ({ c, b: false, fall: false })),
+          { c: d.target, b: false, fall: false },
+        ];
     return [...start, ...own];
   };
 
   const bridgeAt = new Map<string, number>();
   const bridgesRaw: { X: number; Y: number; d: number }[] = [];
-  const nodesRaw: Record<string, { fx: number; fy: number; f: 'L' | 'R'; b: boolean; k?: number; fall?: boolean }[]> = {};
+  const nodesRaw: Record<string, { fx: number; fy: number; f: 'L' | 'R'; b: boolean; k?: number; fall?: boolean }[]> =
+    {};
   const targets: Record<string, { X: number; Y: number; d: number; tag: Tag }> = {};
   for (const [rid, d] of Object.entries(allRoutes)) {
     let prev = def.home;
     nodesRaw[rid] = steps(rid).map(({ c, b, fall }) => {
-      const dx = (c[0] - prev[0]) - (c[1] - prev[1]);
+      const dx = c[0] - prev[0] - (c[1] - prev[1]);
       const [fx, fy] = footpt(...c);
       xs.push(fx - figHW - 8, fx + figHW + 8);
       ys.push(fy - figH - 8);
@@ -150,7 +197,14 @@ function buildScene(def: SceneDef) {
         }
       }
       prev = c;
-      return { fx, fy, f: dx > 0 ? 'R' : 'L', b, ...(k !== undefined ? { k } : {}), ...(fall ? { fall: true } : {}) } as const;
+      return {
+        fx,
+        fy,
+        f: dx > 0 ? 'R' : 'L',
+        b,
+        ...(k !== undefined ? { k } : {}),
+        ...(fall ? { fall: true } : {}),
+      } as const;
     });
     if (def.bubbles.includes(rid)) headroom(footpt(...d.target));
     if (!def.routes[rid]) continue; // Easter Egg: kein Zielblock, kein Etikett
@@ -163,7 +217,10 @@ function buildScene(def: SceneDef) {
     if (!def.meta[rid].parent) {
       const tw = Math.max(125, def.meta[rid].label.length * 10 + 30);
       const half = Math.max(60, (tw - 5) / 2);
-      if (d.tag === 'B') { ys.push(Y + 84.8 + 46); xs.push(X + 40 - half, X + 40 + half); }
+      if (d.tag === 'B') {
+        ys.push(Y + 84.8 + 46);
+        xs.push(X + 40 - half, X + 40 + half);
+      }
       if (d.tag === 'L') xs.push(X - tw);
       if (d.tag === 'R') xs.push(X + 80 + tw);
     }
@@ -180,17 +237,34 @@ function buildScene(def: SceneDef) {
 
   const data: WorldData = {
     home: { x: px(hx), y: py(hy) },
-    routes: Object.fromEntries(Object.entries(nodesRaw).map(([rid, ns]) => [rid, ns.map(({ fx, fy, ...n }) => ({ x: px(fx), y: py(fy), ...n }))])),
+    routes: Object.fromEntries(
+      Object.entries(nodesRaw).map(([rid, ns]) => [
+        rid,
+        ns.map(({ fx, fy, ...n }) => ({ x: px(fx), y: py(fy), ...n })),
+      ]),
+    ),
     bridges: bridgesRaw.map((b) => ({ x: px(b.X), y: py(b.Y), w: W, z: zi(b.d) })),
     nav: Object.keys(def.routes).map((id) => ({
-      id, ...def.meta[id], x: px(targets[id].X), y: py(targets[id].Y), w: W, z: zi(targets[id].d, 1), tag: targets[id].tag,
+      id,
+      ...def.meta[id],
+      x: px(targets[id].X),
+      y: py(targets[id].Y),
+      w: W,
+      z: zi(targets[id].d, 1),
+      tag: targets[id].tag,
     })),
     // Hover-Fläche des Easter Eggs: Umriss der Blöcke, die es auslösen (oben ohne die schrägen Ecken)
     eggs: Object.entries(def.eggs ?? {}).map(([id, e]) => {
       const bx = e.area.map((c) => pos(...c));
       const [ax0, ay0] = [Math.min(...bx.map((b) => b[0])), Math.min(...bx.map((b) => b[1]))];
       const [ax1, ay1] = [Math.max(...bx.map((b) => b[0])) + 80, Math.max(...bx.map((b) => b[1])) + 84.8];
-      return { id, x: px(ax0), y: py(ay0 + 10), w: Number(f(((ax1 - ax0) / sw) * 100)), h: Number(f(((ay1 - ay0 - 20) / sh) * 100)) };
+      return {
+        id,
+        x: px(ax0),
+        y: py(ay0 + 10),
+        w: Number(f(((ax1 - ax0) / sw) * 100)),
+        h: Number(f(((ay1 - ay0 - 20) / sh) * 100)),
+      };
     }),
   };
 
@@ -200,7 +274,11 @@ function buildScene(def: SceneDef) {
     sceneSvg: `<svg viewBox="${[sx0, sy0, sw, sh].map(f).join(' ')}" aria-hidden="true" class="isle-svg">${uses}</svg>`,
     figureSvg: fig.svg,
     aspect: `${f(sw)} / ${f(sh)}`,
-    fig: { w: f((fw * s / sw) * 100), tx: f(((fig.foot[0] - fx0) / fw) * 100), ty: f(((fig.foot[1] - fy0) / fh) * 100) },
+    fig: {
+      w: f(((fw * s) / sw) * 100),
+      tx: f(((fig.foot[0] - fx0) / fw) * 100),
+      ty: f(((fig.foot[1] - fy0) / fh) * 100),
+    },
     particles: particlesCss(1234, 'pop', '.px', 'p', 46, 64) + '\n' + particlesCss(98765, 'spawn', '.sp', 's', 50, 78),
   };
 }
@@ -208,9 +286,41 @@ function buildScene(def: SceneDef) {
 // ---------- Die Insel ----------
 const HOME: Cell = [3, 3, 0];
 const ROUTES: Record<string, RouteDef> = {
-  about: { walk: [[2, 3], [1, 3], [0, 3]], bridge: [[-1, 3, 0], [-2, 3, 1]], target: [-3, 3, 2], tag: 'L' },
-  workshops: { walk: [[3, 2], [3, 1], [3, 0]], bridge: [[3, -1, 0], [3, -2, 1]], target: [3, -3, 2], tag: 'R' },
-  videos: { walk: [[3, 4]], bridge: [[3, 5, 0], [3, 6, 0]], target: [3, 7, -1], tag: 'B' },
+  about: {
+    walk: [
+      [2, 3],
+      [1, 3],
+      [0, 3],
+    ],
+    bridge: [
+      [-1, 3, 0],
+      [-2, 3, 1],
+    ],
+    target: [-3, 3, 2],
+    tag: 'L',
+  },
+  workshops: {
+    walk: [
+      [3, 2],
+      [3, 1],
+      [3, 0],
+    ],
+    bridge: [
+      [3, -1, 0],
+      [3, -2, 1],
+    ],
+    target: [3, -3, 2],
+    tag: 'R',
+  },
+  videos: {
+    walk: [[3, 4]],
+    bridge: [
+      [3, 5, 0],
+      [3, 6, 0],
+    ],
+    target: [3, 7, -1],
+    tag: 'B',
+  },
   blog: { walk: [[4, 3]], bridge: [], target: [7, 3, -2], tag: 'B', fall: [5, 3, 0] },
 };
 const NAV_META: Record<string, NavMeta> = {
@@ -227,13 +337,27 @@ const CHILD_SLOTS: Record<Section, Pick<RouteDef, 'bridge' | 'target' | 'tag'>[]
     { bridge: [[3, -4, 3]], target: [3, -5, 4], tag: 'R' }, // oben rechts, Treppe hoch
     { bridge: [[2, -3, 3]], target: [1, -3, 4], tag: 'L' }, // oben links, Treppe hoch
     { bridge: [[4, -3, 2]], target: [5, -3, 1], tag: 'R' }, // rechts, Stufe runter
-    { bridge: [[3, -4, 2], [4, -4, 2]], target: [4, -5, 2], tag: 'R' }, // rechts, zwischen erster und dritter Kiste (Reserve)
+    {
+      bridge: [
+        [3, -4, 2],
+        [4, -4, 2],
+      ],
+      target: [4, -5, 2],
+      tag: 'R',
+    }, // rechts, zwischen erster und dritter Kiste (Reserve)
   ],
   videos: [
     { bridge: [[2, 7, -1]], target: [1, 7, 0], tag: 'L' }, // links, Stufe hoch
     { bridge: [[3, 8, -1]], target: [3, 9, -1], tag: 'L' }, // unten links
     { bridge: [[4, 7, -1]], target: [5, 7, -2], tag: 'B' }, // unten rechts, Stufe runter (unter der Steinspitze vorbei)
-    { bridge: [[4, 7, -1], [4, 8, -2]], target: [4, 9, -3], tag: 'B' }, // ganz unten, Treppe runter
+    {
+      bridge: [
+        [4, 7, -1],
+        [4, 8, -2],
+      ],
+      target: [4, 9, -3],
+      tag: 'B',
+    }, // ganz unten, Treppe runter
   ],
 };
 
@@ -241,8 +365,26 @@ export type ChildItem = { id: string; label: string; block: string; color?: stri
 
 // Easter Egg: Hover über das Blätterdach → die Figur läuft zum Baum, stapelt zwei Blöcke und klettert in die Krone
 const TREE_EGG: EggDef = {
-  route: { walk: [[3, 2], [3, 1]], bridge: [[2, 1, 1], [2, 1, 2]], climb: [[2, 0, 3]], target: [1, 0, 4], tag: 'B' },
-  area: [[0, 0, 3], [2, 0, 3], [1, -1, 3], [1, 1, 3], [1, 0, 4]],
+  route: {
+    walk: [
+      [3, 2],
+      [3, 1],
+    ],
+    bridge: [
+      [2, 1, 1],
+      [2, 1, 2],
+    ],
+    climb: [[2, 0, 3]],
+    target: [1, 0, 4],
+    tag: 'B',
+  },
+  area: [
+    [0, 0, 3],
+    [2, 0, 3],
+    [1, -1, 3],
+    [1, 1, 3],
+    [1, 0, 4],
+  ],
 };
 
 export function buildWorld(children: Record<Section, ChildItem[]>): Scene {
@@ -253,12 +395,31 @@ export function buildWorld(children: Record<Section, ChildItem[]>): Scene {
     meta[id] = NAV_META[id];
     if (id !== 'workshops' && id !== 'videos') continue;
     const slots = CHILD_SLOTS[id];
-    if (children[id].length > slots.length) throw new Error(`Insel: Für ${id} gibt es ${slots.length} Plätze, gefunden: ${children[id].length} Einträge. Einen Platz in CHILD_SLOTS (src/lib/voxel/world.ts) ergänzen oder einen Eintrag auf draft: true setzen.`);
+    if (children[id].length > slots.length)
+      throw new Error(
+        `Insel: Für ${id} gibt es ${slots.length} Plätze, gefunden: ${children[id].length} Einträge. Einen Platz in CHILD_SLOTS (src/lib/voxel/world.ts) ergänzen oder einen Eintrag auf draft: true setzen.`,
+      );
     children[id].forEach((it, n) => {
       const cid = `${id}/${it.id}`;
       routes[cid] = { walk: [], via: id, ...slots[n] };
-      meta[cid] = { label: it.label, sym: it.block, delay: `${f(-0.4 - 0.7 * n)}s`, p1: it.color ?? '#f0a531', p2: '#ffffff', color: it.color, href: it.href, parent: id };
+      meta[cid] = {
+        label: it.label,
+        sym: it.block,
+        delay: `${f(-0.4 - 0.7 * n)}s`,
+        p1: it.color ?? '#f0a531',
+        p2: '#ffffff',
+        color: it.color,
+        href: it.href,
+        parent: id,
+      };
     });
   }
-  return buildScene({ blocks: islandBlocks(), home: HOME, routes, meta, bubbles: [...Object.keys(ROUTES), 'tree'], eggs: { tree: TREE_EGG } });
+  return buildScene({
+    blocks: islandBlocks(),
+    home: HOME,
+    routes,
+    meta,
+    bubbles: [...Object.keys(ROUTES), 'tree'],
+    eggs: { tree: TREE_EGG },
+  });
 }

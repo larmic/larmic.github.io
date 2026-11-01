@@ -96,13 +96,28 @@ class LarmicIsland extends HTMLElement {
   /** Blick zum Cursor: nur mit Maus und ohne Wunsch nach reduzierter Bewegung. */
   private listenGlobally() {
     if (this.globals) return;
-    if (!matchMedia('(hover: hover) and (pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (
+      !matchMedia('(hover: hover) and (pointer: fine)').matches ||
+      matchMedia('(prefers-reduced-motion: reduce)').matches
+    )
+      return;
     this.globals = new AbortController();
     const opts = { passive: true, signal: this.globals.signal };
     const follow = () => {
-      if (!this.raf) this.raf = requestAnimationFrame(() => { this.raf = 0; this.aimHead(); });
+      if (!this.raf)
+        this.raf = requestAnimationFrame(() => {
+          this.raf = 0;
+          this.aimHead();
+        });
     };
-    document.addEventListener('pointermove', (e) => { this.look = { x: e.clientX, y: e.clientY }; follow(); }, opts);
+    document.addEventListener(
+      'pointermove',
+      (e) => {
+        this.look = { x: e.clientX, y: e.clientY };
+        follow();
+      },
+      opts,
+    );
     window.addEventListener('scroll', follow, opts);
   }
 
@@ -167,12 +182,16 @@ class LarmicIsland extends HTMLElement {
     const ab = s.picks % 2 ? 'A' : 'B';
 
     // Klasse zuerst setzen: beim Respawn ("tp") ohne Übergang springen
-    this.figpos.className = 'figpos' + (s.respawnedAt === s.tick ? ' tp' : '') + (s.respawns ? (s.respawns % 2 ? ' spawnA' : ' spawnB') : '');
+    this.figpos.className =
+      'figpos' + (s.respawnedAt === s.tick ? ' tp' : '') + (s.respawns ? (s.respawns % 2 ? ' spawnA' : ' spawnB') : '');
     this.figpos.style.left = `${v.at.x}%`;
     this.figpos.style.top = `${v.at.y}%`;
     this.flip.className = 'figflip' + (s.facing === 'R' ? ' flip' : '');
     this.jump.className = 'figw' + (s.falling > 0 ? ' falling' : s.picks ? ` jump${ab}` : '');
-    this.hop.className = 'fighop' + (s.steps ? (s.steps % 2 ? ' stepA' : ' stepB') : '') + (s.placed ? (s.placed % 2 ? ' placeA' : ' placeB') : '');
+    this.hop.className =
+      'fighop' +
+      (s.steps ? (s.steps % 2 ? ' stepA' : ' stepB') : '') +
+      (s.placed ? (s.placed % 2 ? ' placeA' : ' placeB') : '');
     if (this.timer !== undefined) this.setHead(0, 0);
 
     this.bridges.forEach((el, k) => {
@@ -183,8 +202,13 @@ class LarmicIsland extends HTMLElement {
       const id = b.dataset.id!;
       const parent = b.dataset.parent;
       const on = s.rest === id || s.rest.startsWith(`${id}/`);
-      b.className = 'blk' + (parent ? ' child' : '') + (on ? ' on' : '') + (s.rest === id && s.picks ? ` pop${ab}` : '')
-        + (v.held.has(id) ? ' held' : '') + (parent && !v.openSections.has(parent) ? ' closed' : '');
+      b.className =
+        'blk' +
+        (parent ? ' child' : '') +
+        (on ? ' on' : '') +
+        (s.rest === id && s.picks ? ` pop${ab}` : '') +
+        (v.held.has(id) ? ' held' : '') +
+        (parent && !v.openSections.has(parent) ? ' closed' : '');
       if (b instanceof HTMLAnchorElement) {
         if (id === s.rest) b.setAttribute('aria-current', 'page');
         else b.removeAttribute('aria-current');

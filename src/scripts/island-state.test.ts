@@ -1,9 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { buildWorld } from '../lib/voxel/world';
-import { BUBBLE_404, BUBBLE_IDLE, FALL_TICKS, aim, initialState, isSettled, leave, select, step, view, type FigureState, type World } from './island-state';
+import {
+  BUBBLE_404,
+  BUBBLE_IDLE,
+  FALL_TICKS,
+  aim,
+  initialState,
+  isSettled,
+  leave,
+  select,
+  step,
+  view,
+  type FigureState,
+  type World,
+} from './island-state';
 
-const entries = (section: string, ids: string[]) => ids.map((id) => ({ id, label: id, block: 'crate', href: `/${section}/${id}/` }));
-const world: World = buildWorld({ workshops: entries('workshops', ['ddd', 'es', 'ms']), videos: entries('videos', ['tc', 'hex', 'es', 'unit']) }).data;
+const entries = (section: string, ids: string[]) =>
+  ids.map((id) => ({ id, label: id, block: 'crate', href: `/${section}/${id}/` }));
+const world: World = buildWorld({
+  workshops: entries('workshops', ['ddd', 'es', 'ms']),
+  videos: entries('videos', ['tc', 'hex', 'es', 'unit']),
+}).data;
 const BUBBLES = { about: 'A', workshops: 'W', videos: 'V', tree: 'T' };
 
 /** Takte bis zur Ruhe; liefert den Endzustand und alle Orte, an denen die Figur dabei stand. */
@@ -19,7 +36,8 @@ function settle(state: FigureState, max = 400) {
 }
 const endOf = (id: string) => world.routes[id].at(-1)!;
 const standsOn = (s: FigureState, id: string) => expect(view(s, world, BUBBLES).at).toEqual(endOf(id));
-const passes = (trail: { x: number; y: number }[], p: { x: number; y: number }) => trail.some((t) => t.x === p.x && t.y === p.y);
+const passes = (trail: { x: number; y: number }[], p: { x: number; y: number }) =>
+  trail.some((t) => t.x === p.x && t.y === p.y);
 
 describe('Figur auf der Insel', () => {
   it('steht beim Start auf dem Block der Seite, alle Brücken dorthin stehen, sie begrüßt', () => {
@@ -32,13 +50,16 @@ describe('Figur auf der Insel', () => {
   });
 
   it('läuft bei Hover über die Inselmitte zum anderen Bereich und bei Maus weg zurück', () => {
-    let { s, trail } = settle(aim(initialState(world, 'about'), 'videos'));
+    const there = settle(aim(initialState(world, 'about'), 'videos'));
+    let s = there.s;
     standsOn(s, 'videos');
-    expect(passes(trail, world.home)).toBe(true);
+    expect(passes(there.trail, world.home)).toBe(true);
     expect(view(s, world, BUBBLES).bubble.visible).toBe(false); // nicht auf ihrem Ruheblock
     ({ s } = settle(leave(s, 'videos')));
     standsOn(s, 'about');
-    expect(view(s, world, BUBBLES).standingBridges).toEqual(new Set(world.routes.about.flatMap((n) => (n.k === undefined ? [] : [n.k]))));
+    expect(view(s, world, BUBBLES).standingBridges).toEqual(
+      new Set(world.routes.about.flatMap((n) => (n.k === undefined ? [] : [n.k]))),
+    );
   });
 
   it('lässt beim Rückweg die Brücken bröckeln und setzt auf dem Hinweg jeden Block, bevor sie ihn betritt', () => {
@@ -69,7 +90,12 @@ describe('Figur auf der Insel', () => {
 
   it('lässt gemeinsame Brückenblöcke stehen, wenn sich zwei Wege ein Feld teilen', () => {
     const routes = Object.entries(world.routes).filter(([id]) => id.startsWith('videos/'));
-    const pair = routes.flatMap(([a, ra]) => routes.filter(([b]) => b !== a).map(([b, rb]) => ({ a, b, shared: ra.filter((n, i) => n.b && rb[i]?.k === n.k).length })))
+    const pair = routes
+      .flatMap(([a, ra]) =>
+        routes
+          .filter(([b]) => b !== a)
+          .map(([b, rb]) => ({ a, b, shared: ra.filter((n, i) => n.b && rb[i]?.k === n.k).length })),
+      )
       .find((p) => p.shared > 0)!;
     expect(pair, 'es gibt Video-Kisten mit gemeinsamer Brücke').toBeDefined();
     const before = view(initialState(world, pair.a), world, BUBBLES).standingBridges;
@@ -77,7 +103,8 @@ describe('Figur auf der Insel', () => {
     let neverCrumbledShared = true;
     for (let i = 0; i < 200 && !isSettled(s, world); i++) {
       s = step(s, world);
-      for (const c of s.crumbling) if (world.routes[pair.b].some((n) => n.k === c.bridge) && before.has(c.bridge)) neverCrumbledShared = false;
+      for (const c of s.crumbling)
+        if (world.routes[pair.b].some((n) => n.k === c.bridge) && before.has(c.bridge)) neverCrumbledShared = false;
     }
     standsOn(s, pair.b);
     expect(neverCrumbledShared).toBe(true);

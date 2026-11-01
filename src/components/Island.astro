@@ -19,21 +19,51 @@ const route = d.routes[rest];
 const at = route[route.length - 1];
 const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
 ---
-<larmic-island data-world={JSON.stringify({ home: d.home, routes: d.routes, rest })} style={`--home-x: ${d.home.x}%; --home-y: ${d.home.y}%`}>
+
+<larmic-island
+  data-world={JSON.stringify({ home: d.home, routes: d.routes, rest })}
+  style={`--home-x: ${d.home.x}%; --home-y: ${d.home.y}%`}
+>
   <div class="isle" style={`aspect-ratio: ${w.aspect}`}>
     <Fragment set:html={w.sceneSvg} />
     <div class="bridges">
       {d.bridges.map((b, k) => (
-        <div class={`brk${built.has(k) ? '' : ' off'}`} data-k={k} style={`left: ${b.x}%; top: ${b.y}%; width: ${b.w}%; z-index: ${b.z}`}>
-          <svg viewBox="0 0 80 84.8" aria-hidden="true"><use href="#v-plank"></use></svg>
+        <div
+          class={`brk${built.has(k) ? '' : ' off'}`}
+          data-k={k}
+          style={`left: ${b.x}%; top: ${b.y}%; width: ${b.w}%; z-index: ${b.z}`}
+        >
+          <svg viewBox="0 0 80 84.8" aria-hidden="true">
+            <use href="#v-plank"></use>
+          </svg>
         </div>
       ))}
     </div>
-    {d.eggs.map((e) => <span class="egg" data-egg={e.id} aria-hidden="true" style={`left: ${e.x}%; top: ${e.y}%; width: ${e.w}%; height: ${e.h}%`}></span>)}
-    <div class="figpos" style={`left: ${at.x}%; top: ${at.y}%; width: ${w.fig.w}%; transform: translate(-${w.fig.tx}%, -${w.fig.ty}%)`}>
-      <p class={`bubble pxf${rest.includes('/') ? ' off' : ''}`} aria-live="polite">Hi! Zeig auf einen Block.</p>
-      {sparks.map((c) => <span class="sp" style={`background: ${c}`}></span>)}
-      <div class={`figflip${at.f === 'R' ? ' flip' : ''}`}><div class="figspawn"><div class="figw"><div class="fighop" set:html={w.figureSvg}></div></div></div></div>
+    {d.eggs.map((e) => (
+      <span
+        class="egg"
+        data-egg={e.id}
+        aria-hidden="true"
+        style={`left: ${e.x}%; top: ${e.y}%; width: ${e.w}%; height: ${e.h}%`}
+      ></span>
+    ))}
+    <div
+      class="figpos"
+      style={`left: ${at.x}%; top: ${at.y}%; width: ${w.fig.w}%; transform: translate(-${w.fig.tx}%, -${w.fig.ty}%)`}
+    >
+      <p class={`bubble pxf${rest.includes('/') ? ' off' : ''}`} aria-live="polite">
+        Hi! Zeig auf einen Block.
+      </p>
+      {sparks.map((c) => (
+        <span class="sp" style={`background: ${c}`}></span>
+      ))}
+      <div class={`figflip${at.f === 'R' ? ' flip' : ''}`}>
+        <div class="figspawn">
+          <div class="figw">
+            <div class="fighop" set:html={w.figureSvg} />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="blkrow">
@@ -52,8 +82,13 @@ const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
           style={`left: ${n.x}%; top: ${n.y}%; width: ${n.w}%; z-index: ${n.z}${n.color ? `; color: ${n.color}` : ''}`}
         >
           <span class="bob" style={`animation-delay: ${n.delay}`}>
-            <svg viewBox="0 0 80 84.8" aria-hidden="true"><use href={`#v-${n.sym}`}></use><polygon class="outline" points={outline} fill="none" stroke="#1d2838" stroke-width="3"></polygon></svg>
-            {[0, 1, 2, 3, 4, 5].map((i) => <span class="px" style={`background: ${i % 2 ? n.p2 : n.p1}`}></span>)}
+            <svg viewBox="0 0 80 84.8" aria-hidden="true">
+              <use href={`#v-${n.sym}`}></use>
+              <polygon class="outline" points={outline} fill="none" stroke="#1d2838" stroke-width="3"></polygon>
+            </svg>
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <span class="px" style={`background: ${i % 2 ? n.p2 : n.p1}`}></span>
+            ))}
           </span>
           <span class={`tag tag${n.tag}`}>{n.label}</span>
         </Tag>

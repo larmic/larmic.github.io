@@ -5,11 +5,13 @@ import { GRASS_SIDE, GRASS_TOP, PAL_GRASS } from './textures';
 
 export function iconSvg(size?: number): string {
   const dims = size ? ` width="${size}" height="${size}"` : '';
-  return `<svg xmlns="http://www.w3.org/2000/svg"${dims} viewBox="0 0 80 84.8">`
-    + face([5, 2.5, -5, 2.5, 40, 0], GRASS_TOP, PAL_GRASS, ['#ffffff', 0.05])
-    + face([5, 2.5, 0, 5.6, 0, 20], GRASS_SIDE, PAL_GRASS, ['#000', 0.08])
-    + face([5, -2.5, 0, 5.6, 40, 40], GRASS_SIDE, PAL_GRASS, ['#000', 0.26])
-    + '</svg>';
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg"${dims} viewBox="0 0 80 84.8">` +
+    face([5, 2.5, -5, 2.5, 40, 0], GRASS_TOP, PAL_GRASS, ['#ffffff', 0.05]) +
+    face([5, 2.5, 0, 5.6, 0, 20], GRASS_SIDE, PAL_GRASS, ['#000', 0.08]) +
+    face([5, -2.5, 0, 5.6, 40, 40], GRASS_SIDE, PAL_GRASS, ['#000', 0.26]) +
+    '</svg>'
+  );
 }
 
 /** Quadratisches PNG; `background` z. B. für das apple-touch-icon, das keine Transparenz mag. */

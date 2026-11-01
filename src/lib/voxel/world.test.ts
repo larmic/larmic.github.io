@@ -2,14 +2,22 @@ import { describe, expect, it } from 'vitest';
 import { buildWorld, type ChildItem, type Scene } from './world';
 
 const items = (section: string, n: number): ChildItem[] =>
-  Array.from({ length: n }, (_, i) => ({ id: `e${i}`, label: `Eintrag ${i}`, block: 'crate', href: `/${section}/e${i}/` }));
+  Array.from({ length: n }, (_, i) => ({
+    id: `e${i}`,
+    label: `Eintrag ${i}`,
+    block: 'crate',
+    href: `/${section}/e${i}/`,
+  }));
 
 // So viele Einträge, wie es Plätze gibt: Hier müssen Geometrie und Wege noch stimmen
 const full = () => buildWorld({ workshops: items('workshops', 4), videos: items('videos', 4) });
 
 /** Prozentangaben der Szene zurück in Szenen-Einheiten (Würfel 80 × 84,8) */
 function units(scene: Scene) {
-  const [x0, y0, w, h] = scene.sceneSvg.match(/viewBox="([^"]+)"/)![1].split(' ').map(Number);
+  const [x0, y0, w, h] = scene.sceneSvg
+    .match(/viewBox="([^"]+)"/)![1]
+    .split(' ')
+    .map(Number);
   return (p: { x: number; y: number }) => ({ X: x0 + (p.x / 100) * w, Y: y0 + (p.y / 100) * h });
 }
 
@@ -58,7 +66,10 @@ describe('buildWorld', () => {
   it('lässt keine Zielblöcke einander oder die Insel überlappen', () => {
     const scene = full();
     const at = units(scene);
-    const cubes = [...scene.sceneSvg.matchAll(/x="([-\d.]+)" y="([-\d.]+)"/g)].map((m) => ({ X: Number(m[1]), Y: Number(m[2]) }));
+    const cubes = [...scene.sceneSvg.matchAll(/x="([-\d.]+)" y="([-\d.]+)"/g)].map((m) => ({
+      X: Number(m[1]),
+      Y: Number(m[2]),
+    }));
     const boxes = scene.data.nav.map((n) => ({ id: n.id, ...at(n) }));
     const overlap = (a: { X: number; Y: number }, b: { X: number; Y: number }) =>
       a.X < b.X + 70 && b.X < a.X + 70 && a.Y < b.Y + 74.8 && b.Y < a.Y + 74.8; // 10 Einheiten Spiel für Kanten, die sich berühren

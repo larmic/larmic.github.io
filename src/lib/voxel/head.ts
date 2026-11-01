@@ -6,7 +6,15 @@ export const C = 2.0;
 export const V = 2.236;
 
 type V3 = [number, number, number];
-export type HeadFace = { id: 'top' | 'front' | 'right' | 'back' | 'left'; o: V3; u: V3; v: V3; n: V3; cols: number; rows: number };
+export type HeadFace = {
+  id: 'top' | 'front' | 'right' | 'back' | 'left';
+  o: V3;
+  u: V3;
+  v: V3;
+  n: V3;
+  cols: number;
+  rows: number;
+};
 
 // o = Ecke oben links der Textur, u = eine Spalte weiter, v = eine Zeile weiter, n = Außennormale
 export const HEAD_FACES: HeadFace[] = [

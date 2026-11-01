@@ -40,7 +40,10 @@ function cellsToRects(cells: Set<string>): number[][] {
     let start = xs[0];
     let prev = xs[0];
     for (const x of [...xs.slice(1), NaN]) {
-      if (x === prev + 1) { prev = x; continue; }
+      if (x === prev + 1) {
+        prev = x;
+        continue;
+      }
       runs.push([start, y, prev - start + 1]);
       start = prev = x;
     }
@@ -64,7 +67,10 @@ export function gridSvg(grid: Grid, pal: Palette): string {
     if (row.length !== W) throw new Error(`Rasterzeile hat falsche Länge: ${row}`);
     [...row].forEach((ch, x) => {
       const layers = pal[ch];
-      if (!layers) { full = false; return; }
+      if (!layers) {
+        full = false;
+        return;
+      }
       layers.forEach(([fill, op], li) => {
         const key = `${li}|${fill}|${op}`;
         if (!cells.has(key)) cells.set(key, new Set());
@@ -75,7 +81,9 @@ export function gridSvg(grid: Grid, pal: Palette): string {
   const out: string[] = [];
   let baseKey: string | null = null;
   if (full) {
-    baseKey = [...cells.keys()].filter((k) => k.startsWith('0|')).sort((a, b) => cells.get(b)!.size - cells.get(a)!.size)[0];
+    baseKey = [...cells.keys()]
+      .filter((k) => k.startsWith('0|'))
+      .sort((a, b) => cells.get(b)!.size - cells.get(a)!.size)[0];
     const [, fill, op] = baseKey.split('|');
     out.push(rect(0, 0, W, H, attr(fill, Number(op))));
   }
@@ -112,11 +120,13 @@ const CL: Matrix = [5, 2.5, 0, 5.6, 0, 20];
 const CR: Matrix = [5, -2.5, 0, 5.6, 40, 40];
 
 export function cube(id: string, T: Grid, L: Grid, R: Grid, pal: Palette, exL = '', exR = ''): string {
-  return `<symbol id="${id}" viewBox="0 0 80 84.8">`
-    + face(CT, T, pal, ['#ffffff', 0.05])
-    + face(CL, L, pal, ['#000', 0.08], exL)
-    + face(CR, R, pal, ['#000', 0.26], exR)
-    + '</symbol>';
+  return (
+    `<symbol id="${id}" viewBox="0 0 80 84.8">` +
+    face(CT, T, pal, ['#ffffff', 0.05]) +
+    face(CL, L, pal, ['#000', 0.08], exL) +
+    face(CR, R, pal, ['#000', 0.26], exR) +
+    '</symbol>'
+  );
 }
 
 // Kachel als eigenständiges SVG (für CSS-Hintergründe)
@@ -130,7 +140,10 @@ export function tileDataUri(grid: Grid, pal: Palette, px = 6): string {
 // Partikel-Flugbahnen für Block-Pop und Respawn
 export function particlesCss(seed: number, pre: string, sel: string, kf: string, r0: number, r1: number): string {
   let s = seed;
-  const rnd = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+  const rnd = () => {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
   const angles = [-160, -115, -65, -20, 30, 150];
   const css: string[] = [];
   angles.forEach((a, i) => {
@@ -139,7 +152,9 @@ export function particlesCss(seed: number, pre: string, sel: string, kf: string,
     const dy = Math.sin((a * Math.PI) / 180) * r;
     for (const v of ['A', 'B']) {
       css.push(`.${pre}${v} ${sel}:nth-of-type(${i + 1}) { animation: ${kf}${v}${i + 1} 0.6s steps(6) forwards; }`);
-      css.push(`@keyframes ${kf}${v}${i + 1} { 0% { opacity: 1; transform: translate(0, 0); } 55% { opacity: 1; transform: translate(${f(dx * 0.75)}px, ${f(dy * 0.75 - 14)}px); } 100% { opacity: 0; transform: translate(${f(dx)}px, ${f(dy + 18)}px); } }`);
+      css.push(
+        `@keyframes ${kf}${v}${i + 1} { 0% { opacity: 1; transform: translate(0, 0); } 55% { opacity: 1; transform: translate(${f(dx * 0.75)}px, ${f(dy * 0.75 - 14)}px); } 100% { opacity: 0; transform: translate(${f(dx)}px, ${f(dy + 18)}px); } }`,
+      );
     }
   });
   return css.join('\n');

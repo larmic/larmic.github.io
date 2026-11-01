@@ -9,23 +9,34 @@ const H = 630;
 
 export async function GET() {
   const scene = await islandScene();
-  const [sx0, sy0, sw, sh] = scene.sceneSvg.match(/viewBox="([^"]+)"/)![1].split(' ').map(Number);
+  const [sx0, sy0, sw, sh] = scene.sceneSvg
+    .match(/viewBox="([^"]+)"/)![1]
+    .split(' ')
+    .map(Number);
   const uses = scene.sceneSvg.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
   const at = (pctX: number, pctY: number) => [sx0 + (pctX / 100) * sw, sy0 + (pctY / 100) * sh];
 
   // Die vier Bereichs-Blöcke wie auf der Seite (ohne Wippen), Kisten sind im Vorschaubild zu
-  const blocks = scene.data.nav.filter((n) => !n.parent).map((n) => {
-    const [x, y] = at(n.x, n.y);
-    return `<use href="#v-${n.sym}" x="${x}" y="${y}" width="80" height="84.8"/>`;
-  }).join('');
+  const blocks = scene.data.nav
+    .filter((n) => !n.parent)
+    .map((n) => {
+      const [x, y] = at(n.x, n.y);
+      return `<use href="#v-${n.sym}" x="${x}" y="${y}" width="80" height="84.8"/>`;
+    })
+    .join('');
 
   // Figur auf dem Startfeld in der Inselmitte; Fußpunkt und Größe wie in Island.astro
-  const [fx0, fy0, fw, fh] = scene.figureSvg.match(/viewBox="([^"]+)"/)![1].split(' ').map(Number);
+  const [fx0, fy0, fw, fh] = scene.figureSvg
+    .match(/viewBox="([^"]+)"/)![1]
+    .split(' ')
+    .map(Number);
   const figW = (Number(scene.fig.w) / 100) * sw;
   const figH = (figW * fh) / fw;
   const [hx, hy] = at(scene.data.home.x, scene.data.home.y);
-  const figure = scene.figureSvg
-    .replace(/^<svg[^>]*>/, `<svg x="${hx - (Number(scene.fig.tx) / 100) * figW}" y="${hy - (Number(scene.fig.ty) / 100) * figH}" width="${figW}" height="${figH}" viewBox="${fx0} ${fy0} ${fw} ${fh}" overflow="visible">`);
+  const figure = scene.figureSvg.replace(
+    /^<svg[^>]*>/,
+    `<svg x="${hx - (Number(scene.fig.tx) / 100) * figW}" y="${hy - (Number(scene.fig.ty) / 100) * figH}" width="${figW}" height="${figH}" viewBox="${fx0} ${fy0} ${fw} ${fh}" overflow="visible">`,
+  );
 
   // Szene rechts mittig, Höhe fast voll
   const size = H - 30;

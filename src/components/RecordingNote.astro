@@ -5,8 +5,13 @@ interface Props {
 }
 const { recording } = Astro.props;
 ---
+
 {recording === 'freitagsfruehstueck' && (
   <aside class="recording-note">
-    <p><strong>Hinweis:</strong> Dieses Video ist beim <em>Freitagsfrühstück</em> von <a href="https://www.team-neusta.de/de">team neusta</a> entstanden, einer regelmäßigen Runde zur Weiterbildung und zum technischen Austausch. Die anschließende Diskussion ist nicht Teil des Videos.</p>
+    <p>
+      <strong>Hinweis:</strong> Dieses Video ist beim <em>Freitagsfrühstück</em> von{' '}
+      <a href="https://www.team-neusta.de/de">team neusta</a> entstanden, einer regelmäßigen Runde zur Weiterbildung und
+      zum technischen Austausch. Die anschließende Diskussion ist nicht Teil des Videos.
+    </p>
   </aside>
 )}

@@ -9,7 +9,16 @@ interface Props {
 const { label } = Astro.props;
 const [user, domain] = SITE.mail.split('@');
 ---
-<a class="mail-link" href="/impressum/" data-mail-user={user} data-mail-domain={domain} data-mail-show={label ? undefined : ''}>{label ?? `${user}[at]${domain}`}</a>
+
+<a
+  class="mail-link"
+  href="/impressum/"
+  data-mail-user={user}
+  data-mail-domain={domain}
+  data-mail-show={label ? undefined : ''}
+>
+  {label ?? `${user}[at]${domain}`}
+</a>
 
 <script>
   // Nach jedem Seitenwechsel neu, weil der Inhalt getauscht wird

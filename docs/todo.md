@@ -61,7 +61,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `ast
 
 - [x] **Vitest** mit Tests für den Voxel-Generator: `headView`, `gridSvg` (Pixel-Abdeckung aller Texturen), `buildWorld` (Determinismus, Baum-Wege, Nachbarschaft der Schritte, keine Überlappung, Slot-Grenze). Läuft als Gate in der Pipeline.
 - [x] **Zustandsmaschine der Figur** als reines Modul `src/scripts/island-state.ts` mit Tests (Brückenbau, Rückweg bis zur Abzweigung, gemeinsame Brücken, Zielwechsel, Blog-Sturz, Baum, alle Kombinationen von Ruheblock und Ziel).
-- [ ] **ESLint und Prettier**, viele überlange Zeilen umbrechen.
+- [x] **ESLint und Prettier** als Gates in der Pipeline. Formatieren hat am Ergebnis nichts geändert (gebaute Seiten zeichengenau gleich).
 - [ ] **Architekturregeln** mit dependency-cruiser als ArchUnit-Gegenstück, z. B. „`src/lib/voxel` importiert nicht aus `src/data`“.
 - [ ] **Link- und HTML-Check** auf `dist` im CI (z. B. lychee, html-validate).
 - [ ] Kurze **Spec** der Insel-Zustandsmaschine unter `docs/specs/`.

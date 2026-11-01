@@ -6,9 +6,17 @@ import WorkshopCard from '../../components/WorkshopCard.astro';
 import WorkshopProvider from '../../components/WorkshopProvider.astro';
 import { workshopMailto } from '../../data/site';
 
-const workshops = (await getCollection('workshops', ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
+const workshops = (await getCollection('workshops', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 ---
-<IslandPage title="Workshops" description="Workshops von Lars Michaelis zu Domain-Driven Design, hexagonaler Architektur, Event Storming und Microservices." rest="workshops" cta={{ label: 'Workshop anfragen', href: workshopMailto('Anfrage Workshop') }}>
+
+<IslandPage
+  title="Workshops"
+  description="Workshops von Lars Michaelis zu Domain-Driven Design, hexagonaler Architektur, Event Storming und Microservices."
+  rest="workshops"
+  cta={{ label: 'Workshop anfragen', href: workshopMailto('Anfrage Workshop') }}
+>
   <script is:inline>
     // Alte Links /workshops/#workshop-<id> führen auf die Seite des Workshops
     {
@@ -18,8 +26,15 @@ const workshops = (await getCollection('workshops', ({ data }) => !data.draft)).
   </script>
   <div class="panel-head">
     <VoxelIcon block="board" size={64} />
-    <div><h1>Workshops</h1><p>Für Teams, die Fachlichkeit und Architektur zusammenbringen wollen.</p></div>
+    <div>
+      <h1>Workshops</h1>
+      <p>Für Teams, die Fachlichkeit und Architektur zusammenbringen wollen.</p>
+    </div>
   </div>
-  <div class="cards">{workshops.map((w) => <WorkshopCard entry={w} />)}</div>
+  <div class="cards">
+    {workshops.map((w) => (
+      <WorkshopCard entry={w} />
+    ))}
+  </div>
   <WorkshopProvider />
 </IslandPage>
