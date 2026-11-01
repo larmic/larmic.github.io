@@ -16,11 +16,12 @@ interface Props {
   description?: string;
   rest: RestId;
   cta?: { label: string; href: string };
+  jsonLd?: object;
 }
-const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/workshops/' } } = Astro.props;
+const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/workshops/' }, jsonLd } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
   <Fragment slot="head" set:html={`<style>${particleCss()}</style>`} />
   <header class="sky" transition:persist="hero">
     <Clouds />

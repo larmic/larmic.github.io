@@ -116,7 +116,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 ### SEO und Performance
 
 - [x] **Schriften:** nur das Latin-Subset (deckt Umlaute, „“, – und … ab). CSS gezippt 12,7 → 4,9 KB, kein Base64 mehr, `_astro` 616 → 216 KB (10 statt 40 Fontdateien).
-- [ ] **Strukturierte Daten:** `Person`, `Course` für Workshops, `VideoObject` für Videos.
+- [x] **Strukturierte Daten** (`src/data/structured-data.ts`): `Person` auf der Startseite (ohne Mail und Adresse), `Course` auf jeder Workshop-Seite mit neusta GmbH als Anbieter. `VideoObject` bewusst nicht: Google verlangt dafür ein Upload-Datum, und das Feld `date` ist entfernt.
 - [x] **Icons:** `favicon.ico`, PNG-Icons, `apple-touch-icon` (180 × 180) und `theme-color`.
 - [x] 404-Seite: kein `canonical`, dafür `noindex`.
 - [x] Workshop-Bilder über `astro:assets` (`src/assets/workshops/`, `image.layout: constrained`): `width`/`height`, `loading="lazy"`, `srcset` von 640 bis 1600 px.

@@ -6,6 +6,7 @@ import WorkshopFacts from '../../components/WorkshopFacts.astro';
 import WorkshopProvider from '../../components/WorkshopProvider.astro';
 import { workshopMailto } from '../../data/site';
 import { MATERIALS } from '../../data/materials';
+import { courseLd } from '../../data/structured-data';
 
 export async function getStaticPaths() {
   const workshops = await getCollection('workshops', ({ data }) => !data.draft);
@@ -20,6 +21,7 @@ const m = MATERIALS[w.data.material];
   title={`${w.data.short} – Workshop`}
   description={w.data.teaser}
   rest={`workshops/${w.id}`}
+  jsonLd={courseLd(w)}
   cta={{ label: 'Workshop anfragen', href: workshopMailto(`Workshop: ${w.data.short}`) }}
 >
   <div class="panel-head">

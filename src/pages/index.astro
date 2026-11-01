@@ -4,9 +4,10 @@ import VoxelIcon from '../components/VoxelIcon.astro';
 import Kit from '../components/Kit.astro';
 import MailLink from '../components/MailLink.astro';
 import { FOCUS, KITS } from '../data/site';
+import { personLd } from '../data/structured-data';
 ---
 
-<IslandPage rest="about">
+<IslandPage rest="about" jsonLd={personLd()}>
   <script is:inline>
     // Alte Anker der Startseite zeigen auf die eigenen Seiten der Bereiche
     {

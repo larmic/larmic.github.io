@@ -18,8 +18,9 @@ interface Props {
   title?: string;
   description?: string;
   noindex?: boolean; // z. B. 404: nicht indexieren, kein canonical
+  jsonLd?: object; // strukturierte Daten (schema.org) für Suchmaschinen
 }
-const { title, description = SITE.description, noindex = false } = Astro.props;
+const { title, description = SITE.description, noindex = false, jsonLd } = Astro.props;
 // Startseite: Name und Rolle statt nur der Domain
 const fullTitle = title ? `${title} – ${SITE.title}` : 'Lars Michaelis – Entwickler, Architekt, Speaker und Berater';
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -49,6 +50,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:image:alt" content="Voxel-Insel im Himmel, darauf Lars als Pixel-Figur – larmic.de" />
     <meta name="twitter:card" content="summary_large_image" />
     <Fragment set:html={`<style>${textureCss()}</style>`} />
+    {jsonLd && (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd).replaceAll('<', '\\u003c')} />
+    )}
     <slot name="head" />
     <ClientRouter />
   </head>

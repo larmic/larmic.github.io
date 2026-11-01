@@ -50,6 +50,7 @@ src/
     island-layout.ts  die konkrete Insel: Wege, Kisten-Plätze, Baum (rein, getestet)
     island.ts         lädt Workshops und Videos und baut daraus die Insel
     avatar.ts         Aussehen der Figur
+    structured-data.ts  schema.org-Daten (Person, Workshops als Course) für Suchmaschinen
   styles/             tokens.css (Design-Tokens), global.css, sections.css
 public/               robots.txt
 src/assets/workshops/ Workshop-Fotos (beim Build in passenden Größen ausgeliefert)
