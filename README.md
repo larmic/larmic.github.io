@@ -100,16 +100,16 @@ Lokal laufen alle zusammen mit `npm run gates`. Zusätzlich prüft ein Git-Hook 
 
 ## Deployment
 
-Die Pipeline `.github/workflows/deploy.yml` läuft bei jedem Push:
+Die Pipeline `.github/workflows/deploy.yml` läuft bei jedem Pull Request (auch von Renovate) und bei jedem Push auf `main`. Sie hat zwei Jobs:
 
-1. installiert die Abhängigkeiten (`npm ci`),
-2. durchläuft die Guard-Gates vor dem Build (Formatierung, Lint, Architektur, Typen und Inhalte, Unit-Tests),
-3. baut die Seite (`npm run build`) und prüft das Ergebnis (`npm run verify`),
-4. veröffentlicht `dist/` in den Branch `gh-pages`, **aber nur auf `main`**.
+1. **Guard-Gates und Build** – nur mit Leserechten: installiert die Abhängigkeiten (`npm ci`), durchläuft die Guard-Gates (Formatierung, Lint, Architektur, Typen und Inhalte, Unit-Tests), baut die Seite und prüft das Ergebnis (`npm run verify`).
+2. **Deploy auf GitHub Pages** – nur auf `main`, erst wenn Job 1 grün ist: veröffentlicht die fertige Seite in den Branch `gh-pages`. Nur dieser Job darf ins Repo schreiben; er installiert und baut nichts.
+
+So laufen die Install-Skripte neuer Paketversionen nie mit einem Schreib-Token. Für einen Branch ohne Pull Request läuft die Pipeline nicht – Änderungen kommen per Pull Request nach `main`.
 
 Andere Branches werden also gebaut und geprüft, aber nicht veröffentlicht. Die GitHub-Pages-Einstellungen bleiben wie bisher: Quelle ist der Branch `gh-pages`, die Domain kommt aus `public/CNAME`. Die Datei `public/.nojekyll` verhindert, dass GitHub Pages den Astro-Ordner `_astro/` verschluckt.
 
-Renovate hält Abhängigkeiten und Actions aktuell. Minor- und Patch-Updates werden automatisch übernommen, sobald der Build grün ist. Major-Updates kommen als Pull Request zur Prüfung.
+Renovate hält Abhängigkeiten und Actions aktuell. Neue Versionen werden erst nach drei Tagen vorgeschlagen (`minimumReleaseAge`): Kompromittierte Releases werden meist in dieser Zeit entdeckt und zurückgezogen. Minor- und Patch-Updates übernimmt Renovate automatisch, aber nur, wenn alle Guard-Gates grün sind. Major-Updates kommen als Pull Request zur Prüfung.
 
 ## Alte Adressen
 

@@ -46,6 +46,7 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
     - `/tags/`, `/categories/` leiten auf die Startseite um
     - `/sitemap.xml` ist ein Sitemap-Index, der auf die neue Sitemap zeigt
     - RSS (`/index.xml`, `/videos/index.xml`, `/workshops/index.xml`) entfällt bewusst, solange es keinen Blog gibt
+  - [ ] Branch-Schutz für `main`: Prüfung „Guard-Gates und Build“ als Pflicht, direkte Pushes nur per Pull Request.
   - [ ] Pages-Einstellungen: Quelle, Custom Domain `larmic.de`, „Enforce HTTPS“.
   - [ ] Stichprobe der alten Adressen nach dem Deploy (`/about/`, `/#workshops`, `/workshops/#workshop-…`, `/videos/#video-…`).
   - [ ] Search Console: `sitemap-index.xml` einreichen, alte `sitemap.xml` entfernen.
@@ -106,12 +107,9 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 
 ### Build, CI und Abhängigkeiten
 
-- [ ] **Workflow härten:**
-  - `contents: read` als Standard.
-  - Deploy als eigener Job nur auf `main`, besser gleich `actions/upload-pages-artifact` und `actions/deploy-pages`. Dann entfallen der `gh-pages`-Branch und die wachsende Historie.
-  - Actions per SHA pinnen (Renovate `helpers:pinGitHubActionDigests`), Versionen aktualisieren.
-- [ ] `cancel-in-progress` nicht für Deploy-Läufe auf `main`. Timeout setzen. Doppelte Läufe bei Pull Requests vermeiden.
-- [ ] **Renovate:** `minimumReleaseAge` (z. B. 3 Tage) gegen kompromittierte Releases, weil Automerge direkt deployt. Vorher prüfen, ob das Preset es schon setzt.
+- [x] **Workflow gehärtet:** global nur Leserechte, Deploy als eigener Job mit Schreibrechten nur auf `main`, Prüfung nur bei Pull Requests und Pushes auf `main` (keine doppelten Läufe), Timeouts, Deploys werden nicht abgebrochen.
+- [ ] Actions per SHA pinnen (Renovate `helpers:pinGitHubActionDigests`), ggf. auf `actions/deploy-pages` umstellen (dann entfällt der Branch `gh-pages` und seine wachsende Historie).
+- [x] **Renovate:** `minimumReleaseAge` 3 Tage, `internalChecksFilter: strict`.
 - [ ] LICENSE-Datei im öffentlichen Repo.
 
 ### SEO und Performance

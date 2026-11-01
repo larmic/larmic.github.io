@@ -1,8 +1,10 @@
 name: Build und Deploy
 
+# Prüfen: jeder Pull Request (auch von Renovate) und jeder Push auf main – mit allen Guard-Gates.
+# Veröffentlichen: nur Pushes auf main, in einem eigenen Job.
 on:
   push:
-    branches: ['**'] # jeder Branch wird gebaut und geprüft …
+    branches: [main]
     paths-ignore:
       - 'README.md'
       - 'CLAUDE.md'
@@ -10,16 +12,18 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Standard: nur lesen. Install-Skripte frisch aktualisierter Pakete (Renovate) laufen damit ohne Schreib-Token.
 permissions:
-  contents: write # für den Push in den Branch gh-pages
-
-concurrency:
-  group: build-${{ github.ref }}
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  build:
+  gates:
+    name: Guard-Gates und Build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: gates-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v6
 
@@ -52,10 +56,37 @@ jobs:
       - name: Guard-Gate – HTML und interne Links der fertigen Seite
         run: npm run verify
 
-      # … aber nur main wird veröffentlicht
-      - name: Deploy auf GitHub Pages
+      - name: Fertige Seite für den Deploy-Job bereitstellen
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        uses: peaceiris/actions-gh-pages@v4
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: dist/
+          include-hidden-files: true # .nojekyll, sonst verschluckt GitHub Pages den Ordner _astro/
+          retention-days: 1
+
+  deploy:
+    name: Deploy auf GitHub Pages
+    needs: gates
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Nur dieser Job darf schreiben (Push in den Branch gh-pages); er baut nichts und installiert nichts.
+    permissions:
+      contents: write
+    # Deploys nie abbrechen, nacheinander ausführen
+    concurrency:
+      group: deploy-pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: dist/
+
+      - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
