@@ -65,7 +65,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `ast
 - [x] **Architekturregeln** mit dependency-cruiser (`npm run arch`): `lib` generisch, `data` ohne Oberfläche, Browser-Code nur mit `head.ts`, keine Zyklen. Gate in der Pipeline. `.astro`-Dateien prüft dependency-cruiser nicht.
 - [x] **Link- und HTML-Check** auf `dist` als Gate nach dem Build (html-validate, linkinator für interne Links). Dabei gefunden und behoben: `<style>` im Body (Partikel jetzt im `<head>`) und zu lange Seitentitel.
 - [x] **Spec** der Insel-Zustandsmaschine in `docs/specs/insel.md`, jede Regel mit dem Test, der sie prüft.
-- [ ] Alle Gates als eigene Schritte im Workflow und im README beschreiben.
+- [x] Alle Gates als eigene Schritte im Workflow, im README (Abschnitt „Guard-Gates“) beschrieben, lokal mit `npm run gates`.
 
 ### Code und Architektur
 

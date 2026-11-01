@@ -13,6 +13,7 @@ npm run format   # Prettier; `npm run format:check` ist das Guard-Gate
 npm run arch     # Guard-Gate: Architekturregeln (dependency-cruiser) – muss grün sein
 npm run build    # statische Seite nach dist/
 npm run verify   # Guard-Gate nach dem Build: gültiges HTML, keine toten internen Links
+npm run gates    # alle Gates in der Reihenfolge der Pipeline
 ```
 
 Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run check`, `npm test`, `npm run build` und `npm run verify` ausführen.

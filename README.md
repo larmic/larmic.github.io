@@ -27,6 +27,7 @@ Die Seite läuft dann unter http://localhost:4321 und lädt Änderungen sofort n
 | `npm run build` | Erzeugt die fertige Seite in `dist/` |
 | `npm run verify` | Prüft die fertige Seite in `dist/`: gültiges HTML (html-validate) und keine toten internen Links (linkinator). Guard-Gate nach dem Build |
 | `npm run preview` | Zeigt den gebauten Stand aus `dist/` lokal an |
+| `npm run gates` | Alle Guard-Gates in der Reihenfolge der Pipeline, inklusive Build |
 
 ## Projektstruktur
 
@@ -40,11 +41,13 @@ src/
     videos/           Videos als Markdown (mit YouTube-ID)
   content.config.ts   Schemas der Inhalte
   components/         Astro-Komponenten (Insel, Werkzeugkisten, Karten …)
-  scripts/            larmic-island.ts – Web Component der Insel
-  lib/voxel/          Voxel-Generator, erzeugt beim Build alle Blöcke, die Insel und die Figur als SVG
+  scripts/            island-state.ts – Zustandsmaschine der Figur (rein, getestet),
+                      larmic-island.ts – Web Component der Insel (DOM, Takt, Kopfblick)
+  lib/voxel/          Voxel-Generator (generisch): Blöcke, Szenen-Engine, Figur und Kopf als SVG
   data/
     site.ts           Adressen, Social Links, Sprechblasen, Werkzeugkisten, Schwerpunkte, giscus
-    island.ts         Insel mit Kisten aus Workshops und Videos
+    island-layout.ts  die konkrete Insel: Wege, Kisten-Plätze, Baum (rein, getestet)
+    island.ts         lädt Workshops und Videos und baut daraus die Insel
     avatar.ts         Aussehen der Figur
   styles/             tokens.css (Design-Tokens), global.css, sections.css
 public/               CNAME, robots.txt, .nojekyll, Bilder
@@ -80,13 +83,28 @@ Fehlt ein Pflichtfeld oder hat es den falschen Typ, bricht `npm run check` ab. S
 
 **Werkzeugkisten und Schwerpunkte:** in `src/data/site.ts`.
 
+## Guard-Gates
+
+Auf der Seite steht „KI mit Leitplanken“ – hier sind sie. Jeder Commit läuft durch dieselben deterministischen Prüfungen, egal ob ein Mensch oder eine KI den Code geschrieben hat. Fällt eine durch, geht nichts live.
+
+| Gate | Prüft | Werkzeug |
+| --- | --- | --- |
+| Formatierung | einheitlicher Code-Stil | Prettier |
+| Lint | typische Fehler in TypeScript und Astro | ESLint |
+| Architektur | Schichten: `lib` ist generisch, `data` kennt keine Oberfläche, Browser-Code bekommt keinen Build-Code, keine Zyklen | dependency-cruiser |
+| Typen und Inhalte | TypeScript strikt, Markdown-Inhalte gegen ihr Schema | astro check |
+| Unit-Tests | Zustandsmaschine der Figur (Spec: [docs/specs/insel.md](docs/specs/insel.md)), Geometrie der Insel, Kopf, Pixel-Raster | Vitest |
+| Fertige Seite | gültiges HTML, keine toten internen Links | html-validate, linkinator |
+
+Lokal laufen alle zusammen mit `npm run gates`. Dass die Gates wirklich etwas fangen, ist geprüft: absichtlich eingebaute Fehler (überlappende Kisten, übersprungene Felder, verbotene Imports, tote Links, kaputtes HTML) lassen sie scheitern.
+
 ## Deployment
 
 Die Pipeline `.github/workflows/deploy.yml` läuft bei jedem Push:
 
 1. installiert die Abhängigkeiten (`npm ci`),
-2. prüft Typen und Inhalte (`npm run check`),
-3. baut die Seite (`npm run build`),
+2. durchläuft die Guard-Gates vor dem Build (Formatierung, Lint, Architektur, Typen und Inhalte, Unit-Tests),
+3. baut die Seite (`npm run build`) und prüft das Ergebnis (`npm run verify`),
 4. veröffentlicht `dist/` in den Branch `gh-pages`, **aber nur auf `main`**.
 
 Andere Branches werden also gebaut und geprüft, aber nicht veröffentlicht. Die GitHub-Pages-Einstellungen bleiben wie bisher: Quelle ist der Branch `gh-pages`, die Domain kommt aus `public/CNAME`. Die Datei `public/.nojekyll` verhindert, dass GitHub Pages den Astro-Ordner `_astro/` verschluckt.
