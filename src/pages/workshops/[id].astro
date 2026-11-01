@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import IslandPage from '../../layouts/IslandPage.astro';
 import VoxelIcon from '../../components/VoxelIcon.astro';
+import WorkshopProvider from '../../components/WorkshopProvider.astro';
 import { MATERIALS } from '../../data/site';
 
 export async function getStaticPaths() {
@@ -21,5 +22,6 @@ const m = MATERIALS[w.data.material];
     <Content />
     {w.data.link && <p><a class="pxbtn small" href={w.data.link}>{w.data.linkLabel ?? 'Mehr erfahren'}</a></p>}
   </div>
+  <WorkshopProvider />
   <a class="backlink" href="/workshops/">Alle Workshops</a>
 </IslandPage>

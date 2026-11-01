@@ -10,9 +10,8 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 
 ### Recht und Datenschutz
 
-- [ ] **Rolle von team neusta klären.** Workshop-Mails gehen an `l.michaelis@neusta.de`, „bei uns im Schuppen Eins“ meint team neusta, Impressum und Datenschutz nennen aber nur die Privatperson. Entscheiden, wer Anbieter und Vertragspartner ist, und das auf der Workshop-Seite in einem Satz sagen. Mit neusta abstimmen, ob die Workshops so auf einer privaten Seite beworben werden dürfen.
+- [x] **Rolle von team neusta geklärt:** Workshops laufen über team neusta, Vertragspartner ist die neusta GmbH. Steht auf `/workshops/`, auf jeder Workshop-Seite und in der Datenschutzerklärung. Für Anfragen an `l.michaelis@neusta.de` gilt die Datenschutzerklärung der team neusta SE (verlinkt).
 - [ ] **Datenschutzerklärung nachziehen:**
-  - Abschnitt „Kontakt“: Anfragen an die neusta-Adresse landen bei team neusta (Empfänger bzw. Verantwortlicher nennen, deren Datenschutzerklärung verlinken).
   - „Schriften und Grafiken liegen auf dem eigenen Server“ ist ungenau (GitHub Pages hostet). Besser: „werden mit der Seite ausgeliefert, nichts wird von Dritten nachgeladen“.
   - Speicherdauer der Server-Logs bei GitHub nennen.
   - Widerspruchsrecht nach Art. 21 DSGVO getrennt und hervorgehoben aufführen.

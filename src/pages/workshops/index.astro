@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import IslandPage from '../../layouts/IslandPage.astro';
 import VoxelIcon from '../../components/VoxelIcon.astro';
 import WorkshopCard from '../../components/WorkshopCard.astro';
+import WorkshopProvider from '../../components/WorkshopProvider.astro';
 
 const workshops = (await getCollection('workshops', ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
 ---
@@ -19,4 +20,5 @@ const workshops = (await getCollection('workshops', ({ data }) => !data.draft)).
     <div><h1>Workshops</h1><p>Für Teams, die Fachlichkeit und Architektur zusammenbringen wollen.</p></div>
   </div>
   <div class="cards">{workshops.map((w) => <WorkshopCard entry={w} />)}</div>
+  <WorkshopProvider />
 </IslandPage>

@@ -88,6 +88,7 @@
 .prose ul { padding-left: 22px; }
 .backlink { display: inline-block; margin-top: 24px; font-family: var(--font-pixel); font-size: 17px; color: var(--ink); }
 .panel .prose, .panel .yt { max-width: 46em; }
+.provider { max-width: 46em; margin: 28px 0 0; padding-top: 16px; border-top: 2px dashed var(--wood-frame); color: var(--muted); font-size: 16px; line-height: 1.6; }
 
 /* YouTube erst nach Klick laden (kein Kontakt zu YouTube vorher) */
 .yt { position: relative; aspect-ratio: 16 / 9; background: #1c2130; margin: 24px 0; box-shadow: var(--px-3); }
