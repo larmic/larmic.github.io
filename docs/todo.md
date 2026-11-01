@@ -96,7 +96,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [x] Linktexte „Details zum Workshop“ und „Video ansehen“ nennen für Screenreader den Titel (`sr-only`).
 - [x] Alt-Texte der Workshop-Fotos beschreiben, was zu sehen ist.
 - [x] Schriftgrößen in `rem` statt `px` (folgen der Schriftgröße im Browser).
-- [ ] Englische Titel mit `lang="en"`.
+- [x] Kein `lang="en"` nötig: Es gibt keine englischen Inhalte, Titel wie „Testcontainers“ oder „Unit vs Integration Testing“ sind gängige Fachbegriffe.
 - [ ] Dauerbewegung (Wolken, wippende Blöcke) pausierbar machen oder dezenter.
 
 ### Inhalt (weitere)
