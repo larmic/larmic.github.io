@@ -61,5 +61,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <div class="page">
       <slot />
     </div>
+    <script>
+      // Nach einem Seitenwechsel ohne Neuladen: Fokus auf den neuen Inhalt, damit Tastatur und Screenreader dort
+      // weitermachen statt auf dem angeklickten Block im (stehen gebliebenen) Kopf. Den Titel sagt Astro selbst an.
+      document.addEventListener('astro:after-swap', () => {
+        document.querySelector<HTMLElement>('main')?.focus({ preventScroll: true });
+      });
+    </script>
   </body>
 </html>

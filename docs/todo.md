@@ -86,7 +86,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 ### Barrierefreiheit (weitere)
 
 - [x] Skip-Link „Zum Inhalt springen“, Kopf als `<header>`, die Insel in `<nav aria-label="Hauptnavigation">`, `main` als Sprungziel (`tabindex="-1"`).
-- [ ] Nach dem Seitenwechsel den Fokus auf die neue Überschrift bzw. `main` setzen.
+- [x] Nach dem Seitenwechsel liegt der Fokus auf `main` (ohne Scrollen); den Titel sagt Astros Router an.
 - [ ] Sprechblase als `aria-live`-Region entschärfen: keine wiederholten Ansagen bei jedem Takt bzw. jeder Rückkehr.
 - [ ] Blog-Button: Der Name sollte die Funktion verraten. Tastaturfokus allein sollte den Sturz nicht auslösen.
 - [ ] YouTube-Button: Fokus nach dem Klick auf das iframe setzen, Videotitel in den Button-Namen.
