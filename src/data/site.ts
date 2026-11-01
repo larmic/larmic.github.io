@@ -1,7 +1,7 @@
 // Zentrale Seitendaten. Texte der Startseite stehen direkt in den Komponenten unter src/components/.
 export const SITE = {
   title: 'larmic.de',
-  description: 'Lars Michaelis – Fullstack-Entwickler, Speaker und Berater. Workshops zu Domain-Driven Design, Event Storming und Microservices.',
+  description: 'Lars Michaelis – Entwickler, Speaker und Berater. Workshops zu Domain-Driven Design, Event Storming und Microservices.',
   url: 'https://larmic.de',
   mail: 'mail@larmic.de',
 };
@@ -17,7 +17,7 @@ export const SOCIALS = [
 
 // Sprechblasen der Figur je Bereich – auf der Insel und auf den Detailseiten
 export const BUBBLES = {
-  about: 'Das bin ich. Fullstack, Architektur und KI mit Leitplanken.',
+  about: 'Das bin ich. Entwicklung, Architektur und KI mit Leitplanken.',
   workshops: 'Lass uns gemeinsam modellieren!',
   videos: 'Popcorn bereit? Hier sind meine Talks.',
   tree: 'Schöne Aussicht!', // Easter Egg: oben im Baum

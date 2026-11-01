@@ -125,8 +125,10 @@ a.blk { text-decoration: none; }
 @container larmic (max-width: 700px) {
   larmic-island { overflow: hidden; }
   .isle { width: 142%; margin-left: -21%; }
-  .blkrow { position: static; display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 10px; margin-top: 6px; padding-bottom: 8px; }
-  .blk { position: relative !important; left: auto !important; top: auto !important; width: auto !important; z-index: auto !important; display: flex; flex-direction: column; align-items: center; }
+  /* Erste Reihe: die vier Bereiche. Darunter, zentriert, die Kisten des offenen Bereichs. */
+  .blkrow { position: static; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px 10px; margin-top: 6px; padding-bottom: 8px; }
+  .blk { position: relative !important; left: auto !important; top: auto !important; width: auto !important; z-index: auto !important; flex: 0 0 calc((100% - 30px) / 4); display: flex; flex-direction: column; align-items: center; }
+  .blk.child { order: 1; }
   .blk .bob { width: 74%; }
   .blk .tag { position: static; transform: none; display: inline-block; margin-top: 6px; font-size: 13px; padding: 4px 6px; white-space: normal; max-width: 100%; text-align: center; }
   .blk.child .tag { display: inline-block; }

@@ -20,4 +20,4 @@ Was sind die Teilnahmebedingungen?
 * Du möchtest verstehen, was Dein Entwicklungsteam macht
 * Du kannst 1 Tag Zeit (am Stück) erübrigen
 
-Bei Fragen und/oder Interesse sende mir einfach eine [Mail](mailto:mail@larmic.de?subject=Workshop:%20DDD%20und%20hex.%20Architektur%20(Nicht-Techniker)).
+Bei Fragen und/oder Interesse sende mir einfach eine [Mail](mailto:l.michaelis@neusta.de?subject=Workshop:%20DDD%20und%20hex.%20Architektur%20(Nicht-Techniker)).
