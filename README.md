@@ -50,7 +50,7 @@ src/
     island.ts         lädt Workshops und Videos und baut daraus die Insel
     avatar.ts         Aussehen der Figur
   styles/             tokens.css (Design-Tokens), global.css, sections.css
-public/               CNAME, robots.txt, .nojekyll, Bilder
+public/               robots.txt, Bilder
 docs/design-system.md Farben, Materialien, Typografie, Interaktionen
 docs/specs/insel.md   Spec der Figur auf der Insel (Regeln, Invarianten, Tests)
 docs/todo.md          Offene Punkte (Livegang-Checkliste, Review-Ergebnisse)
@@ -103,11 +103,11 @@ Lokal laufen alle zusammen mit `npm run gates`. Zusätzlich prüft ein Git-Hook 
 Die Pipeline `.github/workflows/deploy.yml` läuft bei jedem Pull Request (auch von Renovate) und bei jedem Push auf `main`. Sie hat zwei Jobs:
 
 1. **Guard-Gates und Build** – nur mit Leserechten: installiert die Abhängigkeiten (`npm ci`), durchläuft die Guard-Gates (Formatierung, Lint, Architektur, Typen und Inhalte, Unit-Tests), baut die Seite und prüft das Ergebnis (`npm run verify`).
-2. **Deploy auf GitHub Pages** – nur auf `main`, erst wenn Job 1 grün ist: veröffentlicht die fertige Seite in den Branch `gh-pages`. Nur dieser Job darf ins Repo schreiben; er installiert und baut nichts.
+2. **Deploy auf GitHub Pages** – nur auf `main`, erst wenn Job 1 grün ist: veröffentlicht die fertige Seite mit `actions/deploy-pages`. Er braucht nur die Rechte `pages: write` und `id-token: write`, keine Schreibrechte aufs Repo, und installiert und baut nichts.
 
 So laufen die Install-Skripte neuer Paketversionen nie mit einem Schreib-Token. Für einen Branch ohne Pull Request läuft die Pipeline nicht – Änderungen kommen per Pull Request nach `main`.
 
-Andere Branches werden also gebaut und geprüft, aber nicht veröffentlicht. Die GitHub-Pages-Einstellungen bleiben wie bisher: Quelle ist der Branch `gh-pages`, die Domain kommt aus `public/CNAME`. Die Datei `public/.nojekyll` verhindert, dass GitHub Pages den Astro-Ordner `_astro/` verschluckt.
+In den GitHub-Pages-Einstellungen ist die Quelle „GitHub Actions“; es gibt keinen Branch `gh-pages` mehr. Die Domain `larmic.de` steht dort ebenfalls (Custom domain), eine `CNAME`-Datei braucht es dafür nicht, und Jekyll läuft bei diesem Weg nicht, also auch kein `.nojekyll`. Alle Actions sind auf Commit-SHAs gepinnt.
 
 Renovate hält Abhängigkeiten und Actions aktuell. Neue Versionen werden erst nach drei Tagen vorgeschlagen (`minimumReleaseAge`): Kompromittierte Releases werden meist in dieser Zeit entdeckt und zurückgezogen. Minor- und Patch-Updates übernimmt Renovate automatisch, aber nur, wenn alle Guard-Gates grün sind. Major-Updates kommen als Pull Request zur Prüfung.
 

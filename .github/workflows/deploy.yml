@@ -1,7 +1,7 @@
 name: Build und Deploy
 
 # Prüfen: jeder Pull Request (auch von Renovate) und jeder Push auf main – mit allen Guard-Gates.
-# Veröffentlichen: nur Pushes auf main, in einem eigenen Job.
+# Veröffentlichen: nur Pushes auf main, in einem eigenen Job über GitHub Pages (Quelle „GitHub Actions“, kein gh-pages-Branch).
 on:
   push:
     branches: [main]
@@ -59,11 +59,9 @@ jobs:
 
       - name: Fertige Seite für den Deploy-Job bereitstellen
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          name: site
           path: dist/
-          include-hidden-files: true # .nojekyll, sonst verschluckt GitHub Pages den Ordner _astro/
           retention-days: 1
 
   deploy:
@@ -72,22 +70,17 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Nur dieser Job darf schreiben (Push in den Branch gh-pages); er baut nichts und installiert nichts.
+    # Nur dieser Job darf veröffentlichen – ohne Schreibrechte aufs Repo. Er baut nichts und installiert nichts.
     permissions:
-      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     # Deploys nie abbrechen, nacheinander ausführen
     concurrency:
-      group: deploy-pages
+      group: pages
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
-
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: site
-          path: dist/
-
-      - uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

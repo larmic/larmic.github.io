@@ -39,18 +39,20 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 - [x] **Videos ohne JavaScript erreichbar:** Link „direkt auf YouTube ansehen“ unter jedem Video.
 - [x] **Speicherleck der Insel behoben:** globale Listener per AbortController, `cancelAnimationFrame` beim Entfernen.
 - [ ] **Livegang-Checkliste:**
-  - [ ] Merge `relaunch` → `main` per Pull Request, ersten Deploy-Lauf prüfen.
-  - [x] Alte Adressen, die der Deploy sonst auf 404 setzt:
+  - [ ] Pull Request `relaunch` → `main` öffnen. Der Workflow prüft ihn mit allen Gates (erster echter Lauf in GitHub).
+  - [ ] Merge. Der alte Stand bleibt online, solange Pages noch aus dem Branch `gh-pages` veröffentlicht; der Deploy-Job schlägt dann vermutlich fehl, weil die Quelle noch nicht „GitHub Actions“ ist.
+  - [ ] Settings → Pages → Source auf „GitHub Actions“ stellen und den Deploy-Job neu starten („Re-run failed jobs“). So ist die Seite höchstens Sekunden weg.
+  - [x] Alte Adressen, die mit dem Umstieg sonst auf 404 laufen:
     - `/favicon.ico`, `/favicon-16x16.png`, `/favicon-32x32.png` werden beim Build erzeugt
     - `/workshop/ddd_hex_architecture.png`, `/workshop/event_storming.png` entstehen beim Build aus den WebP-Dateien (verkleinert, 0,5 bzw. 0,3 MB statt 13,8 bzw. 9 MB)
     - `/tags/`, `/categories/` leiten auf die Startseite um
     - `/sitemap.xml` ist ein Sitemap-Index, der auf die neue Sitemap zeigt
     - RSS (`/index.xml`, `/videos/index.xml`, `/workshops/index.xml`) entfällt bewusst, solange es keinen Blog gibt
   - [ ] Branch-Schutz für `main`: Prüfung „Guard-Gates und Build“ als Pflicht, direkte Pushes nur per Pull Request.
-  - [ ] Pages-Einstellungen: Quelle, Custom Domain `larmic.de`, „Enforce HTTPS“.
+  - [ ] Pages-Einstellungen prüfen: Custom domain `larmic.de` steht weiter drin, „Enforce HTTPS“ an. Seite mit CSS und Insel ausgeliefert?
   - [ ] Stichprobe der alten Adressen nach dem Deploy (`/about/`, `/#workshops`, `/workshops/#workshop-…`, `/videos/#video-…`).
   - [ ] Search Console: `sitemap-index.xml` einreichen, alte `sitemap.xml` entfernen.
-  - [ ] Branch `relaunch` löschen.
+  - [ ] Branches `relaunch` und `gh-pages` löschen (`gh-pages` wird nicht mehr gebraucht).
 - [ ] **Mobiles Design prüfen**, auch sehr schmale und sehr breite Bildschirme.
 - [x] **Kisten-Plätze:** vierter Workshop-Platz als Reserve (für „DDD für Nicht-Techniker:innen“), Fehlermeldung sagt, was zu tun ist. Videos haben weiterhin vier Plätze.
 
@@ -109,7 +111,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 
 - [x] **Workflow gehärtet:** global nur Leserechte, Deploy als eigener Job mit Schreibrechten nur auf `main`, Prüfung nur bei Pull Requests und Pushes auf `main` (keine doppelten Läufe), Timeouts, Deploys werden nicht abgebrochen.
 - [x] Actions auf Commit-SHAs gepinnt, Renovate hält sie aktuell (`helpers:pinGitHubActionDigests`).
-- [ ] Ggf. auf `actions/deploy-pages` umstellen (dann entfällt der Branch `gh-pages` und seine wachsende Historie).
+- [x] Auf `actions/deploy-pages` umgestellt: kein Branch `gh-pages` mehr, Deploy ohne Schreibrechte aufs Repo, `CNAME` und `.nojekyll` entfallen.
 - [x] **Renovate:** `minimumReleaseAge` 3 Tage, `internalChecksFilter: strict`.
 - [ ] LICENSE-Datei im öffentlichen Repo.
 
