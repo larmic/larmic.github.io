@@ -9,9 +9,7 @@ export const SITE = {
 export const SOCIALS = [
   { name: 'GitHub', href: 'https://github.com/larmic' },
   { name: 'LinkedIn', href: 'https://www.linkedin.com/in/lars-michaelis-6778761b3/' },
-  { name: 'Mastodon', href: 'https://mastodon.social/@larmic' },
   { name: 'YouTube', href: 'https://www.youtube.com/channel/UCuJB-Eqjil4ZTGCK2UeDl9g' },
-  { name: 'X', href: 'https://twitter.com/larmicDE' },
   { name: 'Xing', href: 'https://www.xing.com/profile/Lars_Michaelis2/cv' },
 ];
 
