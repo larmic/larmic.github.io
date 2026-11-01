@@ -22,7 +22,7 @@ const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/wo
 
 <BaseLayout title={title} description={description}>
   <Fragment slot="head" set:html={`<style>${particleCss()}</style>`} />
-  <section class="sky" transition:persist="hero">
+  <header class="sky" transition:persist="hero">
     <Clouds />
     <SiteHeader />
     <div class="hero">
@@ -42,9 +42,9 @@ const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/wo
       </div>
       <Island rest={rest} />
     </div>
-  </section>
+  </header>
   <div class="grass-edge" aria-hidden="true"></div>
-  <main id="inhalt" class="ground" data-rest={rest} data-cta-label={cta.label} data-cta-href={cta.href}>
+  <main id="inhalt" tabindex="-1" class="ground" data-rest={rest} data-cta-label={cta.label} data-cta-href={cta.href}>
     <div class="panel pxbox reveal">
       <slot />
     </div>

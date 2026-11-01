@@ -10,7 +10,7 @@ interface Props {
 const { title, lead } = Astro.props;
 ---
 
-<section class="sky subhero">
+<header class="sky subhero">
   <Clouds />
   <SiteHeader />
   <div class="subhero-row">
@@ -25,4 +25,4 @@ const { title, lead } = Astro.props;
       {lead && <p class="lead">{lead}</p>}
     </div>
   </div>
-</section>
+</header>

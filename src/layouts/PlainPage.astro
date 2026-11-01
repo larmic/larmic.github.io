@@ -16,7 +16,7 @@ const { title, heading = title, description, noindex } = Astro.props;
 <BaseLayout title={title} description={description} noindex={noindex}>
   <SubHero title={heading} />
   <div class="grass-edge" aria-hidden="true"></div>
-  <main class="ground">
+  <main id="inhalt" tabindex="-1" class="ground">
     <div class="doc">
       <article class="entry pxbox paper">
         <div class="prose">

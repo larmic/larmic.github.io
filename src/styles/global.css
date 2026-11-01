@@ -43,6 +43,27 @@ button:focus-visible {
 .pxsm {
   box-shadow: var(--px-3);
 }
+/* Skip-Link: erst bei Tastatur-Fokus sichtbar */
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -80px;
+  z-index: 1000;
+  padding: 12px 18px;
+  background: var(--gold);
+  color: var(--ink);
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--px-3);
+}
+.skip-link:focus {
+  top: 16px;
+}
+/* Ziel des Skip-Links und des Fokus nach dem Seitenwechsel: kein Rahmen um den ganzen Inhalt */
+main:focus {
+  outline: none;
+}
 .svg-defs {
   position: absolute;
   width: 0;
@@ -253,11 +274,14 @@ button:focus-visible {
 }
 
 /* ---------- Insel ---------- */
+/* Die Insel ist die Hauptnavigation: <nav> trägt den Platz im Hero, <larmic-island> füllt ihn */
+.island-nav {
+  flex: 1.35 1 480px;
+  min-width: 0;
+}
 larmic-island {
   display: block;
   position: relative;
-  flex: 1.35 1 480px;
-  min-width: 0;
 }
 .isle {
   position: relative;

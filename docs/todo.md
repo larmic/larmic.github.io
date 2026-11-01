@@ -85,7 +85,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 
 ### Barrierefreiheit (weitere)
 
-- [ ] Skip-Link zum Inhalt. Die Insel als `<nav>`-Landmark, der Kopf als `<header>`.
+- [x] Skip-Link „Zum Inhalt springen“, Kopf als `<header>`, die Insel in `<nav aria-label="Hauptnavigation">`, `main` als Sprungziel (`tabindex="-1"`).
 - [ ] Nach dem Seitenwechsel den Fokus auf die neue Überschrift bzw. `main` setzen.
 - [ ] Sprechblase als `aria-live`-Region entschärfen: keine wiederholten Ansagen bei jedem Takt bzw. jeder Rückkehr.
 - [ ] Blog-Button: Der Name sollte die Funktion verraten. Tastaturfokus allein sollte den Sturz nicht auslösen.
