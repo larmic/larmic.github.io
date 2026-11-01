@@ -3,6 +3,8 @@
 // Blog → die Figur fällt ins Leere und spawnt mit „404 – Kein Blog gefunden“.
 // Klick auf einen Block → Event `larmic:select` (die Seite wechselt den Inhaltsbereich).
 
+import { BUBBLES as SITE_BUBBLES } from '../data/site';
+
 type RouteNode = { x: number; y: number; f: 'L' | 'R'; b: boolean; fall?: boolean };
 type World = { home: { x: number; y: number }; routes: Record<string, RouteNode[]> };
 
@@ -12,11 +14,7 @@ const CRUMBLE_TICKS = 3; // so lange bleibt ein bröckelnder Block sichtbar
 
 const BUBBLE_IDLE = 'Hi! Zeig auf einen Block.';
 const BUBBLE_404 = '404 – Kein Blog gefunden';
-const BUBBLES: Record<string, string> = {
-  about: 'Das bin ich. Fullstack, Architektur und KI mit Leitplanken.',
-  workshops: 'Lass uns gemeinsam modellieren!',
-  videos: 'Popcorn bereit? Hier sind meine Talks.',
-};
+const BUBBLES: Record<string, string> = SITE_BUBBLES;
 
 type State = {
   sel: string | null; n: number; goal: string | null; r: string | null; p: number; built: number;

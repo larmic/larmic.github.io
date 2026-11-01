@@ -14,7 +14,7 @@ Vor jedem Commit `npm run check` und `npm run build` ausführen.
 
 ## Aufbau
 
-- `src/pages/` – Seiten: Startseite, `/workshops/`, `/videos/`, `/videos/<id>/`, `/impressum/`, 404
+- `src/pages/` – Seiten: Startseite, `/workshops/<id>/`, `/videos/<id>/`, `/impressum/`, 404. `/workshops/` und `/videos/` sind nur Weiterleitungen (`HashRedirect.astro`)
 - `src/content/` – Workshops und Videos als Markdown, Schema in `src/content.config.ts`
 - `src/components/` – Astro-Komponenten, die Insel in `Island.astro`
 - `src/scripts/larmic-island.ts` – Web Component für Figur, Brückenbau und Blog-Sturz (ohne Framework)
@@ -31,4 +31,5 @@ Vor jedem Commit `npm run check` und `npm run build` ausführen.
 - Keine Logos, Figuren oder Texturen aus Minecraft oder Hytale – nur eigene Voxel-Grafik.
 - Keine externen Ressourcen ohne Klick des Nutzers (Schriften lokal, YouTube und Kommentare per Zwei-Klick).
 - Animationen respektieren `prefers-reduced-motion`.
+- Die Insel ist die einzige Navigation. Unterseiten haben keine Text-Navigation, sondern `SubHero.astro` mit Zurück-Button.
 - Alte Adressen (`/workshops/#workshop-<id>`, `/videos/#video-<id>`, `/about/`) müssen funktionieren.

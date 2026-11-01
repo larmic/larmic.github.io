@@ -1,15 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SiteHeader from '../components/SiteHeader.astro';
+import SubHero from '../components/SubHero.astro';
 import SiteFooter from '../components/SiteFooter.astro';
-import Clouds from '../components/Clouds.astro';
 ---
 <BaseLayout title="Impressum">
-  <section class="sky subhero">
-    <Clouds />
-    <SiteHeader nav />
-    <h1>Impressum</h1>
-  </section>
+  <SubHero title="Impressum" />
   <div class="grass-edge" aria-hidden="true"></div>
   <main class="ground">
     <div class="doc">

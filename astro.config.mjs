@@ -2,14 +2,15 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
+// Reine Weiterleitungen gehören nicht in die Sitemap
+const redirectPages = /^\/(about|workshops|videos)\/$/;
+
 export default defineConfig({
   site: 'https://larmic.de',
   trailingSlash: 'ignore',
-  integrations: [sitemap()],
-  // Alte Hugo-Adressen weiterleiten
+  integrations: [sitemap({ filter: (page) => !redirectPages.test(new URL(page).pathname) })],
+  // Alte Hugo-Adresse weiterleiten
   redirects: {
     '/about': '/#ueber-mich',
-    '/workshops/ddd_hexagonal_architecture_for_devs': '/workshops/#workshop-ddd_hexagonal_architecture_for_devs',
-    '/workshops/event_storming': '/workshops/#workshop-event_storming',
   },
 });

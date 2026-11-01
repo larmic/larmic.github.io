@@ -15,7 +15,14 @@ export const SOCIALS = [
   { name: 'Xing', href: 'https://www.xing.com/profile/Lars_Michaelis2/cv' },
 ];
 
-export const FOCUS = ['Domain-Driven Design', 'Hexagonale Architektur', 'Event Storming', 'Microservices', 'DevSecOps'];
+// Sprechblasen der Figur je Bereich – auf der Insel und auf den Detailseiten
+export const BUBBLES = {
+  about: 'Das bin ich. Fullstack, Architektur und KI mit Leitplanken.',
+  workshops: 'Lass uns gemeinsam modellieren!',
+  videos: 'Popcorn bereit? Hier sind meine Talks.',
+};
+
+export const FOCUS =['Domain-Driven Design', 'Hexagonale Architektur', 'Event Storming', 'Microservices', 'DevSecOps'];
 
 export type Kit = { id: 'hw' | 'ops' | 'ki'; title: string; sub: string; block: 'crate' | 'metal' | 'crystal'; icon: string; items: { label: string; color: string }[] };
 

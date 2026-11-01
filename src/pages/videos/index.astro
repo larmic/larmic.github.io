@@ -1,34 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import SiteHeader from '../../components/SiteHeader.astro';
-import SiteFooter from '../../components/SiteFooter.astro';
-import Clouds from '../../components/Clouds.astro';
-import { MATERIALS } from '../../data/site';
-
-const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.data.order);
+// Die Videos stehen auf der Startseite. Alte Links /videos/#video-<id> führen auf die Detailseite.
+import HashRedirect from '../../components/HashRedirect.astro';
 ---
-<BaseLayout title="Videos" description="Talks und Screencasts von Lars Michaelis zu Testcontainers, hexagonaler Architektur, Event Storming und Testing.">
-  <section class="sky subhero">
-    <Clouds />
-    <SiteHeader nav current="videos" />
-    <h1>Videos</h1>
-    <p class="lead">Talks und Screencasts zum Nachschauen.</p>
-  </section>
-  <div class="grass-edge" aria-hidden="true"></div>
-  <main class="ground">
-    <div class="doc cards videos">
-      {videos.map((v) => (
-        <article id={`video-${v.id}`} class={`pxsm vcard th-${v.data.material}`}>
-          <div class="thumb"><svg width="56" height="56" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path d="M3 1h1v6h-1z M4 2h1v4h-1z M5 3h1v2h-1z" fill={MATERIALS[v.data.material].play}></path></svg></div>
-          <div class="vbody">
-            <h2 class="pxf" style="margin: 0; font-size: 23px">{v.data.title}</h2>
-            <p>{v.data.teaser}</p>
-            <a href={`/videos/${v.id}/`}>Video ansehen</a>
-          </div>
-        </article>
-      ))}
-    </div>
-  </main>
-  <SiteFooter />
-</BaseLayout>
+<HashRedirect to="/#videos" prefix="video-" base="/videos/" />

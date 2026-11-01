@@ -1,33 +1,5 @@
 ---
-import { getCollection, render } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import SiteHeader from '../../components/SiteHeader.astro';
-import SiteFooter from '../../components/SiteFooter.astro';
-import Clouds from '../../components/Clouds.astro';
-import VoxelIcon from '../../components/VoxelIcon.astro';
-import { MATERIALS } from '../../data/site';
-
-const workshops = (await getCollection('workshops', ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
-const rendered = await Promise.all(workshops.map(async (w) => ({ w, Content: (await render(w)).Content })));
+// Die Workshops stehen auf der Startseite. Alte Links /workshops/#workshop-<id> führen auf die Detailseite.
+import HashRedirect from '../../components/HashRedirect.astro';
 ---
-<BaseLayout title="Workshops" description="Workshops von Lars Michaelis zu Domain-Driven Design, hexagonaler Architektur, Event Storming und Microservices.">
-  <section class="sky subhero">
-    <Clouds />
-    <SiteHeader nav current="workshops" />
-    <h1>Workshops</h1>
-    <p class="lead">Für Teams, die Fachlichkeit und Architektur zusammenbringen wollen. Ich komme auch gern zu euch in die Firma.</p>
-  </section>
-  <div class="grass-edge" aria-hidden="true"></div>
-  <main class="ground">
-    <div class="doc">
-      {rendered.map(({ w, Content }) => (
-        <article id={`workshop-${w.id}`} class={`entry pxbox th-${w.data.material}`}>
-          <div class="cardhead"><VoxelIcon block={MATERIALS[w.data.material].block} color={MATERIALS[w.data.material].icon || undefined} size={48} /><h2>{w.data.title}</h2></div>
-          <div class="prose"><Content /></div>
-          {w.data.link && <p><a class="pxbtn small" href={w.data.link}>{w.data.linkLabel ?? 'Mehr erfahren'}</a></p>}
-        </article>
-      ))}
-    </div>
-  </main>
-  <SiteFooter />
-</BaseLayout>
+<HashRedirect to="/#workshops" prefix="workshop-" base="/workshops/" />

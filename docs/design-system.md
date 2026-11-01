@@ -63,6 +63,14 @@ Animationen nutzen meist `steps()` für den Pixel-Look. Beim Laden fallen nur di
 
 Takt der Figur: 130 ms. Auf schmalen Bildschirmen (unter 700 px Containerbreite) stehen die Blöcke als Reihe unter der Insel, Brücken entfallen.
 
+## Unterseiten
+
+Jeder Workshop und jedes Video hat eine eigene Seite. Die Insel bleibt die einzige Navigation, Unterseiten haben deshalb keine Text-Navigation.
+
+- **Zurück-Button:** goldener Button „Zurück zur Insel“ über dem Titel. Er führt auf den passenden Bereich der Startseite (`/#workshops`, `/#videos`), unten im Inhalt steht derselbe Link noch einmal.
+- **Figur auf dem Zielblock:** Rechts im Himmel steht die Figur auf dem Block des Bereichs (Tafel für Workshops, Bildschirm für Videos), als wäre sie über die Brücke angekommen. Sie hüpft beim Laden einmal, die Sprechblase zeigt denselben Satz wie auf der Insel.
+- **Ein Inhalt pro Seite:** Wer weiterschauen will, geht zurück zur Insel.
+
 ## Voxel-Technik
 
 Alle Blöcke und die Figur entstehen beim Build als SVG (`src/lib/voxel/`).

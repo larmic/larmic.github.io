@@ -1,11 +1,11 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import SiteHeader from '../../components/SiteHeader.astro';
+import SubHero from '../../components/SubHero.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
-import Clouds from '../../components/Clouds.astro';
 import YouTube from '../../components/YouTube.astro';
 import Comments from '../../components/Comments.astro';
+import { BUBBLES } from '../../data/site';
 
 export async function getStaticPaths() {
   const videos = await getCollection('videos');
@@ -13,21 +13,17 @@ export async function getStaticPaths() {
 }
 const { v } = Astro.props;
 const { Content } = await render(v);
+const back = { href: '/#videos', label: 'Zurück zur Insel' };
 ---
 <BaseLayout title={v.data.title} description={v.data.teaser}>
-  <section class="sky subhero">
-    <Clouds />
-    <SiteHeader nav current="videos" />
-    <h1>{v.data.title}</h1>
-    <p class="lead">{v.data.teaser}</p>
-  </section>
+  <SubHero title={v.data.title} lead={v.data.teaser} back={back} perch={{ block: 'screen', bubble: BUBBLES.videos }} />
   <div class="grass-edge" aria-hidden="true"></div>
   <main class="ground">
     <div class="doc">
       <article class={`entry pxbox th-${v.data.material}`}>
         <YouTube id={v.data.youtube} title={v.data.title} />
         <div class="prose"><Content /></div>
-        <a class="backlink" href="/videos/">Alle Videos</a>
+        <a class="backlink" href={back.href}>{back.label}</a>
       </article>
       <Comments />
     </div>

@@ -27,7 +27,7 @@ Die Seite läuft dann unter http://localhost:4321 und lädt Änderungen sofort n
 
 ```
 src/
-  pages/              Startseite, /workshops/, /videos/, /videos/<id>/, /impressum/, 404
+  pages/              Startseite, /workshops/<id>/, /videos/<id>/, /impressum/, 404
   content/
     workshops/        Workshops als Markdown
     videos/           Videos als Markdown (mit YouTube-ID)
@@ -45,7 +45,7 @@ docs/design-system.md Farben, Materialien, Typografie, Interaktionen
 
 ## Inhalte pflegen
 
-**Workshop hinzufügen:** neue Datei in `src/content/workshops/`, der Dateiname wird zum Anker `#workshop-<dateiname>`.
+**Workshop hinzufügen:** neue Datei in `src/content/workshops/`, jeder Workshop bekommt eine eigene Seite unter `/workshops/<dateiname>/`.
 
 ```markdown
 ---
@@ -54,7 +54,7 @@ short: "Kurzer Titel für die Karte"
 teaser: "Ein Satz für die Karte auf der Startseite."
 material: "hw"        # hw = Holz, ops = Metall, ki = Kristall, gr = Gras
 order: 4              # Reihenfolge
-link: "https://…"     # optional: Button führt dorthin statt zur Workshop-Seite
+link: "https://…"     # optional: zusätzlicher Button auf der Workshop-Seite, z. B. zu Folien
 linkLabel: "…"        # optional: Beschriftung des Buttons
 draft: false          # true = nicht veröffentlichen
 ---
@@ -104,7 +104,7 @@ Die Pipeline baut den Branch, deployt ihn aber nicht. Nach dem Merge in `main` g
 
 Ein komplett leerer Branch (`git switch --orphan astro-redesign`) funktioniert auch. Weil er keine gemeinsame Historie mit `main` hat, lässt er sich aber nicht einfach als Pull Request mergen.
 
-Alte Adressen funktionieren weiter: `/workshops/#workshop-…` und `/videos/#video-…` zeigen auf dieselben Inhalte, `/about/` leitet auf die Startseite um. Die Microservices-Folien unter `/workshop_microservices/slides/` kommen aus ihrem eigenen Repository und sind nicht betroffen.
+Alte Adressen funktionieren weiter: `/workshops/#workshop-…` und `/videos/#video-…` leiten auf die jeweilige Detailseite um, `/workshops/` und `/videos/` auf den passenden Bereich der Startseite, `/about/` auf „Über mich“. Die Microservices-Folien unter `/workshop_microservices/slides/` kommen aus ihrem eigenen Repository und sind nicht betroffen.
 
 ## Kommentare mit giscus
 
