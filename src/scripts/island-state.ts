@@ -145,6 +145,13 @@ export function isSettled(state: FigureState, world: World): boolean {
   );
 }
 
+/** Alle Takte auf einmal bis zur Ruhe – für die schmale Ansicht, in der die Figur nicht läuft. */
+export function settle(state: FigureState, world: World, maxTicks = 1000): FigureState {
+  let s = state;
+  for (let i = 0; i < maxTicks && !isSettled(s, world); i++) s = step(s, world);
+  return s;
+}
+
 export type FigureView = {
   at: { x: number; y: number };
   standingBridges: Set<number>;

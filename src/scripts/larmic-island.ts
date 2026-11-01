@@ -12,7 +12,18 @@
 
 import { BUBBLES } from '../data/site';
 import { headView } from '../lib/voxel/head';
-import { aim, initialState, isSettled, leave, select, step, view, type FigureState, type World } from './island-state';
+import {
+  aim,
+  initialState,
+  isSettled,
+  leave,
+  select,
+  settle,
+  step,
+  view,
+  type FigureState,
+  type World,
+} from './island-state';
 
 const TICK_MS = 130; // Takt der Figur
 
@@ -125,7 +136,20 @@ class LarmicIsland extends HTMLElement {
   }
 
   private start() {
+    // Schmale Ansicht: Blöcke stehen als Reihen unter der Insel, die Figur läuft nicht – gleich ans Ziel, ohne Takt
+    if (this.compact()) {
+      this.stop();
+      this.state = settle(this.state, this.world);
+      this.render();
+      return;
+    }
     if (this.timer === undefined) this.timer = window.setInterval(() => this.tick(), TICK_MS);
+  }
+
+  /** Schmale Ansicht? Dort blendet das CSS (Container-Query) die Brücken aus – die Grenze steht nur im CSS. */
+  private compact(): boolean {
+    const bridges = this.querySelector<HTMLElement>('.bridges');
+    return !!bridges && getComputedStyle(bridges).display === 'none';
   }
 
   private stop() {

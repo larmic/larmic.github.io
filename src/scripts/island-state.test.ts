@@ -10,6 +10,7 @@ import {
   isSettled,
   leave,
   select,
+  settle as settleAtOnce,
   step,
   view,
   type FigureState,
@@ -160,6 +161,23 @@ describe('Figur auf der Insel', () => {
     expect(view(s, world, BUBBLES).openSections).toEqual(new Set(['videos']));
     expect(view(s, world, BUBBLES).bubble.visible, 'auf Kisten schweigt sie').toBe(false);
     expect(view(s, world, BUBBLES).held).toEqual(new Set(['videos', 'videos/tc']));
+  });
+
+  it('kommt in der schmalen Ansicht mit settle in einem Schritt dort an, wo sie Takt für Takt ankäme', () => {
+    const cases: [string, string][] = [
+      ['about', 'videos/tc'],
+      ['workshops/ddd', 'workshops/ms'],
+      ['videos/hex', 'about'],
+    ];
+    for (const [rest, next] of cases) {
+      const start = select(initialState(world, rest), world, next);
+      const atOnce = settleAtOnce(start, world);
+      expect(isSettled(atOnce, world)).toBe(true);
+      expect(view(atOnce, world, BUBBLES).at).toEqual(view(settle(start).s, world, BUBBLES).at);
+    }
+    // Blog: Sturz und Respawn passieren sofort, die 404-Meldung steht
+    const fallen = settleAtOnce(aim(initialState(world, 'about'), 'blog'), world);
+    expect(view(fallen, world, BUBBLES).bubble).toEqual({ text: BUBBLE_404, visible: true, error: true });
   });
 
   it('ignoriert select auf den aktuellen oder einen unbekannten Block', () => {
