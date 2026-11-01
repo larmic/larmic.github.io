@@ -57,7 +57,7 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 
 ### Guard-Gates sichtbar machen (Glaubwürdigkeit)
 
-Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Im Repo ist `astro check` das einzige Gate. Wer den Code liest, sollte genau das wiederfinden:
+Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war `astro check` das einzige Gate; inzwischen sind es sieben (siehe README, Abschnitt „Guard-Gates“):
 
 - [x] **Vitest** mit Tests für den Voxel-Generator: `headView`, `gridSvg` (Pixel-Abdeckung aller Texturen), `buildWorld` (Determinismus, Baum-Wege, Nachbarschaft der Schritte, keine Überlappung, Slot-Grenze). Läuft als Gate in der Pipeline.
 - [x] **Zustandsmaschine der Figur** als reines Modul `src/scripts/island-state.ts` mit Tests (Brückenbau, Rückweg bis zur Abzweigung, gemeinsame Brücken, Zielwechsel, Blog-Sturz, Baum, alle Kombinationen von Ruheblock und Ziel).
