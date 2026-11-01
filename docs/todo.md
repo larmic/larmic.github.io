@@ -28,9 +28,9 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 - [x] **Positionierung:** Hero-Intro und Description nennen jetzt auch „KI mit Leitplanken“.
 - [x] „Screencasts“ aus den Texten entfernt, „Architekt“ in Untertitel und Description aufgenommen. Die Talks auf `/videos/` sind auch die Konferenzvorträge, eine eigene Liste braucht es nicht.
 - [x] Satz nach dem KI-Absatz umformuliert (Bezug auf die Workshops).
-- [ ] Eintrag „KI“ in der KI-Werkzeugkiste durch ein konkretes Werkzeug oder eine Praxis ersetzen (Entscheidung offen).
+- [x] Eintrag „KI“ in der KI-Werkzeugkiste heißt jetzt „Prompting“.
 - [x] **Videotexte aufgeräumt:** „team neusta“, Freitagsfrühstück-Hinweis zentral (`RecordingNote.astro`), Überschriften, Grammatik.
-- [ ] Feld `date` der Videos: überall „2023-02-22“ und nicht angezeigt. Echte Daten eintragen und anzeigen oder Feld entfernen.
+- [x] Feld `date` der Videos entfernt (war überall „2023-02-22“ und wurde nicht angezeigt).
 
 ### Technik und Betrieb
 

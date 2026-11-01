@@ -71,7 +71,7 @@ export const KITS: Kit[] = [
     title: 'KI-Werkzeugkiste',
     sub: 'Damit die KI nicht nur schnell, sondern auch richtig baut.',
     items: [
-      { label: 'KI', color: '#b48cf0' },
+      { label: 'Prompting', color: '#b48cf0' },
       { label: 'Claude Code', color: '#e0855f' },
       { label: 'Spec-Driven', color: '#4fd1d9' },
       { label: 'Guard-Gates', color: '#ff6b5e' },

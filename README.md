@@ -82,7 +82,7 @@ draft: false          # true = nicht veröffentlichen
 Beschreibung in Markdown. Eckdaten und Kontakt-Mail nicht in den Text schreiben, die Seite zeigt sie aus den Feldern.
 ```
 
-**Video hinzufügen:** neue Datei in `src/content/videos/` mit `title`, `short`, `teaser`, `material`, `order`, `youtube` (Video-ID), `date` und optional `recording: "freitagsfruehstueck"` (Hinweis unter dem Video). Jedes Video bekommt eine eigene Seite unter `/videos/<dateiname>/` und eine Kiste an der Insel. An Videos gibt es vier Plätze.
+**Video hinzufügen:** neue Datei in `src/content/videos/` mit `title`, `short`, `teaser`, `material`, `order`, `youtube` (Video-ID) und optional `recording: "freitagsfruehstueck"` (Hinweis unter dem Video). Jedes Video bekommt eine eigene Seite unter `/videos/<dateiname>/` und eine Kiste an der Insel. An Videos gibt es vier Plätze.
 
 Fehlt ein Pflichtfeld oder hat es den falschen Typ, bricht `npm run check` ab. So landet kein kaputter Inhalt online.
 

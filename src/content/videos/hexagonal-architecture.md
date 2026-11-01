@@ -5,7 +5,6 @@ teaser: "Fachlichkeit im Kern der Anwendung – Technik als austauschbares Detai
 material: "hw"
 order: 2
 youtube: "-9S_rgrabTA"
-date: "2023-02-22"
 recording: "freitagsfruehstueck"
 ---
 

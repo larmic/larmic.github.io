@@ -5,7 +5,6 @@ teaser: "Kollaborative Workshop-Methode zur Visualisierung komplexer Geschäftsp
 material: "ki"
 order: 3
 youtube: "9MGaB7GhE4g"
-date: "2023-02-22"
 recording: "freitagsfruehstueck"
 ---
 

@@ -5,7 +5,6 @@ teaser: "Docker-basiertes Testing-Framework für Datenbanken und Services währe
 material: "ops"
 order: 1
 youtube: "LYnmbkBfeZA"
-date: "2023-02-22"
 recording: "freitagsfruehstueck"
 ---
 

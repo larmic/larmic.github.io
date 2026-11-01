@@ -5,7 +5,6 @@ teaser: "Verschiedene Sichtweisen auf die Unterscheidung von Unit- und Integrati
 material: "gr"
 order: 4
 youtube: "_CGvdhRc9DE"
-date: "2023-02-22"
 recording: "freitagsfruehstueck"
 ---
 
