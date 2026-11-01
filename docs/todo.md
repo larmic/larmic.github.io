@@ -92,7 +92,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [x] YouTube-Button nennt für Screenreader den Videotitel; nach dem Klick liegt der Fokus auf dem Player.
 - [x] Überschriftenhierarchie ohne Sprünge: Karten und Werkzeugkisten sind `h2`, Videotexte nutzen `##`.
 - [x] 404-Seite hat jetzt eine `main`-Landmark (über `PlainPage`).
-- [ ] `prefers-reduced-motion`: Die Figur sollte direkt aufs Ziel springen statt Schritt für Schritt zu laufen. Hover-Vorschau abschalten.
+- [x] `prefers-reduced-motion`: keine Vorschau-Wege beim Zeigen, die Figur steht nach einem Seitenwechsel sofort am Ziel (`settle`).
 - [x] Linktexte „Details zum Workshop“ und „Video ansehen“ nennen für Screenreader den Titel (`sr-only`).
 - [ ] Alt-Texte der Workshop-Fotos aussagekräftig machen.
 - [ ] Schriftgrößen in `rem` statt `px`. Englische Titel mit `lang="en"`.

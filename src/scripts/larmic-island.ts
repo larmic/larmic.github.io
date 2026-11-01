@@ -44,6 +44,8 @@ class LarmicIsland extends HTMLElement {
   private headKey = '0,0';
   private raf = 0;
   private globals: AbortController | null = null; // Listener auf document/window, leben nur, solange die Insel im DOM ist
+  // Reduzierte Bewegung: keine Vorschau-Wege beim Zeigen, die Figur steht nach einem Seitenwechsel sofort am Ziel
+  private readonly reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
   connectedCallback() {
     this.listenGlobally();
@@ -64,19 +66,19 @@ class LarmicIsland extends HTMLElement {
     this.blocks = [...this.querySelectorAll<HTMLElement>('.blk')];
     for (const b of this.blocks) {
       const id = b.dataset.id!;
-      b.addEventListener('mouseenter', () => this.update(aim(this.state, id)));
+      b.addEventListener('mouseenter', () => this.preview(id));
       b.addEventListener('mouseleave', () => this.update(leave(this.state, id)));
       // Nur Tastatur-Fokus: Fokus durch Mausklick oder beim Zurückkehren in den Tab soll die Figur nicht losschicken.
       // Den Blog nur per Klick oder Enter – beim Durchtabben soll niemand stürzen.
       b.addEventListener('focus', () => {
-        if (id !== 'blog' && b.matches(':focus-visible')) this.update(aim(this.state, id));
+        if (id !== 'blog' && b.matches(':focus-visible')) this.preview(id);
       });
       b.addEventListener('blur', () => this.update(leave(this.state, id)));
       // Links navigieren selbst, nur der Blog-Button löst den Sturz aus
       if (b instanceof HTMLButtonElement) b.addEventListener('click', () => this.update(aim(this.state, id)));
     }
     for (const e of this.querySelectorAll<HTMLElement>('.egg')) {
-      e.addEventListener('mouseenter', () => this.update(aim(this.state, e.dataset.egg!)));
+      e.addEventListener('mouseenter', () => this.preview(e.dataset.egg!));
       e.addEventListener('mouseleave', () => this.update(leave(this.state, e.dataset.egg!)));
     }
     this.faces = [...this.querySelectorAll<SVGGElement>('.fig-head .fh')];
@@ -111,11 +113,7 @@ class LarmicIsland extends HTMLElement {
   /** Blick zum Cursor: nur mit Maus und ohne Wunsch nach reduzierter Bewegung. */
   private listenGlobally() {
     if (this.globals) return;
-    if (
-      !matchMedia('(hover: hover) and (pointer: fine)').matches ||
-      matchMedia('(prefers-reduced-motion: reduce)').matches
-    )
-      return;
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches || this.reducedMotion.matches) return;
     this.globals = new AbortController();
     const opts = { passive: true, signal: this.globals.signal };
     const follow = () => {
@@ -136,9 +134,14 @@ class LarmicIsland extends HTMLElement {
     window.addEventListener('scroll', follow, opts);
   }
 
+  /** Zeigen auf einen Block schickt die Figur los – außer bei reduzierter Bewegung. */
+  private preview(id: string) {
+    if (!this.reducedMotion.matches) this.update(aim(this.state, id));
+  }
+
   private start() {
-    // Schmale Ansicht: Blöcke stehen als Reihen unter der Insel, die Figur läuft nicht – gleich ans Ziel, ohne Takt
-    if (this.compact()) {
+    // Schmale Ansicht (Blöcke als Reihen, Figur steht fest) oder reduzierte Bewegung: gleich ans Ziel, ohne Takt
+    if (this.compact() || this.reducedMotion.matches) {
       this.stop();
       this.state = settle(this.state, this.world);
       this.render();
