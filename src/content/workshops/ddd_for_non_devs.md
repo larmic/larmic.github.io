@@ -1,23 +1,19 @@
 ---
-title: "Domain Driven Design (für Nicht-Techniker:innen)"
+title: "Domain-Driven Design (für Nicht-Techniker:innen)"
 short: "DDD für Nicht-Techniker:innen"
 teaser: "Domain-Driven Design verstehen, ohne selbst zu programmieren."
 material: "hw"
 order: 4
+audience: "Fachbereich, Product Owner und alle, die verstehen wollen, was ihr Entwicklungsteam macht"
+duration: "1 Tag"
+level: "Anspruchsvoll"
 draft: true
 ---
 
 **HINWEIS** dieser Workshop ist gerade in der Entstehung!
 
-Domain Driven Design (kurz DDD) ist ein Ansatz zur Modellierung komplexer Software und stellt dabei die 
-fachlichen Aspekte in den Vordergrund. 
+Domain-Driven Design (kurz DDD) ist ein Ansatz zur Modellierung komplexer Software und stellt dabei die fachlichen Aspekte in den Vordergrund.
 
-**Schwierigkeitsgrad**: Anspruchsvoller  
-**Workshop-Größe**: max. 10 Personen
+**Teilnahmebedingungen**:
 
-## Anforderungen
-Was sind die Teilnahmebedingungen?
-* Du möchtest verstehen, was Dein Entwicklungsteam macht
-* Du kannst 1 Tag Zeit (am Stück) erübrigen
-
-Bei Fragen und/oder Interesse sende mir einfach eine [Mail](mailto:l.michaelis@neusta.de?subject=Workshop:%20DDD%20und%20hex.%20Architektur%20(Nicht-Techniker)).
+* Du möchtest verstehen, was dein Entwicklungsteam macht

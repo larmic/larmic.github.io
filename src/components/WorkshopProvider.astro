@@ -1,9 +1,13 @@
 ---
 // Wer Workshops und Beratung anbietet: Lars als Mitarbeiter, Vertragspartner ist die neusta GmbH (§ 6 DDG: Anbieter erkennbar)
 import { SITE, workshopMailto } from '../data/site';
+interface Props {
+  subject?: string; // Betreff der Mail, auf Workshop-Seiten mit dem Workshop
+}
+const { subject } = Astro.props;
 ---
 
 <p class="provider">
   Workshops und Beratung biete ich als Mitarbeiter von <a href="https://www.team-neusta.de/de">team neusta</a> an.
-  Vertragspartner ist die neusta GmbH. Anfragen gern an <a href={workshopMailto()}>{SITE.workshopMail}</a>.
+  Vertragspartner ist die neusta GmbH. Anfragen gern an <a href={workshopMailto(subject)}>{SITE.workshopMail}</a>.
 </p>

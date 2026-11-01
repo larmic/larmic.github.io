@@ -16,6 +16,13 @@ const workshops = defineCollection({
     order: z.number().int(),
     link: z.url().optional(),
     linkLabel: z.string().optional(),
+    // Eckdaten: stehen auf jeder Workshop-Seite gleich aufgebaut, Dauer und Schwierigkeitsgrad auch auf der Karte
+    audience: z.string(),
+    duration: z.string(),
+    level: z.enum(['Einfach', 'Mittel', 'Anspruchsvoll']),
+    format: z.enum(['Präsenz', 'Präsenz oder remote', 'Remote']).default('Präsenz'),
+    groupSize: z.number().int().positive().default(12),
+    location: z.string().default('Bei uns oder bei euch vor Ort'),
     draft: z.boolean().default(false),
   }),
 });

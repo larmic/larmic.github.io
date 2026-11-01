@@ -1,0 +1,25 @@
+---
+// Eckdaten eines Workshops, auf jeder Workshop-Seite gleich aufgebaut
+import type { CollectionEntry } from 'astro:content';
+interface Props {
+  data: CollectionEntry<'workshops'>['data'];
+}
+const { data } = Astro.props;
+const facts = [
+  ['Zielgruppe', data.audience],
+  ['Dauer', data.duration],
+  ['Format', data.format],
+  ['Gruppengröße', `max. ${data.groupSize} Personen`],
+  ['Schwierigkeitsgrad', data.level],
+  ['Ort', data.location],
+];
+---
+
+<dl class="facts">
+  {facts.map(([term, value]) => (
+    <div>
+      <dt>{term}</dt>
+      <dd>{value}</dd>
+    </div>
+  ))}
+</dl>

@@ -101,8 +101,8 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 
 ### Inhalt (weitere)
 
-- [ ] **Workshop-Eckdaten einheitlich** (Zielgruppe, Dauer, Format, Gruppengröße, Schwierigkeitsgrad, Ort), am besten als Frontmatter-Felder. „Anspruchsvoller“ → „Anspruchsvoll“.
-- [ ] **Schreibweisen vereinheitlichen** (Domain-Driven Design, hexagonale Architektur, z. B.), Gendern konsistent.
+- [x] **Workshop-Eckdaten einheitlich:** Zielgruppe, Dauer, Format, Gruppengröße (max. 12), Schwierigkeitsgrad und Ort als Frontmatter-Felder, auf jeder Workshop-Seite als Kasten, Dauer und Schwierigkeitsgrad auch auf der Karte. Die Kontakt-Mail mit Workshop im Betreff kommt aus `WorkshopProvider`, nicht mehr aus dem Text.
+- [x] **Schreibweisen vereinheitlicht:** „Domain-Driven Design“, „hexagonale Architektur“ (klein im Satz), „Clean Code“, „Projektmanager:innen“.
 - [x] Seitentitel unterscheiden Workshop und Video („Event Storming – Workshop“ / „– Video“). Die Texte von Event-Storming-Video und -Workshop ähneln sich weiter.
 
 ### Build, CI und Abhängigkeiten

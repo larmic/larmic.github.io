@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import IslandPage from '../../layouts/IslandPage.astro';
 import VoxelIcon from '../../components/VoxelIcon.astro';
+import WorkshopFacts from '../../components/WorkshopFacts.astro';
 import WorkshopProvider from '../../components/WorkshopProvider.astro';
 import { workshopMailto } from '../../data/site';
 import { MATERIALS } from '../../data/materials';
@@ -28,6 +29,7 @@ const m = MATERIALS[w.data.material];
       <p>{w.data.teaser}</p>
     </div>
   </div>
+  <WorkshopFacts data={w.data} />
   <div class="prose">
     <Content />
     {w.data.link && (
@@ -38,7 +40,7 @@ const m = MATERIALS[w.data.material];
       </p>
     )}
   </div>
-  <WorkshopProvider />
+  <WorkshopProvider subject={`Workshop: ${w.data.short}`} />
   <a class="backlink" href="/workshops/">
     Alle Workshops
   </a>

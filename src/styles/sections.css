@@ -252,6 +252,15 @@
   font-size: 1.625rem;
   line-height: 1.15;
 }
+.wcard .wfacts {
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  color: var(--muted);
+}
+.th-ki .wfacts {
+  color: inherit;
+  opacity: 0.8;
+}
 .wbtn {
   margin-top: auto;
   padding-top: 10px;
@@ -419,6 +428,27 @@
 }
 .prose ul {
   padding-left: 22px;
+}
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(13em, 100%), 1fr));
+  gap: 12px 24px;
+  max-width: 46em;
+  margin: 0 0 8px;
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.05);
+}
+.th-ki .facts {
+  background: rgba(255, 255, 255, 0.08);
+}
+.facts dt {
+  font-family: var(--font-pixel);
+  font-size: 0.9375rem;
+}
+.facts dd {
+  margin: 2px 0 0;
+  font-size: 1.0625rem;
+  line-height: 1.5;
 }
 .backlink {
   display: inline-block;

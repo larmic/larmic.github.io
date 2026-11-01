@@ -70,10 +70,16 @@ material: "hw"        # hw = Holz, ops = Metall, ki = Kristall, gr = Gras
 order: 4              # Reihenfolge
 link: "https://…"     # optional: zusätzlicher Button auf der Workshop-Seite, z. B. zu Folien
 linkLabel: "…"        # optional: Beschriftung des Buttons
+audience: "Entwickler:innen und Software-Architekt:innen"   # Eckdaten, auf jeder Workshop-Seite gleich aufgebaut
+duration: "2 Tage am Stück"
+level: "Anspruchsvoll"  # Einfach, Mittel oder Anspruchsvoll
+format: "Präsenz"     # optional, Standard Präsenz
+groupSize: 12         # optional, Standard 12
+location: "…"         # optional, Standard „Bei uns oder bei euch vor Ort“
 draft: false          # true = nicht veröffentlichen
 ---
 
-Beschreibung in Markdown.
+Beschreibung in Markdown. Eckdaten und Kontakt-Mail nicht in den Text schreiben, die Seite zeigt sie aus den Feldern.
 ```
 
 **Video hinzufügen:** neue Datei in `src/content/videos/` mit `title`, `short`, `teaser`, `material`, `order`, `youtube` (Video-ID), `date` und optional `recording: "freitagsfruehstueck"` (Hinweis unter dem Video). Jedes Video bekommt eine eigene Seite unter `/videos/<dateiname>/` und eine Kiste an der Insel. An Videos gibt es vier Plätze.
