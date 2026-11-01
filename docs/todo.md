@@ -108,7 +108,8 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 ### Build, CI und Abhängigkeiten
 
 - [x] **Workflow gehärtet:** global nur Leserechte, Deploy als eigener Job mit Schreibrechten nur auf `main`, Prüfung nur bei Pull Requests und Pushes auf `main` (keine doppelten Läufe), Timeouts, Deploys werden nicht abgebrochen.
-- [ ] Actions per SHA pinnen (Renovate `helpers:pinGitHubActionDigests`), ggf. auf `actions/deploy-pages` umstellen (dann entfällt der Branch `gh-pages` und seine wachsende Historie).
+- [x] Actions auf Commit-SHAs gepinnt, Renovate hält sie aktuell (`helpers:pinGitHubActionDigests`).
+- [ ] Ggf. auf `actions/deploy-pages` umstellen (dann entfällt der Branch `gh-pages` und seine wachsende Historie).
 - [x] **Renovate:** `minimumReleaseAge` 3 Tage, `internalChecksFilter: strict`.
 - [ ] LICENSE-Datei im öffentlichen Repo.
 
