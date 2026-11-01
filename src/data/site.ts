@@ -1,7 +1,7 @@
 // Zentrale Seitendaten. Texte der Startseite stehen direkt in den Komponenten unter src/components/.
 export const SITE = {
   title: 'larmic.de',
-  description: 'Lars Michaelis – Entwickler, Speaker und Berater. Workshops zu Domain-Driven Design, Event Storming und Microservices.',
+  description: 'Lars Michaelis – Entwickler, Architekt, Speaker und Berater. Workshops zu Domain-Driven Design, Event Storming und Microservices.',
   url: 'https://larmic.de',
   mail: 'mail@larmic.de',
 };

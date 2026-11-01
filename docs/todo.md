@@ -25,10 +25,8 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
 
 - [x] **Sichtbarer Kontaktweg:** Workshops und Beratung über neusta (`l.michaelis@neusta.de`, auf den Workshop-Seiten), alles andere privat an `mail@larmic.de` (Footer „Kontakt“ und Ende von „Über mich“, Adresse erst per JavaScript zusammengesetzt).
 - [ ] **Button „Workshops ansehen“** führt auf `/workshops/` ins Leere. Je nach Seite wechseln (z. B. „Workshop anfragen“).
-- [ ] **Positionierung schärfen:**
-  - „Architekt“ in Untertitel und Meta-Description aufnehmen (z. B. „Entwickler, Architekt und Speaker“).
-  - Hero-Intro, Unterzeile von „Über mich“ und Description auf dieselbe Kernaussage bringen, inklusive „KI mit Leitplanken“.
-- [ ] **Belege für Aussagen:** „spreche auf Konferenzen“ und „Screencasts“ sind auf der Seite nicht belegt (alle Videos sind Freitagsfrühstück-Aufnahmen). Entweder eine Talk-Liste ergänzen (Event, Jahr, Titel, Link) oder die Texte anpassen.
+- [ ] **Positionierung schärfen:** Hero-Intro, Unterzeile von „Über mich“ und Description auf dieselbe Kernaussage bringen, inklusive „KI mit Leitplanken“.
+- [x] „Screencasts“ aus den Texten entfernt, „Architekt“ in Untertitel und Description aufgenommen. Die Talks auf `/videos/` sind auch die Konferenzvorträge, eine eigene Liste braucht es nicht.
 - [ ] **„Wie das geht, zeige ich in Workshops und Talks“** folgt auf den KI-Absatz, es gibt aber kein KI-Angebot. Etwas verlinken oder umformulieren. Den Eintrag „KI“ in der KI-Werkzeugkiste durch etwas Konkretes ersetzen.
 - [ ] **Videotexte aufräumen:**
   - „Team Neusta“ → „team neusta“, Artikel korrigieren („Veranstaltung bei team neusta“).

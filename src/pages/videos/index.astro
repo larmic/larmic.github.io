@@ -6,7 +6,7 @@ import VideoCard from '../../components/VideoCard.astro';
 
 const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.data.order);
 ---
-<IslandPage title="Videos" description="Talks und Screencasts von Lars Michaelis zu Testcontainers, hexagonaler Architektur, Event Storming und Testing." rest="videos">
+<IslandPage title="Videos" description="Talks von Lars Michaelis zu Testcontainers, hexagonaler Architektur, Event Storming und Testing." rest="videos">
   <script is:inline>
     // Alte Links /videos/#video-<id> führen auf die Seite des Videos
     {
@@ -16,7 +16,7 @@ const videos = (await getCollection('videos')).sort((a, b) => a.data.order - b.d
   </script>
   <div class="panel-head">
     <VoxelIcon block="screen" size={64} />
-    <div><h1>Videos</h1><p>Talks und Screencasts zum Nachschauen.</p></div>
+    <div><h1>Videos</h1><p>Einige Talks zum Nachschauen.</p></div>
   </div>
   <div class="cards videos">{videos.map((v) => <VideoCard entry={v} />)}</div>
 </IslandPage>
