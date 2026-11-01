@@ -20,7 +20,8 @@ interface Props {
   noindex?: boolean; // z. B. 404: nicht indexieren, kein canonical
 }
 const { title, description = SITE.description, noindex = false } = Astro.props;
-const fullTitle = title ? `${title} – ${SITE.title}` : `Lars Michaelis – ${SITE.title}`;
+// Startseite: Name und Rolle statt nur der Domain
+const fullTitle = title ? `${title} – ${SITE.title}` : 'Lars Michaelis – Entwickler, Architekt, Speaker und Berater';
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 

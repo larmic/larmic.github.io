@@ -120,8 +120,9 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [x] **Icons:** `favicon.ico`, PNG-Icons, `apple-touch-icon` (180 × 180) und `theme-color`.
 - [x] 404-Seite: kein `canonical`, dafür `noindex`.
 - [x] Workshop-Bilder über `astro:assets` (`src/assets/workshops/`, `image.layout: constrained`): `width`/`height`, `loading="lazy"`, `srcset` von 640 bis 1600 px.
-- [ ] 28 KB Würfel-Symbole und Textur-CSS stehen in jeder Seite. Als cachebare Datei auslagern.
-- [ ] Sitemap mit `lastmod`, Titel und Descriptions eindeutiger machen.
+- [x] Würfel-Symbole und Textur-CSS bleiben inline, bewusst: 28 KB roh, gezippt nur ca. 2,2 KB pro Seite. Eine externe Datei bräuchte eine zusätzliche Anfrage, und `<use>` auf eine fremde Datei kann beim ersten Laden kurz leere Blöcke zeigen.
+- [x] Titel und Descriptions eindeutig: Startseite mit Rolle im Titel, Impressum und Datenschutz mit eigener Description.
+- [x] Sitemap ohne `lastmod`, bewusst: Ein Build-Datum für alle Seiten wäre falsch, echte Daten aus git brauchen die volle Historie im CI. Suchmaschinen werten `lastmod` nur aus, wenn es stimmt.
 
 ## Später
 
