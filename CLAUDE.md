@@ -14,6 +14,7 @@ npm run arch     # Guard-Gate: Architekturregeln (dependency-cruiser) – muss g
 npm run build    # statische Seite nach dist/
 npm run verify   # Guard-Gate nach dem Build: gültiges HTML, keine toten internen Links
 npm run gates    # alle Gates in der Reihenfolge der Pipeline
+# Git-Hook .githooks/pre-commit (aktiviert durch npm install) prüft vor jedem Commit Formatierung, Lint, Architektur, Tests
 ```
 
 Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run check`, `npm test`, `npm run build` und `npm run verify` ausführen.

@@ -96,7 +96,7 @@ Auf der Seite steht „KI mit Leitplanken“ – hier sind sie. Jeder Commit lä
 | Unit-Tests | Zustandsmaschine der Figur (Spec: [docs/specs/insel.md](docs/specs/insel.md)), Geometrie der Insel, Kopf, Pixel-Raster | Vitest |
 | Fertige Seite | gültiges HTML, keine toten internen Links | html-validate, linkinator |
 
-Lokal laufen alle zusammen mit `npm run gates`. Dass die Gates wirklich etwas fangen, ist geprüft: absichtlich eingebaute Fehler (überlappende Kisten, übersprungene Felder, verbotene Imports, tote Links, kaputtes HTML) lassen sie scheitern.
+Lokal laufen alle zusammen mit `npm run gates`. Zusätzlich prüft ein Git-Hook (`.githooks/pre-commit`) vor jedem Commit die schnellen Gates – Formatierung, Lint, Architektur, Unit-Tests – in wenigen Sekunden. `npm install` aktiviert ihn automatisch; im Notfall überspringt `git commit --no-verify` ihn. Dass die Gates wirklich etwas fangen, ist geprüft: absichtlich eingebaute Fehler (überlappende Kisten, übersprungene Felder, verbotene Imports, tote Links, kaputtes HTML) lassen sie scheitern.
 
 ## Deployment
 

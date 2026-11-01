@@ -1,0 +1,16 @@
+#!/bin/sh
+# Guard-Gate vor jedem Commit: die schnellen Prüfungen der Pipeline (wenige Sekunden).
+# Build, astro check und die Prüfung der fertigen Seite laufen in der Pipeline bzw. lokal mit `npm run gates`.
+# Aktiviert wird der Hook durch `npm install` (Skript "prepare"). Im Notfall überspringen: git commit --no-verify
+set -e
+
+if [ ! -d node_modules ]; then
+  echo "pre-commit: node_modules fehlt – bitte zuerst npm install ausführen" >&2
+  exit 1
+fi
+
+echo "pre-commit: Formatierung, Lint, Architektur, Unit-Tests …"
+npm run --silent format:check
+npm run --silent lint
+npm run --silent arch
+npm test --silent
