@@ -14,7 +14,7 @@ const { block, icon } = MATERIALS[kit.id];
     <svg width="34" height="36" viewBox={CUBE_VIEWBOX} aria-hidden="true" style={`color: ${icon}`}>
       <use href={`#v-${block}`}></use>
     </svg>
-    <h3 id={`kit-${kit.id}`}>{kit.title}</h3>
+    <h2 id={`kit-${kit.id}`}>{kit.title}</h2>
   </div>
   <p class="kitsub">{kit.sub}</p>
   <ul class="items">

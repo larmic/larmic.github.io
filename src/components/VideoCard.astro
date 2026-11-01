@@ -15,8 +15,10 @@ const d = entry.data;
     </svg>
   </div>
   <div class="vbody">
-    <h3>{d.short}</h3>
+    <h2>{d.short}</h2>
     <p>{d.teaser}</p>
-    <a href={`/videos/${entry.id}/`}>Video ansehen</a>
+    <a href={`/videos/${entry.id}/`}>
+      Video ansehen<span class="sr-only">: {d.short}</span>
+    </a>
   </div>
 </article>
