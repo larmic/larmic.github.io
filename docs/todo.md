@@ -97,7 +97,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [x] Alt-Texte der Workshop-Fotos beschreiben, was zu sehen ist.
 - [x] Schriftgrößen in `rem` statt `px` (folgen der Schriftgröße im Browser).
 - [x] Kein `lang="en"` nötig: Es gibt keine englischen Inhalte, Titel wie „Testcontainers“ oder „Unit vs Integration Testing“ sind gängige Fachbegriffe.
-- [ ] Dauerbewegung (Wolken, wippende Blöcke) pausierbar machen oder dezenter.
+- [x] Dauerbewegung (Wolken, wippende Blöcke) bleibt bewusst: Bei `prefers-reduced-motion` steht sie still, sonst ist sie Teil des Designs.
 
 ### Inhalt (weitere)
 
