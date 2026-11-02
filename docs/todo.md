@@ -53,12 +53,12 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
   - [x] Stichprobe der alten Adressen nach dem Deploy (`/about/`, `/#workshops`, `/workshops/#workshop-…`, `/videos/#video-…`).
   - [ ] Search Console: `https://larmic.de/sitemap-index.xml` einreichen, alte `sitemap.xml` entfernen.
   - [ ] Branches `relaunch` und `gh-pages` auf GitHub löschen (`gh-pages` wird nicht mehr gebraucht), danach lokal `relaunch`.
-  - [ ] Branch `docs/livegang` pushen und per Pull Request mergen – gleich der erste Test für den Branch-Schutz.
+  - [ ] Branch `nachbesserungen` pushen und per Pull Request mergen – gleich der erste Test für den Branch-Schutz.
   - [ ] Auf dem Mac: `git pull` und `npm install`, damit der Pre-Commit-Hook aktiv ist.
-- [ ] **Mobiles Design prüfen**, auch sehr schmale und sehr breite Bildschirme.
+- [x] **Mobiles Design geprüft**, auch sehr schmale und sehr breite Bildschirme.
   - [x] Etiketten der Kisten liefen auf Handys über (z. B. „Testcontainers“ ca. 119 px in einer 74-px-Spalte bei 375 px Breite): Kisten jetzt zu zweit nebeneinander, Etiketten mit Silbentrennung.
   - [x] Überschriften liefen über („Netzwerkproblemen“ ca. 331 px, Platz ca. 200 px): Silbentrennung für `h1`–`h3`, unter 560 px kleineres Icon und kleinere Überschrift im Panel-Kopf, schmalerer Erde-Rand.
-  - [ ] Im Browser nachsehen (DevTools, Gerätemodus): 320, 375, 414, 700/701 (Umbruch der Insel), 1024 und 1920 px. Besonders: Sprechblase in der schmalen Ansicht nicht abgeschnitten? Kisten-Reihe unter den Bereichen?
+  - [x] Im Browser nachgesehen (DevTools, Gerätemodus): 320, 375, 414, 700/701 (Umbruch der Insel), 1024 und 1920 px. Besonders: Sprechblase in der schmalen Ansicht nicht abgeschnitten? Kisten-Reihe unter den Bereichen?
 - [x] **Kisten-Plätze:** vierter Workshop-Platz als Reserve (für „DDD für Nicht-Techniker:innen“), Fehlermeldung sagt, was zu tun ist. Videos haben weiterhin vier Plätze.
 
 ## Bald nach dem Livegang
