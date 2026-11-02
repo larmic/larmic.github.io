@@ -7,13 +7,17 @@
   "packageRules": [
     {
       "description": "Kleine Updates automatisch übernehmen, sobald der Build grün ist",
-      "matchUpdateTypes": ["minor", "patch", "digest"],
-      "automerge": true
+      "matchUpdateTypes": ["minor", "patch", "digest", "lockFileMaintenance"],
+      "automerge": true,
+      "dependencyDashboardCategory": "Wird automatisch gemergt",
+      "addLabels": ["automerge"]
     },
     {
       "description": "Major-Updates immer manuell prüfen",
       "matchUpdateTypes": ["major"],
-      "automerge": false
+      "automerge": false,
+      "dependencyDashboardCategory": "Manuell prüfen und mergen",
+      "addLabels": ["manuell prüfen"]
     },
     {
       "description": "Astro und offizielle Integrationen gemeinsam aktualisieren",
