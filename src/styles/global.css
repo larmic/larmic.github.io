@@ -35,6 +35,13 @@ button:focus-visible {
 .pxf {
   font-family: var(--font-pixel);
 }
+/* Lange Wörter in der breiten Pixelschrift („Netzwerkproblemen“) passen auf Handys nicht in eine Zeile: trennen statt überlaufen */
+h1,
+h2,
+h3 {
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
 .pxbox {
   box-shadow:
     var(--px-4),
@@ -742,8 +749,13 @@ a.blk {
     flex-direction: column;
     align-items: center;
   }
+  /* Kisten zu zweit nebeneinander: Ihre Etiketten („Testcontainers“) sind breiter als ein Viertel der Reihe */
   .blk.child {
     order: 1;
+    flex-basis: calc((100% - 10px) / 2);
+  }
+  .blk.child .bob {
+    width: 34%;
   }
   .blk .bob {
     width: 74%;
@@ -758,6 +770,8 @@ a.blk {
     white-space: normal;
     max-width: 100%;
     text-align: center;
+    hyphens: auto;
+    overflow-wrap: break-word;
   }
   .blk.child .tag {
     opacity: 1;

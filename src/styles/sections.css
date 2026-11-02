@@ -18,6 +18,24 @@
 .reveal {
   animation: reveal 0.45s steps(5) both;
 }
+/* Handy: weniger Erde neben dem Panel, kleineres Icon und kleinere Überschrift im Panel-Kopf */
+@container larmic (max-width: 560px) {
+  .ground {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .panel-head {
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .panel-head svg {
+    width: 44px;
+    height: auto;
+  }
+  .panel-head h1 {
+    font-size: 1.75rem;
+  }
+}
 @keyframes reveal {
   from {
     opacity: 0;
