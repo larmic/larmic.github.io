@@ -120,7 +120,7 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [x] Actions auf Commit-SHAs gepinnt, Renovate hält sie aktuell (`helpers:pinGitHubActionDigests`).
 - [x] Auf `actions/deploy-pages` umgestellt: kein Branch `gh-pages` mehr, Deploy ohne Schreibrechte aufs Repo, `CNAME` und `.nojekyll` entfallen.
 - [x] **Renovate:** `minimumReleaseAge` 3 Tage, `internalChecksFilter: strict`.
-- [ ] LICENSE-Datei im öffentlichen Repo.
+- [x] LICENSE-Datei: MIT für den Code, Texte, Fotos und Figur mit allen Rechten vorbehalten.
 
 ### SEO und Performance
 

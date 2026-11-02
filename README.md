@@ -145,3 +145,7 @@ Danach erscheint unter jedem Video ein Bereich „Kommentare“. Geladen wird gi
 ## Design
 
 Farben, Materialien, Typografie und Interaktionen stehen in [docs/design-system.md](docs/design-system.md). Die Design-Tokens liegen in `src/styles/tokens.css`.
+
+## Lizenz
+
+Der Quellcode steht unter der MIT-Lizenz. Texte, Fotos, Name und Figur sind davon ausgenommen, hier sind alle Rechte vorbehalten. Details in [LICENSE](LICENSE).
