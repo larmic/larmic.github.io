@@ -7,7 +7,7 @@ export const SITE = {
     'Lars Michaelis – Entwickler, Architekt, Speaker und Berater. Software mit fachlichem Kern und KI mit Leitplanken; Workshops zu Domain-Driven Design, Event Storming und Microservices.',
   url: 'https://larmic.de',
   mail: 'mail@larmic.de', // privat, nur per JavaScript als Link (MailLink.astro)
-  workshopMail: 'l.michaelis@neusta.de', // Workshops und Beratung laufen über team neusta
+  workshopMail: 'l.michaelis@neusta.de', // Workshops und Beratung laufen über team neusta; wie `mail` nur per MailLink
 };
 
 export const SOCIALS = [
@@ -24,10 +24,6 @@ export const BUBBLES = {
   videos: 'Popcorn bereit? Hier sind meine Talks.',
   tree: 'Schöne Aussicht!', // Easter Egg: oben im Baum
 };
-
-/** Mail-Link für Workshop- und Beratungsanfragen, optional mit Betreff */
-export const workshopMailto = (subject = 'Anfrage Workshop oder Beratung') =>
-  `mailto:${SITE.workshopMail}?subject=${encodeURIComponent(subject)}`;
 
 export const FOCUS = ['Domain-Driven Design', 'Hexagonale Architektur', 'Event Storming', 'Microservices', 'DevSecOps'];
 

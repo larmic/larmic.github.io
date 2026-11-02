@@ -1,4 +1,5 @@
 ---
+import MailLink from '../components/MailLink.astro';
 import PlainPage from '../layouts/PlainPage.astro';
 import { SITE } from '../data/site';
 ---
@@ -66,8 +67,8 @@ import { SITE } from '../data/site';
   </p>
   <p>
     Workshops und Beratung biete ich als Mitarbeiter von team neusta an, Vertragspartner ist die neusta GmbH. Anfragen
-    an meine geschäftliche Adresse bei neusta ({SITE.workshopMail}) landen deshalb auf den Systemen von team neusta und
-    werden dort verarbeitet. Dafür gilt die{' '}
+    an meine geschäftliche Adresse bei neusta (<MailLink address={SITE.workshopMail} fallback="#" />) landen deshalb auf
+    den Systemen von team neusta und werden dort verarbeitet. Dafür gilt die{' '}
     <a href="https://www.team-neusta.de/datenschutzerklaerung">Datenschutzerklärung von team neusta</a>.
   </p>
 

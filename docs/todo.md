@@ -48,11 +48,13 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
     - `/tags/`, `/categories/` leiten auf die Startseite um
     - `/sitemap.xml` ist ein Sitemap-Index, der auf die neue Sitemap zeigt
     - RSS (`/index.xml`, `/videos/index.xml`, `/workshops/index.xml`) entfällt bewusst, solange es keinen Blog gibt
-  - [ ] Branch-Schutz für `main`: Prüfung „Guard-Gates und Build“ als Pflicht, direkte Pushes nur per Pull Request.
+  - [ ] Branch-Schutz für `main` (Settings → Branches → Add rule): „Require a pull request before merging“ und „Require status checks to pass“ mit „Guard-Gates und Build“.
   - [x] Pages-Einstellungen prüfen: Custom domain `larmic.de` steht weiter drin, „Enforce HTTPS“ an. Seite mit CSS und Insel ausgeliefert?
   - [x] Stichprobe der alten Adressen nach dem Deploy (`/about/`, `/#workshops`, `/workshops/#workshop-…`, `/videos/#video-…`).
-  - [ ] Search Console: `sitemap-index.xml` einreichen, alte `sitemap.xml` entfernen.
-  - [ ] Branches `relaunch` und `gh-pages` löschen (`gh-pages` wird nicht mehr gebraucht).
+  - [ ] Search Console: `https://larmic.de/sitemap-index.xml` einreichen, alte `sitemap.xml` entfernen.
+  - [ ] Branches `relaunch` und `gh-pages` auf GitHub löschen (`gh-pages` wird nicht mehr gebraucht), danach lokal `relaunch`.
+  - [ ] Branch `docs/livegang` pushen und per Pull Request mergen – gleich der erste Test für den Branch-Schutz.
+  - [ ] Auf dem Mac: `git pull` und `npm install`, damit der Pre-Commit-Hook aktiv ist.
 - [ ] **Mobiles Design prüfen**, auch sehr schmale und sehr breite Bildschirme.
 - [x] **Kisten-Plätze:** vierter Workshop-Platz als Reserve (für „DDD für Nicht-Techniker:innen“), Fehlermeldung sagt, was zu tun ist. Videos haben weiterhin vier Plätze.
 
@@ -100,6 +102,10 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [x] Dauerbewegung (Wolken, wippende Blöcke) bleibt bewusst: Bei `prefers-reduced-motion` steht sie still, sonst ist sie Teil des Designs.
 
 ### Inhalt (weitere)
+
+- [x] **Mail-Adressen gleich behandelt:** Auch `l.michaelis@neusta.de` läuft über `MailLink` (Button „Workshop anfragen“, neusta-Absatz, Datenschutz). Ohne JavaScript führt der Button zum neusta-Absatz (`#anfrage`).
+- [x] **Name im Text der Seite:** Die Kachel-Buchstaben kommen per CSS (`data-ch`), im Text steht nur noch „Lars Michaelis“ statt „Lars MichaelisLARSMICHAELIS“.
+- [x] „Kontakt“ im Footer ist schon ein Mail-Link (`MailLink`); nur ohne JavaScript führt er aufs Impressum.
 
 - [x] **Workshop-Eckdaten einheitlich:** Zielgruppe, Dauer, Format, Gruppengröße (max. 12), Schwierigkeitsgrad und Ort als Frontmatter-Felder, auf jeder Workshop-Seite als Kasten, Dauer und Schwierigkeitsgrad auch auf der Karte. Die Kontakt-Mail mit Workshop im Betreff kommt aus `WorkshopProvider`, nicht mehr aus dem Text.
 - [x] **Schreibweisen vereinheitlicht:** „Domain-Driven Design“, „hexagonale Architektur“ (klein im Satz), „Clean Code“, „Projektmanager:innen“.

@@ -1,20 +1,26 @@
 ---
-// Private Mail-Adresse, die einfache Crawler nicht finden: Im HTML steht kein mailto, der Link entsteht erst im Browser.
-// Ohne JavaScript steht „mail[at]larmic.de“ als Text da bzw. das Label verweist auf das Impressum.
+// Mail-Adressen, die einfache Crawler nicht finden: Im HTML steht kein mailto und keine Adresse am Stück,
+// der Link entsteht erst im Browser. Ohne JavaScript steht „mail[at]larmic.de“ als Text da bzw. das Label
+// verweist auf `fallback` (Impressum, bei Workshop-Anfragen der neusta-Absatz).
 import { SITE } from '../data/site';
 
 interface Props {
+  address?: string;
+  subject?: string;
   label?: string;
+  fallback?: string;
+  class?: string;
 }
-const { label } = Astro.props;
-const [user, domain] = SITE.mail.split('@');
+const { address = SITE.mail, subject, label, fallback = '/impressum/', class: cls } = Astro.props;
+const [user, domain] = address.split('@');
 ---
 
 <a
-  class="mail-link"
-  href="/impressum/"
+  class:list={['mail-link', cls]}
+  href={fallback}
   data-mail-user={user}
   data-mail-domain={domain}
+  data-mail-subject={subject}
   data-mail-show={label ? undefined : ''}
 >
   {label ?? `${user}[at]${domain}`}
@@ -25,7 +31,8 @@ const [user, domain] = SITE.mail.split('@');
   document.addEventListener('astro:page-load', () => {
     for (const a of document.querySelectorAll<HTMLAnchorElement>('a.mail-link[data-mail-user]')) {
       const address = `${a.dataset.mailUser}@${a.dataset.mailDomain}`;
-      a.href = `mailto:${address}`;
+      const subject = a.dataset.mailSubject;
+      a.href = `mailto:${address}${subject ? `?subject=${encodeURIComponent(subject)}` : ''}`;
       if (a.hasAttribute('data-mail-show')) a.textContent = address;
     }
   });

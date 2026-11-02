@@ -139,7 +139,7 @@ Danach erscheint unter jedem Video ein Bereich „Kommentare“. Geladen wird gi
 - Impressum (`/impressum/`) nach § 5 DDG und § 18 Abs. 2 MStV, Datenschutzerklärung unter `/datenschutz/`.
 - Beim Laden der Seite wird nichts von Dritten nachgeladen: Schriften sind lokal gebündelt, keine Cookies, kein Tracking.
 - YouTube-Videos und Kommentare laden erst nach einem Klick. Unter jedem Video steht ein direkter Link zu YouTube.
-- Die private Mail-Adresse steht nicht im HTML, der Link entsteht erst im Browser (`MailLink.astro`).
+- Keine Mail-Adresse steht am Stück im HTML, weder die private noch die von neusta: Der Link entsteht erst im Browser (`MailLink.astro`), ohne JavaScript steht „mail[at]larmic.de“ bzw. „l.michaelis[at]neusta.de“ da.
 - Wenn du giscus aktivierst, braucht die Datenschutzerklärung einen eigenen Abschnitt dazu.
 
 ## Design

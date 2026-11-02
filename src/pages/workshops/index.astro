@@ -4,7 +4,6 @@ import IslandPage from '../../layouts/IslandPage.astro';
 import VoxelIcon from '../../components/VoxelIcon.astro';
 import WorkshopCard from '../../components/WorkshopCard.astro';
 import WorkshopProvider from '../../components/WorkshopProvider.astro';
-import { workshopMailto } from '../../data/site';
 
 const workshops = (await getCollection('workshops', ({ data }) => !data.draft)).sort(
   (a, b) => a.data.order - b.data.order,
@@ -15,7 +14,7 @@ const workshops = (await getCollection('workshops', ({ data }) => !data.draft)).
   title="Workshops"
   description="Workshops von Lars Michaelis zu Domain-Driven Design, hexagonaler Architektur, Event Storming und Microservices."
   rest="workshops"
-  cta={{ label: 'Workshop anfragen', href: workshopMailto('Anfrage Workshop') }}
+  cta={{ label: 'Workshop anfragen', subject: 'Anfrage Workshop' }}
 >
   <script is:inline>
     // Alte Links /workshops/#workshop-<id> führen auf die Seite des Workshops

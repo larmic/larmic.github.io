@@ -4,7 +4,6 @@ import IslandPage from '../../layouts/IslandPage.astro';
 import VoxelIcon from '../../components/VoxelIcon.astro';
 import WorkshopFacts from '../../components/WorkshopFacts.astro';
 import WorkshopProvider from '../../components/WorkshopProvider.astro';
-import { workshopMailto } from '../../data/site';
 import { MATERIALS } from '../../data/materials';
 import { courseLd } from '../../data/structured-data';
 
@@ -22,7 +21,7 @@ const m = MATERIALS[w.data.material];
   description={w.data.teaser}
   rest={`workshops/${w.id}`}
   jsonLd={courseLd(w)}
-  cta={{ label: 'Workshop anfragen', href: workshopMailto(`Workshop: ${w.data.short}`) }}
+  cta={{ label: 'Workshop anfragen', subject: `Workshop: ${w.data.short}` }}
 >
   <div class="panel-head">
     <VoxelIcon block={m.block} color={m.icon} size={64} />

@@ -1,7 +1,7 @@
 ---
 // Jede Seite mit Insel: oben Name, Intro und Insel (bleibt beim Seitenwechsel stehen), darunter der Inhalt der Seite.
 // `rest` ist der Block der Seite, z. B. `about`, `workshops` oder `workshops/event_storming`: Dort steht die Figur.
-// `cta` ersetzt den Button im Kopf (auf Workshop-Seiten: „Workshop anfragen“).
+// `cta` ersetzt den Button im Kopf: Link (`href`) oder Mail-Anfrage an neusta (`subject`, auf Workshop-Seiten).
 import BaseLayout from './BaseLayout.astro';
 import type { RestId } from '../data/island-layout';
 import SiteHeader from '../components/SiteHeader.astro';
@@ -9,13 +9,15 @@ import SiteFooter from '../components/SiteFooter.astro';
 import Clouds from '../components/Clouds.astro';
 import NameTiles from '../components/NameTiles.astro';
 import Island from '../components/Island.astro';
+import MailLink from '../components/MailLink.astro';
+import { SITE } from '../data/site';
 import { particleCss } from '../lib/voxel/world';
 
 interface Props {
   title?: string;
   description?: string;
   rest: RestId;
-  cta?: { label: string; href: string };
+  cta?: { label: string; href: string } | { label: string; subject: string };
   jsonLd?: object;
 }
 const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/workshops/' }, jsonLd } = Astro.props;
@@ -36,16 +38,34 @@ const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/wo
           Architektur und Testing.
         </p>
         <div class="cta">
-          <a href={cta.href} class="pxbtn">
-            {cta.label}
-          </a>
+          {'subject' in cta ? (
+            <MailLink
+              address={SITE.workshopMail}
+              subject={cta.subject}
+              label={cta.label}
+              fallback="#anfrage"
+              class="pxbtn"
+            />
+          ) : (
+            <a href={cta.href} class="pxbtn">
+              {cta.label}
+            </a>
+          )}
         </div>
       </div>
       <Island rest={rest} />
     </div>
   </header>
   <div class="grass-edge" aria-hidden="true"></div>
-  <main id="inhalt" tabindex="-1" class="ground" data-rest={rest} data-cta-label={cta.label} data-cta-href={cta.href}>
+  <main
+    id="inhalt"
+    tabindex="-1"
+    class="ground"
+    data-rest={rest}
+    data-cta-label={cta.label}
+    data-cta-href={'href' in cta ? cta.href : undefined}
+    data-cta-subject={'subject' in cta ? cta.subject : undefined}
+  >
     <div class="panel pxbox reveal">
       <slot />
     </div>
@@ -53,15 +73,27 @@ const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/wo
   <SiteFooter />
 
   <script>
-    // Nach dem Seitenwechsel: Die Figur läuft zum Block der neuen Seite, der Button im (stehen gebliebenen) Kopf passt sich an
+    // Nach dem Seitenwechsel: Die Figur läuft zum Block der neuen Seite, der Button im (stehen gebliebenen) Kopf passt sich an.
+    // Mail-Anfragen bekommen nur den Betreff; den mailto-Link setzt MailLink danach bei astro:page-load.
     document.addEventListener('astro:after-swap', () => {
       const main = document.querySelector<HTMLElement>('main[data-rest]');
       if (!main) return;
       document.querySelector('larmic-island')?.select(main.dataset.rest!);
       const button = document.querySelector<HTMLAnchorElement>('.hero .cta a');
-      if (button && main.dataset.ctaHref) {
-        button.href = main.dataset.ctaHref;
-        button.textContent = main.dataset.ctaLabel ?? '';
+      if (!button) return;
+      button.textContent = main.dataset.ctaLabel ?? '';
+      const subject = main.dataset.ctaSubject;
+      button.classList.toggle('mail-link', subject !== undefined);
+      if (subject !== undefined) {
+        // Adresse (in Teilen) vom neusta-Absatz der neuen Seite, der Button kann vorher ein normaler Link gewesen sein
+        const source = document.querySelector<HTMLAnchorElement>('#anfrage a.mail-link');
+        button.href = '#anfrage';
+        button.dataset.mailUser = source?.dataset.mailUser;
+        button.dataset.mailDomain = source?.dataset.mailDomain;
+        button.dataset.mailSubject = subject;
+      } else {
+        button.href = main.dataset.ctaHref ?? '/';
+        delete button.dataset.mailSubject;
       }
     });
   </script>

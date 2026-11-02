@@ -235,6 +235,9 @@ main:focus {
   box-shadow: inset 0 0 0 2px var(--wood-frame);
   transition: opacity 0.15s steps(2);
 }
+.lt::before {
+  content: attr(data-ch);
+}
 .lt.hi {
   background: var(--gold);
   box-shadow:
