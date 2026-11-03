@@ -1,7 +1,8 @@
 ---
 title: "Domain-Driven Design und hexagonale Architektur (für Entwickler:innen)"
 short: "DDD & hexagonale Architektur"
-teaser: "Fachliche Aspekte im Kern, Technik drumherum – Domain-Driven Design und hexagonale Architektur für wartbaren Code."
+teaser: "Zwei Tage, wenig Folien, viel Code: Domain-Driven Design und hexagonale Architektur für wartbaren Code."
+claim: "Fachlichkeit in den Kern, Technik an den Rand."
 material: "hw"
 order: 1
 audience: "Entwickler:innen und Software-Architekt:innen"
@@ -9,12 +10,22 @@ duration: "2 Tage am Stück"
 level: "Anspruchsvoll"
 ---
 
-Domain-Driven Design (kurz DDD) ist ein Ansatz zur Modellierung komplexer Software und stellt dabei die fachlichen Aspekte in den Vordergrund. Die hexagonale Architektur greift dieses Konzept auf und integriert die fachlichen Inhalte in den Kern der Anwendung. Die konkrete technische Umsetzung (wie beispielsweise Datenbank oder MQ-Systeme) spielt dabei eine untergeordnete Rolle. Im Zuge von KI-gestützter Softwareentwicklung gewinnt dieses Architekturpattern gerade noch mehr an Bedeutung.
+In vielen Projekten verschwindet die Fachlichkeit irgendwo zwischen Controller, Repository und Mapping-Code. Domain-Driven Design (DDD) holt sie zurück in den Mittelpunkt. Die hexagonale Architektur sorgt dafür, dass sie dort auch bleibt: Datenbank, Message Queue oder REST-Schnittstelle hängen außen dran und lassen sich austauschen, ohne dass der fachliche Kern etwas davon merkt.
+
+Mit KI-gestützter Entwicklung wird das noch wichtiger. Wenn große Teile des Codes generiert werden, brauchst du klare Leitplanken dafür, was in den Kern gehört und was nicht.
 
 ![Workshop-Runde: Teilnehmende mit Laptops an einem langen Konferenztisch, vorne auf der Leinwand eine User Story als Übungsaufgabe](../../assets/workshops/ddd_hex_architecture.webp)
 
-**Teilnahmebedingungen**:
+## Was dich erwartet
+
+* Zwei Tage, wenig Folien, viel Code
+* Wir setzen gemeinsam User Stories in einer hexagonalen Architektur um
+* Du arbeitest in deiner eigenen Programmiersprache
+* Kleine Gruppe (max. 12), viel Raum für Fragen aus deinem Projektalltag
+
+## Das bringst du mit
 
 * Patterns, SOLID und Clean Code verspeist du zum Frühstück
-* Du bist Software-Architekt:in oder willst dies werden
-* Du bringst ein Entwickler-Notebook mit (installiert: Git, IDE, Programmiersprache deiner Wahl)
+* Du bist Software-Architekt:in oder willst es werden
+* Du kannst dir 2 Tage am Stück freihalten
+* Ein Entwickler-Notebook mit Git, IDE und der Programmiersprache deiner Wahl

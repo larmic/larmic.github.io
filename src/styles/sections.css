@@ -468,6 +468,15 @@
   font-size: 1.0625rem;
   line-height: 1.5;
 }
+/* Leitsatz eines Workshops: Fläche in der Themenfarbe, Pixel-Rahmen */
+.claim {
+  max-width: 46rem; /* so breit wie die Eckdaten darüber */
+  margin: 28px 0 8px;
+  padding: 18px 22px;
+  font-family: var(--font-pixel);
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  line-height: 1.4;
+}
 .backlink {
   display: inline-block;
   margin-top: 24px;
