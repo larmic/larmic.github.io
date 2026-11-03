@@ -31,6 +31,7 @@ const m = MATERIALS[w.data.material];
     </div>
   </div>
   <WorkshopFacts data={w.data} />
+  {w.data.claim && <p class={`claim pxsm th-${w.data.material}`}>{w.data.claim}</p>}
   <div class="prose">
     <Content />
     {w.data.link && (

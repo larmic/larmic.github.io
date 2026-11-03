@@ -12,6 +12,7 @@ const workshops = defineCollection({
     title: z.string(),
     short: z.string(),
     teaser: z.string(),
+    claim: z.string().optional(), // Leitsatz: hervorgehoben unter den Eckdaten der Workshop-Seite
     material,
     order: z.number().int(),
     link: z.url().optional(),
