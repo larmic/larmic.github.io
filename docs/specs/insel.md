@@ -74,6 +74,7 @@ Geprüft in `island-layout.test.ts` für die volle Belegung aller Kisten-Plätze
 ## Außerhalb dieser Spec
 
 - **Blick zum Cursor** (Kopf drehen und nicken, Körper umdrehen) ist reine Darstellung in der Web Component (`larmic-island.ts`) und ändert nur die Blickrichtung, nie den Weg. Die Kopfgeometrie prüft `head.test.ts`.
+- **Freudenhüpfer:** Fährt die Maus über den Namen im Kopf, hüpft die Figur zweimal. Nur wenn sie steht (kein Takt, kein Sturz), nur mit Maus und ohne reduzierte Bewegung. Reine Darstellung in der Web Component, ändert weder Weg noch Zustand.
 - **Handy:** Unter 700 px Containerbreite stehen die Blöcke als Reihen unter der Insel, Brücken sind ausgeblendet, die Figur bleibt in der Inselmitte. Die Zustandsmaschine läuft dort nicht Takt für Takt, sondern springt mit `settle` sofort in den Endzustand (gleiches Ergebnis; *Test: „kommt in der schmalen Ansicht mit settle …“*).
 - **Reduzierte Bewegung** (`prefers-reduced-motion`): Zeigen auf einen Block schickt die Figur nicht los; nach einem Seitenwechsel steht sie mit `settle` sofort am Ziel. Ein Klick auf den Blog zeigt direkt die 404-Meldung.
 - **Ohne JavaScript** zeigt die Seite das Startbild: Figur auf dem Ruheblock, Brücken dorthin, alle Blöcke sind normale Links.
