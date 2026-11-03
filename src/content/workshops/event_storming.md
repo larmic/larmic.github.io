@@ -18,7 +18,7 @@ Oft zeigen sich dabei auch die Stellen, an denen jemand sagt: „Moment, das lä
 
 ## Was dich erwartet
 
-* 4 Stunden in Präsenz im Schuppen Eins
+* 4 Stunden in Präsenz, bei uns oder bei euch vor Ort
 * Wir modellieren gemeinsam einen Beispielprozess, Schritt für Schritt
 * Du nimmst mit, wann sich Event Storming lohnt und wie du es in dein Projekt bringst
 
