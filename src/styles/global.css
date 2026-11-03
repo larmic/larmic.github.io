@@ -427,6 +427,27 @@ larmic-island {
     transform: scale(1.04, 0.95);
   }
 }
+/* Freudenhüpfer, wenn die Maus über den Namen fährt: zweimal hoch, zusammen mit den goldenen Buchstaben */
+.cheer {
+  animation: cheer 0.7s ease-out;
+}
+@keyframes cheer {
+  12% {
+    transform: scale(1.06, 0.9);
+  }
+  30% {
+    transform: translateY(-16%) scale(0.95, 1.06);
+  }
+  48% {
+    transform: scale(1.05, 0.92);
+  }
+  68% {
+    transform: translateY(-10%) scale(0.97, 1.04);
+  }
+  86% {
+    transform: scale(1.03, 0.96);
+  }
+}
 .falling {
   animation: fall 0.8s steps(8) forwards;
 }

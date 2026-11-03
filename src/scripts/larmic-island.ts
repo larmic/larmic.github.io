@@ -8,6 +8,7 @@
 // Die Blöcke sind Links. Beim Seitenwechsel bleibt die Insel erhalten (transition:persist), die Seite ruft `select()`.
 // Easter Egg: Hover über das Blätterdach → die Figur stapelt zwei Blöcke und klettert in die Krone.
 // Steht die Figur, schaut sie zum Cursor: Der Körper dreht sich zur Seite, der Kopf dreht und nickt in 15°/10°-Stufen.
+// Fährt die Maus über den Namen, hüpft sie zweimal mit den goldenen Buchstaben mit.
 // Die Logik (Wege, Brücken, Sturz, Sprechblase) steckt rein und getestet in island-state.ts; hier nur DOM, Takt und Kopfblick.
 
 import { BUBBLES } from '../data/site';
@@ -132,6 +133,23 @@ class LarmicIsland extends HTMLElement {
       opts,
     );
     window.addEventListener('scroll', follow, opts);
+    // Über document: Der Name liegt außerhalb der Insel und bleibt wie sie beim Seitenwechsel stehen
+    document.addEventListener(
+      'pointerover',
+      (e) => {
+        const into = (e.target as Element).closest?.('.name');
+        if (into && !into.contains(e.relatedTarget as Node | null)) this.cheer();
+      },
+      opts,
+    );
+  }
+
+  /** Freudenhüpfer: nur wenn die Figur steht, sonst würde er den Schritt- oder Sturz-Sprung überdecken. */
+  private cheer() {
+    if (this.timer !== undefined || this.state.falling) return;
+    this.jump.classList.remove('cheer');
+    void this.jump.offsetWidth; // Animation neu starten, auch wenn sie gerade noch läuft
+    this.jump.classList.add('cheer');
   }
 
   /** Zeigen auf einen Block schickt die Figur los – außer bei reduzierter Bewegung. */
