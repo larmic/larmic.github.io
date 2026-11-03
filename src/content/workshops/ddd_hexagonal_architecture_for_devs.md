@@ -1,8 +1,8 @@
 ---
 title: "Domain-Driven Design und hexagonale Architektur (für Entwickler:innen)"
 short: "DDD & hexagonale Architektur"
-teaser: "Zwei Tage, wenig Folien, viel Code: Domain-Driven Design und hexagonale Architektur für wartbaren Code."
-claim: "Fachlichkeit in den Kern, Technik an den Rand."
+teaser: "Fachlichkeit in den Kern, Technik an den Rand."
+claim: "Wer mit KI entwickelt, braucht eine Architektur mit klaren Grenzen. In zwei Tagen lernst du, wie du mit DDD und hexagonaler Architektur Fachlichkeit und Technik sauber trennst."
 material: "hw"
 order: 1
 audience: "Entwickler:innen und Software-Architekt:innen"
