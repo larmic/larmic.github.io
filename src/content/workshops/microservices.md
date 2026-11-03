@@ -1,7 +1,8 @@
 ---
-title: "Microservices – sind auch nur Monolithen mit Netzwerkproblemen"
+title: "Microservices"
 short: "Microservices"
-teaser: "Zu kleinteilige Services, unklare Grenzen, verteilte Monolithen – dieser Workshop räumt auf: Konzepte und Patterns, die Microservice-Architekturen wirklich tragen."
+teaser: "Microservices sind auch nur Monolithen mit Netzwerkproblemen."
+claim: "Zwei Tage, eine Reisebuchung aus Hotel, Flug und Mietwagen und jede Menge Netzwerkprobleme, die wir gemeinsam lösen. Hands-on, in deiner eigenen Programmiersprache."
 material: "ops"
 order: 3
 audience: "Entwickler:innen und Software-Architekt:innen mit Architekturerfahrung"
@@ -9,18 +10,28 @@ duration: "2 Tage am Stück"
 level: "Anspruchsvoll"
 ---
 
-Microservices sind seit Jahren in aller Munde – und trotzdem begegnen uns in der Praxis immer wieder dieselben Missverständnisse und Fallstricke. Zu kleinteilige Services, unklare Grenzen, verteilte Monolithen: Was gut gemeint ist, wird oft zur Architektur-Falle.
+Zu kleine Services, unklare Grenzen, verteilte Monolithen: In der Praxis begegnen uns bei Microservices immer wieder dieselben Fallstricke. In diesem Workshop schauen wir uns an, welche Konzepte und Patterns eine Microservice-Architektur wirklich tragen, und vor allem, warum.
 
-Dieser Workshop räumt auf. Gemeinsam erarbeiten wir die Konzepte und Patterns, die Microservice-Architekturen wirklich tragen: hands-on, anhand einer praxisnahen Beispieldomäne. Du lernst nicht nur, wie man Microservices umsetzt, sondern vor allem warum bestimmte Entscheidungen den Unterschied machen.
+Dafür bauen wir zwei Tage lang an einer Reisebuchung mit Hotel, Flug und Mietwagen. Kurze Vorträge wechseln sich mit Gruppenarbeit an User Stories ab, der Schwerpunkt liegt klar auf dem Hands-on-Teil. Deinen eigenen Booking-Service schreibst du in deiner Sprache und hängst ihn in die laufende Landschaft ein.
 
-Egal ob du gerade in ein Microservice-Projekt einsteigst oder bestehende Architekturen hinterfragen möchtest: Dieser Workshop gibt dir die Werkzeuge dafür!
+## Themen u. a.
 
-Keine Sorge: Microservices-Vorwissen brauchst du nicht, die Patterns erarbeiten wir gemeinsam. Du solltest aber schon etwas Erfahrung mit Software-Architektur mitbringen. Ohne diese Grundlage sind zwei Tage voller neuer Themen sehr dicht.
+* Service Discovery
+* Resilience mit Circuit Breaker und Bulkhead
+* Saga und CQRS
+* Distributed Tracing und Twelve-Factor
 
-**Teilnahmebedingungen**:
+Microservices-Vorwissen brauchst du nicht, die Patterns erarbeiten wir gemeinsam. Ohne Architekturerfahrung werden zwei Tage voller neuer Themen aber sehr dicht.
 
-* Du hast schon praktische Erfahrung mit Software-Architektur, mindestens ein Architekturpattern ist dir vertraut
-* Du bist Software-Architekt:in oder willst dies werden
-* Du bringst ein Entwickler-Notebook mit (installiert: Git, Docker inkl. Docker Compose, IDE, Programmiersprache deiner Wahl)
-* Du kannst in deiner Sprache ein neues Projekt aufsetzen, das einen HTTP-Endpoint bereitstellt und per Dockerfile ein Image baut (das üben wir im Workshop nicht)
-* Eine Entwicklungs-KI ist empfohlen (z. B. GitHub Copilot, Claude Code), aber kein Muss
+## Das bringst du mit
+
+* Praktische Erfahrung mit Software-Architektur, mindestens ein Architekturpattern ist dir vertraut
+* Du bist Software-Architekt:in oder Tech Lead oder willst dahin
+* Du kannst dir 2 Tage am Stück freihalten
+* Ein Entwickler-Notebook mit Git, Docker (inkl. Docker Compose), IDE und deiner Programmiersprache
+* Du kannst in deiner Sprache ein Projekt mit HTTP-Endpoint aufsetzen und per Dockerfile ein Image bauen. Das üben wir im Workshop nicht.
+* Eine Entwicklungs-KI (z. B. GitHub Copilot, Claude Code) hilft, ist aber kein Muss
+
+## Vorbereitung
+
+Vor dem Workshop gibt es eine kleine Pflicht-Hausaufgabe (ca. 1 bis 2 Stunden). Die Details bekommst du mit der Einladung, oder du findest sie in der [Vorbereitung zum Workshop](https://larmic.de/workshop_microservices/vorbereitung/). Quellcode und Material liegen auf [GitHub](https://github.com/larmic/workshop_microservices).
