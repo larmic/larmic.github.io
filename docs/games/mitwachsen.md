@@ -106,7 +106,7 @@ Eine **Welt** besteht aus Seed, Weltname, Figurenname und Fortschritt. Es kann m
 ## Speichern
 
 - **localStorage**, alle Schlüssel mit Präfix `larmic.games.`: ein Index der Welten und je Welt ein eigener Schlüssel, damit eine kaputte Welt nicht alle anderen mitreißt.
-- **Format je Welt:** `{ v, game: 'threeyear', seed, worldName, figureName, openGates[], metAnimals[], penAnimals[], position, visits }`. Das Versionsfeld `v` hat eine getestete `migrate()`.
+- **Format je Welt:** `{ v, game: 'mitwachsen', age, seed, worldName, figureName, openGates[], metAnimals[], penAnimals[], position, visits }`. `age` ist die Altersstufe der Welt. Das Versionsfeld `v` hat eine getestete `migrate()`.
 - **Zeitpunkte:** sofort bei jedem wichtigen Ereignis (Tier getroffen, Tor offen, Tier im Gehege, schlafen, Welt gewechselt), zusätzlich alle 10 Sekunden die Position und beim Verlassen der Seite (`pagehide`, `visibilitychange`).
 - Alle Zugriffe in `try/catch`. Speichert der Browser nicht (privates Fenster), läuft das Spiel trotzdem.
 - Schlüssel und `game` bleiben auch bei einer Umbenennung der Reihe gleich oder werden in `migrate()` übernommen.

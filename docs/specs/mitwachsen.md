@@ -82,7 +82,8 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Was | Regel |
 | --- | --- |
 | Schlüssel | `larmic.games.index` (Liste der Welten, aktuelle Welt), `larmic.games.world.<id>` je Welt, `larmic.games.muted` |
-| Format | `{ v: 1, game: 'threeyear', id, seed, worldName, figureName, openGates, metAnimals, penAnimals, position, visits }` |
+| Format | `{ v: 2, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, penAnimals, position, visits }`; `age` ist die Altersstufe der Welt (bisher nur 3) |
+| Umzug | Version 1 (Arbeitstitel `game: 'threeyear'`, ohne Alter) wird beim Laden zu Version 2 mit Alter 3; der Index von Version 1 wird übernommen. Nichts geht verloren |
 | Wann | sofort bei getroffen, Gehege, Tor, Schlafen, Weltwechsel und Umbenennen; sonst alle 10 s; beim Verlassen der Seite |
 | Fehler | Jeder Zugriff fängt Fehler ab. Ohne Speicher läuft das Spiel bis zum Neuladen weiter. |
 | `migrate()` | verwirft Fremdes (anderes Spiel, unbekannte Version) und räumt auf (unbekannte Tore und Arten, doppelte Einträge, kaputte Felder) |

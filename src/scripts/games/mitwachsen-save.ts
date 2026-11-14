@@ -9,14 +9,17 @@ import type { PenAnimal, Progress } from './mitwachsen-state';
 export const PREFIX = 'larmic.games.';
 export const INDEX_KEY = `${PREFIX}index`;
 export const worldKey = (id: string) => `${PREFIX}world.${id}`;
-export const VERSION = 1;
+export const VERSION = 2; // 1: Arbeitstitel „threeyear“ ohne Alter · 2: „mitwachsen“ mit Alter
+export const AGES = [3] as const; // Altersstufen, die es schon gibt
+export type Age = (typeof AGES)[number];
 
 /** Nur das, was vom localStorage gebraucht wird – in Tests ersetzbar */
 export type Store = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 
 export type SavedWorld = {
   v: typeof VERSION;
-  game: 'threeyear';
+  game: 'mitwachsen';
+  age: Age; // Altersstufe der Welt: schaltet Fähigkeiten frei
   id: string;
   seed: number;
   worldName: string;
@@ -28,7 +31,7 @@ export type SavedWorld = {
   visits: number;
 };
 export type Index = {
-  v: typeof VERSION;
+  v: typeof VERSION; // Index von Version 1 hat dasselbe Format und wird übernommen
   worlds: { id: string; worldName: string; figureName: string }[];
   current: string | null;
 };
@@ -52,10 +55,17 @@ export function parseWorldCode(code: string): number | null {
   return n <= 0xffffffff ? n : null;
 }
 
-export function newWorld(id: string, seed: number, worldName: string, figureName = DEFAULT_FIGURE): SavedWorld {
+export function newWorld(
+  id: string,
+  seed: number,
+  worldName: string,
+  figureName = DEFAULT_FIGURE,
+  age: Age = 3,
+): SavedWorld {
   return {
     v: VERSION,
-    game: 'threeyear',
+    game: 'mitwachsen',
+    age,
     id,
     seed: seed >>> 0,
     worldName: cleanName(worldName, 'Meine Welt'),
@@ -71,13 +81,24 @@ export function newWorld(id: string, seed: number, worldName: string, figureName
 const isRecord = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x);
 const strings = (x: unknown) => (Array.isArray(x) ? x.filter((s): s is string => typeof s === 'string') : []);
 
+/** Version 1 (Arbeitstitel „threeyear“) → 2: neuer Spielname, Alter 3 – sonst gleich */
+const fromV1 = (raw: Record<string, unknown>): Record<string, unknown> => ({
+  ...raw,
+  v: 2,
+  game: 'mitwachsen',
+  age: 3,
+});
+
 /**
- * Gespeicherte Daten in das aktuelle Format bringen. Unbekanntes wird verworfen statt das Spiel zu stören:
- * fremde Tore, Tierarten oder kaputte Felder. Neuere Versionen als diese gibt es noch nicht → null.
+ * Gespeicherte Daten in das aktuelle Format bringen: ältere Versionen Schritt für Schritt umziehen, dann aufräumen.
+ * Unbekanntes wird verworfen statt das Spiel zu stören: fremde Tore, Tierarten, Alter oder kaputte Felder.
+ * Neuere Versionen als diese und fremde Spiele → null.
  */
-export function migrate(raw: unknown): SavedWorld | null {
-  if (!isRecord(raw) || raw.game !== 'threeyear') return null;
-  if (raw.v !== VERSION) return null; // hier kommen künftige Umzüge hin: if (raw.v === 1) raw = fromV1(raw) …
+export function migrate(input: unknown): SavedWorld | null {
+  if (!isRecord(input)) return null;
+  let raw = input;
+  if (raw.v === 1 && raw.game === 'threeyear') raw = fromV1(raw);
+  if (raw.v !== VERSION || raw.game !== 'mitwachsen') return null;
   if (typeof raw.id !== 'string' || typeof raw.seed !== 'number' || !Number.isFinite(raw.seed)) return null;
   const gates = new Set<string>(GATES.map((g) => g.id));
   const pen = Array.isArray(raw.penAnimals)
@@ -89,7 +110,8 @@ export function migrate(raw: unknown): SavedWorld | null {
   const pos = Array.isArray(raw.position) && raw.position.length === 2 && raw.position.every(Number.isInteger);
   return {
     v: VERSION,
-    game: 'threeyear',
+    game: 'mitwachsen',
+    age: AGES.find((a) => a === raw.age) ?? 3,
     id: raw.id,
     seed: raw.seed >>> 0,
     worldName: cleanName(typeof raw.worldName === 'string' ? raw.worldName : '', 'Meine Welt'),
@@ -121,7 +143,7 @@ function write(store: Store, key: string, value: unknown): boolean {
 
 export function loadIndex(store: Store): Index {
   const raw = read(store, INDEX_KEY);
-  if (!isRecord(raw) || raw.v !== VERSION || !Array.isArray(raw.worlds))
+  if (!isRecord(raw) || (raw.v !== 1 && raw.v !== VERSION) || !Array.isArray(raw.worlds))
     return { v: VERSION, worlds: [], current: null };
   const worlds = raw.worlds
     .filter((w): w is Record<string, unknown> => isRecord(w) && typeof w.id === 'string')
