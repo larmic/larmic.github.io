@@ -12,6 +12,7 @@ Umgesetzt ist es in reinen, getesteten Teilen und einer Web Component:
 | Welt aus dem Seed | [`src/scripts/games/threeyear-world.ts`](../../src/scripts/games/threeyear-world.ts) | `threeyear-world.test.ts` |
 | Spielregeln (Zustandsmaschine) | [`src/scripts/games/threeyear-state.ts`](../../src/scripts/games/threeyear-state.ts) | `threeyear-state.test.ts` |
 | Spielstände | [`src/scripts/games/threeyear-save.ts`](../../src/scripts/games/threeyear-save.ts) | `threeyear-save.test.ts` |
+| Ruhiger Takt der Eingabe | [`src/scripts/games/input-pace.ts`](../../src/scripts/games/input-pace.ts) | `input-pace.test.ts` |
 | Browser: Tastatur, Takt, Kamera, Töne, Menü | [`larmic-threeyear.ts`](../../src/scripts/games/larmic-threeyear.ts), [`threeyear-render.ts`](../../src/scripts/games/threeyear-render.ts), [`sfx.ts`](../../src/scripts/games/sfx.ts) | – |
 
 Bei Änderungen am Verhalten Spec und Tests mitziehen.
@@ -31,8 +32,8 @@ Bei Änderungen am Verhalten Spec und Tests mitziehen.
 
 | Befehl | Auslöser | Wirkung |
 | --- | --- | --- |
-| `move(dir)` | Pfeiltaste (gehalten höchstens alle 230 ms) | Schritt, Hineinlaufen oder Wand, siehe Regeln |
-| `action` | Leertaste, Enter oder jede andere Taste außer Tab, Esc, F-Tasten und Modifikatoren | Singen und Folgen, Schlafen oder Rufen |
+| `move(dir)` | Pfeiltaste im ruhigen Takt: höchstens ein Schritt alle 260 ms, ob getippt oder gehalten. Halten läuft ab dem ersten Schritt gleichmäßig; ein Tipp während eines Schritts wird gemerkt (höchstens einer). *Tests: `input-pace.test.ts`* | Schritt, Hineinlaufen oder Wand, siehe Regeln |
+| `action` | Leertaste, Enter oder jede andere Taste außer Tab, Esc, F-Tasten und Modifikatoren; höchstens eine Aktion alle 350 ms, gehaltene Tasten zählen einmal | Singen und Folgen, Schlafen oder Rufen |
 | `tick` | Takt, solange Seite sichtbar und Menü zu | Tiere laufen umher, Tiere der Landschaft tauchen auf und verschwinden |
 
 Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst tun sie nichts.
@@ -98,7 +99,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Feinheit | Texturen 8 × 8 wie auf der Seite, jedes Texel mit feiner Körnung in 2 × 2 Unterpixeln |
 | Höhen | höhere Flächen etwas heller; dunkle Kante, wo es hinuntergeht; Schatten am Fuß eines höheren Nachbarn; helle Vorderkante und dunkle Unterkante jeder Stufe |
 | Figur | wird zusätzlich halb durchsichtig obenauf gezeichnet, damit sie hinter Hügeln und Bäumen sichtbar bleibt |
-| Wesen | gleiten zu ihrem Feld (9 Felder/s); Sprünge über mehr als 2,5 Felder springen direkt |
+| Wesen | gleiten zu ihrem Feld, etwas schneller als der Takt der Eingabe (gut 4 Felder/s); Sprünge über mehr als 2,5 Felder springen direkt |
 | Folgende Tiere | kleines Herz darüber |
 | Leiste unten | ein Platz je Tier, nach Gegenden gruppiert, dahinter Tiere der Landschaft im Gehege: heller Platz mit Umriss = noch nicht getroffen, Holz mit Tier in Farbe = getroffen, Gras = im Gehege, Herz = folgt gerade |
 | Tafel am Tor | Tiere der Gegend auf dem Brett: getroffene in Farbe, fehlende als Umriss |

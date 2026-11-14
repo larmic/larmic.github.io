@@ -21,14 +21,13 @@ import {
   type SavedWorld,
   type Store,
 } from './threeyear-save';
+import { InputPace, STEP_MS } from './input-pace';
 import { initialState, progressOf, step, type Cmd, type GameEvent, type State } from './threeyear-state';
 import { createWorld, standHeight, type World } from './threeyear-world';
 
 const TICK_MS = 100; // Takt der Regeln
 const SAVE_EVERY_MS = 10_000; // Position regelmäßig sichern
-const REPEAT_MS = 230; // gehaltene Pfeiltaste: höchstens gut 4 Schritte pro Sekunde
-const MIN_GAP_MS = 110; // schneller hintereinander zählt nicht
-const SPEED = 9; // Felder pro Sekunde beim Gleiten
+const SPEED = (1000 / STEP_MS) * 1.1; // Felder pro Sekunde beim Gleiten: etwas schneller als der Takt, also weich
 const KEYS: Record<string, Dir> = { ArrowUp: 'n', ArrowDown: 's', ArrowLeft: 'w', ArrowRight: 'e' };
 const FREE_KEYS = new Set([
   'Tab',
@@ -78,7 +77,7 @@ class LarmicThreeyear extends HTMLElement {
   private raf = 0;
   private lastFrame = 0;
   private lastSave = 0;
-  private lastInput = 0;
+  private pace = new InputPace(); // ruhiger Takt: Tippen ist nicht schneller als Halten
   private size = { w: 0, h: 0, zoom: 1, dpr: 1 };
   private bodies = new Map<string, Body>();
   private hops = new Map<string, number>(); // Zeitpunkt des letzten Sing-Hüpfers je Wesen
@@ -182,20 +181,32 @@ class LarmicThreeyear extends HTMLElement {
         // dem Spiel, sonst öffnet das Kind nach einem Mausklick von Papa das Menü statt zu singen.
         if (t?.closest('button, a') && (e.key === 'Enter' || (e.key === ' ' && !t.closest('.ty-top')))) return;
         e.preventDefault();
+        if (e.repeat) return; // gehaltene Pfeile laufen über den eigenen Takt (poll im Bild), nicht über das System
         const dir = KEYS[e.key];
-        if (!dir && e.repeat) return; // gehaltene Aktionstaste zählt einmal
         const now = performance.now();
-        if (now - this.lastInput < (e.repeat ? REPEAT_MS : MIN_GAP_MS)) return;
-        this.lastInput = now;
         this.sfx.unlock();
-        this.apply(dir ? { type: 'move', dir } : { type: 'action' });
+        if (dir) {
+          const go = this.pace.press(dir, now);
+          if (go) this.apply({ type: 'move', dir: go });
+        } else if (this.pace.action(now)) this.apply({ type: 'action' });
       },
       { signal },
     );
     document.addEventListener(
+      'keyup',
+      (e) => {
+        const dir = KEYS[e.key];
+        if (dir) this.pace.release(dir);
+      },
+      { signal },
+    );
+    // Losgelassene Tasten kommen nicht an, wenn das Fenster den Fokus verliert: dann nichts weiterlaufen lassen
+    window.addEventListener('blur', () => this.pace.clear(), { signal });
+    document.addEventListener(
       'visibilitychange',
       () => {
         if (document.visibilityState === 'hidden') {
+          this.pace.clear();
           this.save();
           this.stop();
           this.sfx.suspend();
@@ -359,6 +370,9 @@ class LarmicThreeyear extends HTMLElement {
     this.lastFrame = t;
     if (!this.size.w) this.measure();
     if (!this.size.w) return;
+    // Gehaltener Pfeil oder gemerkter Tipp: im ruhigen Takt weiterlaufen
+    const next = this.menu.open ? null : this.pace.poll(t);
+    if (next) this.apply({ type: 'move', dir: next });
     this.glide(dt, t);
 
     const bump = t - (this.hops.get('bump') ?? -1e9);
@@ -432,6 +446,7 @@ class LarmicThreeyear extends HTMLElement {
   }
 
   private openMenu() {
+    this.pace.clear();
     this.save();
     this.renderMenu();
     if (this.timer !== undefined) clearInterval(this.timer);
