@@ -1,0 +1,256 @@
+---
+// Spielfläche von threeyear: Canvas über die ganze Höhe, oben Zurück, Name der Figur und Menü für Eltern.
+// Das Kind spielt mit der Tastatur; Zurück und Menü sind nur per Maus erreichbar gedacht (sie reagieren aber auch
+// auf Tab und Enter). Ohne JavaScript bleibt ein kurzer Text für Eltern.
+// Logik: src/scripts/games/ · Konzept: docs/games/threeyear.md
+---
+
+<larmic-threeyear class="ty">
+  <div class="ty-top">
+    <a class="pxbtn small back ty-btn" href="/" data-astro-reload>
+      <svg width="16" height="16" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true">
+        <path d="M2 3h1v2h-1z M3 2h1v4h-1z M4 1h1v6h-1z" fill="currentColor"></path>
+      </svg>
+      <span class="ty-btn-text">Zurück</span>
+    </a>
+    <div class="ty-name"></div>
+    <button type="button" class="pxbtn small ty-btn ty-gear" aria-label="Menü für Eltern">
+      <svg width="20" height="20" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">
+        <path
+          d="M4 0h2v1h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1v1h-2v-1h-1v-1h-1v-1h-1v-1h-1v-2h1v-1h1v-1h1v-1h1z M4 3v1h-1v2h1v1h2v-1h1v-2h-1v-1z"
+          fill="currentColor"
+          fill-rule="evenodd"
+        ></path>
+      </svg>
+    </button>
+  </div>
+
+  <canvas class="ty-canvas" role="img" aria-label="Spielwelt: eine Figur auf einer Voxel-Insel mit Tieren"></canvas>
+
+  <noscript>
+    <div class="ty-noscript pxbox paper">
+      <p>
+        Dieses Spiel für Dreijährige braucht JavaScript. Es läuft ganz im Browser, mit Pfeiltasten und Leertaste, und
+        ist zum gemeinsamen Spielen mit einem Elternteil gedacht.
+      </p>
+    </div>
+  </noscript>
+
+  <dialog class="ty-menu pxbox paper" aria-labelledby="ty-menu-title">
+    <h2 id="ty-menu-title">Menü für Eltern</h2>
+
+    <section aria-labelledby="ty-worlds-title">
+      <h3 id="ty-worlds-title">Welten</h3>
+      <ul class="ty-worlds"></ul>
+      <button type="button" class="pxbtn small" data-act="new">
+        Neue Welt
+      </button>
+    </section>
+
+    <section aria-labelledby="ty-this-title">
+      <h3 id="ty-this-title">Diese Welt</h3>
+      <label for="ty-world-name">Name der Welt</label>
+      <input id="ty-world-name" type="text" maxlength="16" autocomplete="off" />
+      <label for="ty-figure-name">Name der Figur</label>
+      <input id="ty-figure-name" type="text" maxlength="16" autocomplete="off" />
+      <p class="ty-code-row">
+        Welt-Code: <code class="ty-code"></code>
+        <button type="button" class="ty-link" data-act="copy">
+          Kopieren
+        </button>
+      </p>
+      <p class="ty-hint">Mit dem Code entsteht dieselbe Landschaft, ohne den Spielstand.</p>
+    </section>
+
+    <section class="ty-row" aria-label="Einstellungen">
+      <button type="button" class="ty-link" data-act="sound" aria-pressed="true">
+        Ton ist an
+      </button>
+      <button type="button" class="ty-link" data-act="fullscreen">
+        Vollbild
+      </button>
+    </section>
+
+    <button type="button" class="pxbtn small" data-act="close">
+      Weiterspielen
+    </button>
+  </dialog>
+</larmic-threeyear>
+
+<style>
+  .ty {
+    position: relative;
+    display: block;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 420px;
+    background: linear-gradient(var(--sky-1) 0 33%, var(--sky-2) 33% 66%, var(--sky-3) 66% 100%);
+    overflow: hidden;
+  }
+  .ty-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+  .ty-top {
+    position: absolute;
+    inset: 12px 12px auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .ty-top > * {
+    pointer-events: auto;
+  }
+  .ty-gear {
+    padding: 0 14px;
+  }
+  .ty-name {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    pointer-events: none;
+  }
+  .ty-name :global(span) {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 34px;
+    font-family: var(--font-pixel);
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--ink);
+    background: var(--gold);
+    box-shadow:
+      var(--px-3),
+      inset 0 3px 0 var(--gold-light),
+      inset 0 -4px 0 var(--gold-dark);
+  }
+  .ty-noscript {
+    position: absolute;
+    inset: 50% 16px auto;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    transform: translateY(-50%);
+  }
+  .ty-menu {
+    width: min(460px, calc(100vw - 32px));
+    max-height: calc(100dvh - 32px);
+    padding: 24px;
+    border: 0;
+    color: var(--ink);
+    overflow: auto;
+  }
+  .ty-menu::backdrop {
+    background: rgba(29, 40, 56, 0.55);
+  }
+  .ty-menu h2 {
+    margin: 0 0 12px;
+    font-family: var(--font-pixel);
+  }
+  .ty-menu h3 {
+    margin: 20px 0 8px;
+    font-family: var(--font-pixel);
+    font-size: 1.1rem;
+  }
+  .ty-menu section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .ty-menu label {
+    font-weight: 800;
+    font-size: 0.95rem;
+  }
+  .ty-menu input {
+    width: 100%;
+    padding: 8px 10px;
+    font: inherit;
+    font-family: var(--font-pixel);
+    border: 0;
+    background: #ffffff;
+    box-shadow: var(--px-3);
+  }
+  .ty-worlds {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ty-worlds :global(.ty-world) {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    font: inherit;
+    text-align: left;
+    color: var(--ink);
+    background: var(--wood-bg);
+    border: 0;
+    box-shadow: inset 0 0 0 3px var(--wood-frame);
+    cursor: pointer;
+  }
+  .ty-worlds :global(.ty-world[aria-current='true']) {
+    box-shadow: inset 0 0 0 3px var(--ink);
+  }
+  .ty-worlds :global(.ty-world span) {
+    color: var(--muted);
+  }
+  .ty-code-row {
+    margin: 8px 0 0;
+  }
+  .ty-code {
+    margin-right: 10px;
+    font-family: var(--font-pixel);
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+  }
+  .ty-hint {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .ty-row {
+    flex-direction: row !important;
+    gap: 20px !important;
+    margin: 20px 0;
+  }
+  .ty-link {
+    padding: 0;
+    font: inherit;
+    font-weight: 800;
+    color: var(--ink);
+    text-decoration: underline;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  .ty-menu > .pxbtn {
+    margin-top: 8px;
+  }
+  @media (max-width: 560px) {
+    .ty-btn-text {
+      display: none;
+    }
+    .ty-name :global(span) {
+      width: 24px;
+      height: 26px;
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<script>
+  import '../scripts/games/larmic-threeyear';
+</script>

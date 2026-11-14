@@ -2,8 +2,8 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// Reine Weiterleitungen gehören nicht in die Sitemap
-const redirectPages = /^\/(about|tags|categories)\/$/;
+// Reine Weiterleitungen gehören nicht in die Sitemap, die Kinderspiele (noch) auch nicht
+const redirectPages = /^\/(about|tags|categories)\/$|^\/spiele\//;
 
 export default defineConfig({
   site: 'https://larmic.de',

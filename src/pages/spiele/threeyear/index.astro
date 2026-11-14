@@ -1,0 +1,17 @@
+---
+// Spiel für drei Jahre (Stufe 2: nur über die direkte Adresse erreichbar, nicht in der Sitemap).
+// Seite ohne Insel: Das Spiel füllt den Bildschirm; zurück geht es über den Button oben links.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ThreeyearGame from '../../../components/ThreeyearGame.astro';
+---
+
+<BaseLayout
+  title="threeyear"
+  description="Ein Spiel für Dreijährige, gespielt zusammen mit einem Elternteil: Tiere treffen, nach Hause führen, schlafen gehen."
+  noindex
+>
+  <main id="inhalt" tabindex="-1">
+    <h1 class="sr-only">threeyear – ein Spiel für Dreijährige</h1>
+    <ThreeyearGame />
+  </main>
+</BaseLayout>

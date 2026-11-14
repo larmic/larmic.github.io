@@ -160,6 +160,15 @@ Wie bei der Insel: reine, getestete Logik getrennt von der Komponente, die zeich
 
 Gespielt wird direkt auf der Homepage: Sobald eine Stufe spielbar ist, spielt der Vater sie mit seinem Sohn.
 
+## Ideen für später
+
+Nur gesammelt, noch nicht ausgeplant.
+
+- **Höhle** als eigene Gegend.
+- **Portale:** In jeder Gegend gibt es ein Portal zu finden, dazu ein passendes Gegenstück im Haus. Der Heimweg-Pfeil zeigt auf das Portal, wenn der Weg darüber kürzer ist.
+- **Gemeinsame Welt:** Für ein höheres Alter: Man schickt anderen einen Link und spielt zu zweit in derselben Welt, z. B. Elternteil und Kind oder Kind und Freund. Braucht mehr als GitHub Pages (Verbindung zwischen zwei Browsern oder ein kleiner Dienst) und eine eigene Datenschutzprüfung.
+- **Geschichtenerzähler:** Der Vater spricht die Geschichten selbst ein, das Spiel kann sie vorspielen. Die Aufnahmen lägen als Audiodateien auf der Seite (keine externen Ressourcen). Ob das umgesetzt wird, ist offen.
+
 ## Offen
 
 - Name der Reihe (siehe [README](README.md)); vor Stufe 2,5 entscheiden.

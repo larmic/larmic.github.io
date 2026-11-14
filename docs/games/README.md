@@ -37,3 +37,7 @@ Jedes Jahr kommt ein Spiel dazu, das zu seinem Alter passt.
 - **threeyear, fouryear, …**: bleibt beim Arbeitstitel.
 
 Bis das entschieden ist, heißen Dateien und Code nach dem Arbeitstitel.
+
+Idee dazu (Favorit des Vaters ist **Mitwachsen**): statt einzelner Spiele pro Jahr ein Spiel, das mitwächst. Jede Welt bekommt ein einstellbares Alter (im Menü für Eltern). Mit 3 laufen und Tiere treffen, mit 4 kommen z. B. Bauen und Abbauen dazu, mit 5 Aufgaben. Die Welt bleibt dieselbe, nur die Fähigkeiten wachsen. Technisch passt das: Die Regeln sind eine Zustandsmaschine, Fähigkeiten lassen sich je Alter freischalten, das Speicherformat ist versioniert.
+
+Vor der Entscheidung prüfen, ob der Name als Marke eingetragen ist: [TMview](https://www.tmdn.org/tmview/) (EU und national) und [DPMAregister](https://register.dpma.de/), vor allem die Klassen 9 (Software), 28 (Spiele) und 41 (Unterhaltung). Eine kurze Websuche im November 2026 fand zu keinem der drei Vorschläge ein Spiel; das ersetzt keine Markenrecherche.
