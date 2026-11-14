@@ -315,8 +315,8 @@ class LarmicThreeyear extends HTMLElement {
     if (!w || !h) return;
     this.canvas.width = Math.round(w * dpr);
     this.canvas.height = Math.round(h * dpr);
-    // Etwa 13 Felder breit, auf großen Schirmen nicht riesig, auf kleinen nicht winzig
-    this.size = { w, h, dpr, zoom: Math.min(1.6, Math.max(0.55, w / (13 * 64))) };
+    // Etwa 18 Felder breit, auf großen Schirmen nicht riesig, auf kleinen nicht winzig
+    this.size = { w, h, dpr, zoom: Math.min(1.25, Math.max(0.5, w / (18 * 64))) };
   }
 
   private camera() {

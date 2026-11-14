@@ -31,6 +31,7 @@ import {
   HOME,
   REGIONS,
   SPECIES,
+  animalId,
   figureParts,
   type GateId,
   type Look,
@@ -149,6 +150,48 @@ export class Renderer {
     this.effects(P, sc);
     this.homeArrow(P, state, sc);
     if (sc.night > 0) this.nightSky(sc);
+    this.album(state, sc);
+  }
+
+  /**
+   * Leiste unten: ein Platz je Tier, nach Gegenden gruppiert, dahinter Tiere der Landschaft im Gehege.
+   * Dunkler Umriss = noch nicht getroffen, in Farbe = getroffen, grüner Grund = im Gehege, Herz = folgt gerade.
+   */
+  private album(state: State, sc: Scene) {
+    const { ctx } = this;
+    const groups = REGIONS.map((r) => r.animals.map((a) => ({ id: animalId(r.id, a.species), species: a.species })));
+    const wild = state.pen.filter((p) => p.id.startsWith('wild:')).slice(0, 10);
+    if (wild.length) groups.push(wild);
+    const count = groups.reduce((n, g) => n + g.length, 0);
+    const gap = 6,
+      groupGap = 18;
+    const room = sc.width - 24 - (count - 1) * gap - (groups.length - 1) * (groupGap - gap);
+    const size = Math.floor(Math.max(26, Math.min(52, 44 * sc.zoom, room / count)));
+    const total = count * size + (count - 1) * gap + (groups.length - 1) * (groupGap - gap);
+    let x = Math.round((sc.width - total) / 2);
+    const y = Math.round(sc.height - size - 14);
+    const inPen = new Set(state.pen.map((p) => p.id));
+    const following = new Set(state.followers);
+    for (const group of groups) {
+      for (const a of group) {
+        const met = state.met.includes(a.id) || inPen.has(a.id);
+        ctx.fillStyle = inPen.has(a.id) ? GAME_COLORS.slotPen : met ? GAME_COLORS.slotMet : GAME_COLORS.slotEmpty;
+        ctx.fillRect(x, y, size, size);
+        // Pixel-Rahmen ohne Eckpixel wie auf der Seite
+        ctx.fillStyle = GAME_COLORS.ink;
+        ctx.fillRect(x, y - 3, size, 3);
+        ctx.fillRect(x, y + size, size, 3);
+        ctx.fillRect(x - 3, y, 3, size);
+        ctx.fillRect(x + size, y, 3, size);
+        const sp = SPECIES[a.species];
+        const s = (size * 1.15) / (0.9 * TILE_W * sp.scale); // Tier füllt den Platz gut zu drei Vierteln
+        const P = projection(0.5, 0.5, x + size / 2, y + size * 0.86, s);
+        drawModel(ctx, P, sp.parts, 0.5, 0.5, 0, 'e', sp.scale, met ? undefined : GAME_COLORS.silhouette);
+        if (following.has(a.id)) sprite(ctx, HEART, GAME_COLORS.heart, x + size - 6, y + 12, Math.max(1.5, size / 22));
+        x += size + gap;
+      }
+      x += groupGap - gap;
+    }
   }
 
   private sky(sc: Scene) {
@@ -187,6 +230,48 @@ export class Renderer {
                 ? this.blocks.path
                 : this.blocks.grass;
       this.img(P, image, x, y, k + 1);
+    }
+    this.edges(P, world, x, y, c.h);
+  }
+
+  /** Höhen sichtbar machen: höhere Flächen heller, Kanten an Abhängen, Schatten am Fuß höherer Nachbarn */
+  private edges(P: Projection, world: World, x: number, y: number, h: number) {
+    const { ctx } = this;
+    const height = (nx: number, ny: number) => {
+      const n = world.cell(nx, ny);
+      return n.ground === 'water' ? 0 : n.h;
+    };
+    const [ax, ay] = P(x, y, h);
+    const [bx, by] = P(x + 1, y + 1, h);
+    const w = bx - ax,
+      d = by - ay;
+    const line = Math.max(2, w / 28);
+    if (h >= 2) {
+      ctx.fillStyle = `rgba(255,255,255,${0.045 * (h - 1)})`;
+      ctx.fillRect(ax, ay, w, d);
+    }
+    const sides: [number, number, (t: number) => void][] = [
+      [x - 1, y, (t) => ctx.fillRect(ax, ay, t, d)],
+      [x + 1, y, (t) => ctx.fillRect(bx - t, ay, t, d)],
+      [x, y - 1, (t) => ctx.fillRect(ax, ay, w, t)],
+    ];
+    for (const [nx, ny, rect] of sides) {
+      const nh = height(nx, ny);
+      if (nh > h) {
+        ctx.fillStyle = GAME_COLORS.shade;
+        rect(w * 0.14);
+      } else if (nh < h) {
+        ctx.fillStyle = GAME_COLORS.ledge;
+        rect(line);
+      }
+    }
+    if (height(x, y + 1) < h) {
+      ctx.fillStyle = GAME_COLORS.highlight;
+      ctx.fillRect(ax, by - line, w, line);
+      // dunkle Unterkante der Stufe, damit sie sich vom Boden davor abhebt
+      const [, fy] = P(x, y + 1, height(x, y + 1));
+      ctx.fillStyle = GAME_COLORS.ledge;
+      ctx.fillRect(ax, fy - line, w, line);
     }
   }
 

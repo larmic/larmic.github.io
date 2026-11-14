@@ -3,6 +3,7 @@
 // Höhe z zählt in Ebenen; die Oberkante eines Blocks auf Ebene k liegt bei z = k + 1.
 
 import type { Grid, Palette } from '../voxel/textures';
+import { hash } from './rng';
 
 export const TILE_W = 64; // Breite eines Feldes
 export const TILE_D = 44; // Tiefe der Oberseite (verkürzt)
@@ -42,8 +43,22 @@ function paint(ctx: CanvasRenderingContext2D, grid: Grid, pal: Palette) {
   ctx.globalAlpha = 1;
 }
 
+/**
+ * Feine Körnung: Jedes Texel wird in 2 × 2 Unterpixel geteilt, die leicht heller oder dunkler sind. Die Farben
+ * der 8 × 8-Texturen bleiben, die Fläche wirkt aber doppelt so fein aufgelöst.
+ */
+function grain(ctx: CanvasRenderingContext2D, n: number, seed: number, strength: number) {
+  for (let r = 0; r < n * 2; r++)
+    for (let c = 0; c < n * 2; c++) {
+      const v = hash(seed, c, r) / 4294967296 - 0.5;
+      ctx.fillStyle =
+        v > 0 ? `rgba(255,255,255,${(v * strength).toFixed(3)})` : `rgba(0,0,0,${(-v * strength).toFixed(3)})`;
+      ctx.fillRect(c / 2, r / 2, 0.5, 0.5);
+    }
+}
+
 /** Block als Bild: Oberseite TILE_W × TILE_D, darunter Vorderseite TILE_W × LEVEL_H, mit Hausschattierung */
-export function frontBlock(top: Grid, front: Grid, pal: Palette, res = 2): HTMLCanvasElement {
+export function frontBlock(top: Grid, front: Grid, pal: Palette, res = 2, strength = 0.16): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = TILE_W * res;
   canvas.height = (TILE_D + LEVEL_H) * res;
@@ -51,10 +66,12 @@ export function frontBlock(top: Grid, front: Grid, pal: Palette, res = 2): HTMLC
   const n = top.length;
   ctx.setTransform((res * TILE_W) / n, 0, 0, (res * TILE_D) / n, 0, 0);
   paint(ctx, top, pal);
+  grain(ctx, n, top.join('').length + 1, strength);
   ctx.fillStyle = 'rgba(255,255,255,.05)';
   ctx.fillRect(0, 0, n, n);
   ctx.setTransform((res * TILE_W) / n, 0, 0, (res * LEVEL_H) / n, 0, res * TILE_D);
   paint(ctx, front, pal);
+  grain(ctx, n, front.join('').length + 7, strength);
   ctx.fillStyle = 'rgba(0,0,0,.18)';
   ctx.fillRect(0, 0, n, n);
   return canvas;

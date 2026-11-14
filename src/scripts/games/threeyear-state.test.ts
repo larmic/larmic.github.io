@@ -387,3 +387,28 @@ describe('Eingang des Geheges', () => {
     }
   });
 });
+
+describe('Durchgänge bleiben frei', () => {
+  it('umherlaufende Tiere bleiben nie an Toren, Brücke, Gehege-Öffnung oder Pfad stehen', () => {
+    const world = createWorld(5);
+    const passages = [...GATES.map((g) => g.at), HOME.penGate, HOME.exit].flatMap(([x, y]) => [
+      `${x},${y}`,
+      `${x + 1},${y}`,
+      `${x - 1},${y}`,
+      `${x},${y + 1}`,
+      `${x},${y - 1}`,
+    ]);
+    // Alle Tore offen, Figur weit weg: Die Tiere laufen lange frei umher
+    let s: State = {
+      ...initialState(world, { openGates: ['gartentor', 'bruecke'] }),
+      sleeping: false,
+      player: { x: 0, y: 30, dir: 's' },
+    };
+    for (let i = 0; i < 4000; i++) {
+      s = step(s, world, TICK).state;
+      for (const a of s.animals)
+        if (a.mode === 'wander' && a.home.kind === 'region')
+          expect(passages, `${a.id} ${a.x},${a.y}`).not.toContain(`${a.x},${a.y}`);
+    }
+  });
+});

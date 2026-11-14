@@ -51,7 +51,7 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 8. **Tore:** Ein Tor öffnet genau dann, wenn alle Tiere seiner Gegend getroffen sind, und bleibt offen. *Tests: „öffnen genau dann …“, „das letzte getroffene Tier öffnet das Tor sofort …“*
 9. **Schlafen:** Aktion mit dem Bett vorn oder daneben (wenn kein Tier näher ist). Folgende Tiere gehen heim: Tiere einer Gegend an einen freien Platz nahe ihrem Start, Tiere der Landschaft verschwinden und tauchen später an ihrem Platz auf. 30 Takte lang weckt keine Taste. *Tests: „legt sich mit der Aktion am Bett schlafen …“, „schickt folgende Tiere beim Schlafen heim“*
 10. **Rufen:** Aktion ohne Tier und Bett in der Nähe. *Test: „ruft, wenn weder Tier noch Bett …“*
-11. **Umherlaufen:** Freie Tiere ruhen 8 bis 25 Takte, dann gehen sie einen Schritt oder drehen sich. Sie bleiben in ihrem Zuhause (Gegend, Stück der Landschaft oder Gehege); wer außerhalb steht (nach einem Platztausch), zieht heim. Steht die Figur daneben, bleiben sie stehen und schauen sie an. *Tests: „bleibt stehen und schaut …“, „läuft umher, aber nur in seinem Zuhause“*
+11. **Umherlaufen:** Freie Tiere ruhen 8 bis 25 Takte, dann gehen sie einen Schritt oder drehen sich. Sie bleiben in ihrem Zuhause (Gegend, Stück der Landschaft oder Gehege) und nie auf einem Feld an einem Durchgang (Tor, Brücke, Gehege-Öffnung, Pfad und deren Nachbarfelder); wer außerhalb steht (nach einem Platztausch), zieht heim. Steht die Figur daneben, bleiben sie stehen und schauen sie an. *Tests: „bleibt stehen und schaut …“, „läuft umher, aber nur in seinem Zuhause“, „Durchgänge bleiben frei“*
 12. **Landschaft:** Tiere der Landschaft gibt es in den Stücken um die Figur (Abstand 1). Ab Abstand 3 verschwinden frei laufende wieder. Gleiche Welt, gleiches Stück: gleiche Tiere am gleichen Platz.
 
 ## Welt
@@ -94,10 +94,13 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Was | Regel |
 | --- | --- |
 | Ansicht | von vorn, Reihe für Reihe von hinten nach vorn; Felder zeigen nur die Blöcke, die das Feld davor nicht verdeckt |
-| Kamera | folgt der Figur; Figur in der Bildmitte. Etwa 13 Felder breit |
+| Kamera | folgt der Figur; Figur in der Bildmitte. Etwa 18 Felder breit |
+| Feinheit | Texturen 8 × 8 wie auf der Seite, jedes Texel mit feiner Körnung in 2 × 2 Unterpixeln |
+| Höhen | höhere Flächen etwas heller; dunkle Kante, wo es hinuntergeht; Schatten am Fuß eines höheren Nachbarn; helle Vorderkante und dunkle Unterkante jeder Stufe |
 | Figur | wird zusätzlich halb durchsichtig obenauf gezeichnet, damit sie hinter Hügeln und Bäumen sichtbar bleibt |
 | Wesen | gleiten zu ihrem Feld (9 Felder/s); Sprünge über mehr als 2,5 Felder springen direkt |
 | Folgende Tiere | kleines Herz darüber |
+| Leiste unten | ein Platz je Tier, nach Gegenden gruppiert, dahinter Tiere der Landschaft im Gehege: heller Platz mit Umriss = noch nicht getroffen, Holz mit Tier in Farbe = getroffen, Gras = im Gehege, Herz = folgt gerade |
 | Tafel am Tor | Tiere der Gegend auf dem Brett: getroffene in Farbe, fehlende als Umriss |
 | Heimweg-Pfeil | am Bildrand Richtung Bett, solange das Bett nicht zu sehen ist |
 | Nacht | dunkler Himmel mit Sternen und Mond, die Figur liegt im Bett, Zzz steigt auf |

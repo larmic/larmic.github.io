@@ -68,10 +68,23 @@ const cheb = (ax: number, ay: number, bx: number, by: number) => Math.max(Math.a
 const PEN_ENTRY = [HOME.penGate[0], HOME.penGate[1] - 1] as const;
 const isPenEntry = (x: number, y: number) => x === PEN_ENTRY[0] && y === PEN_ENTRY[1];
 
+/** Felder an Durchgängen (Tore, Brücke, Gehege-Öffnung, Pfad): Dort bleibt kein Tier stehen, sonst versperrt es den Weg */
+const PASSAGES = new Set(
+  [...GATES.map((g) => g.at), HOME.penGate, HOME.exit].flatMap(([x, y]) =>
+    [
+      [x, y],
+      [x + 1, y],
+      [x - 1, y],
+      [x, y + 1],
+      [x, y - 1],
+    ].map(([a, b]) => `${a},${b}`),
+  ),
+);
+
 function atHome(world: World, home: Home, x: number, y: number): boolean {
   const c = world.cell(x, y);
   if (home.kind === 'pen') return c.pen === true && !isPenEntry(x, y);
-  if (c.pen || c.penGate) return false;
+  if (c.pen || c.penGate || PASSAGES.has(`${x},${y}`)) return false;
   if (home.kind === 'region') return c.region === home.region;
   const [cx, cy] = chunkOf(x, y);
   return c.region === 'wild' && cx === home.cx && cy === home.cy;
