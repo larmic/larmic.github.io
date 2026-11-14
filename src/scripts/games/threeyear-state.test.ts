@@ -360,3 +360,30 @@ describe('Randfälle aus der Prüfung', () => {
     expect(r.s.pen.map((p) => p.id)).toEqual(['zuhause:hase']);
   });
 });
+
+describe('Eingang des Geheges', () => {
+  it('neue Tiere rücken nach hinten, das Feld hinter der Öffnung bleibt frei für das nächste', () => {
+    const world = createWorld(1);
+    const [gx, gy] = HOME.penGate;
+    let s = awake(world, gx, gy + 1, [
+      animal('zuhause:hase', gx, gy + 2, { mode: 'follow' }),
+      animal('zuhause:igel', gx, gy + 3, { mode: 'follow', species: 'igel' }),
+    ]);
+    s = { ...s, followers: ['zuhause:hase', 'zuhause:igel'] };
+    const r = run(s, world, 'n', 'n', 'n', 'n');
+    expect(r.s.pen.map((p) => p.id).sort()).toEqual(['zuhause:hase', 'zuhause:igel']);
+    expect(r.s.followers).toEqual([]);
+    expect(r.s.animals.some((a) => a.x === gx && a.y === gy - 1)).toBe(false);
+  });
+
+  it('Tiere im Gehege laufen nie auf das Feld hinter der Öffnung', () => {
+    const world = createWorld(2);
+    const [gx, gy] = HOME.penGate;
+    const pen = Array.from({ length: 6 }, (_, i) => ({ id: `wild:9:9:${i}`, species: 'hase' as const }));
+    let s = { ...initialState(world, { pen }), sleeping: false, player: { x: 0, y: 4, dir: 's' as const } };
+    for (let i = 0; i < 3000; i++) {
+      s = step(s, world, TICK).state;
+      expect(s.animals.some((a) => a.mode === 'pen' && a.x === gx && a.y === gy - 1)).toBe(false);
+    }
+  });
+});

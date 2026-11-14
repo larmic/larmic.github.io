@@ -64,9 +64,13 @@ const dirTo = (dx: number, dy: number): Dir =>
 const cheb = (ax: number, ay: number, bx: number, by: number) => Math.max(Math.abs(ax - bx), Math.abs(ay - by));
 
 /** Darf ein Tier auf diesem Feld umherlaufen? (Folgende Tiere gehen überall hin, wo die Figur war) */
+/** Feld direkt hinter der Öffnung des Geheges: bleibt frei, damit neue Tiere hineinkommen */
+const PEN_ENTRY = [HOME.penGate[0], HOME.penGate[1] - 1] as const;
+const isPenEntry = (x: number, y: number) => x === PEN_ENTRY[0] && y === PEN_ENTRY[1];
+
 function atHome(world: World, home: Home, x: number, y: number): boolean {
   const c = world.cell(x, y);
-  if (home.kind === 'pen') return c.pen === true;
+  if (home.kind === 'pen') return c.pen === true && !isPenEntry(x, y);
   if (c.pen || c.penGate) return false;
   if (home.kind === 'region') return c.region === home.region;
   const [cx, cy] = chunkOf(x, y);
@@ -87,7 +91,8 @@ function random(s: State): number {
 
 const penCells = () => {
   const out: [number, number][] = [];
-  for (let y = HOME.pen.y0; y <= HOME.pen.y1; y++) for (let x = HOME.pen.x0; x <= HOME.pen.x1; x++) out.push([x, y]);
+  for (let y = HOME.pen.y0; y <= HOME.pen.y1; y++)
+    for (let x = HOME.pen.x0; x <= HOME.pen.x1; x++) if (!isPenEntry(x, y)) out.push([x, y]);
   return out;
 };
 
@@ -291,6 +296,9 @@ function penFollowers(s: State, world: World, events: GameEvent[]) {
     a.rest = 10;
     s.followers = s.followers.filter((f) => f !== id);
     if (!s.pen.some((x) => x.id === id)) s.pen.push({ id, species: a.species });
+    // Nach hinten rücken, damit der Eingang für das nächste Tier frei ist
+    const spot = freeNear(s, world, [PEN_ENTRY[0], HOME.pen.y0], (x, y) => atHome(world, a.home, x, y), id);
+    if (spot) [a.x, a.y] = spot;
     events.push({ type: 'pen', id });
   }
 }

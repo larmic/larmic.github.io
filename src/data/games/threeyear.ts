@@ -84,8 +84,8 @@ export const HOME = {
     [-4, -3],
     [-4, -2],
   ] as readonly Point[], // freie Plätze am Bett zum Aufwachen
-  pen: { x0: 1, y0: -3, x1: 4, y1: -1 } as Rect, // Inneres des Geheges, Zaun ringsum
-  penGate: [2, 0] as Point, // Öffnung im Zaun
+  pen: { x0: 1, y0: -3, x1: 4, y1: 0 } as Rect, // Inneres des Geheges (4 × 4), Zaun ringsum
+  penGate: [2, 1] as Point, // Öffnung im Zaun; das Feld dahinter bleibt frei
   exit: [0, 6] as Point, // Pfad in die endlose Landschaft
   trees: [
     [-6, -4],

@@ -74,7 +74,7 @@ Neue Gegenden kommen nach und nach hinzu; so wächst die Welt mit. Berge gibt es
 
 ## Zuhause, Gehege, Nacht
 
-- **Gehege:** Zaun mit einer Öffnung am Zuhause. Figur und folgende Tiere können hindurch. Jedes folgende Tier, das ein Feld im Gehege betritt, löst sich aus der Kette und bleibt. Für Tiere im Gehege ist die Öffnung eine Wand. Gespeichert.
+- **Gehege:** Zaun mit einer Öffnung am Zuhause, 4 × 4 Felder. Das Feld hinter der Öffnung bleibt frei, neue Tiere rücken nach hinten. Figur und folgende Tiere können hindurch. Jedes folgende Tier, das ein Feld im Gehege betritt, löst sich aus der Kette und bleibt. Für Tiere im Gehege ist die Öffnung eine Wand. Gespeichert.
 - **Bett:** Aktion am Bett → die Figur legt sich hin, der Himmel wird dunkel, Sterne gehen auf, eine leise Melodie spielt, es wird gespeichert.
 - **Aufwachen:** Nach dem Einschlafen reagiert das Spiel einige Sekunden nicht auf Tasten, damit wildes Drücken die Runde nicht sofort weiterführt. Danach bringt ein Tastendruck den Morgen.
 - **Start einer Runde:** Die Figur schläft im Bett, ein Tastendruck weckt sie. Dieser erste Druck schaltet auch den Ton frei (Autoplay-Regeln).
