@@ -1,4 +1,4 @@
-// Zeichnet threeyear in ein Canvas: Welt von vorn, Reihe für Reihe von hinten nach vorn, dazu Tiere, Figur,
+// Zeichnet Mitwachsen in ein Canvas: Welt von vorn, Reihe für Reihe von hinten nach vorn, dazu Tiere, Figur,
 // Herzen, Noten, Heimweg-Pfeil und Nacht. Liest nur Zustand und Welt; was sich bewegt (Kamera, gleitende Figuren,
 // Hüpfer), berechnet die Web Component und reicht es als `Scene` herein.
 
@@ -35,9 +35,9 @@ import {
   figureParts,
   type GateId,
   type Look,
-} from '../../data/games/threeyear';
-import type { State } from './threeyear-state';
-import type { Cell, World } from './threeyear-world';
+} from '../../data/games/mitwachsen';
+import type { State } from './mitwachsen-state';
+import type { Cell, World } from './mitwachsen-world';
 
 /** Gleitende Position eines Wesens auf dem Bildschirm (in Feldern), dazu Hüpfer und Blickrichtung */
 export type Body = { x: number; y: number; z: number; hop: number };

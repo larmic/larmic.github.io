@@ -1,7 +1,7 @@
-// Welt von threeyear – rein und deterministisch: Derselbe Seed ergibt immer dieselbe Welt.
+// Welt von Mitwachsen – rein und deterministisch: Derselbe Seed ergibt immer dieselbe Welt.
 // In der Mitte die von Hand entworfenen Gegenden (Zuhause, Blumenwiese, Teich), jede ringsum abgeschlossen und nur
 // durch ihr Tor erreichbar. Außen herum endlose Landschaft aus Rauschen, berechnet in Stücken.
-// Spezifikation: docs/specs/threeyear.md
+// Spezifikation: docs/specs/mitwachsen.md
 
 import { CHUNK, ChunkCache } from '../../lib/games/chunks';
 import { hash, rand01, valueNoise } from '../../lib/games/rng';
@@ -18,7 +18,7 @@ import {
   type Rect,
   type RegionId,
   type SpeciesId,
-} from '../../data/games/threeyear';
+} from '../../data/games/mitwachsen';
 
 export type Ground = 'grass' | 'stone' | 'water' | 'path' | 'sand';
 export type Deco = 'tree' | 'bush' | 'flower' | 'reed' | 'lily' | 'rock' | 'fence' | 'gate' | 'bridge' | 'bed' | 'sign';

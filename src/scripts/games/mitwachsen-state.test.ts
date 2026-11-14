@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Dir } from '../../lib/games/front';
-import { GATES, HOME, animalId } from '../../data/games/threeyear';
+import { GATES, HOME, animalId } from '../../data/games/mitwachsen';
 import {
   SLEEP_LOCK,
   SWAP_WINDOW,
@@ -12,8 +12,8 @@ import {
   type Cmd,
   type GameEvent,
   type State,
-} from './threeyear-state';
-import { createWorld, standHeight, type Cell, type World } from './threeyear-world';
+} from './mitwachsen-state';
+import { createWorld, standHeight, type Cell, type World } from './mitwachsen-world';
 
 /** Kleine Testwelt: überall flaches Gras des Zuhauses, einzelne Felder überschreibbar */
 function fakeWorld(cells: Record<string, Partial<Cell>> = {}): World {

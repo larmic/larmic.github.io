@@ -21,19 +21,19 @@ Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run chec
 
 ## Aufbau
 
-- `src/pages/` – Seiten: `/` (Über mich), `/workshops/`, `/workshops/<id>/`, `/videos/`, `/videos/<id>/`, `/impressum/`, 404, `/spiele/threeyear/` (Kinderspiel, Seite ohne Insel, vorerst nur per direkter Adresse und nicht in der Sitemap)
+- `src/pages/` – Seiten: `/` (Über mich), `/workshops/`, `/workshops/<id>/`, `/videos/`, `/videos/<id>/`, `/impressum/`, 404, `/spiele/mitwachsen/` (Kinderspiel Mitwachsen, Seite ohne Insel, vorerst nur per direkter Adresse und nicht in der Sitemap; `/spiele/threeyear/` leitet dorthin)
 - `src/layouts/PlainPage.astro` – Layout der Seiten ohne Insel (Impressum, Datenschutz, 404)
 - `src/layouts/IslandPage.astro` – Layout aller Seiten mit Insel: Kopf bleibt beim Seitenwechsel stehen (`transition:persist`), `rest` sagt der Figur, wo sie steht
 - `src/content/` – Workshops und Videos als Markdown, Schema in `src/content.config.ts`
 - `src/components/` – Astro-Komponenten, die Insel in `Island.astro`, der Kopf ohne Insel (Impressum) in `SubHero.astro`
 - `src/scripts/island-state.ts` – Zustandsmaschine der Figur (rein, getestet); `larmic-island.ts` – Web Component dazu (DOM, Takt, Kopfblick)
-- Kinderspiel threeyear: `src/lib/games/` (Zufall, Stücke, Ansicht von vorn – generisch, läuft im Browser), `src/data/games/threeyear.ts` (Gegenden, Tiere, Figur), `src/scripts/games/` (Welt, Regeln und Speichern rein und getestet; `larmic-threeyear.ts` Web Component, `threeyear-render.ts` Zeichnen, `sfx.ts` Töne), `src/components/ThreeyearGame.astro`
+- Kinderspiel Mitwachsen: `src/lib/games/` (Zufall, Stücke, Ansicht von vorn – generisch, läuft im Browser), `src/data/games/mitwachsen.ts` (Gegenden, Tiere, Figur), `src/scripts/games/` (Welt, Regeln und Speichern rein und getestet; `larmic-mitwachsen.ts` Web Component, `mitwachsen-render.ts` Zeichnen, `sfx.ts` Töne), `src/components/MitwachsenGame.astro`
 - `src/lib/voxel/` – Voxel-Generator, läuft beim Build: `textures.ts` (Pixel-Raster), `render.ts`, `figure.ts`, `world.ts` (generische Szenen-Engine), `head.ts` (drehbarer Kopf, auch im Browser genutzt), `avatar.ts` (Avatar als Parameter)
 - `src/data/` – `site.ts` (Links, Werkzeugkisten, Sprechblasen, giscus), `materials.ts` (Block und Farben je Material, einzige Quelle), `avatar.ts` (Aussehen der Figur), `island-layout.ts` (die konkrete Insel: Wege, Kisten-Plätze, Baum), `island.ts` (lädt Workshops und Videos dafür)
 - `src/styles/` – `tokens.css` (Design-Tokens), `global.css`, `sections.css`
 - `docs/design-system.md` – Farben, Materialien, Typografie, Interaktionen
-- `docs/games/` – Kinderspiele, eins pro Lebensjahr meines Sohnes: `README.md` (Reihe, Einleitung, gemeinsame Regeln), `threeyear.md` (Konzept des ersten Spiels). Vor Arbeiten am Spiel lesen
-- `docs/specs/threeyear.md` – Spec des Spiels (Regeln, Invarianten, zugehörige Tests). Bei Änderungen am Verhalten Spec und Tests mitziehen
+- `docs/games/` – Kinderspiel Mitwachsen, wächst mit meinem Sohn: `README.md` (Einleitung, Altersstufen, gemeinsame Regeln), `mitwachsen.md` (Konzept der Stufe ab 3). Vor Arbeiten am Spiel lesen
+- `docs/specs/mitwachsen.md` – Spec von Mitwachsen (Regeln, Invarianten, zugehörige Tests). Bei Änderungen am Verhalten Spec und Tests mitziehen
 - `docs/specs/insel.md` – Spec der Figur auf der Insel (Ereignisse, Regeln, Invarianten, zugehörige Tests). Bei Änderungen am Verhalten Spec und Tests mitziehen
 
 ## Regeln
@@ -47,4 +47,4 @@ Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run chec
 - Animationen respektieren `prefers-reduced-motion`.
 - Die Insel ist auf allen Seiten die einzige Navigation. Neue Seiten mit Insel nutzen `IslandPage.astro` und setzen `rest`. Keine Text-Navigation einbauen.
 - Skripte laufen wegen der View Transitions nur einmal: Klicks über `document` delegieren, nicht an Elemente hängen.
-- Alte Adressen (`/#workshops`, `/#videos`, `/workshops/#workshop-<id>`, `/videos/#video-<id>`, `/about/`) müssen funktionieren.
+- Alte Adressen (`/#workshops`, `/#videos`, `/workshops/#workshop-<id>`, `/videos/#video-<id>`, `/about/`, `/spiele/threeyear/`) müssen funktionieren.

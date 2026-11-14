@@ -11,10 +11,12 @@ export default defineConfig({
   // Bilder (auch in Markdown) mit Breite/Höhe, lazy und in passenden Größen (srcset), höchstens so breit wie der Text
   image: { layout: 'constrained' },
   integrations: [sitemap({ filter: (page) => !redirectPages.test(new URL(page).pathname) })],
-  // Alte Hugo-Adressen weiterleiten
+  // Alte Adressen weiterleiten (Hugo, Arbeitstitel des Kinderspiels)
   redirects: {
     '/about': '/',
     '/tags': '/',
     '/categories': '/',
+    // Arbeitstitel des Kinderspiels
+    '/spiele/threeyear': '/spiele/mitwachsen/',
   },
 });

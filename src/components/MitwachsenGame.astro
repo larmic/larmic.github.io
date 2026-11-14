@@ -1,20 +1,20 @@
 ---
-// Spielfläche von threeyear: Canvas über die ganze Höhe, oben Zurück, Name der Figur und Menü für Eltern.
+// Spielfläche von Mitwachsen: Canvas über die ganze Höhe, oben Zurück, Name der Figur und Menü für Eltern.
 // Das Kind spielt mit der Tastatur; Zurück und Menü sind nur per Maus erreichbar gedacht (sie reagieren aber auch
 // auf Tab und Enter). Ohne JavaScript bleibt ein kurzer Text für Eltern.
-// Logik: src/scripts/games/ · Konzept: docs/games/threeyear.md
+// Logik: src/scripts/games/ · Konzept: docs/games/mitwachsen.md
 ---
 
-<larmic-threeyear class="ty">
-  <div class="ty-top">
-    <a class="pxbtn small back ty-btn" href="/" data-astro-reload>
+<larmic-mitwachsen class="mw">
+  <div class="mw-top">
+    <a class="pxbtn small back mw-btn" href="/" data-astro-reload>
       <svg width="16" height="16" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true">
         <path d="M2 3h1v2h-1z M3 2h1v4h-1z M4 1h1v6h-1z" fill="currentColor"></path>
       </svg>
-      <span class="ty-btn-text">Zurück</span>
+      <span class="mw-btn-text">Zurück</span>
     </a>
-    <div class="ty-name"></div>
-    <button type="button" class="pxbtn small ty-btn ty-gear" aria-label="Menü für Eltern">
+    <div class="mw-name"></div>
+    <button type="button" class="pxbtn small mw-btn mw-gear" aria-label="Menü für Eltern">
       <svg width="20" height="20" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">
         <path
           d="M4 0h2v1h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1v1h-2v-1h-1v-1h-1v-1h-1v-1h-1v-2h1v-1h1v-1h1v-1h1z M4 3v1h-1v2h1v1h2v-1h1v-2h-1v-1z"
@@ -25,10 +25,10 @@
     </button>
   </div>
 
-  <canvas class="ty-canvas" role="img" aria-label="Spielwelt: eine Figur auf einer Voxel-Insel mit Tieren"></canvas>
+  <canvas class="mw-canvas" role="img" aria-label="Spielwelt: eine Figur auf einer Voxel-Insel mit Tieren"></canvas>
 
   <noscript>
-    <div class="ty-noscript pxbox paper">
+    <div class="mw-noscript pxbox paper">
       <p>
         Dieses Spiel für Dreijährige braucht JavaScript. Es läuft ganz im Browser, mit Pfeiltasten und Leertaste, und
         ist zum gemeinsamen Spielen mit einem Elternteil gedacht.
@@ -36,37 +36,37 @@
     </div>
   </noscript>
 
-  <dialog class="ty-menu pxbox paper" aria-labelledby="ty-menu-title">
-    <h2 id="ty-menu-title">Menü für Eltern</h2>
+  <dialog class="mw-menu pxbox paper" aria-labelledby="mw-menu-title">
+    <h2 id="mw-menu-title">Menü für Eltern</h2>
 
-    <section aria-labelledby="ty-worlds-title">
-      <h3 id="ty-worlds-title">Welten</h3>
-      <ul class="ty-worlds"></ul>
+    <section aria-labelledby="mw-worlds-title">
+      <h3 id="mw-worlds-title">Welten</h3>
+      <ul class="mw-worlds"></ul>
       <button type="button" class="pxbtn small" data-act="new">
         Neue Welt
       </button>
     </section>
 
-    <section aria-labelledby="ty-this-title">
-      <h3 id="ty-this-title">Diese Welt</h3>
-      <label for="ty-world-name">Name der Welt</label>
-      <input id="ty-world-name" type="text" maxlength="16" autocomplete="off" />
-      <label for="ty-figure-name">Name der Figur</label>
-      <input id="ty-figure-name" type="text" maxlength="16" autocomplete="off" />
-      <p class="ty-code-row">
-        Welt-Code: <code class="ty-code"></code>
-        <button type="button" class="ty-link" data-act="copy">
+    <section aria-labelledby="mw-this-title">
+      <h3 id="mw-this-title">Diese Welt</h3>
+      <label for="mw-world-name">Name der Welt</label>
+      <input id="mw-world-name" type="text" maxlength="16" autocomplete="off" />
+      <label for="mw-figure-name">Name der Figur</label>
+      <input id="mw-figure-name" type="text" maxlength="16" autocomplete="off" />
+      <p class="mw-code-row">
+        Welt-Code: <code class="mw-code"></code>
+        <button type="button" class="mw-link" data-act="copy">
           Kopieren
         </button>
       </p>
-      <p class="ty-hint">Mit dem Code entsteht dieselbe Landschaft, ohne den Spielstand.</p>
+      <p class="mw-hint">Mit dem Code entsteht dieselbe Landschaft, ohne den Spielstand.</p>
     </section>
 
-    <section class="ty-row" aria-label="Einstellungen">
-      <button type="button" class="ty-link" data-act="sound" aria-pressed="true">
+    <section class="mw-row" aria-label="Einstellungen">
+      <button type="button" class="mw-link" data-act="sound" aria-pressed="true">
         Ton ist an
       </button>
-      <button type="button" class="ty-link" data-act="fullscreen">
+      <button type="button" class="mw-link" data-act="fullscreen">
         Vollbild
       </button>
     </section>
@@ -75,10 +75,10 @@
       Weiterspielen
     </button>
   </dialog>
-</larmic-threeyear>
+</larmic-mitwachsen>
 
 <style>
-  .ty {
+  .mw {
     position: relative;
     display: block;
     height: 100vh;
@@ -87,13 +87,13 @@
     background: linear-gradient(var(--sky-1) 0 33%, var(--sky-2) 33% 66%, var(--sky-3) 66% 100%);
     overflow: hidden;
   }
-  .ty-canvas {
+  .mw-canvas {
     display: block;
     width: 100%;
     height: 100%;
     image-rendering: pixelated;
   }
-  .ty-top {
+  .mw-top {
     position: absolute;
     inset: 12px 12px auto;
     display: flex;
@@ -103,20 +103,20 @@
     pointer-events: none;
     z-index: 1;
   }
-  .ty-top > * {
+  .mw-top > * {
     pointer-events: auto;
   }
-  .ty-gear {
+  .mw-gear {
     padding: 0 14px;
   }
-  .ty-name {
+  .mw-name {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 4px;
     pointer-events: none;
   }
-  .ty-name :global(span) {
+  .mw-name :global(span) {
     display: grid;
     place-items: center;
     width: 32px;
@@ -131,7 +131,7 @@
       inset 0 3px 0 var(--gold-light),
       inset 0 -4px 0 var(--gold-dark);
   }
-  .ty-noscript {
+  .mw-noscript {
     position: absolute;
     inset: 50% 16px auto;
     max-width: 520px;
@@ -139,7 +139,7 @@
     padding: 20px 24px;
     transform: translateY(-50%);
   }
-  .ty-menu {
+  .mw-menu {
     width: min(460px, calc(100vw - 32px));
     max-height: calc(100dvh - 32px);
     padding: 24px;
@@ -147,29 +147,29 @@
     color: var(--ink);
     overflow: auto;
   }
-  .ty-menu::backdrop {
+  .mw-menu::backdrop {
     background: rgba(29, 40, 56, 0.55);
   }
-  .ty-menu h2 {
+  .mw-menu h2 {
     margin: 0 0 12px;
     font-family: var(--font-pixel);
   }
-  .ty-menu h3 {
+  .mw-menu h3 {
     margin: 20px 0 8px;
     font-family: var(--font-pixel);
     font-size: 1.1rem;
   }
-  .ty-menu section {
+  .mw-menu section {
     display: flex;
     flex-direction: column;
     gap: 8px;
     align-items: flex-start;
   }
-  .ty-menu label {
+  .mw-menu label {
     font-weight: 800;
     font-size: 0.95rem;
   }
-  .ty-menu input {
+  .mw-menu input {
     width: 100%;
     padding: 8px 10px;
     font: inherit;
@@ -178,7 +178,7 @@
     background: #ffffff;
     box-shadow: var(--px-3);
   }
-  .ty-worlds {
+  .mw-worlds {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -187,7 +187,7 @@
     padding: 0;
     list-style: none;
   }
-  .ty-worlds :global(.ty-world) {
+  .mw-worlds :global(.mw-world) {
     display: flex;
     justify-content: space-between;
     gap: 12px;
@@ -201,32 +201,32 @@
     box-shadow: inset 0 0 0 3px var(--wood-frame);
     cursor: pointer;
   }
-  .ty-worlds :global(.ty-world[aria-current='true']) {
+  .mw-worlds :global(.mw-world[aria-current='true']) {
     box-shadow: inset 0 0 0 3px var(--ink);
   }
-  .ty-worlds :global(.ty-world span) {
+  .mw-worlds :global(.mw-world span) {
     color: var(--muted);
   }
-  .ty-code-row {
+  .mw-code-row {
     margin: 8px 0 0;
   }
-  .ty-code {
+  .mw-code {
     margin-right: 10px;
     font-family: var(--font-pixel);
     font-size: 1.1rem;
     letter-spacing: 0.08em;
   }
-  .ty-hint {
+  .mw-hint {
     margin: 0;
     font-size: 0.9rem;
     color: var(--muted);
   }
-  .ty-row {
+  .mw-row {
     flex-direction: row !important;
     gap: 20px !important;
     margin: 20px 0;
   }
-  .ty-link {
+  .mw-link {
     padding: 0;
     font: inherit;
     font-weight: 800;
@@ -236,14 +236,14 @@
     border: 0;
     cursor: pointer;
   }
-  .ty-menu > .pxbtn {
+  .mw-menu > .pxbtn {
     margin-top: 8px;
   }
   @media (max-width: 560px) {
-    .ty-btn-text {
+    .mw-btn-text {
       display: none;
     }
-    .ty-name :global(span) {
+    .mw-name :global(span) {
       width: 24px;
       height: 26px;
       font-size: 1rem;
@@ -252,5 +252,5 @@
 </style>
 
 <script>
-  import '../scripts/games/larmic-threeyear';
+  import '../scripts/games/larmic-mitwachsen';
 </script>

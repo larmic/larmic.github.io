@@ -1,8 +1,8 @@
-# Konzept: threeyear (Spiel für 3 Jahre)
+# Konzept: Mitwachsen ab 3
 
 Das Kind läuft mit einer eigenen Figur durch eine endlose Voxel-Welt, trifft Tiere, die singen, führt sie nach Hause in ein Gehege und öffnet so nach und nach neue Gegenden. Zu jeder Gegend gibt es eine Geschichte, die der Elternteil vorliest. Zum Aufhören legt sich die Figur ins Bett, und es wird Nacht.
 
-Hintergrund und gemeinsame Regeln der Reihe: [README](README.md). Ein früher Prototyp (feste kleine Insel, Tiere treffen) liegt als Artefakt vor und hat gezeigt: Die Pfeiltasten beherrscht das Kind, die schräge Ansicht der Homepage passt aber nicht dazu (→ läuft dort nach rechts unten).
+Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dokument beschreibt die erste Stufe (ab 3). Ein früher Prototyp (feste kleine Insel, Tiere treffen) liegt als Artefakt vor und hat gezeigt: Die Pfeiltasten beherrscht das Kind, die schräge Ansicht der Homepage passt aber nicht dazu (→ läuft dort nach rechts unten).
 
 ## Grundsätze
 
@@ -124,7 +124,7 @@ Bei `prefers-reduced-motion`: Die Kamera springt feldweise mit, ohne Nachgleiten
 Seiten und Navigation (ob der Einstieg auf der Insel sichtbar ist, ist noch offen):
 
 - **`/spiele/`** als Seite mit Insel (`IslandPage.astro`, `rest="spiele"`): Einleitung für Eltern aus dem README, die Reihe als Kisten (eine pro Jahr), ein Standbild und ein Link zum Spiel. Mitziehen: `ROUTES` und `RestId` in `island-layout.ts`, Sprechblasen in `site.ts`, `docs/specs/insel.md`, die Tests der Insel, die Tabelle in `docs/design-system.md` und die schmale Ansicht.
-- **`/spiele/threeyear/`** als Seite ohne Insel wie Impressum und 404, mit schlankem Layout. Oben in der Ecke neben dem Zahnrad ein goldener Zurück-Button wie in `SubHero.astro` (Ziel `/spiele/`), nur per Maus. Keine Text-Navigation. Die Liste der Seiten ohne Insel in `CLAUDE.md` wird um die Spielseite ergänzt.
+- **`/spiele/mitwachsen/`** als Seite ohne Insel wie Impressum und 404, mit schlankem Layout. Oben in der Ecke neben dem Zahnrad ein goldener Zurück-Button wie in `SubHero.astro` (Ziel `/spiele/`), nur per Maus. Keine Text-Navigation. Die Liste der Seiten ohne Insel in `CLAUDE.md` wird um die Spielseite ergänzt.
 
 Fest:
 
@@ -141,20 +141,20 @@ Wie bei der Insel: reine, getestete Logik getrennt von der Komponente, die zeich
 | Ort | Inhalt |
 | --- | --- |
 | `src/lib/games/` | Generischer Code ohne Node: Seed-Zufall, Rauschen, Stücke, Projektion von vorn. Bekommt Gegenden als Parameter und kennt keine Tiere. |
-| `src/data/games/threeyear.ts` | Gegenden, Tiere mit Ton, Tore, Lage ums Zuhause. Importiert nur aus `src/lib/games/` und `textures.ts`. |
-| `src/scripts/games/threeyear-state.ts` | Reine Zustandsmaschine mit Tests, nach dem Muster von `island-state.ts` |
-| `src/scripts/games/threeyear-save.ts` | Speichern und `migrate()` mit Tests |
-| `src/scripts/games/larmic-threeyear.ts` | Web Component: Canvas, Eingabe, WebAudio |
+| `src/data/games/mitwachsen.ts` | Gegenden, Tiere mit Ton, Tore, Lage ums Zuhause. Importiert nur aus `src/lib/games/` und `textures.ts`. |
+| `src/scripts/games/mitwachsen-state.ts` | Reine Zustandsmaschine mit Tests, nach dem Muster von `island-state.ts` |
+| `src/scripts/games/mitwachsen-save.ts` | Speichern und `migrate()` mit Tests |
+| `src/scripts/games/larmic-mitwachsen.ts` | Web Component: Canvas, Eingabe, WebAudio |
 
 **Architekturregel (vom Vater freigegeben):** Browser-Code darf aus `src/lib` bisher nur `head.ts` nutzen. Künftig zusätzlich `textures.ts` (reine Daten) und `src/lib/games/**`. `cube.ts`, `render.ts` und `world.ts` bleiben Build-Code: Sie gehören zur schrägen Ansicht und ziehen Node-Code nach sich. Neue Regel: `src/data/games/**` darf nur browser-taugliche Module aus `src/lib` importieren.
 
 ## Stufen
 
 1. **Konzept** (dieses Dokument).
-2. **MVP ohne Texte**, direkt im Repo unter `/spiele/threeyear/`, über alle Gates und mit Deploy. Bis Stufe 2,5 nur über die direkte Adresse erreichbar.
+2. **MVP ohne Texte**, direkt im Repo unter `/spiele/mitwachsen/`, über alle Gates und mit Deploy. Bis Stufe 2,5 nur über die direkte Adresse erreichbar.
    - Enthalten: Ansicht von vorn mit mitlaufender Kamera, endlose Welt aus dem Seed, Zuhause mit Bett, Nacht und Gehege, Heimweg-Pfeil, Klettern, Tiere treffen und folgen lassen. Gegenden: Zuhause, Blumenwiese hinter dem Gartentor, Teich hinter der Brücke, jeweils mit Bildtafel und Tor-Regel. Welten-Menü (MVP-Punkte), Speichern.
    - Nicht enthalten: Wald, Strand, Geschichten, Tor-Texte, Spielstand-Datei, Welt aus Code.
-   - Dazu `docs/specs/threeyear.md` mit Ereignissen (`move`, `action`, `tick`, `sleep`, `wake`), Regeln und Invarianten. Jede Regel hat einen Test, z. B.: gleicher Seed ergibt gleiche Stücke, ein Tor öffnet genau dann, wenn alle Tiere seiner Gegend getroffen sind, jede Gegend ist vom Zuhause erreichbar, die Figur kann nicht eingeklemmt werden.
+   - Dazu `docs/specs/mitwachsen.md` mit Ereignissen (`move`, `action`, `tick`, `sleep`, `wake`), Regeln und Invarianten. Jede Regel hat einen Test, z. B.: gleicher Seed ergibt gleiche Stücke, ein Tor öffnet genau dann, wenn alle Tiere seiner Gegend getroffen sind, jede Gegend ist vom Zuhause erreichbar, die Figur kann nicht eingeklemmt werden.
 2,5. **MVP in die Homepage einbauen:** Einstieg über die Insel, Fallback ohne JavaScript, Datenschutz-Absatz.
 3. **Geschichten** schreiben und nach und nach einbauen, dazu Tor-Texte und weitere Gegenden (Wald, Strand).
 
@@ -171,7 +171,6 @@ Nur gesammelt, noch nicht ausgeplant.
 
 ## Offen
 
-- Name der Reihe (siehe [README](README.md)); vor Stufe 2,5 entscheiden.
 - Einstieg auf der Insel: sichtbar als „Spiele“ oder eher versteckt? Soll die Spielseite von Suchmaschinen ausgeschlossen werden (`noindex`, dann auch aus der Sitemap filtern)?
 - Werden die Berge später eine eigene Gegend?
 - Wie viele Tiere laufen in der berechneten Landschaft?

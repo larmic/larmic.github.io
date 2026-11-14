@@ -13,7 +13,7 @@ import {
   worldCode,
   worldKey,
   type Store,
-} from './threeyear-save';
+} from './mitwachsen-save';
 
 /** Speicher im Arbeitsspeicher wie localStorage */
 function memoryStore(): Store & { data: Map<string, string> } {

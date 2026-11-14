@@ -2,7 +2,7 @@
 // Tippen und Halten sind gleich schnell: höchstens ein Schritt je STEP_MS. Halten läuft ab dem ersten Schritt
 // gleichmäßig weiter (ohne die Verzögerung der Tastenwiederholung des Systems). Ein Tipp während eines Schritts
 // wird gemerkt und kommt im Takt dran, aber nie mehr als einer. So lohnt hektisches Drücken nicht.
-// Spezifikation: docs/specs/threeyear.md (Eingabe)
+// Spezifikation: docs/specs/mitwachsen.md (Eingabe)
 
 import type { Dir } from '../../lib/games/front';
 

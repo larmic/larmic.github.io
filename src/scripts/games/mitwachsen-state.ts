@@ -1,13 +1,21 @@
-// Spielregeln von threeyear als reine Zustandsmaschine – ohne DOM, ohne Timer, ohne Math.random.
-// Die Web Component (larmic-threeyear.ts) schickt Befehle (`move`, `action`, `tick`) an `step` und reagiert auf die
+// Spielregeln von Mitwachsen als reine Zustandsmaschine – ohne DOM, ohne Timer, ohne Math.random.
+// Die Web Component (larmic-mitwachsen.ts) schickt Befehle (`move`, `action`, `tick`) an `step` und reagiert auf die
 // Ereignisse, die zurückkommen (Töne, Herzen, Speichern). Zufall kommt aus einer Folge im Zustand.
-// Spezifikation: docs/specs/threeyear.md
+// Spezifikation: docs/specs/mitwachsen.md
 
 import { chunkOf } from '../../lib/games/chunks';
 import { DIRS, type Dir } from '../../lib/games/front';
 import { nextRandom } from '../../lib/games/rng';
-import { GATES, HOME, REGIONS, animalId, type GateId, type RegionId, type SpeciesId } from '../../data/games/threeyear';
-import { canStep, standHeight, wildAnimals, type World } from './threeyear-world';
+import {
+  GATES,
+  HOME,
+  REGIONS,
+  animalId,
+  type GateId,
+  type RegionId,
+  type SpeciesId,
+} from '../../data/games/mitwachsen';
+import { canStep, standHeight, wildAnimals, type World } from './mitwachsen-world';
 
 export const SLEEP_LOCK = 30; // Takte nach dem Einschlafen, in denen Tasten nicht wecken (3 s)
 export const SWAP_WINDOW = 15; // Takte, in denen zweimal Hineinlaufen den Platz tauscht (1,5 s)

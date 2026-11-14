@@ -1,6 +1,6 @@
-// Inhalte von threeyear: Gegenden, Tore, Zuhause, Tiere (Modell und Ton) und Figur.
+// Inhalte von Mitwachsen (Stufe ab 3): Gegenden, Tore, Zuhause, Tiere (Modell und Ton) und Figur.
 // Neue Gegenden und Tiere kommen hier dazu; Regeln und Generator bleiben gleich.
-// Konzept: docs/games/threeyear.md · Spec: docs/specs/threeyear.md
+// Konzept: docs/games/mitwachsen.md · Spec: docs/specs/mitwachsen.md
 
 import { eyes, type Part } from '../../lib/games/front';
 

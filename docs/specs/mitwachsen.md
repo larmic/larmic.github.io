@@ -1,6 +1,6 @@
-# Spec: threeyear (Spiel für 3 Jahre)
+# Spec: Mitwachsen (Stufe ab 3)
 
-Verhalten des Spiels unter `/spiele/threeyear/`. Konzept und Hintergrund: [docs/games/threeyear.md](../games/threeyear.md).
+Verhalten des Spiels unter `/spiele/mitwachsen/` (die alte Adresse `/spiele/threeyear/` leitet dorthin weiter). Konzept und Hintergrund: [docs/games/mitwachsen.md](../games/mitwachsen.md).
 
 Umgesetzt ist es in reinen, getesteten Teilen und einer Web Component:
 
@@ -8,12 +8,12 @@ Umgesetzt ist es in reinen, getesteten Teilen und einer Web Component:
 | --- | --- | --- |
 | Zufall, Rauschen, Stücke | [`src/lib/games/rng.ts`](../../src/lib/games/rng.ts), [`chunks.ts`](../../src/lib/games/chunks.ts) | `rng.test.ts` |
 | Ansicht von vorn, Modelle aus Quadern | [`src/lib/games/front.ts`](../../src/lib/games/front.ts) | – (Zeichnen) |
-| Inhalte: Gegenden, Tore, Zuhause, Tiere, Figur | [`src/data/games/threeyear.ts`](../../src/data/games/threeyear.ts) | über die Tests unten |
-| Welt aus dem Seed | [`src/scripts/games/threeyear-world.ts`](../../src/scripts/games/threeyear-world.ts) | `threeyear-world.test.ts` |
-| Spielregeln (Zustandsmaschine) | [`src/scripts/games/threeyear-state.ts`](../../src/scripts/games/threeyear-state.ts) | `threeyear-state.test.ts` |
-| Spielstände | [`src/scripts/games/threeyear-save.ts`](../../src/scripts/games/threeyear-save.ts) | `threeyear-save.test.ts` |
+| Inhalte: Gegenden, Tore, Zuhause, Tiere, Figur | [`src/data/games/mitwachsen.ts`](../../src/data/games/mitwachsen.ts) | über die Tests unten |
+| Welt aus dem Seed | [`src/scripts/games/mitwachsen-world.ts`](../../src/scripts/games/mitwachsen-world.ts) | `mitwachsen-world.test.ts` |
+| Spielregeln (Zustandsmaschine) | [`src/scripts/games/mitwachsen-state.ts`](../../src/scripts/games/mitwachsen-state.ts) | `mitwachsen-state.test.ts` |
+| Spielstände | [`src/scripts/games/mitwachsen-save.ts`](../../src/scripts/games/mitwachsen-save.ts) | `mitwachsen-save.test.ts` |
 | Ruhiger Takt der Eingabe | [`src/scripts/games/input-pace.ts`](../../src/scripts/games/input-pace.ts) | `input-pace.test.ts` |
-| Browser: Tastatur, Takt, Kamera, Töne, Menü | [`larmic-threeyear.ts`](../../src/scripts/games/larmic-threeyear.ts), [`threeyear-render.ts`](../../src/scripts/games/threeyear-render.ts), [`sfx.ts`](../../src/scripts/games/sfx.ts) | – |
+| Browser: Tastatur, Takt, Kamera, Töne, Menü | [`larmic-mitwachsen.ts`](../../src/scripts/games/larmic-mitwachsen.ts), [`mitwachsen-render.ts`](../../src/scripts/games/mitwachsen-render.ts), [`sfx.ts`](../../src/scripts/games/sfx.ts) | – |
 
 Bei Änderungen am Verhalten Spec und Tests mitziehen.
 
@@ -88,7 +88,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | `migrate()` | verwirft Fremdes (anderes Spiel, unbekannte Version) und räumt auf (unbekannte Tore und Arten, doppelte Einträge, kaputte Felder) |
 | Welt-Code | Seed in Basis 36, z. B. `0IDFDSE`; ergibt dieselbe Landschaft ohne Spielstand |
 
-*Tests: `threeyear-save.test.ts`*
+*Tests: `mitwachsen-save.test.ts`*
 
 ## Was angezeigt wird
 

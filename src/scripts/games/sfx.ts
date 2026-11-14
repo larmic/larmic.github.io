@@ -2,7 +2,7 @@
 // Kurz, warm und leise. Höchstens MAX_VOICES Töne gleichzeitig, damit Dauerdrücken nicht laut wird.
 // Der Browser erlaubt Ton erst nach einer Geste: `unlock()` aus einem Tasten- oder Klick-Handler aufrufen.
 
-import type { Tone } from '../../data/games/threeyear';
+import type { Tone } from '../../data/games/mitwachsen';
 
 const MAX_VOICES = 6;
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DIRS } from '../../lib/games/front';
-import { GATES, HOME, REGIONS, type GateId } from '../../data/games/threeyear';
-import { canStep, createWorld, inRect, standHeight, wildAnimals, type World } from './threeyear-world';
+import { GATES, HOME, REGIONS, type GateId } from '../../data/games/mitwachsen';
+import { canStep, createWorld, inRect, standHeight, wildAnimals, type World } from './mitwachsen-world';
 
 /** Alle Felder, die von `start` aus zu Fuß erreichbar sind (bis `limit` Felder) */
 function reachable(world: World, open: GateId[], start: readonly [number, number], limit = 6000) {

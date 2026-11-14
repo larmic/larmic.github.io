@@ -1,10 +1,10 @@
-// Spielstände von threeyear im localStorage – rein bis auf den übergebenen Speicher, damit testbar.
+// Spielstände von Mitwachsen im localStorage – rein bis auf den übergebenen Speicher, damit testbar.
 // Ein Index listet die Welten, jede Welt liegt unter einem eigenen Schlüssel: Eine kaputte Welt reißt die anderen
 // nicht mit. Jeder Zugriff fängt Fehler ab (privates Fenster, voller Speicher); das Spiel läuft dann ohne Speichern.
-// Spezifikation: docs/specs/threeyear.md
+// Spezifikation: docs/specs/mitwachsen.md
 
-import { GATES, SPECIES, type GateId, type SpeciesId } from '../../data/games/threeyear';
-import type { PenAnimal, Progress } from './threeyear-state';
+import { GATES, SPECIES, type GateId, type SpeciesId } from '../../data/games/mitwachsen';
+import type { PenAnimal, Progress } from './mitwachsen-state';
 
 export const PREFIX = 'larmic.games.';
 export const INDEX_KEY = `${PREFIX}index`;

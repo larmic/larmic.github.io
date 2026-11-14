@@ -1,12 +1,12 @@
-// <larmic-threeyear>: das Spiel für drei Jahre. Verbindet die reinen Teile (Welt, Regeln, Speichern) mit dem
-// Browser: Tastatur, Takt, Kamera, Töne, Menü und Canvas. Alle Regeln stecken getestet in threeyear-state.ts.
+// <larmic-mitwachsen>: das Spiel Mitwachsen (Stufe ab 3). Verbindet die reinen Teile (Welt, Regeln, Speichern) mit dem
+// Browser: Tastatur, Takt, Kamera, Töne, Menü und Canvas. Alle Regeln stecken getestet in mitwachsen-state.ts.
 // Listener auf document/window hängen an einem AbortController und verschwinden mit der Komponente; so stört das
 // Spiel nach einem Seitenwechsel (View Transitions) niemanden.
-// Konzept: docs/games/threeyear.md · Spec: docs/specs/threeyear.md
+// Konzept: docs/games/mitwachsen.md · Spec: docs/specs/mitwachsen.md
 
 import type { Dir } from '../../lib/games/front';
-import { GAME_COLORS, LOOK, SPECIES } from '../../data/games/threeyear';
-import { Renderer, type Body, type Float, type Particle, type Scene } from './threeyear-render';
+import { GAME_COLORS, LOOK, SPECIES } from '../../data/games/mitwachsen';
+import { Renderer, type Body, type Float, type Particle, type Scene } from './mitwachsen-render';
 import { Sfx } from './sfx';
 import {
   DEFAULT_FIGURE,
@@ -20,10 +20,10 @@ import {
   worldCode,
   type SavedWorld,
   type Store,
-} from './threeyear-save';
+} from './mitwachsen-save';
 import { InputPace, STEP_MS } from './input-pace';
-import { initialState, progressOf, step, type Cmd, type GameEvent, type State } from './threeyear-state';
-import { createWorld, standHeight, type World } from './threeyear-world';
+import { initialState, progressOf, step, type Cmd, type GameEvent, type State } from './mitwachsen-state';
+import { createWorld, standHeight, type World } from './mitwachsen-world';
 
 const TICK_MS = 100; // Takt der Regeln
 const SAVE_EVERY_MS = 10_000; // Position regelmäßig sichern
@@ -62,7 +62,7 @@ function browserStore(): Store {
 const randomSeed = () => crypto.getRandomValues(new Uint32Array(1))[0];
 const randomId = () => randomSeed().toString(36) + Date.now().toString(36);
 
-class LarmicThreeyear extends HTMLElement {
+class LarmicMitwachsen extends HTMLElement {
   private store!: Store;
   private saved!: SavedWorld;
   private world!: World;
@@ -179,7 +179,7 @@ class LarmicThreeyear extends HTMLElement {
         if (t?.closest('input, textarea, select')) return;
         // Buttons bleiben bedienbar (Enter, im Menü auch die Leertaste). Zurück und Zahnrad oben: Die Leertaste gehört
         // dem Spiel, sonst öffnet das Kind nach einem Mausklick von Papa das Menü statt zu singen.
-        if (t?.closest('button, a') && (e.key === 'Enter' || (e.key === ' ' && !t.closest('.ty-top')))) return;
+        if (t?.closest('button, a') && (e.key === 'Enter' || (e.key === ' ' && !t.closest('.mw-top')))) return;
         e.preventDefault();
         if (e.repeat) return; // gehaltene Pfeile laufen über den eigenen Takt (poll im Bild), nicht über das System
         const dir = KEYS[e.key];
@@ -216,7 +216,7 @@ class LarmicThreeyear extends HTMLElement {
     );
     window.addEventListener('pagehide', () => this.save(), { signal });
 
-    this.querySelector('.ty-gear')!.addEventListener('click', () => this.openMenu(), { signal });
+    this.querySelector('.mw-gear')!.addEventListener('click', () => this.openMenu(), { signal });
     // Beim Schließen gibt der Dialog den Fokus ans Zahnrad zurück; die Leertaste öffnete dann sofort wieder das Menü
     this.menu.addEventListener(
       'close',
@@ -431,7 +431,7 @@ class LarmicThreeyear extends HTMLElement {
   // ---------- Kopf und Menü ----------
 
   private renderName() {
-    const tag = this.querySelector('.ty-name');
+    const tag = this.querySelector('.mw-name');
     if (!tag) return;
     tag.replaceChildren(
       ...[...this.saved.figureName.toUpperCase()]
@@ -457,13 +457,13 @@ class LarmicThreeyear extends HTMLElement {
   }
 
   private renderMenu() {
-    const list = this.menu.querySelector('.ty-worlds')!;
+    const list = this.menu.querySelector('.mw-worlds')!;
     list.replaceChildren(
       ...loadIndex(this.store).worlds.map((w) => {
         const li = document.createElement('li');
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'ty-world';
+        b.className = 'mw-world';
         b.dataset.world = w.id;
         if (w.id === this.saved.id) b.setAttribute('aria-current', 'true');
         const name = document.createElement('strong');
@@ -475,9 +475,9 @@ class LarmicThreeyear extends HTMLElement {
         return li;
       }),
     );
-    (this.menu.querySelector('#ty-world-name') as HTMLInputElement).value = this.saved.worldName;
-    (this.menu.querySelector('#ty-figure-name') as HTMLInputElement).value = this.saved.figureName;
-    this.menu.querySelector('.ty-code')!.textContent = worldCode(this.saved.seed);
+    (this.menu.querySelector('#mw-world-name') as HTMLInputElement).value = this.saved.worldName;
+    (this.menu.querySelector('#mw-figure-name') as HTMLInputElement).value = this.saved.figureName;
+    this.menu.querySelector('.mw-code')!.textContent = worldCode(this.saved.seed);
     const sound = this.menu.querySelector('[data-act="sound"]')!;
     sound.setAttribute('aria-pressed', String(!this.sfx.muted));
     sound.textContent = this.sfx.muted ? 'Ton ist aus' : 'Ton ist an';
@@ -529,8 +529,8 @@ class LarmicThreeyear extends HTMLElement {
 
   private menuChange(e: Event) {
     const input = e.target as HTMLInputElement;
-    if (input.id === 'ty-world-name') this.saved = { ...this.saved, worldName: cleanName(input.value, 'Meine Welt') };
-    else if (input.id === 'ty-figure-name')
+    if (input.id === 'mw-world-name') this.saved = { ...this.saved, worldName: cleanName(input.value, 'Meine Welt') };
+    else if (input.id === 'mw-figure-name')
       this.saved = { ...this.saved, figureName: cleanName(input.value, DEFAULT_FIGURE) };
     else return;
     this.save();
@@ -549,7 +549,7 @@ class LarmicThreeyear extends HTMLElement {
       done('Kopiert');
     } catch {
       const range = document.createRange();
-      range.selectNodeContents(this.menu.querySelector('.ty-code')!);
+      range.selectNodeContents(this.menu.querySelector('.mw-code')!);
       getSelection()?.removeAllRanges();
       getSelection()?.addRange(range);
       done('Markiert');
@@ -557,4 +557,4 @@ class LarmicThreeyear extends HTMLElement {
   }
 }
 
-if (!customElements.get('larmic-threeyear')) customElements.define('larmic-threeyear', LarmicThreeyear);
+if (!customElements.get('larmic-mitwachsen')) customElements.define('larmic-mitwachsen', LarmicMitwachsen);
