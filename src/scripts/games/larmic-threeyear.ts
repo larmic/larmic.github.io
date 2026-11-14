@@ -178,7 +178,9 @@ class LarmicThreeyear extends HTMLElement {
           return;
         const t = e.target as HTMLElement | null;
         if (t?.closest('input, textarea, select')) return;
-        if (t?.closest('button, a') && (e.key === ' ' || e.key === 'Enter')) return; // Buttons bleiben bedienbar
+        // Buttons bleiben bedienbar (Enter, im Menü auch die Leertaste). Zurück und Zahnrad oben: Die Leertaste gehört
+        // dem Spiel, sonst öffnet das Kind nach einem Mausklick von Papa das Menü statt zu singen.
+        if (t?.closest('button, a') && (e.key === 'Enter' || (e.key === ' ' && !t.closest('.ty-top')))) return;
         e.preventDefault();
         const dir = KEYS[e.key];
         if (!dir && e.repeat) return; // gehaltene Aktionstaste zählt einmal
@@ -434,6 +436,8 @@ class LarmicThreeyear extends HTMLElement {
     this.renderMenu();
     if (this.timer !== undefined) clearInterval(this.timer);
     this.timer = undefined;
+    // Ohne Fokus auf dem Zahnrad gibt der Dialog beim Schließen keinen Fokus dorthin zurück
+    (document.activeElement as HTMLElement | null)?.blur();
     this.menu.showModal();
   }
 
