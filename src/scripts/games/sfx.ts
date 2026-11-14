@@ -40,7 +40,9 @@ export class Sfx {
 
   private note(freq: number, len: number, wave: OscillatorType, gain: number, slide = 1, delay = 0) {
     const ctx = this.ctx;
-    if (this.muted || !ctx || !this.out || ctx.state !== 'running' || this.voices >= MAX_VOICES) return;
+    // Das Limit gilt nur für sofort erklingende Töne (Dauerdrücken); Melodien sind schon eingeplant und dürfen zu Ende spielen.
+    // Ein gerade fortgesetzter Context (resume läuft asynchron) spielt eingeplante Töne nach.
+    if (this.muted || !ctx || !this.out || ctx.state === 'closed' || (delay === 0 && this.voices >= MAX_VOICES)) return;
     const t = ctx.currentTime + delay;
     const osc = ctx.createOscillator();
     const env = ctx.createGain();

@@ -55,6 +55,7 @@ export type Scene = {
   particles: Particle[];
   now: number;
   look: Look;
+  reduced: boolean; // prefers-reduced-motion: nichts wippt, steigt oder funkelt
 };
 
 const PAL_SAND: Palette = { D: [['#e3cf95', 1]], d: [['#d4bd7d', 1]], e: [['#efdeaa', 1]] };
@@ -303,7 +304,7 @@ export class Renderer {
       if (t >= 1) continue;
       const [x, y] = P(f.x + 0.5, f.y + 0.5, f.z);
       ctx.globalAlpha = t > 0.7 ? (1 - t) / 0.3 : 1;
-      const lift = t * 40 * sc.zoom;
+      const lift = sc.reduced ? 0 : t * 40 * sc.zoom;
       if (f.kind === 'heart') sprite(ctx, HEART, f.color, x + 14 * sc.zoom, y - lift, 4 * sc.zoom);
       else if (f.kind === 'note') sprite(ctx, NOTE, f.color, x - 14 * sc.zoom, y - lift, 4 * sc.zoom);
       else sprite(ctx, ZZZ, f.color, x + (10 + t * 14) * sc.zoom, y - lift, 4 * sc.zoom);
@@ -329,7 +330,7 @@ export class Renderer {
     const sx = (sc.width / 2 - m) / Math.abs(Math.cos(ang) || 1e-6);
     const sy = (Math.sin(ang) < 0 ? cy - top : sc.height - m - cy) / Math.abs(Math.sin(ang) || 1e-6);
     const r = Math.min(sx, sy);
-    const bob = Math.sin(sc.now / 250) * 4 * sc.zoom;
+    const bob = sc.reduced ? 0 : Math.sin(sc.now / 250) * 4 * sc.zoom;
     const ax = cx + Math.cos(ang) * (r + bob),
       ay = cy + Math.sin(ang) * (r + bob);
     const { ctx } = this;
@@ -360,20 +361,19 @@ export class Renderer {
     for (let i = 0; i < 46; i++) {
       const x = ((i * 7919) % 1000) / 1000,
         y = ((i * 104729) % 1000) / 1000;
-      const twinkle = 0.5 + 0.5 * Math.sin(sc.now / 600 + i);
+      const twinkle = sc.reduced ? 1 : 0.5 + 0.5 * Math.sin(sc.now / 600 + i);
       const s = (i % 3 === 0 ? 4 : 2) * sc.zoom;
       ctx.globalAlpha = sc.night * (0.4 + 0.6 * twinkle);
       ctx.fillRect(Math.round(x * sc.width), Math.round(y * sc.height * 0.7), s, s);
     }
-    // Mond
+    // Mondsichel aus zwei Rechtecken
     ctx.globalAlpha = sc.night;
     ctx.fillStyle = GAME_COLORS.star;
     const mx = sc.width * 0.82,
       my = sc.height * 0.16,
       r = 22 * sc.zoom;
-    ctx.fillRect(mx - r, my - r, 2 * r, 2 * r);
-    ctx.fillStyle = GAME_COLORS.night;
-    ctx.fillRect(mx - r * 0.2, my - r, r * 1.2, r * 1.4);
+    ctx.fillRect(mx - r, my - r, 0.8 * r, 2 * r);
+    ctx.fillRect(mx - 0.2 * r, my + 0.4 * r, 1.2 * r, 0.6 * r);
     ctx.globalAlpha = 1;
   }
 }

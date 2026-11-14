@@ -325,3 +325,38 @@ describe('Invarianten bei wildem Drücken', () => {
     });
   }
 });
+
+describe('Randfälle aus der Prüfung', () => {
+  it('schläft am Bett, auch wenn ein folgendes Tier direkt hinter der Figur steht', () => {
+    const world = createWorld(1);
+    const [bx, by] = HOME.bed;
+    let s = awake(world, bx + 1, by, [animal('zuhause:hase', bx + 1, by + 1, { mode: 'follow' })]);
+    s = { ...s, followers: ['zuhause:hase'], player: { ...s.player, dir: 'n' } };
+    const r = run(s, world, ACT);
+    expect(r.s.sleeping).toBe(true);
+  });
+
+  it('ein Tier im Gehege rückt beiseite, statt den Eingang zu versperren', () => {
+    const world = createWorld(1);
+    const [gx, gy] = HOME.penGate;
+    let s = awake(world, gx, gy, [animal('zuhause:igel', gx, gy - 1, { mode: 'pen', home: { kind: 'pen' } })]);
+    s = run(s, world, 'n').s; // singt
+    const r = run(s, world, 'n'); // zweites Mal: Tier rückt im Gehege beiseite, Figur geht hinein
+    expect([r.s.player.x, r.s.player.y]).toEqual([gx, gy - 1]);
+    const igel = r.s.animals[0];
+    expect(world.cell(igel.x, igel.y).pen).toBe(true);
+    expect([igel.x, igel.y]).not.toEqual([gx, gy - 1]);
+  });
+
+  it('ein folgendes Tier, das per Platztausch ins Gehege kommt, bleibt dort', () => {
+    const world = createWorld(1);
+    const [gx, gy] = HOME.penGate;
+    let s = awake(world, gx, gy - 1, [animal('zuhause:hase', gx, gy, { mode: 'follow' })]);
+    s = { ...s, followers: ['zuhause:hase'] };
+    s = run(s, world, 's').s; // singt
+    const r = run(s, world, 's'); // tauscht: Hase steht jetzt im Gehege
+    expect(r.events).toContainEqual({ type: 'pen', id: 'zuhause:hase' });
+    expect(r.s.followers).toEqual([]);
+    expect(r.s.pen.map((p) => p.id)).toEqual(['zuhause:hase']);
+  });
+});

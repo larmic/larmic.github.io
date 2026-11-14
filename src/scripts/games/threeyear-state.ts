@@ -226,9 +226,22 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
   const animal = s.animals.find((a) => a.x === tx && a.y === ty);
   if (animal) {
     const again = s.lastBump?.id === animal.id && s.tick - s.lastBump.tick <= SWAP_WINDOW;
-    const fits =
-      (animal.mode !== 'pen' || world.cell(p.x, p.y).pen === true) && canStep(world, s.openGates, p.x, p.y, tx, ty);
-    if (again && fits) {
+    const climbable = canStep(world, s.openGates, p.x, p.y, tx, ty);
+    const atPenGate = p.x === HOME.penGate[0] && p.y === HOME.penGate[1];
+    if (again && climbable && animal.mode === 'pen' && atPenGate) {
+      // Ein Tier im Gehege versperrt den Eingang: Es rückt im Gehege beiseite, die Figur geht hinein
+      const spot = freeNear(
+        s,
+        world,
+        [tx, ty],
+        (x, y) => world.cell(x, y).pen === true && (x !== tx || y !== ty),
+        animal.id,
+      );
+      if (spot) {
+        [animal.x, animal.y] = spot;
+        s.lastBump = null;
+      }
+    } else if (again && climbable && (animal.mode !== 'pen' || world.cell(p.x, p.y).pen === true)) {
       // Zweimal hineingelaufen: Platz tauschen, so bleibt die Figur nie stecken
       animal.x = p.x;
       animal.y = p.y;
@@ -237,11 +250,14 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
       p.y = ty;
       s.lastBump = null;
       events.push({ type: 'swap', id: animal.id });
+      penFollowers(s, world, events);
       return;
     }
-    s.lastBump = { id: animal.id, tick: s.tick };
-    sing(s, animal, false, events);
-    return;
+    if (s.animals.some((a) => a.x === tx && a.y === ty)) {
+      s.lastBump = { id: animal.id, tick: s.tick };
+      sing(s, animal, false, events);
+      return;
+    }
   }
   if (!canStep(world, s.openGates, p.x, p.y, tx, ty)) {
     events.push({ type: 'bump' });
@@ -262,7 +278,11 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
     a.y = prev[1];
     prev = old;
   }
-  // Wer im Gehege ankommt, bleibt dort
+  penFollowers(s, world, events);
+}
+
+/** Wer als folgendes Tier im Gehege ankommt, löst sich aus der Kette und bleibt dort */
+function penFollowers(s: State, world: World, events: GameEvent[]) {
   for (const id of [...s.followers]) {
     const a = s.animals.find((x) => x.id === id)!;
     if (!world.cell(a.x, a.y).pen) continue;
@@ -287,8 +307,12 @@ function action(s: State, world: World, events: GameEvent[]) {
   const front = s.animals.find((a) => a.x === fx && a.y === fy);
   if (front) return sing(s, front, true, events);
   if (isBed(fx, fy)) return sleep(s, world, events);
+  // Bett daneben: schlafen, außer ein Tier steht näher als das Bett
+  const man = (x: number, y: number) => Math.abs(x - p.x) + Math.abs(y - p.y);
+  const bedNear = cheb(p.x, p.y, HOME.bed[0], HOME.bed[1]) <= 1;
+  if (bedNear && (!near.length || man(near[0].x, near[0].y) >= man(HOME.bed[0], HOME.bed[1])))
+    return sleep(s, world, events);
   if (near.length) return sing(s, near[0], true, events);
-  if (cheb(p.x, p.y, HOME.bed[0], HOME.bed[1]) <= 1) return sleep(s, world, events);
   events.push({ type: 'call' });
 }
 

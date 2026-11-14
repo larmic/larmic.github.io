@@ -120,7 +120,11 @@ class LarmicThreeyear extends HTMLElement {
   /** Welt laden (oder eine neue anlegen) und das Spiel darauf starten */
   private openWorld(id: string | null) {
     const loaded = id ? loadWorld(this.store, id) : null;
-    this.saved = loaded ?? newWorld(randomId(), randomSeed(), 'Meine Welt', DEFAULT_FIGURE);
+    // Fehlt eine Welt aus dem Index (gelöscht, kaputt), entsteht sie neu unter derselben Kennung und mit ihren Namen
+    const entry = id ? loadIndex(this.store).worlds.find((w) => w.id === id) : undefined;
+    this.saved =
+      loaded ??
+      newWorld(id ?? randomId(), randomSeed(), entry?.worldName ?? 'Meine Welt', entry?.figureName ?? DEFAULT_FIGURE);
     this.saved = { ...this.saved, visits: this.saved.visits + 1 };
     saveWorld(this.store, this.saved);
     this.world = createWorld(this.saved.seed);
@@ -200,7 +204,15 @@ class LarmicThreeyear extends HTMLElement {
     window.addEventListener('pagehide', () => this.save(), { signal });
 
     this.querySelector('.ty-gear')!.addEventListener('click', () => this.openMenu(), { signal });
-    this.menu.addEventListener('close', () => this.start(), { signal });
+    // Beim Schließen gibt der Dialog den Fokus ans Zahnrad zurück; die Leertaste öffnete dann sofort wieder das Menü
+    this.menu.addEventListener(
+      'close',
+      () => {
+        (document.activeElement as HTMLElement | null)?.blur();
+        this.start();
+      },
+      { signal },
+    );
     this.menu.addEventListener('click', (e) => this.menuClick(e), { signal });
     this.menu.addEventListener('change', (e) => this.menuChange(e), { signal });
   }
@@ -368,11 +380,12 @@ class LarmicThreeyear extends HTMLElement {
       if (!b) continue;
       floats.push({ ...f, x: b.x, y: b.y, z: b.z + (f.who === 'player' ? 1.5 : 0.9), age: t - f.born });
     }
+    const k = dt * 60; // Partikel laufen in Zeit, nicht in Bildern (120-Hz-Schirme)
     for (const p of this.particles) {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.22;
-      p.life--;
+      p.x += p.vx * k;
+      p.y += p.vy * k;
+      p.vy += 0.22 * k;
+      p.life -= k;
     }
     this.particles = this.particles.filter((p) => p.life > 0);
 
@@ -394,6 +407,7 @@ class LarmicThreeyear extends HTMLElement {
       particles: this.particles,
       now: t,
       look: LOOK,
+      reduced: this.reduced.matches,
     };
     this.renderer.draw(this.world, this.state, scene);
   }
