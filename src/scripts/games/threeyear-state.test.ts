@@ -380,7 +380,7 @@ describe('Eingang des Geheges', () => {
     const world = createWorld(2);
     const [gx, gy] = HOME.penGate;
     const pen = Array.from({ length: 6 }, (_, i) => ({ id: `wild:9:9:${i}`, species: 'hase' as const }));
-    let s = { ...initialState(world, { pen }), sleeping: false, player: { x: 0, y: 4, dir: 's' as const } };
+    let s: State = { ...initialState(world, { pen }), sleeping: false, player: { x: 0, y: 4, dir: 's' } };
     for (let i = 0; i < 3000; i++) {
       s = step(s, world, TICK).state;
       expect(s.animals.some((a) => a.mode === 'pen' && a.x === gx && a.y === gy - 1)).toBe(false);
