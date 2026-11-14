@@ -16,7 +16,8 @@
     "arch": "depcruise src --config .dependency-cruiser.cjs",
     "verify:html": "html-validate \"dist/**/*.html\"",
     "verify:links": "linkinator dist --recurse --skip \"^https?://(?!localhost|127\\\\.0\\\\.0\\\\.1)\"",
-    "verify": "npm run verify:html && npm run verify:links",
+    "verify:bundles": "node scripts/verify-bundles.ts",
+    "verify": "npm run verify:html && npm run verify:links && npm run verify:bundles",
     "gates": "npm run format:check && npm run lint && npm run arch && npm run check && npm test && npm run build && npm run verify",
     "prepare": "git config core.hooksPath .githooks || true"
   },
