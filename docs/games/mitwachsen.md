@@ -25,7 +25,8 @@ Ohne Tastatur (Handy, Tablet) zeigt die Seite einen Hinweis für Eltern, dass da
 
 ## Ansicht und Kamera
 
-- **Ansicht von vorn:** Blöcke zeigen Ober- und Vorderseite, die Gitterachsen liegen waagerecht und senkrecht. Texturen wie in `src/lib/voxel/textures.ts`.
+- **3D-Ansicht:** echtes 3D mit Three.js, Kamera schräg von oben (etwa 55°, im Code einstellbar), Sonnenlicht mit Schatten, Nebel in der Ferne. Texturen wie in `src/lib/voxel/textures.ts`, pixelig. Three.js lädt erst beim Spielstart nach, die Homepage nie (Bundle-Gate).
+- **2D-Ansicht von vorn** als Rückfall ohne WebGL und während 3D lädt: Blöcke zeigen Ober- und Vorderseite.
 - **Die Figur bleibt in der Bildmitte**, die Kamera folgt ihr weich, die Welt läuft darunter durch. Gezeichnet wird nur, was im Bild ist.
 - **Heimweg-Pfeil:** Liegt das Zuhause außerhalb des Bildes, zeigt ein Pfeil am Bildschirmrand dorthin.
 - **Farben:** Farben der Spielwelt (Tiere, Herzen, Nacht, Sterne) sind Spielgrafik wie die Texturen und stehen in einer Spiel-Palette, nicht in `tokens.css`. Herzen sind rosa oder rot, nicht Gold. Tafeln sind aus Holz mit Pixel-Rahmen in Tinte, Umrisse fehlender Tiere in Tinte. Oberfläche (Zahnrad, Menü, Buttons) nutzt die Tokens und `.pxbtn`; Gold bleibt die Farbe für klickbare Aktionen.

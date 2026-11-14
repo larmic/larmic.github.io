@@ -4,7 +4,8 @@
 // Spiel nach einem Seitenwechsel (View Transitions) niemanden.
 // Konzept: docs/games/mitwachsen.md · Spec: docs/specs/mitwachsen.md
 
-import type { Dir } from '../../lib/games/front';
+import { projection, type Dir } from '../../lib/games/front';
+import type { World3D as World3DType } from './mitwachsen-3d';
 import { GAME_COLORS, LOOK, SPECIES } from '../../data/games/mitwachsen';
 import { Renderer, type Body, type Float, type Particle, type Scene } from './mitwachsen-render';
 import { Sfx } from './sfx';
@@ -88,9 +89,10 @@ class LarmicMitwachsen extends HTMLElement {
   private dayAt = 0;
   private resize: ResizeObserver | null = null;
   private readonly reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  private r3d: World3DType | null = null; // 3D-Ansicht, sobald nachgeladen
 
   connectedCallback() {
-    this.canvas = this.querySelector('canvas')!;
+    this.canvas = this.querySelector('canvas.mw-canvas')!;
     this.ctx = this.canvas.getContext('2d')!;
     this.menu = this.querySelector('dialog')!;
     this.renderer = new Renderer(this.ctx);
@@ -103,6 +105,25 @@ class LarmicMitwachsen extends HTMLElement {
     this.measure();
     this.classList.add('ready');
     this.start();
+    void this.load3d();
+  }
+
+  /**
+   * 3D-Ansicht nachladen: Three.js kommt erst jetzt (import()), nie mit der Homepage. Ohne WebGL oder wenn das Laden
+   * scheitert, bleibt die 2D-Ansicht. Bis die 3D-Ansicht bereit ist, läuft das Spiel schon in 2D.
+   */
+  private async load3d() {
+    const probe = document.createElement('canvas');
+    if (!probe.getContext('webgl2') && !probe.getContext('webgl')) return;
+    try {
+      const { World3D } = await import('./mitwachsen-3d');
+      if (!this.isConnected) return;
+      this.r3d = new World3D(this.querySelector<HTMLCanvasElement>('canvas.mw-canvas3d')!, LOOK);
+      this.classList.add('three');
+      this.measure();
+    } catch {
+      this.r3d = null; // 2D reicht
+    }
   }
 
   disconnectedCallback() {
@@ -112,6 +133,8 @@ class LarmicMitwachsen extends HTMLElement {
     this.globals = null;
     this.resize?.disconnect();
     this.sfx.close();
+    this.r3d?.dispose();
+    this.r3d = null;
   }
 
   // ---------- Welten ----------
@@ -300,8 +323,7 @@ class LarmicMitwachsen extends HTMLElement {
     const b = this.bodies.get(who);
     if (!b) return;
     const { zoom } = this.size;
-    const sx = this.size.w / 2 + (b.x - this.camera().x) * 64 * zoom;
-    const sy = this.size.h / 2 + 30 * zoom + ((b.y - this.camera().y) * 44 - (b.z + 0.8) * 40) * zoom;
+    const [sx, sy] = this.project(b.x + 0.5, b.y + 0.5, b.z + 0.8);
     for (let i = 0; i < n; i++) {
       const a = (i / n) * Math.PI * 2;
       const v = 1 + (i % 4) * 0.8;
@@ -328,6 +350,15 @@ class LarmicMitwachsen extends HTMLElement {
     this.canvas.height = Math.round(h * dpr);
     // Etwa 18 Felder breit, auf großen Schirmen nicht riesig, auf kleinen nicht winzig
     this.size = { w, h, dpr, zoom: Math.min(1.25, Math.max(0.5, w / (18 * 64))) };
+    this.r3d?.resize(w, h, dpr);
+  }
+
+  /** Bildschirmpunkt eines Weltpunkts – aus der 3D-Kamera, sonst aus der Ansicht von vorn */
+  private project(x: number, y: number, z: number): [number, number] {
+    if (this.r3d) return this.r3d.project(x, y, z);
+    const cam = this.camera();
+    const { w, h, zoom } = this.size;
+    return projection(cam.x + 0.5, cam.y + 0.5, w / 2, h / 2 + 30 * zoom, zoom)(x, y, z);
   }
 
   private camera() {
@@ -425,7 +456,12 @@ class LarmicMitwachsen extends HTMLElement {
       look: LOOK,
       reduced: this.reduced.matches,
     };
-    this.renderer.draw(this.world, this.state, scene);
+    if (this.r3d) {
+      // 3D-Welt, darüber die durchsichtige 2D-Ebene mit Zeichen, Pfeil, Nacht und Leiste
+      this.r3d.render(this.world, this.state, scene);
+      this.ctx.clearRect(0, 0, w, h);
+      this.renderer.overlay(this.state, scene, this.r3d.project);
+    } else this.renderer.draw(this.world, this.state, scene);
   }
 
   // ---------- Kopf und Menü ----------

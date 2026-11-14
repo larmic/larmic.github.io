@@ -118,7 +118,6 @@ export class Renderer {
       rows.set(row, [...(rows.get(row) ?? []), id]);
     }
     const byId = new Map(state.animals.map((a) => [a.id, a]));
-    const followers = new Set(state.followers);
 
     for (let y = y0; y <= y1; y++) {
       for (let x = x0; x <= x1; x++) this.ground(P, world, x, y, sc);
@@ -136,21 +135,6 @@ export class Renderer {
         const sp = SPECIES[a.species];
         this.shadow(P, b.x + 0.5, b.y + 0.5, b.z, 0.26 * sp.scale);
         drawModel(ctx, P, sp.parts, b.x + 0.5, b.y + 0.5, b.z + b.hop, a.dir, sp.scale);
-        const [hx, hy] = P(b.x + 0.5, b.y + 0.5, b.z + b.hop + 1.05);
-        if (followers.has(id)) sprite(ctx, HEART, GAME_COLORS.heart, hx, hy, 2.5 * z);
-        else if (!state.met.includes(id)) {
-          // Verloren: ein Fragezeichen schwebt über dem Kopf
-          const bob = sc.reduced ? 0 : Math.sin(sc.now / 400 + b.x) * 2 * z;
-          sprite(ctx, ASK, GAME_COLORS.lost, hx, hy + bob, 2.5 * z);
-        } else if (a.mode === 'home' && !sc.reduced) {
-          // Zu Hause im Garten glücklich: ab und zu steigt ein kleines Herz auf
-          const phase = (sc.now / 1000 + ((id.length * 7.3) % 5)) % 5;
-          if (phase < 1.2) {
-            ctx.globalAlpha = 1 - phase / 1.2;
-            sprite(ctx, HEART, GAME_COLORS.heart, hx + 6 * z, hy - phase * 18 * z, 2 * z);
-            ctx.globalAlpha = 1;
-          }
-        }
       }
     }
 
@@ -163,6 +147,37 @@ export class Renderer {
     }
 
     this.atmosphere(sc);
+    this.overlay(state, sc, P);
+  }
+
+  /**
+   * Alles, was über der Welt schwebt: Zeichen über den Tieren, Herzen und Noten, Heimweg-Pfeil, Nacht, Leben in der
+   * Luft und die Leiste. Gleich für beide Ansichten; die 3D-Ansicht reicht ihre eigene Projektion herein und zeichnet
+   * diese Ebene auf ein durchsichtiges Canvas über der 3D-Welt.
+   */
+  overlay(state: State, sc: Scene, P: Projection) {
+    const { ctx } = this;
+    const z = sc.zoom;
+    const followers = new Set(state.followers);
+    for (const a of state.animals) {
+      const b = sc.bodies.get(a.id);
+      if (!b) continue;
+      const [hx, hy] = P(b.x + 0.5, b.y + 0.5, b.z + b.hop + 1.05 * SPECIES[a.species].scale * 0.75);
+      if (followers.has(a.id)) sprite(ctx, HEART, GAME_COLORS.heart, hx, hy, 2.5 * z);
+      else if (!state.met.includes(a.id)) {
+        // Verloren: ein Fragezeichen schwebt über dem Kopf
+        const bob = sc.reduced ? 0 : Math.sin(sc.now / 400 + b.x) * 2 * z;
+        sprite(ctx, ASK, GAME_COLORS.lost, hx, hy + bob, 2.5 * z);
+      } else if (a.mode === 'home' && !sc.reduced) {
+        // Zu Hause im Garten glücklich: ab und zu steigt ein kleines Herz auf
+        const phase = (sc.now / 1000 + ((a.id.length * 7.3) % 5)) % 5;
+        if (phase < 1.2) {
+          ctx.globalAlpha = 1 - phase / 1.2;
+          sprite(ctx, HEART, GAME_COLORS.heart, hx + 6 * z, hy - phase * 18 * z, 2 * z);
+          ctx.globalAlpha = 1;
+        }
+      }
+    }
     this.effects(P, sc);
     this.homeArrow(P, state, sc);
     if (sc.night > 0) this.nightSky(sc);
