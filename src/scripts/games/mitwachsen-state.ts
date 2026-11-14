@@ -22,19 +22,19 @@ export const SWAP_WINDOW = 15; // Takte, in denen zweimal Hineinlaufen den Platz
 export const WILD_RADIUS = 1; // Stücke um die Figur, in denen Tiere der Landschaft unterwegs sind
 export const WILD_KEEP = 2; // ab diesem Abstand verschwinden sie wieder (und tauchen später an ihrem Platz auf)
 
-export type Home = { kind: 'region'; region: RegionId } | { kind: 'wild'; cx: number; cy: number } | { kind: 'pen' };
+export type Home = { kind: 'region'; region: RegionId } | { kind: 'wild'; cx: number; cy: number } | { kind: 'garden' };
 export type Animal = {
   id: string;
   species: SpeciesId;
   x: number;
   y: number;
   dir: Dir;
-  mode: 'wander' | 'follow' | 'pen';
+  mode: 'wander' | 'follow' | 'home';
   home: Home;
   spawn: readonly [number, number];
   rest: number; // Takte bis zum nächsten Schritt beim Umherlaufen
 };
-export type PenAnimal = { id: string; species: SpeciesId };
+export type HomeAnimal = { id: string; species: SpeciesId };
 
 export type State = {
   tick: number;
@@ -45,13 +45,13 @@ export type State = {
   animals: Animal[];
   followers: string[]; // Reihenfolge = Platz in der Kette hinter der Figur
   met: string[];
-  pen: PenAnimal[];
+  garden: HomeAnimal[];
   openGates: GateId[];
   lastBump: { id: string; tick: number } | null;
 };
 
 /** Was gespeichert wird */
-export type Progress = { met: string[]; pen: PenAnimal[]; openGates: GateId[]; position: [number, number] };
+export type Progress = { met: string[]; garden: HomeAnimal[]; openGates: GateId[]; position: [number, number] };
 
 export type Cmd = { type: 'move'; dir: Dir } | { type: 'action' } | { type: 'tick' };
 export type GameEvent =
@@ -60,7 +60,7 @@ export type GameEvent =
   | { type: 'sing'; id: string; species: SpeciesId; first: boolean }
   | { type: 'follow'; id: string }
   | { type: 'swap'; id: string }
-  | { type: 'pen'; id: string }
+  | { type: 'home'; id: string }
   | { type: 'gate'; id: GateId }
   | { type: 'call' }
   | { type: 'sleep' }
@@ -72,13 +72,13 @@ const dirTo = (dx: number, dy: number): Dir =>
 const cheb = (ax: number, ay: number, bx: number, by: number) => Math.max(Math.abs(ax - bx), Math.abs(ay - by));
 
 /** Darf ein Tier auf diesem Feld umherlaufen? (Folgende Tiere gehen überall hin, wo die Figur war) */
-/** Feld direkt hinter der Öffnung des Geheges: bleibt frei, damit neue Tiere hineinkommen */
-const PEN_ENTRY = [HOME.penGate[0], HOME.penGate[1] - 1] as const;
-const isPenEntry = (x: number, y: number) => x === PEN_ENTRY[0] && y === PEN_ENTRY[1];
+/** Feld direkt hinter dem Rosenbogen: bleibt frei, damit neue Tiere hineinkommen */
+const GARDEN_ENTRY = [HOME.gardenGate[0], HOME.gardenGate[1] - 1] as const;
+const isGardenEntry = (x: number, y: number) => x === GARDEN_ENTRY[0] && y === GARDEN_ENTRY[1];
 
-/** Felder an Durchgängen (Tore, Brücke, Gehege-Öffnung, Pfad): Dort bleibt kein Tier stehen, sonst versperrt es den Weg */
+/** Felder an Durchgängen (Tore, Brücke, Rosenbogen, Pfad): Dort bleibt kein Tier stehen, sonst versperrt es den Weg */
 const PASSAGES = new Set(
-  [...GATES.map((g) => g.at), HOME.penGate, HOME.exit].flatMap(([x, y]) =>
+  [...GATES.map((g) => g.at), HOME.gardenGate, HOME.exit].flatMap(([x, y]) =>
     [
       [x, y],
       [x + 1, y],
@@ -91,8 +91,8 @@ const PASSAGES = new Set(
 
 function atHome(world: World, home: Home, x: number, y: number): boolean {
   const c = world.cell(x, y);
-  if (home.kind === 'pen') return c.pen === true && !isPenEntry(x, y);
-  if (c.pen || c.penGate || PASSAGES.has(`${x},${y}`)) return false;
+  if (home.kind === 'garden') return c.garden === true && !isGardenEntry(x, y);
+  if (c.garden || c.gardenGate || PASSAGES.has(`${x},${y}`)) return false;
   if (home.kind === 'region') return c.region === home.region;
   const [cx, cy] = chunkOf(x, y);
   return c.region === 'wild' && cx === home.cx && cy === home.cy;
@@ -110,21 +110,21 @@ function random(s: State): number {
 
 // ---------- Aufbau ----------
 
-const penCells = () => {
+const gardenCells = () => {
   const out: [number, number][] = [];
-  for (let y = HOME.pen.y0; y <= HOME.pen.y1; y++)
-    for (let x = HOME.pen.x0; x <= HOME.pen.x1; x++) if (!isPenEntry(x, y)) out.push([x, y]);
+  for (let y = HOME.garden.y0; y <= HOME.garden.y1; y++)
+    for (let x = HOME.garden.x0; x <= HOME.garden.x1; x++) if (!isGardenEntry(x, y)) out.push([x, y]);
   return out;
 };
 
 export function initialState(world: World, saved: Partial<Progress> = {}, rngSeed = 1): State {
-  const pen = saved.pen ?? [];
-  const inPen = new Set(pen.map((p) => p.id));
+  const garden = saved.garden ?? [];
+  const atHomeIds = new Set(garden.map((p) => p.id));
   const animals: Animal[] = [];
   for (const r of REGIONS)
     for (const { species, at } of r.animals) {
       const id = animalId(r.id, species);
-      if (!inPen.has(id))
+      if (!atHomeIds.has(id))
         animals.push({
           id,
           species,
@@ -137,8 +137,8 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
           rest: 5,
         });
     }
-  const cells = penCells();
-  pen.forEach((p, i) => {
+  const cells = gardenCells();
+  garden.forEach((p, i) => {
     const [x, y] = cells[i % cells.length];
     animals.push({
       id: p.id,
@@ -146,8 +146,8 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
       x,
       y,
       dir: 's',
-      mode: 'pen',
-      home: { kind: 'pen' },
+      mode: 'home',
+      home: { kind: 'garden' },
       spawn: [x, y],
       rest: 5,
     });
@@ -161,7 +161,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     animals,
     followers: [],
     met: [...(saved.met ?? [])].sort(),
-    pen: [...pen],
+    garden: [...garden],
     openGates: [...(saved.openGates ?? [])],
     lastBump: null,
   };
@@ -172,7 +172,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
 
 export const progressOf = (s: State): Progress => ({
   met: [...s.met],
-  pen: [...s.pen],
+  garden: [...s.garden],
   openGates: [...s.openGates],
   position: [s.player.x, s.player.y],
 });
@@ -191,7 +191,7 @@ export function step(state: State, world: World, cmd: Cmd): { state: State; even
     animals: state.animals.map((a) => ({ ...a })),
     followers: [...state.followers],
     met: [...state.met],
-    pen: [...state.pen],
+    garden: [...state.garden],
     openGates: [...state.openGates],
   };
   const events: GameEvent[] = [];
@@ -253,21 +253,21 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
   if (animal) {
     const again = s.lastBump?.id === animal.id && s.tick - s.lastBump.tick <= SWAP_WINDOW;
     const climbable = canStep(world, s.openGates, p.x, p.y, tx, ty);
-    const atPenGate = p.x === HOME.penGate[0] && p.y === HOME.penGate[1];
-    if (again && climbable && animal.mode === 'pen' && atPenGate) {
-      // Ein Tier im Gehege versperrt den Eingang: Es rückt im Gehege beiseite, die Figur geht hinein
+    const atGardenGate = p.x === HOME.gardenGate[0] && p.y === HOME.gardenGate[1];
+    if (again && climbable && animal.mode === 'home' && atGardenGate) {
+      // Ein Tier im Garten versperrt den Eingang: Es rückt im Garten beiseite, die Figur geht hinein
       const spot = freeNear(
         s,
         world,
         [tx, ty],
-        (x, y) => world.cell(x, y).pen === true && (x !== tx || y !== ty),
+        (x, y) => world.cell(x, y).garden === true && (x !== tx || y !== ty),
         animal.id,
       );
       if (spot) {
         [animal.x, animal.y] = spot;
         s.lastBump = null;
       }
-    } else if (again && climbable && (animal.mode !== 'pen' || world.cell(p.x, p.y).pen === true)) {
+    } else if (again && climbable && (animal.mode !== 'home' || world.cell(p.x, p.y).garden === true)) {
       // Zweimal hineingelaufen: Platz tauschen, so bleibt die Figur nie stecken
       animal.x = p.x;
       animal.y = p.y;
@@ -276,7 +276,7 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
       p.y = ty;
       s.lastBump = null;
       events.push({ type: 'swap', id: animal.id });
-      penFollowers(s, world, events);
+      bringHome(s, world, events);
       return;
     }
     if (s.animals.some((a) => a.x === tx && a.y === ty)) {
@@ -304,23 +304,23 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
     a.y = prev[1];
     prev = old;
   }
-  penFollowers(s, world, events);
+  bringHome(s, world, events);
 }
 
-/** Wer als folgendes Tier im Gehege ankommt, löst sich aus der Kette und bleibt dort */
-function penFollowers(s: State, world: World, events: GameEvent[]) {
+/** Wer als folgendes Tier im Garten ankommt, löst sich aus der Kette und bleibt dort */
+function bringHome(s: State, world: World, events: GameEvent[]) {
   for (const id of [...s.followers]) {
     const a = s.animals.find((x) => x.id === id)!;
-    if (!world.cell(a.x, a.y).pen) continue;
-    a.mode = 'pen';
-    a.home = { kind: 'pen' };
+    if (!world.cell(a.x, a.y).garden) continue;
+    a.mode = 'home';
+    a.home = { kind: 'garden' };
     a.rest = 10;
     s.followers = s.followers.filter((f) => f !== id);
-    if (!s.pen.some((x) => x.id === id)) s.pen.push({ id, species: a.species });
+    if (!s.garden.some((x) => x.id === id)) s.garden.push({ id, species: a.species });
     // Nach hinten rücken, damit der Eingang für das nächste Tier frei ist
-    const spot = freeNear(s, world, [PEN_ENTRY[0], HOME.pen.y0], (x, y) => atHome(world, a.home, x, y), id);
+    const spot = freeNear(s, world, [GARDEN_ENTRY[0], HOME.garden.y0], (x, y) => atHome(world, a.home, x, y), id);
     if (spot) [a.x, a.y] = spot;
-    events.push({ type: 'pen', id });
+    events.push({ type: 'home', id });
   }
 }
 
@@ -398,7 +398,7 @@ function wake(s: State, world: World, events: GameEvent[]) {
   if (s.tick - s.sleptAt < SLEEP_LOCK) return; // wildes Drücken direkt nach dem Einschlafen weckt nicht
   const spot =
     HOME.wake.find(([x, y]) => standHeight(world, s.openGates, x, y) !== null && !occupied(s, x, y)) ??
-    freeNear(s, world, HOME.bed, (x, y) => world.cell(x, y).region === 'zuhause' && !world.cell(x, y).pen);
+    freeNear(s, world, HOME.bed, (x, y) => world.cell(x, y).region === 'zuhause' && !world.cell(x, y).garden);
   if (!spot) return;
   s.sleeping = false;
   s.player.x = spot[0];
@@ -435,7 +435,7 @@ function syncWild(s: State, world: World) {
     if (a.home.kind !== 'wild' || a.mode !== 'wander') return true;
     return Math.max(Math.abs(a.home.cx - pcx), Math.abs(a.home.cy - pcy)) <= WILD_KEEP;
   });
-  const present = new Set([...s.animals.map((a) => a.id), ...s.pen.map((p) => p.id)]);
+  const present = new Set([...s.animals.map((a) => a.id), ...s.garden.map((p) => p.id)]);
   for (let cy = pcy - WILD_RADIUS; cy <= pcy + WILD_RADIUS; cy++)
     for (let cx = pcx - WILD_RADIUS; cx <= pcx + WILD_RADIUS; cx++)
       for (const w of wildAnimals(world, cx, cy)) {

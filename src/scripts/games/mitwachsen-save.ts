@@ -4,12 +4,12 @@
 // Spezifikation: docs/specs/mitwachsen.md
 
 import { GATES, SPECIES, type GateId, type SpeciesId } from '../../data/games/mitwachsen';
-import type { PenAnimal, Progress } from './mitwachsen-state';
+import type { HomeAnimal, Progress } from './mitwachsen-state';
 
 export const PREFIX = 'larmic.games.';
 export const INDEX_KEY = `${PREFIX}index`;
 export const worldKey = (id: string) => `${PREFIX}world.${id}`;
-export const VERSION = 2; // 1: Arbeitstitel „threeyear“ ohne Alter · 2: „mitwachsen“ mit Alter
+export const VERSION = 3; // 1: Arbeitstitel „threeyear“ ohne Alter · 2: „mitwachsen“ mit Alter · 3: Garten statt Gehege
 export const AGES = [3] as const; // Altersstufen, die es schon gibt
 export type Age = (typeof AGES)[number];
 
@@ -26,7 +26,7 @@ export type SavedWorld = {
   figureName: string;
   openGates: GateId[];
   metAnimals: string[];
-  penAnimals: PenAnimal[];
+  homeAnimals: HomeAnimal[];
   position: [number, number];
   visits: number;
 };
@@ -72,7 +72,7 @@ export function newWorld(
     figureName: cleanName(figureName, DEFAULT_FIGURE),
     openGates: [],
     metAnimals: [],
-    penAnimals: [],
+    homeAnimals: [],
     position: [0, 0],
     visits: 0,
   };
@@ -88,6 +88,11 @@ const fromV1 = (raw: Record<string, unknown>): Record<string, unknown> => ({
   game: 'mitwachsen',
   age: 3,
 });
+/** Version 2 → 3: Aus dem Gehege wird der Garten, aus `penAnimals` werden `homeAnimals` */
+function fromV2(raw: Record<string, unknown>): Record<string, unknown> {
+  const { penAnimals, ...rest } = raw;
+  return { ...rest, v: 3, homeAnimals: penAnimals };
+}
 
 /**
  * Gespeicherte Daten in das aktuelle Format bringen: ältere Versionen Schritt für Schritt umziehen, dann aufräumen.
@@ -98,12 +103,13 @@ export function migrate(input: unknown): SavedWorld | null {
   if (!isRecord(input)) return null;
   let raw = input;
   if (raw.v === 1 && raw.game === 'threeyear') raw = fromV1(raw);
+  if (raw.v === 2 && raw.game === 'mitwachsen') raw = fromV2(raw);
   if (raw.v !== VERSION || raw.game !== 'mitwachsen') return null;
   if (typeof raw.id !== 'string' || typeof raw.seed !== 'number' || !Number.isFinite(raw.seed)) return null;
   const gates = new Set<string>(GATES.map((g) => g.id));
-  const pen = Array.isArray(raw.penAnimals)
-    ? raw.penAnimals.filter(
-        (p): p is PenAnimal =>
+  const garden = Array.isArray(raw.homeAnimals)
+    ? raw.homeAnimals.filter(
+        (p): p is HomeAnimal =>
           isRecord(p) && typeof p.id === 'string' && typeof p.species === 'string' && p.species in SPECIES,
       )
     : [];
@@ -118,7 +124,7 @@ export function migrate(input: unknown): SavedWorld | null {
     figureName: cleanName(typeof raw.figureName === 'string' ? raw.figureName : '', DEFAULT_FIGURE),
     openGates: strings(raw.openGates).filter((g): g is GateId => gates.has(g)),
     metAnimals: [...new Set(strings(raw.metAnimals))].sort(),
-    penAnimals: pen.map((p) => ({ id: p.id, species: p.species as SpeciesId })),
+    homeAnimals: garden.map((p) => ({ id: p.id, species: p.species as SpeciesId })),
     position: pos ? (raw.position as [number, number]) : [0, 0],
     visits: typeof raw.visits === 'number' && raw.visits >= 0 ? Math.floor(raw.visits) : 0,
   };
@@ -143,7 +149,7 @@ function write(store: Store, key: string, value: unknown): boolean {
 
 export function loadIndex(store: Store): Index {
   const raw = read(store, INDEX_KEY);
-  if (!isRecord(raw) || (raw.v !== 1 && raw.v !== VERSION) || !Array.isArray(raw.worlds))
+  if (!isRecord(raw) || ![1, 2, VERSION].includes(raw.v as number) || !Array.isArray(raw.worlds))
     return { v: VERSION, worlds: [], current: null };
   const worlds = raw.worlds
     .filter((w): w is Record<string, unknown> => isRecord(w) && typeof w.id === 'string')
@@ -177,14 +183,14 @@ export const withProgress = (world: SavedWorld, p: Progress): SavedWorld => ({
   ...world,
   openGates: [...p.openGates],
   metAnimals: [...p.met],
-  penAnimals: [...p.pen],
+  homeAnimals: [...p.garden],
   position: [...p.position],
 });
 
 /** Fortschritt einer gespeicherten Welt für den Spielstart */
 export const progressFrom = (w: SavedWorld): Progress => ({
   met: [...w.metAnimals],
-  pen: [...w.penAnimals],
+  garden: [...w.homeAnimals],
   openGates: [...w.openGates],
   position: [...w.position],
 });

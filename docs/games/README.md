@@ -14,11 +14,11 @@ Mit jedem Jahr wächst das Spiel mit: mehr Steuerung, mehr Geschichte, mehr eige
 
 ## Altersstufen
 
-Jede Welt hat ein Alter, das die Eltern im Menü einstellen. Das Alter schaltet Fähigkeiten frei; die Welt mit allen Freunden im Gehege bleibt.
+Jede Welt hat ein Alter, das die Eltern im Menü einstellen. Das Alter schaltet Fähigkeiten frei; die Welt mit allen Tieren im Garten bleibt.
 
 | Alter | Was dazukommt | Stand | Konzept |
 | --- | --- | --- | --- |
-| ab 3 | laufen, Tiere treffen und nach Hause führen, Tore öffnen, schlafen gehen | spielbar (MVP) | [mitwachsen.md](mitwachsen.md) |
+| ab 3 | laufen, verlorene Tiere finden und nach Hause in den Garten bringen, Tore öffnen, schlafen gehen | spielbar (MVP) | [mitwachsen.md](mitwachsen.md) |
 | ab 4 | Idee: Blöcke bauen und abbauen, Vorlagen nachbauen | – | – |
 | ab 5 | Idee: kleine Aufgaben, Zählen | – | – |
 

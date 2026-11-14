@@ -260,8 +260,8 @@ class LarmicMitwachsen extends HTMLElement {
         case 'swap':
           this.sfx.step();
           break;
-        case 'pen':
-          this.sfx.pen();
+        case 'home':
+          this.sfx.home();
           this.burst(e.id, ['#ffd47e', '#ffffff', '#6cc46f'], 14);
           persist = true;
           break;

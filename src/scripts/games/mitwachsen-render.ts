@@ -65,6 +65,7 @@ const PAL_PATH: Palette = { D: [['#c9a46e', 1]], d: [['#b48d58', 1]], e: [['#d8b
 const HEART = ['.rr.rr.', 'rrrrrrr', 'rrrrrrr', '.rrrrr.', '..rrr..', '...r...'];
 const NOTE = ['..kkkk', '..k..k', '..k..k', 'kkk.kk', 'kkk.kk'];
 const ZZZ = ['zzzz', '..z.', '.z..', 'zzzz'];
+const ASK = ['.qqq.', 'q...q', '...q.', '..q..', '.....', '..q..']; // Fragezeichen über verlorenen Tieren
 
 function sprite(ctx: CanvasRenderingContext2D, grid: string[], color: string, cx: number, bottom: number, px: number) {
   ctx.fillStyle = color;
@@ -132,9 +133,20 @@ export class Renderer {
         if (!a) continue;
         const sp = SPECIES[a.species];
         drawModel(ctx, P, sp.parts, b.x + 0.5, b.y + 0.5, b.z + b.hop, a.dir, sp.scale);
-        if (followers.has(id)) {
-          const [hx, hy] = P(b.x + 0.5, b.y + 0.5, b.z + b.hop + 1.05);
-          sprite(ctx, HEART, GAME_COLORS.heart, hx, hy, 2.5 * z);
+        const [hx, hy] = P(b.x + 0.5, b.y + 0.5, b.z + b.hop + 1.05);
+        if (followers.has(id)) sprite(ctx, HEART, GAME_COLORS.heart, hx, hy, 2.5 * z);
+        else if (!state.met.includes(id)) {
+          // Verloren: ein Fragezeichen schwebt über dem Kopf
+          const bob = sc.reduced ? 0 : Math.sin(sc.now / 400 + b.x) * 2 * z;
+          sprite(ctx, ASK, GAME_COLORS.lost, hx, hy + bob, 2.5 * z);
+        } else if (a.mode === 'home' && !sc.reduced) {
+          // Zu Hause im Garten glücklich: ab und zu steigt ein kleines Herz auf
+          const phase = (sc.now / 1000 + ((id.length * 7.3) % 5)) % 5;
+          if (phase < 1.2) {
+            ctx.globalAlpha = 1 - phase / 1.2;
+            sprite(ctx, HEART, GAME_COLORS.heart, hx + 6 * z, hy - phase * 18 * z, 2 * z);
+            ctx.globalAlpha = 1;
+          }
         }
       }
     }
@@ -154,13 +166,13 @@ export class Renderer {
   }
 
   /**
-   * Leiste unten: ein Platz je Tier, nach Gegenden gruppiert, dahinter Tiere der Landschaft im Gehege.
-   * Dunkler Umriss = noch nicht getroffen, in Farbe = getroffen, grüner Grund = im Gehege, Herz = folgt gerade.
+   * Leiste unten: ein Platz je Tier, nach Gegenden gruppiert, dahinter Tiere der Landschaft, die im Garten wohnen.
+   * Umriss mit Fragezeichen = noch verloren, in Farbe = gefunden, grüner Grund = zu Hause im Garten, Herz = folgt gerade.
    */
   private album(state: State, sc: Scene) {
     const { ctx } = this;
     const groups = REGIONS.map((r) => r.animals.map((a) => ({ id: animalId(r.id, a.species), species: a.species })));
-    const wild = state.pen.filter((p) => p.id.startsWith('wild:')).slice(0, 10);
+    const wild = state.garden.filter((p) => p.id.startsWith('wild:')).slice(0, 10);
     if (wild.length) groups.push(wild);
     const count = groups.reduce((n, g) => n + g.length, 0);
     const gap = 6,
@@ -170,12 +182,12 @@ export class Renderer {
     const total = count * size + (count - 1) * gap + (groups.length - 1) * (groupGap - gap);
     let x = Math.round((sc.width - total) / 2);
     const y = Math.round(sc.height - size - 14);
-    const inPen = new Set(state.pen.map((p) => p.id));
+    const atHomeIds = new Set(state.garden.map((p) => p.id));
     const following = new Set(state.followers);
     for (const group of groups) {
       for (const a of group) {
-        const met = state.met.includes(a.id) || inPen.has(a.id);
-        ctx.fillStyle = inPen.has(a.id) ? GAME_COLORS.slotPen : met ? GAME_COLORS.slotMet : GAME_COLORS.slotEmpty;
+        const met = state.met.includes(a.id) || atHomeIds.has(a.id);
+        ctx.fillStyle = atHomeIds.has(a.id) ? GAME_COLORS.slotHome : met ? GAME_COLORS.slotMet : GAME_COLORS.slotEmpty;
         ctx.fillRect(x, y, size, size);
         // Pixel-Rahmen ohne Eckpixel wie auf der Seite
         ctx.fillStyle = GAME_COLORS.ink;
@@ -187,6 +199,7 @@ export class Renderer {
         const s = (size * 1.15) / (0.9 * TILE_W * sp.scale); // Tier füllt den Platz gut zu drei Vierteln
         const P = projection(0.5, 0.5, x + size / 2, y + size * 0.86, s);
         drawModel(ctx, P, sp.parts, 0.5, 0.5, 0, 'e', sp.scale, met ? undefined : GAME_COLORS.silhouette);
+        if (!met) sprite(ctx, ASK, GAME_COLORS.lost, x + size - 7, y + 13, Math.max(1.5, size / 26));
         if (following.has(a.id)) sprite(ctx, HEART, GAME_COLORS.heart, x + size - 6, y + 12, Math.max(1.5, size / 22));
         x += size + gap;
       }
@@ -311,6 +324,10 @@ export class Renderer {
         box(ctx, P, x + 0.25, y + 0.3, 0.8, 0.5, 0.4, 0.03, '#4f9a3c', '#6dbd47');
         box(ctx, P, x + 0.45, y + 0.42, 0.83, 0.12, 0.12, 0.06, '#e77fb3');
         break;
+      case 'hedge':
+      case 'arch':
+        this.hedge(P, world, x, y, h, c.deco);
+        break;
       case 'fence':
         this.fence(P, world, x, y, h, 1);
         break;
@@ -335,6 +352,45 @@ export class Renderer {
         this.sign(P, state, x, y, h, c);
         break;
     }
+  }
+
+  /** Hecke um den Garten: Blätterbüsche, die zu Nachbarn mit Hecke verbunden sind; der Rosenbogen ist der Eingang */
+  private hedge(P: Projection, world: World, x: number, y: number, h: number, kind: 'hedge' | 'arch') {
+    const { ctx } = this;
+    const joins = (dx: number, dy: number) => {
+      const d = world.cell(x + dx, y + dy).deco;
+      return d === 'hedge' || d === 'arch';
+    };
+    const leaf = '#3f9a3c',
+      light = '#5ab651';
+    if (kind === 'arch') {
+      const vertical = joins(0, -1) || joins(0, 1);
+      const posts: [number, number][] = vertical
+        ? [
+            [0.38, 0.02],
+            [0.38, 0.8],
+          ]
+        : [
+            [0.02, 0.38],
+            [0.8, 0.38],
+          ];
+      for (const [px, py] of posts)
+        box(ctx, P, x + px, y + py, h, 0.18, 0.18, 1.25, GAME_COLORS.fenceDark, GAME_COLORS.fence);
+      if (vertical) box(ctx, P, x + 0.36, y, h + 1.25, 0.22, 1, 0.18, leaf, light);
+      else box(ctx, P, x, y + 0.36, h + 1.25, 1, 0.22, 0.18, leaf, light);
+      for (let i = 0; i < 4; i++) {
+        const t = 0.15 + i * 0.23;
+        const [rx, ry] = vertical ? [x + 0.44, y + t] : [x + t, y + 0.44];
+        box(ctx, P, rx, ry, h + 1.43, 0.1, 0.1, 0.06, i % 2 ? '#e77fb3' : '#ffffff');
+      }
+      return;
+    }
+    if (joins(0, -1)) box(ctx, P, x + 0.2, y, h, 0.6, 0.5, 0.6, leaf, light);
+    if (joins(-1, 0)) box(ctx, P, x, y + 0.2, h, 0.5, 0.6, 0.6, leaf, light);
+    if (joins(1, 0)) box(ctx, P, x + 0.5, y + 0.2, h, 0.5, 0.6, 0.6, leaf, light);
+    if (joins(0, 1)) box(ctx, P, x + 0.2, y + 0.5, h, 0.6, 0.5, 0.6, leaf, light);
+    box(ctx, P, x + 0.15, y + 0.15, h, 0.7, 0.7, 0.7, leaf, light);
+    if ((x * 31 + y * 17) % 3 === 0) box(ctx, P, x + 0.45, y + 0.5, h + 0.7, 0.1, 0.1, 0.05, '#f2d14b');
   }
 
   /** Zaun: Pfosten in der Mitte, Latten zu jedem Nachbarn mit Zaun oder Tor. `closed` < 1 öffnet ein Tor. */

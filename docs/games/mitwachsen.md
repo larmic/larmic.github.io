@@ -1,6 +1,6 @@
 # Konzept: Mitwachsen ab 3
 
-Das Kind läuft mit einer eigenen Figur durch eine endlose Voxel-Welt, trifft Tiere, die singen, führt sie nach Hause in ein Gehege und öffnet so nach und nach neue Gegenden. Zu jeder Gegend gibt es eine Geschichte, die der Elternteil vorliest. Zum Aufhören legt sich die Figur ins Bett, und es wird Nacht.
+Das Kind läuft mit einer eigenen Figur durch eine endlose Voxel-Welt, findet verlorene Tiere, die singen, wenn man sie findet, bringt sie nach Hause in den Garten und öffnet so nach und nach neue Gegenden. Zu jeder Gegend gibt es eine Geschichte, die der Elternteil vorliest. Zum Aufhören legt sich die Figur ins Bett, und es wird Nacht.
 
 Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dokument beschreibt die erste Stufe (ab 3). Ein früher Prototyp (feste kleine Insel, Tiere treffen) liegt als Artefakt vor und hat gezeigt: Die Pfeiltasten beherrscht das Kind, die schräge Ansicht der Homepage passt aber nicht dazu (→ läuft dort nach rechts unten).
 
@@ -45,7 +45,7 @@ Von Hand entworfen. Jede hat Landschaft, Tiere, ein Tor und eine Geschichte. Tie
 
 | Gegend | Tiere | Tor in die nächste Gegend |
 | --- | --- | --- |
-| Zuhause (Start, mit Bett und Gehege) | Hase, Igel | Gartentor zur Blumenwiese |
+| Zuhause (Start, mit Bett und Garten) | Hase, Igel | Gartentor zur Blumenwiese |
 | Blumenwiese | Schaf, Kuh, Biene | Brücke zum Teich |
 | Teich | Ente, Frosch, Schildkröte | Waldtor zum Wald |
 | Wald | Eichhörnchen, Fuchs, Eule, Reh | Weg zum Strand |
@@ -55,26 +55,29 @@ Neue Gegenden kommen nach und nach hinzu; so wächst die Welt mit. Berge gibt es
 
 ## Tore
 
-1. Ein Tor ist zu, bis das Kind **alle Tiere der Gegend getroffen hat, in der das Tor steht**. Getroffen reicht; ins Gehege bringen muss es sie dafür nicht.
-2. Am Tor steht eine **Tafel mit Bildern**: getroffene Tiere in Farbe, fehlende als dunkle Umrisse. So sieht das Kind selbst, wer noch fehlt.
+1. Ein Tor ist zu, bis das Kind **alle Tiere der Gegend gefunden hat, in der das Tor steht**. Gefunden reicht; in den Garten bringen muss es sie dafür nicht.
+2. Am Tor steht eine **Tafel mit Bildern**: gefundene Tiere in Farbe, fehlende als dunkle Umrisse. So sieht das Kind selbst, wer noch fehlt.
 3. Dazu ein **Text zum Vorlesen** („Der Fuchs wartet noch im hohen Gras …“). Kommt erst mit den Geschichten (Stufe 3).
-4. Sind alle getroffen, öffnet sich das Tor sichtbar und hörbar (Brücke baut sich Block für Block, Tor schwingt auf). Offene Tore bleiben offen.
+4. Sind alle gefunden, öffnet sich das Tor sichtbar und hörbar (Brücke baut sich Block für Block, Tor schwingt auf). Offene Tore bleiben offen.
 
 ## Tiere
 
+**Die Geschichte:** Die Tiere haben sich verlaufen und finden nicht mehr nach Hause. Verlorene Tiere tragen ein kleines Fragezeichen über dem Kopf. Das Kind findet sie, sie freuen sich (Ton, Hüpfer, Herz) und laufen mit ihm nach Hause in den Garten. Dort wohnen sie und sind glücklich. Es geht ums Helfen, nicht ums Sammeln oder Einsperren.
+
+
 1. Jedes Tier hat eine **Heimat-Gegend** und wandert dort langsam umher.
 2. Steht die Figur direkt neben einem Tier, **bleibt es stehen** und schaut sie an.
-3. **Aktion neben einem Tier:** Es hüpft und **singt seinen eigenen Ton** (alle aus derselben Pentatonik, klingt immer zusammen). Beim ersten Mal gilt es als **getroffen** und bekommt ein Herz. Danach **folgt** es der Figur im Gänsemarsch, bis es im Gehege ist oder die Figur schläft. Über folgenden Tieren schwebt ein kleines Herz.
+3. **Aktion neben einem Tier:** Es hüpft und **singt seinen eigenen Ton** (alle aus derselben Pentatonik, klingt immer zusammen). Beim ersten Mal gilt es als **gefunden** und bekommt ein Herz. Danach **folgt** es der Figur im Gänsemarsch, bis es im Garten ist oder die Figur schläft. Über folgenden Tieren schwebt ein kleines Herz.
 4. **Hineinlaufen in ein Tier:** Es singt, folgt aber nicht. Läuft die Figur innerhalb kurzer Zeit ein zweites Mal hinein, tauschen beide den Platz. So bleibt die Figur nie eingeklemmt.
 5. **Aktion neben einem folgenden Tier:** Es singt noch einmal, sonst ändert sich nichts.
-6. **Aktion neben einem Tier im Gehege:** Es singt und hüpft, folgt aber nicht und verlässt das Gehege nie.
+6. **Aktion neben einem Tier im Garten:** Es singt und hüpft, folgt aber nicht. Es ist zu Hause und bleibt gern im Garten.
 7. **Schläft die Figur**, laufen folgende Tiere in ihre Heimat-Gegend zurück.
-8. **Tiere der berechneten Landschaft:** Sie zählen für kein Tor, singen aber, folgen und dürfen ins Gehege. Ihre Kennung ergibt sich aus Seed, Stück und Nummer und bleibt dadurch stabil.
-9. Positionen werden nicht gespeichert, nur „getroffen“ und „im Gehege“. Ein Tier im Gehege erscheint nicht mehr in seiner Heimat-Gegend.
+8. **Tiere der berechneten Landschaft:** Sie zählen für kein Tor, singen aber, folgen und dürfen in den Garten. Ihre Kennung ergibt sich aus Seed, Stück und Nummer und bleibt dadurch stabil.
+9. Positionen werden nicht gespeichert, nur „gefunden“ und „im Garten“. Ein Tier im Garten erscheint nicht mehr in seiner Heimat-Gegend.
 
-## Zuhause, Gehege, Nacht
+## Zuhause, Garten, Nacht
 
-- **Gehege:** Zaun mit einer Öffnung am Zuhause, 4 × 4 Felder. Das Feld hinter der Öffnung bleibt frei, neue Tiere rücken nach hinten. Figur und folgende Tiere können hindurch. Jedes folgende Tier, das ein Feld im Gehege betritt, löst sich aus der Kette und bleibt. Für Tiere im Gehege ist die Öffnung eine Wand. Gespeichert.
+- **Garten:** Hecke mit einem Rosenbogen als Eingang am Zuhause, 4 × 4 Felder mit Blumen. Hier wohnen die gefundenen Tiere gern; ab und zu steigt über ihnen ein Herz auf. Niemand ist eingesperrt, die Tiere bleiben, weil sie zu Hause sind. Das Feld hinter dem Rosenbogen bleibt frei, neue Tiere rücken nach hinten. Figur und folgende Tiere können hindurch. Jedes folgende Tier, das ein Feld im Garten betritt, löst sich aus der Kette und bleibt. Für Tiere im Garten ist die Öffnung eine Wand. Gespeichert.
 - **Bett:** Aktion am Bett → die Figur legt sich hin, der Himmel wird dunkel, Sterne gehen auf, eine leise Melodie spielt, es wird gespeichert.
 - **Aufwachen:** Nach dem Einschlafen reagiert das Spiel einige Sekunden nicht auf Tasten, damit wildes Drücken die Runde nicht sofort weiterführt. Danach bringt ein Tastendruck den Morgen.
 - **Start einer Runde:** Die Figur schläft im Bett, ein Tastendruck weckt sie. Dieser erste Druck schaltet auch den Ton frei (Autoplay-Regeln).
@@ -106,8 +109,8 @@ Eine **Welt** besteht aus Seed, Weltname, Figurenname und Fortschritt. Es kann m
 ## Speichern
 
 - **localStorage**, alle Schlüssel mit Präfix `larmic.games.`: ein Index der Welten und je Welt ein eigener Schlüssel, damit eine kaputte Welt nicht alle anderen mitreißt.
-- **Format je Welt:** `{ v, game: 'mitwachsen', age, seed, worldName, figureName, openGates[], metAnimals[], penAnimals[], position, visits }`. `age` ist die Altersstufe der Welt. Das Versionsfeld `v` hat eine getestete `migrate()`.
-- **Zeitpunkte:** sofort bei jedem wichtigen Ereignis (Tier getroffen, Tor offen, Tier im Gehege, schlafen, Welt gewechselt), zusätzlich alle 10 Sekunden die Position und beim Verlassen der Seite (`pagehide`, `visibilitychange`).
+- **Format je Welt:** `{ v, game: 'mitwachsen', age, seed, worldName, figureName, openGates[], metAnimals[], homeAnimals[], position, visits }`. `age` ist die Altersstufe der Welt. Das Versionsfeld `v` hat eine getestete `migrate()`.
+- **Zeitpunkte:** sofort bei jedem wichtigen Ereignis (Tier gefunden, Tor offen, Tier im Garten, schlafen, Welt gewechselt), zusätzlich alle 10 Sekunden die Position und beim Verlassen der Seite (`pagehide`, `visibilitychange`).
 - Alle Zugriffe in `try/catch`. Speichert der Browser nicht (privates Fenster), läuft das Spiel trotzdem.
 - Schlüssel und `game` bleiben auch bei einer Umbenennung der Reihe gleich oder werden in `migrate()` übernommen.
 
@@ -152,9 +155,9 @@ Wie bei der Insel: reine, getestete Logik getrennt von der Komponente, die zeich
 
 1. **Konzept** (dieses Dokument).
 2. **MVP ohne Texte**, direkt im Repo unter `/spiele/mitwachsen/`, über alle Gates und mit Deploy. Bis Stufe 2,5 nur über die direkte Adresse erreichbar.
-   - Enthalten: Ansicht von vorn mit mitlaufender Kamera, endlose Welt aus dem Seed, Zuhause mit Bett, Nacht und Gehege, Heimweg-Pfeil, Klettern, Tiere treffen und folgen lassen. Gegenden: Zuhause, Blumenwiese hinter dem Gartentor, Teich hinter der Brücke, jeweils mit Bildtafel und Tor-Regel. Welten-Menü (MVP-Punkte), Speichern.
+   - Enthalten: Ansicht von vorn mit mitlaufender Kamera, endlose Welt aus dem Seed, Zuhause mit Bett, Nacht und Garten, Heimweg-Pfeil, Klettern, Tiere treffen und folgen lassen. Gegenden: Zuhause, Blumenwiese hinter dem Gartentor, Teich hinter der Brücke, jeweils mit Bildtafel und Tor-Regel. Welten-Menü (MVP-Punkte), Speichern.
    - Nicht enthalten: Wald, Strand, Geschichten, Tor-Texte, Spielstand-Datei, Welt aus Code.
-   - Dazu `docs/specs/mitwachsen.md` mit Ereignissen (`move`, `action`, `tick`, `sleep`, `wake`), Regeln und Invarianten. Jede Regel hat einen Test, z. B.: gleicher Seed ergibt gleiche Stücke, ein Tor öffnet genau dann, wenn alle Tiere seiner Gegend getroffen sind, jede Gegend ist vom Zuhause erreichbar, die Figur kann nicht eingeklemmt werden.
+   - Dazu `docs/specs/mitwachsen.md` mit Ereignissen (`move`, `action`, `tick`, `sleep`, `wake`), Regeln und Invarianten. Jede Regel hat einen Test, z. B.: gleicher Seed ergibt gleiche Stücke, ein Tor öffnet genau dann, wenn alle Tiere seiner Gegend gefunden sind, jede Gegend ist vom Zuhause erreichbar, die Figur kann nicht eingeklemmt werden.
 2,5. **MVP in die Homepage einbauen:** Einstieg über die Insel, Fallback ohne JavaScript, Datenschutz-Absatz.
 3. **Geschichten** schreiben und nach und nach einbauen, dazu Tor-Texte und weitere Gegenden (Wald, Strand).
 

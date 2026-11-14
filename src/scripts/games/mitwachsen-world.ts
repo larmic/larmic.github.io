@@ -21,7 +21,20 @@ import {
 } from '../../data/games/mitwachsen';
 
 export type Ground = 'grass' | 'stone' | 'water' | 'path' | 'sand';
-export type Deco = 'tree' | 'bush' | 'flower' | 'reed' | 'lily' | 'rock' | 'fence' | 'gate' | 'bridge' | 'bed' | 'sign';
+export type Deco =
+  | 'tree'
+  | 'bush'
+  | 'flower'
+  | 'reed'
+  | 'lily'
+  | 'rock'
+  | 'fence'
+  | 'gate'
+  | 'bridge'
+  | 'bed'
+  | 'sign'
+  | 'hedge'
+  | 'arch';
 
 export type Cell = {
   h: number; // Oberkante in Ebenen: Wasser 0, Boden 1, Hügel bis 3
@@ -32,8 +45,8 @@ export type Cell = {
   solid: boolean; // Deko versperrt das Feld (Baum, Busch, Fels, Zaun, Bett, Tafel)
   gate?: GateId; // Tor oder Brücke: begehbar, sobald offen
   sign?: GateId; // Tafel zu diesem Tor
-  pen?: true; // Inneres des Geheges
-  penGate?: true; // Öffnung im Gehege-Zaun
+  garden?: true; // Inneres des Gartens, in dem gefundene Tiere zu Hause sind
+  gardenGate?: true; // Rosenbogen in der Hecke
 };
 
 export type World = { readonly seed: number; cell(x: number, y: number): Cell };
@@ -87,12 +100,19 @@ function buildRegions(seed: number): Map<string, Cell> {
       else set(x, y, { ...grass('border'), deco: 'fence', solid: true });
     }
 
-  // Zuhause: Bäume, Bett, Gehege
+  // Zuhause: Bäume, Bett, Garten mit Hecke, Rosenbogen und Blumen
   for (const [x, y] of HOME.trees) set(x, y, { ...grass('zuhause'), deco: 'tree', solid: true });
   set(HOME.bed[0], HOME.bed[1], { ...grass('zuhause'), deco: 'bed', solid: true });
-  for (const [x, y] of ring(HOME.pen)) set(x, y, { ...grass('zuhause'), deco: 'fence', solid: true });
-  for (const [x, y] of cellsOf(HOME.pen)) set(x, y, { ...grass('zuhause'), pen: true });
-  set(HOME.penGate[0], HOME.penGate[1], { ...grass('zuhause'), ground: 'path', penGate: true });
+  for (const [x, y] of ring(HOME.garden)) set(x, y, { ...grass('zuhause'), deco: 'hedge', solid: true });
+  for (const [x, y] of cellsOf(HOME.garden)) {
+    const bloom = rand01(seed, x, y, 4) < 0.4;
+    set(x, y, {
+      ...grass('zuhause'),
+      garden: true,
+      ...(bloom ? { deco: 'flower', color: flowerColor(seed, x, y) } : {}),
+    });
+  }
+  set(HOME.gardenGate[0], HOME.gardenGate[1], { ...grass('zuhause'), ground: 'path', gardenGate: true, deco: 'arch' });
 
   for (const g of GATES) {
     const [x, y] = g.at;

@@ -212,30 +212,30 @@ describe('Tiere', () => {
   });
 });
 
-describe('Gehege', () => {
-  it('ein folgendes Tier bleibt im Gehege und verlässt es nie wieder', () => {
+describe('Garten', () => {
+  it('ein folgendes Tier bleibt im Garten und verlässt es nie wieder', () => {
     const world = createWorld(1);
-    const [gx, gy] = HOME.penGate;
-    // Figur steht unter der Öffnung, der Hase folgt; dann durch die Öffnung hinein
+    const [gx, gy] = HOME.gardenGate;
+    // Figur steht unter dem Rosenbogen, der Hase folgt; dann hindurch in den Garten
     let s = awake(world, gx, gy + 1, [animal('zuhause:hase', gx, gy + 2)]);
     s = { ...s, player: { ...s.player, dir: 's' } };
     s = run(s, world, ACT).s;
     const r = run(s, world, 'n', 'n', 'n');
     s = r.s;
-    expect(r.events).toContainEqual({ type: 'pen', id: 'zuhause:hase' });
+    expect(r.events).toContainEqual({ type: 'home', id: 'zuhause:hase' });
     expect(s.followers).toEqual([]);
-    expect(s.pen).toEqual([{ id: 'zuhause:hase', species: 'hase' }]);
+    expect(s.garden).toEqual([{ id: 'zuhause:hase', species: 'hase' }]);
     s = run(s, world, 's', 's', 's', 's').s; // Figur geht hinaus und weg
     for (let i = 0; i < 3000; i++) {
       s = run(s, world, TICK).s;
       const a = s.animals.find((x) => x.id === 'zuhause:hase')!;
-      expect(world.cell(a.x, a.y).pen, `${a.x},${a.y}`).toBe(true);
+      expect(world.cell(a.x, a.y).garden, `${a.x},${a.y}`).toBe(true);
     }
   });
 
-  it('Tiere im Gehege singen bei der Aktion, folgen aber nicht', () => {
-    const w = fakeWorld({ '1,0': { pen: true }, '0,0': { pen: true } });
-    const r = run(awake(w, 0, 0, [animal('a', 1, 0, { mode: 'pen', home: { kind: 'pen' } })]), w, ACT);
+  it('Tiere im Garten singen bei der Aktion, folgen aber nicht', () => {
+    const w = fakeWorld({ '1,0': { garden: true }, '0,0': { garden: true } });
+    const r = run(awake(w, 0, 0, [animal('a', 1, 0, { mode: 'home', home: { kind: 'garden' } })]), w, ACT);
     expect(types(r.events)).toEqual(['sing']);
     expect(r.s.followers).toEqual([]);
   });
@@ -278,23 +278,23 @@ describe('Rufen', () => {
 });
 
 describe('Spielstand', () => {
-  it('stellt Getroffene, offene Tore und Tiere im Gehege wieder her', () => {
+  it('stellt Getroffene, offene Tore und Tiere im Garten wieder her', () => {
     const world = createWorld(4);
     const met = regionAnimals('zuhause');
-    const s = initialState(world, { met, pen: [{ id: 'wild:0:2:0', species: 'fuchs' }] });
+    const s = initialState(world, { met, garden: [{ id: 'wild:0:2:0', species: 'fuchs' }] });
     expect(s.met).toEqual([...met].sort());
     expect(s.openGates).toEqual(['gartentor']);
     const fox = s.animals.find((a) => a.id === 'wild:0:2:0')!;
-    expect(fox.mode).toBe('pen');
-    expect(world.cell(fox.x, fox.y).pen).toBe(true);
+    expect(fox.mode).toBe('home');
+    expect(world.cell(fox.x, fox.y).garden).toBe(true);
     const p = progressOf(s);
     expect(p.met).toEqual(s.met);
-    expect(p.pen).toEqual([{ id: 'wild:0:2:0', species: 'fuchs' }]);
+    expect(p.garden).toEqual([{ id: 'wild:0:2:0', species: 'fuchs' }]);
   });
 
-  it('ein Tier im Gehege taucht nicht zusätzlich in seiner Gegend auf', () => {
+  it('ein Tier im Garten taucht nicht zusätzlich in seiner Gegend auf', () => {
     const world = createWorld(4);
-    const s = initialState(world, { pen: [{ id: animalId('zuhause', 'hase'), species: 'hase' }] });
+    const s = initialState(world, { garden: [{ id: animalId('zuhause', 'hase'), species: 'hase' }] });
     expect(s.animals.filter((a) => a.id === animalId('zuhause', 'hase'))).toHaveLength(1);
   });
 });
@@ -302,7 +302,7 @@ describe('Spielstand', () => {
 describe('Invarianten bei wildem Drücken', () => {
   const DIRS: Dir[] = ['n', 's', 'e', 'w'];
   for (const seed of [1, 2, 3]) {
-    it(`Seed ${seed}: Figur steht immer begehbar, nie zwei auf einem Feld, Gehege-Tiere bleiben drin, alles wiederholbar`, () => {
+    it(`Seed ${seed}: Figur steht immer begehbar, nie zwei auf einem Feld, Garten-Tiere bleiben drin, alles wiederholbar`, () => {
       const world = createWorld(seed);
       const play = () => {
         let s = initialState(world, {}, seed);
@@ -316,7 +316,7 @@ describe('Invarianten bei wildem Drücken', () => {
           const spots = s.animals.map((a) => `${a.x},${a.y}`);
           if (!s.sleeping) spots.push(`${s.player.x},${s.player.y}`);
           expect(new Set(spots).size).toBe(spots.length);
-          for (const a of s.animals) if (a.mode === 'pen') expect(world.cell(a.x, a.y).pen).toBe(true);
+          for (const a of s.animals) if (a.mode === 'home') expect(world.cell(a.x, a.y).garden).toBe(true);
           expect(new Set(s.followers).size).toBe(s.followers.length);
         }
         return s;
@@ -336,62 +336,62 @@ describe('Randfälle aus der Prüfung', () => {
     expect(r.s.sleeping).toBe(true);
   });
 
-  it('ein Tier im Gehege rückt beiseite, statt den Eingang zu versperren', () => {
+  it('ein Tier im Garten rückt beiseite, statt den Eingang zu versperren', () => {
     const world = createWorld(1);
-    const [gx, gy] = HOME.penGate;
-    let s = awake(world, gx, gy, [animal('zuhause:igel', gx, gy - 1, { mode: 'pen', home: { kind: 'pen' } })]);
+    const [gx, gy] = HOME.gardenGate;
+    let s = awake(world, gx, gy, [animal('zuhause:igel', gx, gy - 1, { mode: 'home', home: { kind: 'garden' } })]);
     s = run(s, world, 'n').s; // singt
-    const r = run(s, world, 'n'); // zweites Mal: Tier rückt im Gehege beiseite, Figur geht hinein
+    const r = run(s, world, 'n'); // zweites Mal: Tier rückt im Garten beiseite, Figur geht hinein
     expect([r.s.player.x, r.s.player.y]).toEqual([gx, gy - 1]);
     const igel = r.s.animals[0];
-    expect(world.cell(igel.x, igel.y).pen).toBe(true);
+    expect(world.cell(igel.x, igel.y).garden).toBe(true);
     expect([igel.x, igel.y]).not.toEqual([gx, gy - 1]);
   });
 
-  it('ein folgendes Tier, das per Platztausch ins Gehege kommt, bleibt dort', () => {
+  it('ein folgendes Tier, das per Platztausch in den Garten kommt, bleibt dort', () => {
     const world = createWorld(1);
-    const [gx, gy] = HOME.penGate;
+    const [gx, gy] = HOME.gardenGate;
     let s = awake(world, gx, gy - 1, [animal('zuhause:hase', gx, gy, { mode: 'follow' })]);
     s = { ...s, followers: ['zuhause:hase'] };
     s = run(s, world, 's').s; // singt
-    const r = run(s, world, 's'); // tauscht: Hase steht jetzt im Gehege
-    expect(r.events).toContainEqual({ type: 'pen', id: 'zuhause:hase' });
+    const r = run(s, world, 's'); // tauscht: Hase steht jetzt im Garten
+    expect(r.events).toContainEqual({ type: 'home', id: 'zuhause:hase' });
     expect(r.s.followers).toEqual([]);
-    expect(r.s.pen.map((p) => p.id)).toEqual(['zuhause:hase']);
+    expect(r.s.garden.map((p) => p.id)).toEqual(['zuhause:hase']);
   });
 });
 
-describe('Eingang des Geheges', () => {
-  it('neue Tiere rücken nach hinten, das Feld hinter der Öffnung bleibt frei für das nächste', () => {
+describe('Eingang des Gartens', () => {
+  it('neue Tiere rücken nach hinten, das Feld hinter dem Rosenbogen bleibt frei für das nächste', () => {
     const world = createWorld(1);
-    const [gx, gy] = HOME.penGate;
+    const [gx, gy] = HOME.gardenGate;
     let s = awake(world, gx, gy + 1, [
       animal('zuhause:hase', gx, gy + 2, { mode: 'follow' }),
       animal('zuhause:igel', gx, gy + 3, { mode: 'follow', species: 'igel' }),
     ]);
     s = { ...s, followers: ['zuhause:hase', 'zuhause:igel'] };
     const r = run(s, world, 'n', 'n', 'n', 'n');
-    expect(r.s.pen.map((p) => p.id).sort()).toEqual(['zuhause:hase', 'zuhause:igel']);
+    expect(r.s.garden.map((p) => p.id).sort()).toEqual(['zuhause:hase', 'zuhause:igel']);
     expect(r.s.followers).toEqual([]);
     expect(r.s.animals.some((a) => a.x === gx && a.y === gy - 1)).toBe(false);
   });
 
-  it('Tiere im Gehege laufen nie auf das Feld hinter der Öffnung', () => {
+  it('Tiere im Garten laufen nie auf das Feld hinter dem Rosenbogen', () => {
     const world = createWorld(2);
-    const [gx, gy] = HOME.penGate;
-    const pen = Array.from({ length: 6 }, (_, i) => ({ id: `wild:9:9:${i}`, species: 'hase' as const }));
-    let s: State = { ...initialState(world, { pen }), sleeping: false, player: { x: 0, y: 4, dir: 's' } };
+    const [gx, gy] = HOME.gardenGate;
+    const garden = Array.from({ length: 6 }, (_, i) => ({ id: `wild:9:9:${i}`, species: 'hase' as const }));
+    let s: State = { ...initialState(world, { garden }), sleeping: false, player: { x: 0, y: 4, dir: 's' } };
     for (let i = 0; i < 3000; i++) {
       s = step(s, world, TICK).state;
-      expect(s.animals.some((a) => a.mode === 'pen' && a.x === gx && a.y === gy - 1)).toBe(false);
+      expect(s.animals.some((a) => a.mode === 'home' && a.x === gx && a.y === gy - 1)).toBe(false);
     }
   });
 });
 
 describe('Durchgänge bleiben frei', () => {
-  it('umherlaufende Tiere bleiben nie an Toren, Brücke, Gehege-Öffnung oder Pfad stehen', () => {
+  it('umherlaufende Tiere bleiben nie an Toren, Brücke, Rosenbogen oder Pfad stehen', () => {
     const world = createWorld(5);
-    const passages = [...GATES.map((g) => g.at), HOME.penGate, HOME.exit].flatMap(([x, y]) => [
+    const passages = [...GATES.map((g) => g.at), HOME.gardenGate, HOME.exit].flatMap(([x, y]) => [
       `${x},${y}`,
       `${x + 1},${y}`,
       `${x - 1},${y}`,

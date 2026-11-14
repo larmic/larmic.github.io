@@ -79,7 +79,7 @@ export class Sfx {
   friend() {
     [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => this.note(f, 0.16, 'triangle', 0.1, 1, 0.25 + i * 0.08));
   }
-  pen() {
+  home() {
     [783.99, 1046.5].forEach((f, i) => this.note(f, 0.18, 'sine', 0.1, 1, i * 0.1));
   }
   gate() {

@@ -38,21 +38,21 @@ Bei Änderungen am Verhalten Spec und Tests mitziehen.
 
 Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst tun sie nichts.
 
-`step` liefert den neuen Zustand und **Ereignisse** für Ton, Bild und Speichern: `step` (mit Kletterrichtung), `bump`, `sing` (mit `first`), `follow`, `swap`, `pen`, `gate`, `call`, `sleep`, `wake`.
+`step` liefert den neuen Zustand und **Ereignisse** für Ton, Bild und Speichern: `step` (mit Kletterrichtung), `bump`, `sing` (mit `first`), `follow`, `swap`, `home`, `gate`, `call`, `sleep`, `wake`.
 
 ## Regeln
 
 1. **Start:** Die Figur schläft im Bett. Die erste Taste weckt sie an einem freien Platz neben dem Bett. *Test: „startet schlafend im Bett …“*
 2. **Laufen:** Ein Feld in Pfeilrichtung, die Figur schaut dorthin. *Test: „geht ein Feld in Pfeilrichtung …“*
 3. **Klettern:** Eine Stufe hoch oder runter geht, zwei Stufen sind eine Wand. Wasser, Bäume, Büsche, Fels, Zäune, Bett, Tafeln und geschlossene Tore versperren das Feld; die Figur bleibt stehen (`bump`). *Tests: „klettert eine Stufe …“, „läuft nicht durch Wasser …“*
-4. **Aktion neben einem Tier** (vorn, sonst das nächste der acht Nachbarfelder): Es singt. Beim ersten Mal ist es getroffen. Läuft es frei umher, folgt es danach der Figur. Folgt es schon oder ist es im Gehege, singt es nur. *Tests: „singt bei der Aktion …“, „nimmt mit der Aktion auch ein Tier schräg daneben …“, „Tiere im Gehege singen …“*
-5. **Hineinlaufen in ein Tier:** Es singt, folgt aber nicht. Läuft die Figur innerhalb von 15 Takten noch einmal hinein, tauschen beide den Platz (nur wenn das Tier auf dem Feld der Figur stehen darf). Steht die Figur in der Öffnung des Geheges und versperrt ein Tier im Gehege den Weg, rückt es stattdessen im Gehege beiseite. Kommt ein folgendes Tier durch den Tausch ins Gehege, bleibt es dort (Regel 7). *Tests auch: „Randfälle aus der Prüfung“* *Tests: „Hineinlaufen lässt singen …“, „tauscht nach Ablauf der Zeit nicht mehr …“*
+4. **Aktion neben einem Tier** (vorn, sonst das nächste der acht Nachbarfelder): Es singt. Beim ersten Mal ist es gefunden. Läuft es frei umher, folgt es danach der Figur. Folgt es schon oder ist es im Garten, singt es nur. *Tests: „singt bei der Aktion …“, „nimmt mit der Aktion auch ein Tier schräg daneben …“, „Tiere im Garten singen …“*
+5. **Hineinlaufen in ein Tier:** Es singt, folgt aber nicht. Läuft die Figur innerhalb von 15 Takten noch einmal hinein, tauschen beide den Platz (nur wenn das Tier auf dem Feld der Figur stehen darf). Steht die Figur in der Öffnung des Gartens und versperrt ein Tier im Garten den Weg, rückt es stattdessen im Garten beiseite. Kommt ein folgendes Tier durch den Tausch in den Garten, bleibt es dort (Regel 7). *Tests auch: „Randfälle aus der Prüfung“* *Tests: „Hineinlaufen lässt singen …“, „tauscht nach Ablauf der Zeit nicht mehr …“*
 6. **Gänsemarsch:** Geht die Figur einen Schritt, rückt jedes folgende Tier auf den Platz seines Vordermanns. *Test: „läuft im Gänsemarsch …“*
-7. **Gehege:** 4 × 4 Felder mit einer Öffnung. Ein folgendes Tier, das ein Feld im Gehege betritt, löst sich aus der Kette, rückt nach hinten auf einen freien Platz und bleibt für immer dort (gespeichert). Das Feld direkt hinter der Öffnung bleibt frei: Kein Tier im Gehege läuft dorthin, so kommt das nächste Tier immer hinein. *Tests: „ein folgendes Tier bleibt im Gehege …“, „Eingang des Geheges“*
-8. **Tore:** Ein Tor öffnet genau dann, wenn alle Tiere seiner Gegend getroffen sind, und bleibt offen. *Tests: „öffnen genau dann …“, „das letzte getroffene Tier öffnet das Tor sofort …“*
+7. **Garten:** 4 × 4 Felder mit Hecke und einem Rosenbogen als Eingang. Ein folgendes Tier, das ein Feld im Garten betritt, löst sich aus der Kette, rückt nach hinten auf einen freien Platz und bleibt für immer dort (gespeichert). Das Feld direkt hinter der Öffnung bleibt frei: Kein Tier im Garten läuft dorthin, so kommt das nächste Tier immer hinein. *Tests: „ein folgendes Tier bleibt im Garten …“, „Eingang des Gartens“*
+8. **Tore:** Ein Tor öffnet genau dann, wenn alle Tiere seiner Gegend gefunden sind, und bleibt offen. *Tests: „öffnen genau dann …“, „das letzte gefundene Tier öffnet das Tor sofort …“*
 9. **Schlafen:** Aktion mit dem Bett vorn oder daneben (wenn kein Tier näher ist). Folgende Tiere gehen heim: Tiere einer Gegend an einen freien Platz nahe ihrem Start, Tiere der Landschaft verschwinden und tauchen später an ihrem Platz auf. 30 Takte lang weckt keine Taste. *Tests: „legt sich mit der Aktion am Bett schlafen …“, „schickt folgende Tiere beim Schlafen heim“*
 10. **Rufen:** Aktion ohne Tier und Bett in der Nähe. *Test: „ruft, wenn weder Tier noch Bett …“*
-11. **Umherlaufen:** Freie Tiere ruhen 8 bis 25 Takte, dann gehen sie einen Schritt oder drehen sich. Sie bleiben in ihrem Zuhause (Gegend, Stück der Landschaft oder Gehege) und nie auf einem Feld an einem Durchgang (Tor, Brücke, Gehege-Öffnung, Pfad und deren Nachbarfelder); wer außerhalb steht (nach einem Platztausch), zieht heim. Steht die Figur daneben, bleiben sie stehen und schauen sie an. *Tests: „bleibt stehen und schaut …“, „läuft umher, aber nur in seinem Zuhause“, „Durchgänge bleiben frei“*
+11. **Umherlaufen:** Freie Tiere ruhen 8 bis 25 Takte, dann gehen sie einen Schritt oder drehen sich. Sie bleiben in ihrem Zuhause (Gegend, Stück der Landschaft oder Garten) und nie auf einem Feld an einem Durchgang (Tor, Brücke, Garten-Öffnung, Pfad und deren Nachbarfelder); wer außerhalb steht (nach einem Platztausch), zieht heim. Steht die Figur daneben, bleiben sie stehen und schauen sie an. *Tests: „bleibt stehen und schaut …“, „läuft umher, aber nur in seinem Zuhause“, „Durchgänge bleiben frei“*
 12. **Landschaft:** Tiere der Landschaft gibt es in den Stücken um die Figur (Abstand 1). Ab Abstand 3 verschwinden frei laufende wieder. Gleiche Welt, gleiches Stück: gleiche Tiere am gleichen Platz.
 
 ## Welt
@@ -60,11 +60,11 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 | Regel | Test |
 | --- | --- |
 | Gleicher Seed ergibt gleiche Felder, anderer Seed andere Landschaft | „entsteht aus demselben Seed immer gleich …“ |
-| Gegenden, Bett und Gehege liegen bei jedem Seed an derselben Stelle | „hat die Gegenden bei jedem Seed …“ |
+| Gegenden, Bett und Garten liegen bei jedem Seed an derselben Stelle | „hat die Gegenden bei jedem Seed …“ |
 | Ohne offene Tore erreicht man nur Zuhause und Landschaft; der Pfad hinaus ist offen | „Ohne offene Tore erreicht man nur …“ |
 | Jedes Tor öffnet genau seine nächste Gegend | „Jedes Tor öffnet genau …“ |
 | Aus der Landschaft kommt man nicht seitlich in eine Gegend | „Aus der Landschaft kommt man nicht seitlich …“ |
-| Das Gehege hat genau eine Öffnung | „das Gehege hat genau eine Öffnung“ |
+| Der Garten hat genau einen Eingang (Rosenbogen) | „der Garten hat genau einen Eingang“ |
 | Die Landschaft ist sanft (selten mehr als eine Stufe zwischen Nachbarn); vor dem Pfad steigt sie höchstens alle zwei Felder | „ist meist sanft …“ |
 
 ## Invarianten
@@ -73,7 +73,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 
 - Die wache Figur steht immer auf einem Feld, auf dem man stehen kann.
 - Nie stehen zwei Wesen auf einem Feld.
-- Tiere im Gehege verlassen es nie.
+- Tiere im Garten verlassen ihn nie.
 - Jedes Tier ist höchstens einmal in der Kette.
 - Gleiche Befehle ergeben den gleichen Zustand (kein `Math.random`, Zufall aus dem Zustand).
 
@@ -82,9 +82,9 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Was | Regel |
 | --- | --- |
 | Schlüssel | `larmic.games.index` (Liste der Welten, aktuelle Welt), `larmic.games.world.<id>` je Welt, `larmic.games.muted` |
-| Format | `{ v: 2, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, penAnimals, position, visits }`; `age` ist die Altersstufe der Welt (bisher nur 3) |
-| Umzug | Version 1 (Arbeitstitel `game: 'threeyear'`, ohne Alter) wird beim Laden zu Version 2 mit Alter 3; der Index von Version 1 wird übernommen. Nichts geht verloren |
-| Wann | sofort bei getroffen, Gehege, Tor, Schlafen, Weltwechsel und Umbenennen; sonst alle 10 s; beim Verlassen der Seite |
+| Format | `{ v: 3, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, homeAnimals, position, visits }`; `age` ist die Altersstufe der Welt (bisher nur 3) |
+| Umzug | Version 1 (Arbeitstitel `game: 'threeyear'`, ohne Alter) → 2 (Alter 3) → 3 (`penAnimals` heißt jetzt `homeAnimals`). Ältere Indizes werden übernommen. Nichts geht verloren |
+| Wann | sofort bei gefunden, Garten, Tor, Schlafen, Weltwechsel und Umbenennen; sonst alle 10 s; beim Verlassen der Seite |
 | Fehler | Jeder Zugriff fängt Fehler ab. Ohne Speicher läuft das Spiel bis zum Neuladen weiter. |
 | `migrate()` | verwirft Fremdes (anderes Spiel, unbekannte Version) und räumt auf (unbekannte Tore und Arten, doppelte Einträge, kaputte Felder) |
 | Welt-Code | Seed in Basis 36, z. B. `0IDFDSE`; ergibt dieselbe Landschaft ohne Spielstand |
@@ -102,8 +102,11 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Figur | wird zusätzlich halb durchsichtig obenauf gezeichnet, damit sie hinter Hügeln und Bäumen sichtbar bleibt |
 | Wesen | gleiten zu ihrem Feld, etwas schneller als der Takt der Eingabe (gut 4 Felder/s); Sprünge über mehr als 2,5 Felder springen direkt |
 | Folgende Tiere | kleines Herz darüber |
-| Leiste unten | ein Platz je Tier, nach Gegenden gruppiert, dahinter Tiere der Landschaft im Gehege: heller Platz mit Umriss = noch nicht getroffen, Holz mit Tier in Farbe = getroffen, Gras = im Gehege, Herz = folgt gerade |
-| Tafel am Tor | Tiere der Gegend auf dem Brett: getroffene in Farbe, fehlende als Umriss |
+| Verlorene Tiere | noch nicht gefunden: kleines Fragezeichen über dem Kopf (wippt leicht, außer bei reduzierter Bewegung) |
+| Tiere im Garten | ab und zu steigt ein kleines Herz auf (nicht bei reduzierter Bewegung) |
+| Garten | Hecke ringsum, Rosenbogen als Eingang, Blumen innen |
+| Leiste unten | ein Platz je Tier, nach Gegenden gruppiert, dahinter Tiere der Landschaft, die im Garten wohnen: heller Platz mit Umriss und Fragezeichen = noch verloren, Holz mit Tier in Farbe = gefunden, Gras = zu Hause im Garten, Herz = folgt gerade |
+| Tafel am Tor | Tiere der Gegend auf dem Brett: gefundene in Farbe, verlorene als Umriss |
 | Heimweg-Pfeil | am Bildrand Richtung Bett, solange das Bett nicht zu sehen ist |
 | Nacht | dunkler Himmel mit Sternen und Mond, die Figur liegt im Bett, Zzz steigt auf |
 | Menü | Zahnrad oben rechts: Welten wählen, neue Welt, Namen, Welt-Code kopieren, Ton, Vollbild. Das Spiel pausiert, solange es offen ist |

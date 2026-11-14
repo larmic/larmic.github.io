@@ -84,8 +84,8 @@ export const HOME = {
     [-4, -3],
     [-4, -2],
   ] as readonly Point[], // freie Plätze am Bett zum Aufwachen
-  pen: { x0: 1, y0: -3, x1: 4, y1: 0 } as Rect, // Inneres des Geheges (4 × 4), Zaun ringsum
-  penGate: [2, 1] as Point, // Öffnung im Zaun; das Feld dahinter bleibt frei
+  garden: { x0: 1, y0: -3, x1: 4, y1: 0 } as Rect, // Inneres des Gartens (4 × 4), Hecke ringsum
+  gardenGate: [2, 1] as Point, // Rosenbogen in der Hecke; das Feld dahinter bleibt frei
   exit: [0, 6] as Point, // Pfad in die endlose Landschaft
   trees: [
     [-6, -4],
@@ -309,10 +309,11 @@ export const GAME_COLORS = {
   flowers: ['#e77fb3', '#f2d14b', '#f39a3d', '#ffffff', '#b48cf0', '#5aa6e8'],
   bed: { frame: '#a0703f', pillow: '#e8e2d6', blanket: '#5aa6e8' },
   arrow: '#ffffff',
-  slotPen: '#e3ecd2', // im Gehege (Fläche „Gras“)
+  slotHome: '#e3ecd2', // zu Hause im Garten (Fläche „Gras“)
   slotMet: '#f3ead6', // getroffen (Fläche „Holz“)
   slotEmpty: 'rgba(255, 255, 255, 0.45)', // noch nicht getroffen
   silhouette: '#4b5563',
+  lost: '#1d2838', // Fragezeichen über verlorenen Tieren
   ledge: 'rgba(29, 40, 56, 0.45)', // Kante, wo es eine Stufe hinuntergeht
   shade: 'rgba(0, 0, 0, 0.16)', // Schatten am Fuß einer höheren Stufe
   highlight: 'rgba(255, 255, 255, 0.35)', // Licht auf der Vorderkante

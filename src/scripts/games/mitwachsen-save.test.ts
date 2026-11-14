@@ -45,7 +45,7 @@ describe('Welten speichern', () => {
     expect(saveWorld(store, w)).toBe(true);
     expect(loadWorld(store, 'a1')).toEqual(w);
     expect(loadIndex(store)).toEqual({
-      v: 2,
+      v: 3,
       worlds: [{ id: 'a1', worldName: 'Bobos Insel', figureName: 'Bobo' }],
       current: 'a1',
     });
@@ -68,7 +68,7 @@ describe('Welten speichern', () => {
     const w = newWorld('a', 1, 'X');
     const p = {
       met: ['zuhause:hase'],
-      pen: [{ id: 'zuhause:hase', species: 'hase' as const }],
+      garden: [{ id: 'zuhause:hase', species: 'hase' as const }],
       openGates: ['gartentor' as const],
       position: [3, 4] as [number, number],
     };
@@ -78,16 +78,16 @@ describe('Welten speichern', () => {
   it('läuft ohne Fehler weiter, wenn der Browser nichts speichern lässt', () => {
     expect(saveWorld(brokenStore, newWorld('a', 1, 'X'))).toBe(false);
     expect(loadWorld(brokenStore, 'a')).toBeNull();
-    expect(loadIndex(brokenStore)).toEqual({ v: 2, worlds: [], current: null });
+    expect(loadIndex(brokenStore)).toEqual({ v: 3, worlds: [], current: null });
   });
 
   it('übersteht kaputte Daten: falsches JSON, fremder Index, unbekannte aktuelle Welt', () => {
     const store = memoryStore();
     store.setItem(worldKey('x'), '{kaputt');
     expect(loadWorld(store, 'x')).toBeNull();
-    store.setItem(INDEX_KEY, JSON.stringify({ v: 2, worlds: [{ id: 'a' }, 42, { nope: true }], current: 'weg' }));
+    store.setItem(INDEX_KEY, JSON.stringify({ v: 3, worlds: [{ id: 'a' }, 42, { nope: true }], current: 'weg' }));
     expect(loadIndex(store)).toEqual({
-      v: 2,
+      v: 3,
       worlds: [{ id: 'a', worldName: 'Meine Welt', figureName: 'Bobo' }],
       current: 'a',
     });
@@ -111,7 +111,7 @@ describe('Format und Umzug (migrate)', () => {
       ...newWorld('a', 1, 'X'),
       openGates: ['gartentor', 'mondtor', 3],
       metAnimals: ['b', 'a', 'a', 7],
-      penAnimals: [{ id: 'p', species: 'hase' }, { id: 'q', species: 'drache' }, 'kaputt'],
+      homeAnimals: [{ id: 'p', species: 'hase' }, { id: 'q', species: 'drache' }, 'kaputt'],
       position: [1.5, 2],
       visits: -3,
       worldName: '<script>Welt',
@@ -119,7 +119,7 @@ describe('Format und Umzug (migrate)', () => {
     const w = migrate(raw)!;
     expect(w.openGates).toEqual(['gartentor']);
     expect(w.metAnimals).toEqual(['a', 'b']);
-    expect(w.penAnimals).toEqual([{ id: 'p', species: 'hase' }]);
+    expect(w.homeAnimals).toEqual([{ id: 'p', species: 'hase' }]);
     expect(w.position).toEqual([0, 0]);
     expect(w.visits).toBe(0);
     expect(w.worldName).toBe('scriptWelt');
@@ -158,8 +158,8 @@ describe('Umzug vom Arbeitstitel threeyear (Version 1)', () => {
   };
 
   it('macht aus einer threeyear-Welt eine Mitwachsen-Welt ab 3, ohne Fortschritt zu verlieren', () => {
-    const w = migrate(v1)!;
-    expect(w).toEqual({ ...v1, v: 2, game: 'mitwachsen', age: 3 });
+    const { penAnimals, ...rest } = v1;
+    expect(migrate(v1)).toEqual({ ...rest, homeAnimals: penAnimals, v: 3, game: 'mitwachsen', age: 3 });
   });
 
   it('übernimmt Index und Welten aus dem Speicher und schreibt sie im neuen Format zurück', () => {
@@ -174,11 +174,30 @@ describe('Umzug vom Arbeitstitel threeyear (Version 1)', () => {
     const w = loadWorld(store, 'alt')!;
     expect(w.metAnimals).toEqual(['zuhause:hase', 'zuhause:igel']);
     saveWorld(store, w);
-    expect(JSON.parse(store.getItem(worldKey('alt'))!)).toMatchObject({ v: 2, game: 'mitwachsen', age: 3 });
-    expect(JSON.parse(store.getItem(INDEX_KEY)!).v).toBe(2);
+    expect(JSON.parse(store.getItem(worldKey('alt'))!)).toMatchObject({
+      v: 3,
+      game: 'mitwachsen',
+      age: 3,
+      homeAnimals: [{ id: 'zuhause:hase', species: 'hase' }],
+    });
+    expect(JSON.parse(store.getItem(INDEX_KEY)!).v).toBe(3);
   });
 
   it('setzt ein unbekanntes Alter auf 3', () => {
     expect(migrate({ ...newWorld('a', 1, 'X'), age: 9 })!.age).toBe(3);
+  });
+});
+
+describe('Umzug vom Gehege zum Garten (Version 2)', () => {
+  it('benennt die Tiere im Gehege in Tiere zu Hause um', () => {
+    const v2 = { ...newWorld('b', 2, 'X'), v: 2, penAnimals: [{ id: 'zuhause:igel', species: 'igel' }] } as Record<
+      string,
+      unknown
+    >;
+    delete v2.homeAnimals;
+    const w = migrate(v2)!;
+    expect(w.v).toBe(3);
+    expect(w.homeAnimals).toEqual([{ id: 'zuhause:igel', species: 'igel' }]);
+    expect('penAnimals' in w).toBe(false);
   });
 });

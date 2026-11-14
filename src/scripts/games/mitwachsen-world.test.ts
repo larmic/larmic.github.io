@@ -94,14 +94,14 @@ describe('Gegenden und Tore', () => {
     expect(w.cell(bridge.at[0], bridge.at[1]).ground).toBe('water');
   });
 
-  it('das Gehege hat genau eine Öffnung', () => {
+  it('der Garten hat genau einen Eingang', () => {
     const w = createWorld(3);
-    const inside = reachable(w, [], [HOME.pen.x0, HOME.pen.y0]).filter(([x, y]) => !w.cell(x, y).pen);
-    // Von innen führt jeder Weg hinaus über die Öffnung
-    expect(inside.some(([x, y]) => x === HOME.penGate[0] && y === HOME.penGate[1])).toBe(true);
+    const inside = reachable(w, [], [HOME.garden.x0, HOME.garden.y0]).filter(([x, y]) => !w.cell(x, y).garden);
+    // Von innen führt jeder Weg hinaus über den Rosenbogen
+    expect(inside.some(([x, y]) => x === HOME.gardenGate[0] && y === HOME.gardenGate[1])).toBe(true);
     let openings = 0;
-    for (let y = HOME.pen.y0 - 1; y <= HOME.pen.y1 + 1; y++)
-      for (let x = HOME.pen.x0 - 1; x <= HOME.pen.x1 + 1; x++) if (w.cell(x, y).penGate) openings++;
+    for (let y = HOME.garden.y0 - 1; y <= HOME.garden.y1 + 1; y++)
+      for (let x = HOME.garden.x0 - 1; x <= HOME.garden.x1 + 1; x++) if (w.cell(x, y).gardenGate) openings++;
     expect(openings).toBe(1);
   });
 });
