@@ -105,6 +105,8 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Verlorene Tiere | noch nicht gefunden: kleines Fragezeichen über dem Kopf (wippt leicht, außer bei reduzierter Bewegung) |
 | Tiere im Garten | ab und zu steigt ein kleines Herz auf (nicht bei reduzierter Bewegung) |
 | Garten | Hecke ringsum, Rosenbogen als Eingang, Blumen innen |
+| Natur | Grasbüschel, Farne, Pilze, bemooste Findlinge (blockieren, nur auf Hügeln); Bäume als Eiche, Birke, Herbst- oder Blütenbaum, in Gruppen; Farbflecken im Boden. Reine Zierde aus dem Seed, die Regeln ändern sich nicht |
+| Licht und Leben | weiche Schatten unter Bäumen, Büschen, Tieren und Figur; warmes Licht von oben links, leichter Dunst oben, dunklere Ränder; glitzerndes Wasser mit hellem Ufer; tagsüber Schmetterlinge und Pollen, nachts Glühwürmchen (Bewegtes nicht bei reduzierter Bewegung) |
 | Leiste unten | ein Platz je Tier, nach Gegenden gruppiert, dahinter Tiere der Landschaft, die im Garten wohnen: heller Platz mit Umriss und Fragezeichen = noch verloren, Holz mit Tier in Farbe = gefunden, Gras = zu Hause im Garten, Herz = folgt gerade |
 | Tafel am Tor | Tiere der Gegend auf dem Brett: gefundene in Farbe, verlorene als Umriss |
 | Heimweg-Pfeil | am Bildrand Richtung Bett, solange das Bett nicht zu sehen ist |

@@ -34,7 +34,11 @@ export type Deco =
   | 'bed'
   | 'sign'
   | 'hedge'
-  | 'arch';
+  | 'arch'
+  | 'fern'
+  | 'boulder'
+  | 'mushroom';
+export type TreeKind = 'oak' | 'birch' | 'autumn' | 'blossom';
 
 export type Cell = {
   h: number; // Oberkante in Ebenen: Wasser 0, Boden 1, Hügel bis 3
@@ -47,6 +51,9 @@ export type Cell = {
   sign?: GateId; // Tafel zu diesem Tor
   garden?: true; // Inneres des Gartens, in dem gefundene Tiere zu Hause sind
   gardenGate?: true; // Rosenbogen in der Hecke
+  tree?: TreeKind; // Baumart bei deco 'tree'
+  tufts?: number; // Grasbüschel auf dem Feld (nur Zierde, begehbar)
+  shade?: number; // Farbfleck im Boden: −1 dunkler … +1 heller (große, weiche Flecken)
 };
 
 export type World = { readonly seed: number; cell(x: number, y: number): Cell };
@@ -149,7 +156,38 @@ function wildCell(seed: number, x: number, y: number): Cell {
   if (roll < 0.035) Object.assign(c, { deco: 'tree', solid: true });
   else if (roll < 0.05) Object.assign(c, { deco: 'bush', solid: true });
   else if (roll < 0.14) Object.assign(c, { deco: 'flower', color: flowerColor(seed, x, y) });
+  else if (roll < 0.165) c.deco = 'fern';
+  else if (roll < 0.175 && h >= 2) Object.assign(c, { deco: 'boulder', solid: true });
+  else if (roll < 0.183) c.deco = 'mushroom';
   return c;
+}
+
+/**
+ * Zierde für jedes Feld, ändert nichts an den Regeln: Farbflecken im Boden, Grasbüschel und die Baumart.
+ * Bäume wachsen in Gruppen: Herbst- und Blütenbäume dort, wo ein weiches Rauschen hoch bzw. niedrig ist.
+ */
+function dress(seed: number, x: number, y: number, c: Cell): Cell {
+  const out: Cell = { ...c, shade: (valueNoise(seed + 9, x, y, 5) - 0.5) * 2 };
+  if (c.deco === 'tree' && !c.tree) {
+    const patch = valueNoise(seed + 5, x, y, 14);
+    out.tree =
+      c.region === 'zuhause'
+        ? rand01(seed, x, y, 12) < 0.5
+          ? 'blossom'
+          : 'oak'
+        : patch > 0.66
+          ? 'autumn'
+          : patch < 0.27
+            ? 'blossom'
+            : rand01(seed, x, y, 12) < 0.3
+              ? 'birch'
+              : 'oak';
+  }
+  if (c.ground === 'grass' && !c.deco && !c.garden && !c.gate) {
+    const r = rand01(seed, x, y, 11);
+    if (r < 0.7) out.tufts = 1 + (hash(seed, x, y, 13) % 3);
+  }
+  return out;
 }
 
 export function createWorld(seed: number): World {
@@ -157,7 +195,8 @@ export function createWorld(seed: number): World {
   const cache = new ChunkCache<Cell>((cx, cy) => {
     const cells: Cell[] = [];
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)
-      for (let x = cx * CHUNK; x < (cx + 1) * CHUNK; x++) cells.push(regions.get(key(x, y)) ?? wildCell(seed, x, y));
+      for (let x = cx * CHUNK; x < (cx + 1) * CHUNK; x++)
+        cells.push(dress(seed, x, y, regions.get(key(x, y)) ?? wildCell(seed, x, y)));
     return cells;
   });
   return { seed, cell: (x, y) => cache.get(x, y) };
