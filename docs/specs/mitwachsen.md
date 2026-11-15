@@ -175,6 +175,8 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 - Jedes Tier ist höchstens einmal in der Kette.
 - Gleiche Befehle ergeben den gleichen Zustand (kein `Math.random`, Zufall aus dem Zustand).
 
+In der 3D-Ansicht liegen in Torhäusern, Portalen und ihren Sockeln nie zwei Flächen deckungsgleich in einer Ebene; sonst flackern sie beim Bewegen (Z-Fighting, Rückmeldung: Grafikfehler am Regenbogen). *Test: „Torhäuser und Portale flackern nicht“ (`mitwachsen-gatehouse.test.ts`)*
+
 ## Speichern
 
 | Was | Regel |

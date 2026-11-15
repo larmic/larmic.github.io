@@ -89,7 +89,7 @@ export function gatehouse(p: Parts, theme: GateTheme) {
         '#d9473a',
       );
       for (const [dx, dz] of [
-        [0.1, 0.6],
+        [0.15, 0.6], // nicht bündig mit dem Rand des Hutes darunter
         [1.3, 0.2],
         [0.7, -0.9],
         [1.8, -1.6],
@@ -202,7 +202,7 @@ function decorate(p: Parts, theme: GateTheme) {
     case 'wasser':
       for (const cx of towerMid) {
         block(p.bright, cx - 0.45, 0.7, 0.66, cx + 0.45, TOWER_H, 0.72, '#7fc8ff', '#b8e2ff'); // Wasserfall
-        block(p.bright, cx - 0.7, 0.7, 0.66, cx + 0.7, 0.9, 1.1, '#b8e2ff'); // Gischt unten
+        block(p.bright, cx - 0.7, 0.7, 0.68, cx + 0.7, 0.9, 1.1, '#b8e2ff'); // Gischt unten (vor dem Wasserfall, nicht in seiner Ebene)
         for (const [dx, c] of [
           [-0.6, '#f4a7b9'],
           [0.1, '#ffd7a8'],
@@ -284,7 +284,8 @@ function decorate(p: Parts, theme: GateTheme) {
         block(p.solid, cx - 0.8, TOWER_H + 0.6, -DEPTH + 0.3, cx + 0.8, TOWER_H + 1.2, 0.5, '#ffffff', null, 'cloud');
         block(p.bright, cx - 0.15, TOWER_H + 1.2, -1.1, cx + 0.15, TOWER_H + 1.6, -0.8, '#ffe27a'); // goldener Knauf
       }
-      // Regenbogen über dem Tor: sechs Bänder in Stufen
+      // Regenbogen über dem Tor: sechs Bänder in Stufen. Sie überlappen sich in der Höhe; jedes innere Band liegt
+      // ein Stück weiter vorn, sonst lägen ihre Flächen in einer Ebene und flackerten (Z-Fighting)
       const bands = ['#e8504a', '#f39a3d', '#f2d14b', '#6dbd47', '#5aa6e8', '#8a6bd6'];
       bands.forEach((c, i) => {
         const r = 4.4 - i * 0.28;
@@ -294,7 +295,7 @@ function decorate(p: Parts, theme: GateTheme) {
           const x0 = -Math.cos(a0) * r,
             x1 = -Math.cos(a1) * r;
           const y = ARCH_Y + 1.2 + Math.sin((a0 + a1) / 2) * r * 0.55;
-          block(p.bright, Math.min(x0, x1), y, -0.4, Math.max(x0, x1), y + 0.28, -0.1, c);
+          block(p.bright, Math.min(x0, x1), y, -0.4 + i * 0.03, Math.max(x0, x1), y + 0.28, -0.1 + i * 0.03, c);
         }
       });
       break;
