@@ -304,6 +304,7 @@ export class World3D {
   private entity = new MeshLambertMaterial({ vertexColors: true });
   private dark = new MeshLambertMaterial({ color: GAME_COLORS.silhouette }); // verlorene Tiere auf den Tafeln
   private lava!: MeshLambertMaterial; // leuchtet auch nachts
+  private canopy!: MeshLambertMaterial;
   private themes = new Group(); // Blöcke oben auf den großen Toren
   private chunks = new Map<string, Chunk>();
   private models = new Map<string, BufferGeometry>();
@@ -323,6 +324,7 @@ export class World3D {
     this.renderer.shadowMap.type = PCFShadowMap;
     const tex = atlas();
     this.solid = new MeshLambertMaterial({ map: tex, vertexColors: true });
+    this.canopy = new MeshLambertMaterial({ map: tex, vertexColors: true }); // Laub: wird vor der Figur durchsichtig
     this.lava = new MeshLambertMaterial({
       map: tex,
       vertexColors: true,
@@ -333,7 +335,8 @@ export class World3D {
     this.foliage = new MeshLambertMaterial({ vertexColors: true, side: DoubleSide });
     this.fogTex.magFilter = LinearFilter;
     this.fogTex.minFilter = LinearFilter;
-    for (const m of [this.solid, this.foliage, this.water, this.lava]) this.withFog(m);
+    for (const m of [this.solid, this.foliage, this.water, this.lava]) this.withFog(m, false);
+    this.withFog(this.canopy, true);
     this.scene.background = SKY.clone();
     this.scene.fog = new Fog(SKY.clone(), 26, 58);
     this.sun.castShadow = true;
@@ -352,11 +355,12 @@ export class World3D {
   /**
    * Shader-Zusatz für die Welt:
    * – Nebel: Farbe nach der Beleuchtung je nach Nebel-Maske in die Himmelsfarbe mischen.
-   * – Durchblick: Nah an der Sichtlinie Kamera → Figur, vor der Figur und auf Körperhöhe oder darüber (Baumkronen,
-   *   Hügel, Felsen) werden Pixel im 2 × 2-Muster weggelassen, bis zu drei von vier, zum Rand hin immer weniger.
-   *   So sieht man die Figur zwischen vielen Bäumen; die Figur selbst bleibt unverändert.
+   * – Durchblick (nur Laub: Baumkronen, Büsche, Hecken): Nah an der Sichtlinie Kamera → Figur, vor der Figur und auf
+   *   Körperhöhe oder darüber werden Pixel im 2 × 2-Muster weggelassen, bis zu drei von vier, zum Rand hin immer
+   *   weniger. So sieht man die Figur zwischen vielen Bäumen. Boden und Felsen bleiben fest (unter ihrer Oberfläche
+   *   ist nichts, ein Loch zeigte den Himmel).
    */
-  private withFog(material: MeshLambertMaterial) {
+  private withFog(material: MeshLambertMaterial, seeThrough: boolean) {
     material.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, this.fogUniforms);
       shader.vertexShader =
@@ -371,16 +375,18 @@ export class World3D {
         shader.fragmentShader
           .replace(
             '#include <clipping_planes_fragment>',
-            '#include <clipping_planes_fragment>\n' +
-              '  vec3 mwDir = normalize(mwTarget - mwEye);\n' +
-              '  float mwLen = distance(mwTarget, mwEye);\n' +
-              '  float mwT = dot(vMwWorld - mwEye, mwDir);\n' +
-              '  float mwD = distance(vMwWorld, mwEye + mwDir * mwT);\n' +
-              '  if (mwT < mwLen - 0.8 && vMwWorld.y > mwTarget.y - 0.7) {\n' +
-              '    float mwCut = 0.75 * smoothstep(1.7, 0.9, mwD);\n' +
-              '    float mwBayer = (mod(floor(gl_FragCoord.x), 2.0) * 2.0 + mod(floor(gl_FragCoord.y), 2.0)) / 4.0;\n' +
-              '    if (mwBayer < mwCut) discard;\n' +
-              '  }',
+            !seeThrough
+              ? '#include <clipping_planes_fragment>'
+              : '#include <clipping_planes_fragment>\n' +
+                  '  vec3 mwDir = normalize(mwTarget - mwEye);\n' +
+                  '  float mwLen = distance(mwTarget, mwEye);\n' +
+                  '  float mwT = dot(vMwWorld - mwEye, mwDir);\n' +
+                  '  float mwD = distance(vMwWorld, mwEye + mwDir * mwT);\n' +
+                  '  if (mwT < mwLen - 0.8 && vMwWorld.y > mwTarget.y - 0.7) {\n' +
+                  '    float mwCut = 0.75 * smoothstep(1.7, 0.9, mwD);\n' +
+                  '    float mwBayer = (mod(floor(gl_FragCoord.x), 2.0) * 2.0 + mod(floor(gl_FragCoord.y), 2.0)) / 4.0;\n' +
+                  '    if (mwBayer < mwCut) discard;\n' +
+                  '  }',
           )
           .replace(
             '#include <tonemapping_fragment>',
@@ -389,7 +395,7 @@ export class World3D {
               '#include <tonemapping_fragment>',
           );
     };
-    material.customProgramCacheKey = () => 'mw-fog';
+    material.customProgramCacheKey = () => (seeThrough ? 'mw-fog-see' : 'mw-fog');
   }
 
   /** Nebel-Maske neu berechnen: erkundet = 1, dann zweimal weich verwischt (sanfter Übergang über 2–3 Felder) */
@@ -444,7 +450,7 @@ export class World3D {
     for (const g of this.models.values()) g.dispose();
     this.models.clear();
     this.solid.map?.dispose();
-    for (const m of [this.solid, this.foliage, this.water, this.lava, this.entity, this.dark]) m.dispose();
+    for (const m of [this.solid, this.foliage, this.water, this.lava, this.canopy, this.entity, this.dark]) m.dispose();
     this.fogTex.dispose();
     this.sun.shadow.dispose();
     this.renderer.dispose();
@@ -567,12 +573,13 @@ export class World3D {
   private buildChunk(world: World, cx: number, cy: number): Chunk {
     const solid = new Geo(),
       leaves = new Geo(),
+      canopy = new Geo(),
       water = new Geo();
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)
       for (let x = cx * CHUNK; x < (cx + 1) * CHUNK; x++) {
         const c = world.cell(x, y);
         this.terrain(solid, water, world, c, x, y);
-        this.decoration(solid, leaves, c, x, y);
+        this.decoration(solid, leaves, canopy, c, x, y);
       }
     const meshes: Mesh[] = [];
     const add = (g: Geo, mat: MeshLambertMaterial, shadows: boolean) => {
@@ -584,6 +591,7 @@ export class World3D {
       meshes.push(m);
     };
     add(solid, this.solid, true);
+    add(canopy, this.canopy, true);
     add(leaves, this.foliage, false);
     add(water, this.water, false);
     return { meshes };
@@ -635,15 +643,15 @@ export class World3D {
     }
   }
 
-  private decoration(g: Geo, blades: Geo, c: Cell, x: number, y: number) {
+  private decoration(g: Geo, blades: Geo, canopy: Geo, c: Cell, x: number, y: number) {
     const h = c.h;
     if (c.tufts) this.tufts(blades, x, y, h, c.tufts);
     switch (c.deco) {
       case 'tree':
-        this.tree(g, x, y, h, c.tree ?? 'oak');
+        this.tree(g, canopy, x, y, h, c.tree ?? 'oak');
         break;
       case 'bush':
-        g.box(x + 0.08, h, y + 0.12, 0.84, 0.72, 0.76, '#3f9a3c', '#5ab651', 'leaves');
+        canopy.box(x + 0.08, h, y + 0.12, 0.84, 0.72, 0.76, '#3f9a3c', '#5ab651', 'leaves');
         break;
       case 'flower':
         g.box(x + 0.47, h, y + 0.47, 0.06, 0.18, 0.06, '#3f9a3c');
@@ -678,7 +686,7 @@ export class World3D {
         this.bigGate(g, x, y, h);
         break;
       case 'hedge':
-        g.box(x + 0.08, h, y + 0.08, 0.84, 0.75, 0.84, '#3a8a35', '#4fa84a', 'leaves');
+        canopy.box(x + 0.08, h, y + 0.08, 0.84, 0.75, 0.84, '#3a8a35', '#4fa84a', 'leaves');
         break;
       case 'arch':
         g.box(x + 0.02, h, y + 0.38, 0.16, 1.3, 0.2, GAME_COLORS.fenceDark, GAME_COLORS.fence);
@@ -731,26 +739,26 @@ export class World3D {
     }
   }
 
-  private tree(g: Geo, x: number, y: number, h: number, kind: TreeKind) {
+  private tree(g: Geo, canopy: Geo, x: number, y: number, h: number, kind: TreeKind) {
     const leaf = new Color(LEAF[kind]);
     const top = leaf.clone().lerp(new Color('#ffffff'), 0.18);
     if (kind === 'birch') {
       g.box(x + 0.4, h, y + 0.4, 0.2, 1.6, 0.2, '#e8e4d8', '#f3efe6');
       for (const z of [0.3, 0.75, 1.15]) g.box(x + 0.39, h + z, y + 0.53, 0.22, 0.06, 0.08, '#3a3a44');
-      g.box(x + 0.05, h + 1.35, y + 0.05, 0.9, 0.95, 0.9, leaf, top, 'leaves');
-      g.box(x + 0.2, h + 2.3, y + 0.2, 0.6, 0.45, 0.6, leaf, top, 'leaves');
+      canopy.box(x + 0.05, h + 1.35, y + 0.05, 0.9, 0.95, 0.9, leaf, top, 'leaves');
+      canopy.box(x + 0.2, h + 2.3, y + 0.2, 0.6, 0.45, 0.6, leaf, top, 'leaves');
       return;
     }
     g.box(x + 0.36, h, y + 0.36, 0.28, 1.3, 0.28, '#7a5432', '#93683f', 'log', 'logTop');
     // runde Krone: Mitte am breitesten, oben kleiner
-    g.box(x - 0.1, h + 1.05, y - 0.1, 1.2, 0.55, 1.2, leaf, top, 'leaves');
-    g.box(x - 0.4, h + 1.45, y - 0.4, 1.8, 0.8, 1.8, leaf, top, 'leaves');
-    g.box(x - 0.15, h + 2.25, y - 0.15, 1.3, 0.55, 1.3, leaf, top, 'leaves');
-    g.box(x + 0.15, h + 2.8, y + 0.15, 0.7, 0.35, 0.7, leaf, top, 'leaves');
+    canopy.box(x - 0.1, h + 1.05, y - 0.1, 1.2, 0.55, 1.2, leaf, top, 'leaves');
+    canopy.box(x - 0.4, h + 1.45, y - 0.4, 1.8, 0.8, 1.8, leaf, top, 'leaves');
+    canopy.box(x - 0.15, h + 2.25, y - 0.15, 1.3, 0.55, 1.3, leaf, top, 'leaves');
+    canopy.box(x + 0.15, h + 2.8, y + 0.15, 0.7, 0.35, 0.7, leaf, top, 'leaves');
     if (kind === 'blossom')
       for (let i = 0; i < 8; i++) {
         const r = hash(17, x, y, i);
-        g.box(x - 0.35 + (r % 170) / 100, h + 1.5 + ((r >>> 8) % 66) / 100, y + 1.41, 0.09, 0.09, 0.02, '#ffffff');
+        canopy.box(x - 0.35 + (r % 170) / 100, h + 1.5 + ((r >>> 8) % 66) / 100, y + 1.41, 0.09, 0.09, 0.02, '#ffffff');
       }
   }
 

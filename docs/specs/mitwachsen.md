@@ -75,8 +75,8 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 
 | Regel | Test |
 | --- | --- |
-| Am Anfang liegt alles im Nebel außer einem Kreis mit Radius 5 um das Bett | (Komponente) |
-| Bei jedem Schritt lichtet sich ein Kreis mit Radius 4 um die Figur | „lichtet sich rund um die Figur …“ |
+| Am Anfang liegt alles im Nebel außer einem Kreis mit Radius 10 um das Bett | (Komponente) |
+| Bei jedem Schritt lichtet sich ein Kreis mit Radius 7 um die Figur | „lichtet sich rund um die Figur …“ |
 | Nur wenn sich etwas geändert hat, wird die Nebel-Maske neu berechnet | „meldet nur Stücke, in denen sich wirklich etwas geändert hat“ |
 | Erkundetes wird gespeichert (je Stück 32 Byte als Base64) und übersteht Laden und kaputte Daten | „übersteht das Speichern und Laden“, „ist im Spielstand klein …“ |
 | Im Nebel sind keine Tiere und keine Zeichen über Tieren zu sehen; die Karte zeigt nur Erkundetes | (Zeichnen) |
@@ -112,7 +112,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Was | Regel |
 | --- | --- |
 | Ansicht | **3D** mit Three.js (WebGL): Kamera schräg von oben (55°) aus Süden, folgt der Figur; echtes Sonnenlicht mit Schatten, Himmel und Nebel in der Ferne. Three.js wird erst beim Spielstart per `import()` nachgeladen (Bundle-Gate). Darüber liegt ein durchsichtiges 2D-Canvas für Zeichen über den Tieren, Herzen, Noten, Heimweg-Pfeil, Nacht, Schmetterlinge und die Leiste. Ohne WebGL bleibt die **2D-Ansicht von vorn** (Reihe für Reihe von hinten nach vorn), sie läuft auch, bis 3D geladen ist |
-| Verdeckte Figur | In 3D wird halb durchsichtig, was zwischen Kamera und Figur steht (Baumkronen, Hügel, Felsen auf Körperhöhe oder darüber): ein weicher Kreis um die Sichtlinie, bis zu drei von vier Pixeln weggelassen, die Figur selbst bleibt unverändert. In 2D wird die Figur halb durchsichtig obenauf gezeichnet |
+| Verdeckte Figur | In 3D wird Laub halb durchsichtig, das zwischen Kamera und Figur steht (Baumkronen, Büsche, Hecken auf Körperhöhe oder darüber; Boden und Felsen bleiben fest): ein weicher Kreis um die Sichtlinie, bis zu drei von vier Pixeln weggelassen, die Figur selbst bleibt unverändert. In 2D wird die Figur halb durchsichtig obenauf gezeichnet |
 | Große Tore | Holz mit Eisenbändern, Steinsturz; obendrauf Themen-Blöcke (Eis, Sand, Wasser, Lava, später Höhle), die verraten, welche Welt dahinter liegt. Lava leuchtet auch nachts |
 | Nebel | keine Blöcke: Die Welt verblasst am Rand des Erkundeten weich in die Himmelsfarbe und verschwindet im Dunst. 3D: Nebel-Maske (128 × 128 Felder um die Figur, zweimal weich verwischt) als Textur, ein Shader-Zusatz mischt nach der Beleuchtung in die Himmelsfarbe (nachts dunkel). 2D: Unerkundetes bleibt leer, am Rand heller Dunst |
 | Hochformat | In 3D rückt die Kamera im Hochformat weiter weg (bis 1,8-fach), der Nebel rückt mit |

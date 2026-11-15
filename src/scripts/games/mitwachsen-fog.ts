@@ -5,8 +5,8 @@
 
 import { CHUNK, chunkOf } from '../../lib/games/chunks';
 
-export const REVEAL = 4; // so weit sieht die Figur um sich herum
-export const START_REVEAL = 5; // so viel ist am Anfang um das Bett zu sehen
+export const REVEAL = 7; // so weit sieht die Figur um sich herum
+export const START_REVEAL = 10; // so viel ist am Anfang um das Bett zu sehen
 const BYTES = (CHUNK * CHUNK) / 8;
 
 const toBase64 = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes));
