@@ -1,7 +1,16 @@
 // Bausteine der 3D-Ansicht: Textur-Atlas aus den 8 × 8-Rastern der Seite und ein Baukasten, der Quader und Flächen
 // zu einer Geometrie zusammenfügt. Gehört zur 3D-Ansicht und wird nur mit ihr nachgeladen (Three.js).
 
-import { BufferAttribute, BufferGeometry, CanvasTexture, Color, NearestFilter, SRGBColorSpace } from 'three';
+import {
+  BufferAttribute,
+  BufferGeometry,
+  CanvasTexture,
+  Color,
+  Matrix4,
+  NearestFilter,
+  SRGBColorSpace,
+  Vector3,
+} from 'three';
 import { hash } from '../../lib/games/rng';
 import {
   DIRT,
@@ -252,4 +261,24 @@ export class Geo {
     g.computeBoundingSphere();
     return g;
   }
+}
+
+// ---------- Licht ----------
+
+/**
+ * Ziel der Sonne auf das Raster der Schattenkarte legen. Folgt die Schattenkamera der Figur stufenlos, verschiebt sich
+ * ihr Raster in jedem Bild um Bruchteile eines Pixels, und Schattenkanten flimmern beim Laufen. Eingerastet bewegt sie
+ * sich nur in ganzen Pixeln: Quer zum Licht wird gerundet, entlang des Lichts nicht (das ändert das Bild nicht).
+ * `offset`: wo die Sonne vom Ziel aus steht; `texel`: Breite eines Pixels der Schattenkarte in Feldern.
+ */
+export function snapToShadowTexel(target: Vector3, offset: Vector3, texel: number): Vector3 {
+  const basis = new Matrix4().lookAt(offset, new Vector3(), new Vector3(0, 1, 0));
+  const right = new Vector3().setFromMatrixColumn(basis, 0);
+  const up = new Vector3().setFromMatrixColumn(basis, 1);
+  const along = new Vector3().setFromMatrixColumn(basis, 2);
+  const snap = (v: number) => Math.round(v / texel) * texel;
+  return right
+    .multiplyScalar(snap(target.dot(right)))
+    .add(up.multiplyScalar(snap(target.dot(up))))
+    .add(along.multiplyScalar(target.dot(along)));
 }

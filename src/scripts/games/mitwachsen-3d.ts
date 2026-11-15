@@ -52,7 +52,7 @@ import {
   type GateTheme,
   type Look,
 } from '../../data/games/mitwachsen';
-import { Geo, atlas, type Tile, type V3 } from './mitwachsen-geo';
+import { Geo, atlas, snapToShadowTexel, type Tile, type V3 } from './mitwachsen-geo';
 import { grown } from './mitwachsen-growth';
 import { gatehouse, parts, portalFrame, swirlCanvas, type Parts } from './mitwachsen-gatehouse';
 import { StoneNotes, stoneInto } from './mitwachsen-story-3d';
@@ -73,6 +73,8 @@ const BERRIES = [
   [0.88, 0.26, 0.4],
 ] as const;
 const DISTANCE = 18; // Abstand der Kamera zur Figur
+const SUN_OFFSET = new Vector3(-9, 22, 7); // Sonne von links oben vorn, vom Ziel aus
+const SHADOW_TEXEL = 36 / 2048; // Schattenkamera ±18 Felder auf 2048 Pixeln
 const RADIUS = 2; // Stücke um die Figur, die als Mesh vorliegen (5 × 5 = 80 × 80 Felder)
 const BUILD_PER_FRAME = 2; // neue Stücke je Bild, damit nichts ruckelt
 const FOG_N = 128; // Nebel-Maske: 128 × 128 Felder um die Figur (8 × 8 Stücke)
@@ -214,6 +216,7 @@ export class World3D {
     sc.near = 1;
     sc.far = 60;
     this.sun.shadow.bias = -0.0008;
+    this.sun.shadow.normalBias = 0.03; // gegen Streifen auf Wänden, die die Sonne schräg trifft (Shadow Acne)
     this.scene.add(
       this.sun,
       this.sun.target,
@@ -373,8 +376,9 @@ export class World3D {
     this.fogUniforms.mwTime.value = sc.now / 1000;
     this.fogUniforms.mwWind.value = sc.wind;
     // Sonne von links oben vorn; Schatten folgen der Figur
-    this.sun.position.set(tx - 9, ty + 22, tz + 7);
-    this.sun.target.position.set(tx, ty, tz);
+    const target = snapToShadowTexel(new Vector3(tx, ty, tz), SUN_OFFSET, SHADOW_TEXEL);
+    this.sun.position.copy(target).add(SUN_OFFSET);
+    this.sun.target.position.copy(target);
     const day = 1 - sc.night * 0.75;
     const cloud = sc.weather.cloud;
     // Licht der Richtung: Farbe und Helligkeit der Sonne, je näher am Tor, desto mehr
