@@ -35,7 +35,7 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 - **Endlos**, berechnet aus einem **Seed**. Derselbe Seed ergibt immer dieselbe Welt. Gespeichert werden nur Seed und Fortschritt, nie die Landschaft.
 - **Start auf der Lichtung:** Am Anfang gibt es nur das **Bett** in der Mitte einer großen Lichtung (gut 160 × 136 Felder) mit sanften Hügeln, mehreren Teichen, einzelnen Bäumen, Blumenwiesen und Steinen zum Klettern. Keine Mauer, kein Garten: Das entwickelt sich mit der Zeit.
 - **Frei zugänglich (aus dem ersten Spieltest):** Ein Dreijähriger kommt um einen Baum herum, bei mehreren dicht beieinander wird es schwierig. Darum stehen Bäume und Büsche einzeln, mit Platz ringsum. Büsche tragen rote Beeren, damit man sie nicht für Baumspitzen hält. Läuft man hinein, pflückt die Figur die Beeren und freut sich; nach kurzer Zeit wachsen neue. Keine Stufe ist höher als eins, so kommt man überall hinauf und nirgends in eine Ecke, aus der es nicht herausgeht. Die Tore liegen weit weg.
-- **Ringsum natürliche Felsen** mit leicht unregelmäßigem Rand, in Terrassen ansteigend. Sie sind eine feste Grenze: Man kann sie weder besteigen noch hineinfallen, darin vier **große Tore** (Norden, Osten, Süden, Westen). Sie sind vorerst verschlossen; dahinter liegen später Eiswelt, Sandwelt, Wasserwelt und Lavaberge. Vorerst ist nur die Lichtung spielbar.
+- **Ringsum natürliche Felsen** mit leicht unregelmäßigem Rand, in Terrassen ansteigend. Sie sind eine feste Grenze: Man kann sie weder besteigen noch hineinfallen. Darin stehen acht **große Tore**, eines je Welt. Wo sie stehen und in welcher Reihenfolge, würfelt jede Welt neu. Sie sind vorerst verschlossen; vorerst ist nur die Lichtung spielbar.
 - **Nebel:** Zu sehen ist nur, was das Kind schon erkundet hat. Dahinter verschwindet die Welt weich im Dunst, wie echter Nebel, und zeigt sich beim Herumlaufen (gespeichert).
 - Hinter den Toren: endlose, berechnete Landschaft in Stücken (16 × 16 Felder).
 - **Höhen:** Eine Stufe hinauf geht automatisch mit einem kleinen Hüpfer, auch auf Steine und Felsen; dann Stufe für Stufe weiter. Herunter geht immer, egal wie tief.
@@ -46,67 +46,89 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 | | |
 | --- | --- |
 | Tiere zum Entdecken | zehn Arten: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte, je vier Tiere (aus dem ersten Spieltest: die Lichtung war zu leer). Die Leiste zeigt jede Art einmal. |
-| Tore | Nordtor (Eiswelt), Osttor (Sandwelt), Südtor (Wasserwelt), Westtor (Lavaberge), alle vorerst zu. Oben auf dem Steinsturz jedes Tors liegen Blöcke, die verraten, was dahinter wartet: Eis, Sand, Wasser, leuchtende Lava |
+| Tore | acht, eines je Welt (Eis, Sand, Wasser, Lava, Höhle, Wald, Wolken, Pilze), Lage und Reihenfolge je Welt gewürfelt, alle vorerst zu. Jedes Torhaus ist im Stil seiner Welt geschmückt |
 
 Die Leiste unten ist die **Liste der entdeckten Tiere**: Umriss mit Fragezeichen = noch nicht entdeckt, in Farbe = entdeckt, Herz = folgt gerade. Einen Garten, in den sie ziehen, gibt es am Anfang nicht. Wie sich die Tore später öffnen, hängt an der Geschichte (siehe Ideen: Tiere befreien).
 
 ## Die Welten
 
-Die Lichtung ist das Zuhause mit dem Bett. Hinter jedem der vier großen Tore liegt eine eigene Welt mit eigenem Thema, eigenen Tieren und später einer eigenen Geschichte. Vorerst ist nur die Lichtung spielbar; die anderen Welten sind entworfen, aber noch nicht gebaut. Für alle gilt: freundlich und ungefährlich, nichts kann der Figur passieren, nichts geht verloren.
+Die Lichtung ist das Zuhause mit dem Bett. Hinter jedem der acht großen Tore liegt eine eigene Welt mit eigenem Thema, eigenen Pflanzen, später eigenen Tieren und einer eigenen Geschichte. Die Landschaft der Welten ist schon gebaut und durch die Tore zu sehen; betreten kann man sie noch nicht. Für alle gilt: freundlich und ungefährlich, nichts kann der Figur passieren, nichts geht verloren.
 
-| Welt | Wo | Stand | Thema (`GateTheme`) |
-| --- | --- | --- | --- |
-| **Lichtung** | Mitte, mit dem Bett | spielbar | – |
-| **Eiswelt** | hinter dem Nordtor | geplant | `eis` |
-| **Sandwelt** | hinter dem Osttor | geplant | `sand` |
-| **Wasserwelt** | hinter dem Südtor | geplant | `wasser` |
-| **Lavaberge** | hinter dem Westtor | geplant | `lava` |
-| **Höhlenwelt** | noch ohne Tor, vielleicht ein Höhleneingang im Felsring | Idee | `hoehle` |
+| Welt | Stand | Thema (`GateTheme`) |
+| --- | --- | --- |
+| **Lichtung** | spielbar | – |
+| **Eiswelt** | Landschaft gebaut, Tor zu | `eis` |
+| **Sandwelt** | Landschaft gebaut, Tor zu | `sand` |
+| **Wasserwelt** | Landschaft gebaut, Tor zu | `wasser` |
+| **Lavaberge** | Landschaft gebaut, Tor zu | `lava` |
+| **Höhlenwelt** | Landschaft gebaut, Tor zu | `hoehle` |
+| **Wald** | Landschaft gebaut, Tor zu | `wald` |
+| **Wolkenwelt** | Landschaft gebaut, Tor zu | `wolken` |
+| **Pilzwald** | Landschaft gebaut, Tor zu | `pilze` |
 
 **Was alle Welten verbindet:**
 
-- **Tor mit Themen-Blöcken:** Oben auf dem Steinsturz des Tors liegen Blöcke der Welt dahinter (Eis, Sand, Wasser, leuchtende Lava). So sieht das Kind schon vorher, was wartet.
-- **Portal neben dem Tor:** Daneben steht ein Portal im Thema der Welt, zuerst leer. Läuft das Kind hinein, leuchtet es auf und bleibt an. Gleichzeitig erscheint sein Gegenstück wenige Schritte über dem Bett. Von da an kann das Kind zwischen Bett und Tor hin- und herreisen, folgende Tiere reisen mit. Die Portale sind schon umgesetzt, auch solange die Tore zu sind.
-- **Eigene Tiere:** Jede Welt hat ihre eigenen verlorenen Tiere. Die Vorschläge unten sind Ideen, gemeinsam mit dem Kind auszusuchen.
-- **Gleiche Regeln:** Klettern, Nebel, Singen, Folgen und Schlafen bleiben überall gleich. Neu ist nur, wie die Welt aussieht und klingt.
+- **Die Welt wächst beim Laufen:** Alles entsteht aus dem Seed, Stück für Stück, wenn die Figur dorthin kommt. Derselbe Seed ergibt immer dieselbe Welt, ein anderer eine andere: Die Tore stehen in jeder Welt woanders und in anderer Reihenfolge. In Richtung jedes Tors liegt seine Welt, endlos.
+- **Mächtiges Torhaus:** Neun Felder breit, hohe Türme, eine geschlossene Doppeltür mit leuchtendem Zeichen in der Farbe der Welt, und Schmuck, der verrät, was dahinter wartet (Eiszapfen, Wasserfälle, glühende Lava-Adern, Kristalle, Laubkronen, ein Regenbogen, Riesenpilze). Vor dem Tor ist eine freie Bucht; steht das Kind davor, lichtet sich der Nebel im Gang dahinter, und es sieht schon ein Stück der Welt. Hinter das Tor kommt man nicht, auch nicht außen herum.
+- **Portal neben dem Tor:** Drei Felder breit mit Säulen und Krone im Thema der Welt, zuerst leer. Läuft das Kind hinein, leuchtet es auf, ein Wirbel dreht sich, Funken kreisen, und es bleibt an. Gleichzeitig erscheint sein Gegenstück im Kreis um das Bett, in Richtung seines Tors (vorher zeigen dort zwei kleine Sockel, wo es stehen wird). Von da an kann das Kind zwischen Bett und Tor hin- und herreisen, folgende Tiere reisen mit.
+- **Eigene Tiere:** Jede Welt bekommt ihre eigenen verlorenen Tiere, sobald man hinein kann. Die Vorschläge unten sind Ideen, gemeinsam mit dem Kind auszusuchen.
+- **Gleiche Regeln:** Klettern, Nebel, Folgen und Schlafen bleiben überall gleich. Neu ist nur, wie die Welt aussieht und klingt.
 - **Öffnen der Tore:** Wie die Tore aufgehen, hängt an der Geschichte (siehe Ideen: Tiere befreien). Bis dahin bleiben sie zu.
 
 ### Lichtung
 
 Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzelnen Bäumen, Blumenwiesen und Klettersteinen, ringsum Felsen als feste Grenze. In der Mitte das Bett, darüber später die vier Portale in einer Reihe. Zehn Tiere: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte. Tag und Nacht, Schmetterlinge, nachts Glühwürmchen.
 
-### Eiswelt (Nordtor)
+### Eiswelt
 
 - **Aussehen:** Schneefelder, glitzernde Eisblöcke zum Klettern, zugefrorene Seen, verschneite Tannen, Iglus. Kühles, helles Licht, sanfter Schneefall (nicht bei reduzierter Bewegung).
 - **Besonderes:** Auf Eis rutscht die Figur nicht (das wäre für ein kleines Kind frustrierend), es knirscht nur beim Laufen.
 - **Tiere (Ideen):** Pinguin, Eisbär, Robbe, Schneehase, Schneeeule.
 - **Portal:** hellblau, Rahmen aus Eis.
 
-### Sandwelt (Osttor)
+### Sandwelt
 
 - **Aussehen:** Dünen in sanften Stufen, Kakteen, Palmen an einer kleinen Oase, Sandsteinfelsen, warmes Licht.
 - **Besonderes:** Fußspuren im Sand, die langsam verwehen (reine Zierde).
 - **Tiere (Ideen):** Kamel, Erdmännchen, Eidechse, Wüstenfuchs, Schildkröte aus der Oase.
 - **Portal:** goldgelb, Rahmen aus Sandstein.
 
-### Wasserwelt (Südtor)
+### Wasserwelt
 
 - **Aussehen:** Viele kleine Inseln und Strände, verbunden durch Stege, Brücken und Trittsteine; Seerosen, Boote am Ufer, ein Leuchtturm.
 - **Besonderes:** Wasser bleibt nicht begehbar, die Wege führen darüber. Wellen und Glitzern, leises Plätschern.
 - **Tiere (Ideen):** Fisch (springt aus dem Wasser), Krebs, Seestern, Möwe, Otter.
 - **Portal:** blau, Rahmen aus Wasserblöcken.
 
-### Lavaberge (Westtor)
+### Lavaberge
 
 - **Aussehen:** Dunkle Felsen und Berge, dazwischen glühende Lavaflüsse, die warm leuchten, auch nachts. Höher als die anderen Welten, mit viel zum Klettern.
 - **Besonderes:** Ganz ungefährlich: Die Figur kommt nicht in die Lava, die Lava leuchtet nur. Kein Feuer, kein Rauch, der Angst macht.
 - **Tiere (Ideen):** Bergziege, Salamander, Murmeltier, Adler, Steinbock.
 - **Portal:** orange, Rahmen aus leuchtender Lava.
 
-### Höhlenwelt (Idee)
+### Wald
+
+- **Aussehen:** Dichter, aber lichter Wald mit Eichen, Birken, Tannen und Herbstbäumen, Beerenbüsche, Farne, Pilze, kleine Teiche.
+- **Tiere (Ideen):** Reh, Wildschwein, Eule, Dachs, Specht.
+- **Portal:** grün, Säulen aus Holz, oben Laub.
+
+### Wolkenwelt
+
+- **Aussehen:** Weiße Wolkeninseln in verschiedenen Höhen, dazwischen nur Himmel. Am Tor ein Regenbogen.
+- **Besonderes:** Wenn man hineinkann, braucht es Wolkenbrücken zwischen den Inseln. Niemand fällt hinunter.
+- **Tiere (Ideen):** Wolkenschaf, Vögel, Schmetterlinge, ein kleiner Drache (freundlich).
+- **Portal:** goldgelb, Säulen aus Wolken.
+
+### Pilzwald
+
+- **Aussehen:** Lila Moos, Riesenpilze mit roten, blauen und orangen Hüten, viele kleine Pilze.
+- **Tiere (Ideen):** Schnecke, Glühwürmchen, Igel, Maus.
+- **Portal:** lila, Säulen wie Pilzstiele, oben ein roter Hut.
+
+### Höhlenwelt
 
 - **Aussehen:** Dunkle Steinblöcke, leuchtende Kristalle und Pilze als Lichtquellen, unterirdische Seen. Nie ganz dunkel: Es bleibt immer genug Licht, damit nichts unheimlich wirkt.
-- **Wo:** Noch offen, vielleicht ein Höhleneingang im Felsring der Lichtung statt eines fünften Tors.
 - **Tiere (Ideen):** Fledermaus, Maulwurf, Glühwürmchen, Höhlenmolch.
 - **Portal:** lila, Rahmen aus dunklem Stein (das Thema `hoehle` gibt es schon).
 
@@ -229,7 +251,7 @@ Gespielt wird direkt auf der Homepage: Sobald eine Stufe spielbar ist, spielt de
 
 Nur gesammelt, noch nicht ausgeplant.
 
-- **Welten hinter den Toren:** Eiswelt, Sandwelt, Wasserwelt, Lavaberge und die Höhlenwelt sind oben unter „Die Welten“ beschrieben.
+- **Welten hinter den Toren:** Alle acht sind oben unter „Die Welten“ beschrieben. Weitere Ideen: Blumenland, Herbstwald, Strand mit Gezeiten.
 - **Tiere befreien:** Später sollen die Tiere nicht nur entdeckt, sondern befreit werden. Daran hängt auch, wie sich die großen Tore öffnen. Die Geschichte dazu fehlt noch: Wovon werden die Tiere befreit, und warum? (Für ein kleines Kind freundlich, ohne Bösewicht, der Angst macht.)
 - **Garten:** entsteht mit der Zeit am Bett; Regeln und Tests stehen schon (siehe Bett, Nacht, später der Garten).
 - **Portale:** Umgesetzt für die großen Tore (siehe Spec). Noch offen: Der Heimweg-Pfeil zeigt auf das Portal, wenn der Weg darüber kürzer ist.

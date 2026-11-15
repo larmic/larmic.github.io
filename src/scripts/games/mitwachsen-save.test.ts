@@ -70,8 +70,8 @@ describe('Welten speichern', () => {
     const p = {
       met: ['zuhause:hase'],
       garden: [{ id: 'zuhause:hase', species: 'hase' as const }],
-      openGates: ['nordtor' as const],
-      portals: ['westtor' as const],
+      openGates: ['eis' as const],
+      portals: ['lava' as const],
       position: [3, 4] as [number, number],
     };
     expect(progressFrom(withProgress(w, p))).toEqual(p);
@@ -136,7 +136,7 @@ describe('Format und Umzug (migrate)', () => {
   it('verwirft unbekannte Tore und Tierarten, räumt Listen auf und repariert Felder', () => {
     const raw = {
       ...newWorld('a', 1, 'X'),
-      openGates: ['nordtor', 'mondtor', 3],
+      openGates: ['eis', 'nordtor', 3],
       metAnimals: ['b', 'a', 'a', 7],
       homeAnimals: [{ id: 'p', species: 'hase' }, { id: 'q', species: 'drache' }, 'kaputt'],
       position: [1.5, 2],
@@ -144,7 +144,7 @@ describe('Format und Umzug (migrate)', () => {
       worldName: '<script>Welt',
     };
     const w = migrate(raw)!;
-    expect(w.openGates).toEqual(['nordtor']);
+    expect(w.openGates).toEqual(['eis']);
     expect(w.metAnimals).toEqual(['a', 'b']);
     expect(w.homeAnimals).toEqual([{ id: 'p', species: 'hase' }]);
     expect(w.position).toEqual([0, 0]);

@@ -64,6 +64,16 @@ export type Scene = {
   explored: (x: number, y: number) => boolean; // Nebel: nur Erkundetes wird gezeigt
 };
 
+/** Böden der Welten hinter den Toren in der 2D-Ansicht: Seite, Oberseite */
+const FLAT_GROUND: Partial<Record<Cell['ground'], [string, string]>> = {
+  snow: ['#cfd8de', '#f4f8fb'],
+  ice: ['#9fd6ef', '#d4f1ff'],
+  basalt: ['#2a2b30', '#3a3b42'],
+  cave: ['#2a2c33', '#3c3f47'],
+  cloud: ['#e6eef7', '#ffffff'],
+  moss: ['#6a4a3a', '#8a76cc'],
+};
+
 const PAL_SAND: Palette = { D: [['#e3cf95', 1]], d: [['#d4bd7d', 1]], e: [['#efdeaa', 1]] };
 const PAL_PATH: Palette = { D: [['#c9a46e', 1]], d: [['#b48d58', 1]], e: [['#d8b783', 1]] };
 
@@ -266,6 +276,20 @@ export class Renderer {
     const c = world.cell(x, y);
     if (!sc.explored(x, y)) return; // im Nebel: nichts, der Himmel scheint durch
     if (c.ground === 'water') return this.water(P, world, x, y, sc);
+    if (c.ground === 'sky') return; // zwischen den Wolken: nur Himmel
+    if (c.ground === 'lava') {
+      box(this.ctx, P, x, y, 0, 1, 1, 0.6, '#b8380a', '#ff7a1a');
+      return;
+    }
+    const flat = FLAT_GROUND[c.ground];
+    if (flat) {
+      // Böden der Welten hinter den Toren: einfache Blöcke in ihren Farben
+      const frontH = world.cell(x, y + 1).h;
+      for (let k = Math.max(0, Math.min(c.h - 1, frontH)); k < c.h; k++) box(this.ctx, P, x, y, k, 1, 1, 1, ...flat);
+      this.edges(P, world, x, y, c.h);
+      this.haze(P, x, y, c.h, sc);
+      return;
+    }
     const front = world.cell(x, y + 1);
     const frontH = front.ground === 'water' ? 0 : front.h;
     const low = Math.max(0, Math.min(c.h - 1, frontH));
@@ -428,9 +452,31 @@ export class Renderer {
       birch: ['#6aab3a', '#8fcf5a'],
       autumn: ['#d9732e', '#f0a04a'],
       blossom: ['#e595bd', '#f6c3dc'],
+      pine: ['#2f6f3a', '#3f8a48'],
+      snowpine: ['#2f6f3a', '#ffffff'],
+      palm: ['#3f9a3c', '#5ab651'],
+      dead: ['#4a3426', '#5d3e21'],
     };
     const [leaf, top] = leaves[kind];
     this.shadow(P, x + 0.5, y + 0.6, h, 0.7);
+    if (kind === 'pine' || kind === 'snowpine') {
+      box(ctx, P, x + 0.4, y + 0.42, h, 0.2, 0.2, 0.7, '#7a5432', '#93683f');
+      box(ctx, P, x - 0.25, y - 0.1, h + 0.5, 1.5, 1.2, 0.6, leaf, top);
+      box(ctx, P, x, y + 0.1, h + 1.2, 1.0, 0.8, 0.6, leaf, top);
+      box(ctx, P, x + 0.2, y + 0.25, h + 1.8, 0.6, 0.5, 0.6, leaf, top);
+      return;
+    }
+    if (kind === 'palm') {
+      box(ctx, P, x + 0.4, y + 0.42, h, 0.22, 0.2, 2.1, '#a77c46', '#c9a066');
+      box(ctx, P, x - 0.6, y + 0.3, h + 2.1, 2.4, 0.4, 0.14, leaf, top);
+      box(ctx, P, x + 0.35, y - 0.6, h + 2.1, 0.32, 2.2, 0.14, leaf, top);
+      return;
+    }
+    if (kind === 'dead') {
+      box(ctx, P, x + 0.4, y + 0.42, h, 0.2, 0.2, 1.5, leaf, top);
+      box(ctx, P, x + 0.15, y + 0.45, h + 0.9, 0.3, 0.1, 0.1, leaf);
+      return;
+    }
     if (kind === 'birch') {
       box(ctx, P, x + 0.4, y + 0.42, h, 0.2, 0.2, 1.5, '#e8e4d8', '#f3efe6');
       for (const z of [0.3, 0.75, 1.15]) box(ctx, P, x + 0.4, y + 0.6, h + z, 0.12, 0.02, 0.06, '#3a3a44');
@@ -602,34 +648,64 @@ export class Renderer {
         this.fence(P, world, x, y, h, 1);
         break;
       case 'biggate': {
-        // Großes Tor im Felsen (vorerst zu): Holz mit Eisenbändern, oben Stein; Ost- und Westtor laufen nach vorn
-        const along = world.cell(x, y - 1).deco === 'biggate' || world.cell(x, y + 1).deco === 'biggate';
-        if (along) {
-          box(ctx, P, x + 0.35, y, h, 0.3, 1, 2.4, '#8a5a30', '#a0703f');
-          for (const z of [0.5, 1.7]) box(ctx, P, x + 0.3, y, h + z, 0.4, 1, 0.12, '#3a3a44');
-          box(ctx, P, x + 0.2, y - 0.02, h + 2.4, 0.6, 1.04, 0.45, '#8f949b', '#a8adb3');
-        } else {
-          box(ctx, P, x, y + 0.35, h, 1, 0.3, 2.4, '#8a5a30', '#a0703f');
-          for (const z of [0.5, 1.7]) box(ctx, P, x, y + 0.3, h + z, 1, 0.4, 0.12, '#3a3a44');
-          box(ctx, P, x - 0.02, y + 0.2, h + 2.4, 1.04, 0.6, 0.45, '#8f949b', '#a8adb3');
-        }
-        // Themen-Block oben auf dem Tor: verrät, welche Welt dahinter liegt
-        const theme = THEME_COLORS[GATES.find((g) => g.id === c.gate)?.theme ?? 'hoehle'];
-        box(ctx, P, x + 0.1, y + 0.1, h + 2.85, 0.8, 0.8, 0.8, theme.side, theme.top);
+        // Großes Tor (zu): Holztür mit Eisenbändern, darüber der Torbogen in den Farben seiner Welt
+        const theme = THEME_COLORS[c.gate!];
+        box(ctx, P, x, y + 0.35, h, 1, 0.3, 4.7, '#6b4423', '#7d5232');
+        for (const z of [0.7, 2.3, 3.9]) box(ctx, P, x, y + 0.3, h + z, 1, 0.4, 0.18, '#3a3a44');
+        box(ctx, P, x, y + 0.1, h + 4.7, 1, 0.8, 1.2, theme.side, theme.top);
+        const [mx, my] = world.gates.get(c.gate!)!.mid;
+        if (x === mx && y === my) box(ctx, P, x + 0.3, y + 0.28, h + 2.2, 0.4, 0.04, 0.6, theme.portal); // Zeichen in der Mitte
+        break;
+      }
+      case 'gatetower': {
+        const theme = THEME_COLORS[c.part!.id];
+        box(ctx, P, x, y, h, 1, 1, 6.6, theme.side, theme.top);
+        box(ctx, P, x + 0.3, y + 0.3, h + 6.6, 0.4, 0.4, 0.6, theme.portal);
         break;
       }
       case 'portal': {
-        // Portal: Rahmen im Thema des Tors; über dem Bett erst nach der Aktivierung, innen leuchtend, wenn aktiv
+        // Portal: Sturz über drei Felder und innen leuchtend, wenn aktiv; am Bett erst nach der Aktivierung
         const id = c.portal!.id;
         const active = state.portals.includes(id);
         if (c.portal!.side === 'home' && !active) break;
-        const theme = THEME_COLORS[GATES.find((g) => g.id === id)!.theme];
-        box(ctx, P, x + 0.02, y + 0.35, h, 0.22, 0.3, 2.2, theme.side, theme.top);
-        box(ctx, P, x + 0.76, y + 0.35, h, 0.22, 0.3, 2.2, theme.side, theme.top);
-        if (active) box(ctx, P, x + 0.24, y + 0.48, h + 0.05, 0.52, 0.04, 2.1, theme.portal);
-        box(ctx, P, x - 0.05, y + 0.3, h + 2.2, 1.1, 0.4, 0.3, theme.side, theme.top);
+        const theme = THEME_COLORS[id];
+        const p = world.portals.get(id)!;
+        const [fx] = c.portal!.side === 'gate' ? p.gateFacing : p.homeFacing;
+        if (active) box(ctx, P, x + 0.1, y + 0.45, h + 0.1, 0.8, 0.1, 3.1, theme.portal);
+        if (fx === 0) box(ctx, P, x - 1, y + 0.3, h + 3.4, 3, 0.4, 0.6, theme.side, theme.top);
+        else box(ctx, P, x + 0.3, y - 1, h + 3.4, 0.4, 3, 0.6, theme.side, theme.top);
+        box(ctx, P, x + 0.35, y + 0.35, h + 4.0, 0.3, 0.3, 0.4, theme.portal);
         break;
       }
+      case 'portalside': {
+        const { id, side } = c.part!;
+        const theme = THEME_COLORS[id];
+        if (side === 'home' && !state.portals.includes(id))
+          box(ctx, P, x + 0.2, y + 0.2, h, 0.6, 0.6, 0.5, theme.side, theme.top);
+        else box(ctx, P, x + 0.15, y + 0.15, h, 0.7, 0.7, 3.4, theme.side, theme.top);
+        break;
+      }
+      case 'cactus':
+        box(ctx, P, x + 0.37, y + 0.42, h, 0.26, 0.2, 1.35, '#3f8f3a', '#5aab4a');
+        box(ctx, P, x + 0.13, y + 0.45, h + 0.55, 0.14, 0.14, 0.55, '#3f8f3a', '#5aab4a');
+        box(ctx, P, x + 0.73, y + 0.45, h + 0.8, 0.14, 0.14, 0.45, '#3f8f3a', '#5aab4a');
+        break;
+      case 'crystal':
+        box(ctx, P, x + 0.36, y + 0.4, h, 0.28, 0.24, 1.15, c.color ?? '#b48cf0');
+        box(ctx, P, x + 0.14, y + 0.55, h, 0.2, 0.16, 0.7, c.color ?? '#b48cf0');
+        break;
+      case 'stalagmite':
+        box(ctx, P, x + 0.22, y + 0.3, h, 0.56, 0.5, 0.5, '#2a2c33', '#3c3f47');
+        box(ctx, P, x + 0.32, y + 0.38, h + 0.5, 0.36, 0.32, 0.5, '#2a2c33', '#3c3f47');
+        box(ctx, P, x + 0.41, y + 0.45, h + 1.0, 0.18, 0.16, 0.45, '#2a2c33', '#3c3f47');
+        break;
+      case 'bigshroom':
+        box(ctx, P, x + 0.36, y + 0.42, h, 0.28, 0.24, 1.4, '#efe4d2', '#f7efe2');
+        box(ctx, P, x - 0.25, y - 0.1, h + 1.4, 1.5, 1.2, 0.45, c.color ?? '#d9473a');
+        break;
+      case 'cloudpuff':
+        box(ctx, P, x + 0.15, y + 0.3, h, 0.6, 0.4, 0.3, '#e6eef7', '#ffffff');
+        break;
       case 'gate':
         this.fence(P, world, x, y, h, 1 - (sc.gates.get(c.gate!) ?? 0));
         break;

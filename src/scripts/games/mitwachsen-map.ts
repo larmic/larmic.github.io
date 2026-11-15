@@ -24,8 +24,23 @@ const COLORS = {
   roof: '#c0453a',
 };
 
+/** Böden der Welten hinter den Toren */
+const WORLD_GROUND: Partial<Record<Cell['ground'], string>> = {
+  snow: '#f4f8fb',
+  ice: '#bfe6f5',
+  basalt: '#3a3b42',
+  lava: '#ff7a1a',
+  cave: '#3c3f47',
+  cloud: '#ffffff',
+  sky: '#c9e6f7',
+  moss: '#8a76cc',
+};
+
 function colorOf(c: Cell): string {
-  if (c.gate || c.deco === 'gate') return COLORS.gate;
+  if (c.gate) return THEME_COLORS[c.gate].side;
+  if (c.deco === 'gatetower' || c.deco === 'portalside') return THEME_COLORS[c.part!.id].side;
+  if (c.deco === 'gate') return COLORS.gate;
+  if (WORLD_GROUND[c.ground]) return WORLD_GROUND[c.ground]!;
   if (c.ground === 'water') return COLORS.water;
   if (c.deco === 'tree') return COLORS.tree;
   if (c.deco === 'bush' || c.deco === 'hedge') return COLORS.bush;

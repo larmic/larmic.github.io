@@ -7,7 +7,7 @@
 // Die Welt wird in Stücken zu einem Mesh gebaut: Boden, Zierde und Wasser, alles mit einer Textur-Kachel.
 
 import {
-  BufferAttribute,
+  BoxGeometry,
   BufferGeometry,
   CanvasTexture,
   DataTexture,
@@ -25,7 +25,6 @@ import {
   HemisphereLight,
   Mesh,
   MeshLambertMaterial,
-  NearestFilter,
   PCFShadowMap,
   PerspectiveCamera,
   Scene as ThreeScene,
@@ -36,22 +35,6 @@ import {
 import { CHUNK, chunkOf } from '../../lib/games/chunks';
 import type { Dir, Part, Projection } from '../../lib/games/front';
 import { hash } from '../../lib/games/rng';
-import {
-  DIRT,
-  GRASS_SIDE,
-  GRASS_TOP,
-  LEAVES,
-  LOG_SIDE,
-  LOG_TOP,
-  PAL_GRASS,
-  PAL_LOG,
-  PAL_SHELF,
-  PAL_STONE,
-  PLANKS,
-  STONE,
-  type Grid,
-  type Palette,
-} from '../../lib/voxel/textures';
 import {
   GAME_COLORS,
   GATES,
@@ -64,6 +47,8 @@ import {
   type GateTheme,
   type Look,
 } from '../../data/games/mitwachsen';
+import { Geo, atlas, type Tile, type V3 } from './mitwachsen-geo';
+import { gatehouse, parts, portalFrame, swirlCanvas, type Parts } from './mitwachsen-gatehouse';
 import type { Scene } from './mitwachsen-render';
 import type { State } from './mitwachsen-state';
 import type { Cell, TreeKind, World } from './mitwachsen-world';
@@ -85,195 +70,6 @@ const RADIUS = 2; // Stücke um die Figur, die als Mesh vorliegen (5 × 5 = 80 �
 const BUILD_PER_FRAME = 2; // neue Stücke je Bild, damit nichts ruckelt
 const FOG_N = 128; // Nebel-Maske: 128 × 128 Felder um die Figur (8 × 8 Stücke)
 
-// ---------- Textur-Kacheln ----------
-
-type Tile =
-  | 'grassTop'
-  | 'grassSide'
-  | 'dirt'
-  | 'stone'
-  | 'sand'
-  | 'path'
-  | 'leaves'
-  | 'log'
-  | 'logTop'
-  | 'planks'
-  | 'white'
-  | 'lava'
-  | 'ice'
-  | 'cave'
-  | 'water';
-const TILES: Tile[] = [
-  'grassTop',
-  'grassSide',
-  'dirt',
-  'stone',
-  'sand',
-  'path',
-  'leaves',
-  'log',
-  'logTop',
-  'planks',
-  'white',
-  'lava',
-  'ice',
-  'cave',
-  'water',
-];
-const TPX = 16; // Pixel je Kachel: 8 × 8-Raster mit feiner Körnung in 2 × 2 Unterpixeln
-const COLS = 4;
-const PAL_SAND: Palette = { D: [['#e3cf95', 1]], d: [['#d4bd7d', 1]], e: [['#efdeaa', 1]] };
-const PAL_PATH: Palette = { D: [['#c9a46e', 1]], d: [['#b48d58', 1]], e: [['#d8b783', 1]] };
-// Themen-Blöcke auf den großen Toren
-const PAL_LAVA: Palette = { D: [['#ff7a1a', 1]], d: [['#b8380a', 1]], e: [['#ffd34d', 1]] };
-const PAL_ICE: Palette = { S: [['#bfe6f5', 1]], s: [['#a2d6ee', 1]], r: [['#f2fbff', 1]] };
-const PAL_CAVE: Palette = { S: [['#3c3f47', 1]], s: [['#2a2c33', 1]], r: [['#5a5f70', 1]] };
-const PAL_WATER: Palette = { D: [['#3f8fd8', 1]], d: [['#2f6fb8', 1]], e: [['#8cc6f0', 1]] };
-// Blätter in Grau: Die Baumart färbt sie über die Vertex-Farbe (grün, orange, rosa)
-const PAL_LEAVES_GRAY: Palette = {
-  F: [['#e6e6e6', 1]],
-  f: [['#cccccc', 1]],
-  k: [['#ffffff', 1]],
-  q: [['#b4b4b4', 1]],
-};
-const SOURCES: Record<Tile, [Grid, Palette] | null> = {
-  grassTop: [GRASS_TOP, PAL_GRASS],
-  grassSide: [GRASS_SIDE, PAL_GRASS],
-  dirt: [DIRT, PAL_GRASS],
-  stone: [STONE, PAL_STONE],
-  sand: [DIRT, PAL_SAND],
-  path: [DIRT, PAL_PATH],
-  leaves: [LEAVES, PAL_LEAVES_GRAY],
-  log: [LOG_SIDE, PAL_LOG],
-  logTop: [LOG_TOP, PAL_LOG],
-  planks: [PLANKS, PAL_SHELF],
-  white: null,
-  lava: [DIRT, PAL_LAVA],
-  ice: [STONE, PAL_ICE],
-  cave: [STONE, PAL_CAVE],
-  water: [DIRT, PAL_WATER],
-};
-
-function atlas(): CanvasTexture {
-  const rows = Math.ceil(TILES.length / COLS);
-  const canvas = document.createElement('canvas');
-  canvas.width = COLS * TPX;
-  canvas.height = rows * TPX;
-  const ctx = canvas.getContext('2d')!;
-  TILES.forEach((t, i) => {
-    const ox = (i % COLS) * TPX,
-      oy = Math.floor(i / COLS) * TPX;
-    const src = SOURCES[t];
-    if (!src) {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(ox, oy, TPX, TPX);
-      return;
-    }
-    const [grid, pal] = src;
-    const px = TPX / grid.length;
-    grid.forEach((row, r) => {
-      for (let c = 0; c < row.length; c++)
-        for (const [color, alpha] of pal[row[c]] ?? []) {
-          ctx.globalAlpha = alpha;
-          ctx.fillStyle = color;
-          ctx.fillRect(ox + c * px, oy + r * px, px, px);
-        }
-    });
-    ctx.globalAlpha = 1;
-    // feine Körnung wie in der 2D-Ansicht
-    for (let r = 0; r < TPX; r++)
-      for (let c = 0; c < TPX; c++) {
-        const v = hash(i + 1, c, r) / 4294967296 - 0.5;
-        ctx.fillStyle = v > 0 ? `rgba(255,255,255,${(v * 0.14).toFixed(3)})` : `rgba(0,0,0,${(-v * 0.14).toFixed(3)})`;
-        ctx.fillRect(ox + c, oy + r, 1, 1);
-      }
-  });
-  const tex = new CanvasTexture(canvas);
-  tex.magFilter = NearestFilter;
-  tex.minFilter = NearestFilter;
-  tex.generateMipmaps = false;
-  tex.colorSpace = SRGBColorSpace;
-  return tex;
-}
-
-function tileUV(t: Tile): [number, number, number, number] {
-  const i = TILES.indexOf(t);
-  const rows = Math.ceil(TILES.length / COLS);
-  const w = COLS * TPX,
-    h = rows * TPX;
-  const e = 0.02; // etwas nach innen, damit Nachbarkacheln nicht durchblitzen
-  const x = (i % COLS) * TPX,
-    y = Math.floor(i / COLS) * TPX;
-  return [(x + e) / w, 1 - (y + TPX - e) / h, (x + TPX - e) / w, 1 - (y + e) / h];
-}
-
-// ---------- Geometrie aus Quadern und Flächen ----------
-
-type V3 = [number, number, number];
-/** Farbe ohne Alphakanal: rgba(…) wird zu rgb(…), Three.js kennt in Vertex-Farben keine Deckkraft */
-const col = (c: string | Color) =>
-  typeof c === 'string' ? new Color(c.replace(/^rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)$/, 'rgb($1,$2,$3)')) : c;
-
-class Geo {
-  private pos: number[] = [];
-  private nor: number[] = [];
-  private uv: number[] = [];
-  private rgb: number[] = [];
-  private idx: number[] = [];
-
-  /** Viereck a-b-c-d gegen den Uhrzeigersinn von außen gesehen; a-b unten, c-d oben */
-  quad(a: V3, b: V3, c: V3, d: V3, n: V3, tile: Tile, color: Color) {
-    const base = this.pos.length / 3;
-    const [u0, v0, u1, v1] = tileUV(tile);
-    for (const p of [a, b, c, d]) this.pos.push(...p);
-    for (let i = 0; i < 4; i++) {
-      this.nor.push(...n);
-      this.rgb.push(color.r, color.g, color.b);
-    }
-    this.uv.push(u0, v0, u1, v0, u1, v1, u0, v1);
-    this.idx.push(base, base + 1, base + 2, base, base + 2, base + 3);
-  }
-
-  /** Quader (x, y = Höhe, z) mit Größe (w, h, d); Seiten und Oberseite einzeln einfärb- und texturierbar */
-  box(
-    x: number,
-    y: number,
-    z: number,
-    w: number,
-    h: number,
-    d: number,
-    side: string | Color,
-    top?: string | Color | null,
-    tile: Tile = 'white',
-    topTile?: Tile,
-  ) {
-    const s = col(side),
-      t = col(top ?? side);
-    const [x0, y0, z0, x1, y1, z1] = [x, y, z, x + w, y + h, z + d];
-    const tt = topTile ?? tile;
-    this.quad([x0, y1, z1], [x1, y1, z1], [x1, y1, z0], [x0, y1, z0], [0, 1, 0], tt, t);
-    this.quad([x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1], [0, 0, 1], tile, s);
-    this.quad([x1, y0, z0], [x0, y0, z0], [x0, y1, z0], [x1, y1, z0], [0, 0, -1], tile, s);
-    this.quad([x1, y0, z1], [x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [1, 0, 0], tile, s);
-    this.quad([x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [x0, y1, z0], [-1, 0, 0], tile, s);
-  }
-
-  get empty() {
-    return this.idx.length === 0;
-  }
-
-  build(): BufferGeometry {
-    const g = new BufferGeometry();
-    g.setAttribute('position', new BufferAttribute(new Float32Array(this.pos), 3));
-    g.setAttribute('normal', new BufferAttribute(new Float32Array(this.nor), 3));
-    g.setAttribute('uv', new BufferAttribute(new Float32Array(this.uv), 2));
-    g.setAttribute('color', new BufferAttribute(new Float32Array(this.rgb), 3));
-    g.setIndex(this.idx);
-    g.computeBoundingSphere();
-    return g;
-  }
-}
-
 /** Modell aus Teilen (wie in der 2D-Ansicht), mit Blick nach Osten (+x): vorn → x, rechts → z, oben → y */
 function modelGeometry(parts: readonly Part[]): BufferGeometry {
   const g = new Geo();
@@ -284,7 +80,29 @@ const YAW: Record<Dir, number> = { e: 0, s: -Math.PI / 2, w: Math.PI, n: Math.PI
 
 // ---------- Die 3D-Welt ----------
 
-const LEAF: Record<TreeKind, string> = { oak: '#4fa84a', birch: '#7cbf48', autumn: '#e8823a', blossom: '#f0a8c8' };
+const LEAF: Record<TreeKind, string> = {
+  oak: '#4fa84a',
+  birch: '#7cbf48',
+  autumn: '#e8823a',
+  blossom: '#f0a8c8',
+  pine: '#2f6f3a',
+  snowpine: '#2f6f3a',
+  palm: '#4fa84a',
+  dead: '#5d3e21',
+};
+/** Kacheln der Böden: Oberseite, oberste Seitenkachel, Seiten darunter */
+const GROUND_TILES: Record<Exclude<Cell['ground'], 'water' | 'lava' | 'sky'>, [Tile, Tile, Tile]> = {
+  grass: ['grassTop', 'grassSide', 'dirt'],
+  stone: ['stone', 'stone', 'stone'],
+  sand: ['sand', 'sand', 'sand'],
+  path: ['path', 'dirt', 'dirt'],
+  snow: ['snowTop', 'snowSide', 'dirt'],
+  ice: ['ice', 'ice', 'ice'],
+  basalt: ['basalt', 'basalt', 'basalt'],
+  cave: ['cave', 'cave', 'cave'],
+  cloud: ['cloud', 'cloud', 'cloud'],
+  moss: ['mossTop', 'mossSide', 'dirt'],
+};
 const SKY = new Color('#9fd6f0');
 const NIGHT_SKY = new Color('#141a3a');
 
@@ -319,11 +137,14 @@ export class World3D {
   private dark = new MeshLambertMaterial({ color: GAME_COLORS.silhouette }); // verlorene Tiere auf den Tafeln
   private lava!: MeshLambertMaterial; // leuchtet auch nachts
   private canopy!: MeshLambertMaterial;
-  private themes = new Group(); // Blöcke oben auf den großen Toren
+  private gateGroup = new Group(); // Torhäuser
+  private gateSolid!: MeshLambertMaterial; // Mauerwerk der Torhäuser und Portale: vor der Figur durchsichtig
+  private bright!: MeshBasicMaterial; // leuchtet aus sich selbst: Kristalle, Zeichen, Wasserfälle
+  private swirl!: CanvasTexture; // Wirbel in aktiven Portalen
   private portalGroup = new Group();
   private portalParts = new Map<
     GateId,
-    { gateInner: Mesh; home: Group; homeInner: Mesh; cell: readonly [number, number] }
+    { gateInner: Mesh; home: Group; homeInner: Mesh; stubs: Group; sparks: Mesh[]; cell: readonly [number, number] }
   >();
   private chunks = new Map<string, Chunk>();
   private picked: Record<string, number> = {}; // Büsche ohne Beeren (aus den Regeln)
@@ -353,10 +174,16 @@ export class World3D {
       emissiveIntensity: 0.7,
     });
     this.foliage = new MeshLambertMaterial({ vertexColors: true, side: DoubleSide });
+    this.gateSolid = new MeshLambertMaterial({ map: tex, vertexColors: true });
+    this.bright = new MeshBasicMaterial({ map: tex, vertexColors: true });
+    this.swirl = new CanvasTexture(swirlCanvas());
+    this.swirl.center.set(0.5, 0.5);
+    this.swirl.colorSpace = SRGBColorSpace;
     this.fogTex.magFilter = LinearFilter;
     this.fogTex.minFilter = LinearFilter;
-    for (const m of [this.solid, this.foliage, this.water, this.lava]) this.withFog(m, false);
+    for (const m of [this.solid, this.foliage, this.water, this.lava, this.bright]) this.withFog(m, false);
     this.withFog(this.canopy, true);
+    this.withFog(this.gateSolid, true);
     this.scene.background = SKY.clone();
     this.scene.fog = new Fog(SKY.clone(), 26, 58);
     this.sun.castShadow = true;
@@ -369,7 +196,7 @@ export class World3D {
     sc.near = 1;
     sc.far = 60;
     this.sun.shadow.bias = -0.0008;
-    this.scene.add(this.sun, this.sun.target, this.hemi, this.signs, this.sleeper, this.themes, this.portalGroup);
+    this.scene.add(this.sun, this.sun.target, this.hemi, this.signs, this.sleeper, this.gateGroup, this.portalGroup);
   }
 
   /**
@@ -380,7 +207,7 @@ export class World3D {
    *   weniger. So sieht man die Figur zwischen vielen Bäumen. Boden und Felsen bleiben fest (unter ihrer Oberfläche
    *   ist nichts, ein Loch zeigte den Himmel).
    */
-  private withFog(material: MeshLambertMaterial, seeThrough: boolean) {
+  private withFog(material: MeshLambertMaterial | MeshBasicMaterial, seeThrough: boolean) {
     material.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, this.fogUniforms);
       shader.vertexShader =
@@ -546,7 +373,7 @@ export class World3D {
   private reset(world: World) {
     this.world = world;
     this.fogDirty = true;
-    this.buildThemes(world);
+    this.buildGates(world);
     this.buildPortals(world);
     for (const c of this.chunks.values())
       for (const m of c.meshes) {
@@ -557,80 +384,127 @@ export class World3D {
     this.signKey = '';
   }
 
-  /** Blöcke oben auf den großen Toren: verraten, welche Welt dahinter liegt (Eis, Sand, Wasser, Lava, Höhle) */
-  private buildThemes(world: World) {
-    for (const child of [...this.themes.children]) {
-      this.themes.remove(child);
-      (child as Mesh).geometry.dispose();
+  /** Meshes aus den Teilen eines Torhauses oder Portals, mit dem passenden Material je Teil */
+  private meshes(p: Parts): Mesh[] {
+    const out: Mesh[] = [];
+    for (const [g, mat] of [
+      [p.solid, this.gateSolid],
+      [p.lava, this.lava],
+      [p.bright, this.bright],
+      [p.leaves, this.canopy],
+    ] as const) {
+      if (g.empty) continue;
+      const m = new Mesh(g.build(), mat);
+      m.castShadow = mat !== this.bright;
+      m.receiveShadow = true;
+      out.push(m);
     }
-    const tile: Record<GateTheme, Tile> = { eis: 'ice', sand: 'sand', wasser: 'water', lava: 'lava', hoehle: 'cave' };
-    for (const gate of GATES) {
-      const cells = world.gates.get(gate.id);
-      if (!cells) continue;
-      const g = new Geo();
-      const white = new Color('#ffffff');
-      cells.forEach(([x, y], i) => {
-        const h = world.cell(x, y).h + 2.85; // Oberkante des Steinsturzes
-        g.box(x + 0.1, h, y + 0.1, 0.8, 0.8, 0.8, white, white, tile[gate.theme]);
-        if (i === 1) g.box(x + 0.2, h + 0.8, y + 0.2, 0.6, 0.6, 0.6, white, white, tile[gate.theme]);
-      });
-      const m = new Mesh(g.build(), gate.theme === 'lava' ? this.lava : this.solid);
-      m.castShadow = true;
-      this.themes.add(m);
+    return out;
+  }
+
+  /** Gruppe an der Mitte eines Feldes, gedreht so, dass ihr +z in Richtung `facing` (Welt-x, Welt-y) schaut */
+  private place(group: Group, x: number, y: number, h: number, facing: readonly [number, number]) {
+    group.position.set(x + 0.5, h, y + 0.5);
+    group.rotation.y = Math.atan2(facing[0], facing[1]);
+    return group;
+  }
+
+  private clear(group: Group) {
+    group.traverse((o) => {
+      if (o instanceof Mesh && o.geometry !== this.sparkGeo) o.geometry.dispose();
+    });
+    group.clear();
+  }
+
+  /** Die großen Tore: mächtige Torhäuser im Felsring, je Welt geschmückt, zur Lichtung schauend */
+  private buildGates(world: World) {
+    this.clear(this.gateGroup);
+    for (const g of world.gates.values()) {
+      const p = parts();
+      gatehouse(p, g.id);
+      const [mx, my] = g.mid;
+      const group = this.place(new Group(), mx, my, world.cell(mx, my).h, [-g.out[0], -g.out[1]]);
+      group.add(...this.meshes(p));
+      this.gateGroup.add(group);
     }
   }
 
+  private sparkGeo = new BoxGeometry(0.1, 0.1, 0.1);
+
   /**
-   * Portale: Rahmen im Thema des Tors, innen eine schimmernde Fläche, sobald aktiv. Das Portal am Tor ist immer da,
-   * sein Partner über dem Bett erscheint erst mit der Aktivierung.
+   * Portale: Säulen, Sturz und Krone im Thema des Tors; innen dreht sich ein Wirbel, sobald es aktiv ist, und
+   * Funken kreisen. Das Portal am Tor steht immer, sein Partner am Bett erscheint mit der Aktivierung (vorher zeigen
+   * zwei kleine Sockel, wo es stehen wird).
    */
   private buildPortals(world: World) {
-    for (const child of [...this.portalGroup.children]) this.portalGroup.remove(child);
+    this.clear(this.portalGroup);
     this.portalParts.clear();
-    const tile: Record<GateTheme, Tile> = { eis: 'ice', sand: 'sand', wasser: 'water', lava: 'lava', hoehle: 'cave' };
-    // Ein Portal als Gruppe um die Feldmitte; an Ost- und Westtor quer gedreht, damit es zur Lichtung schaut
-    const portal = (x: number, y: number, h: number, theme: GateTheme, turned: boolean) => {
-      const g = new Geo();
-      const white = new Color('#ffffff');
-      g.box(-0.48, 0, -0.15, 0.22, 2.2, 0.3, white, white, tile[theme]);
-      g.box(0.26, 0, -0.15, 0.22, 2.2, 0.3, white, white, tile[theme]);
-      g.box(-0.55, 2.2, -0.2, 1.1, 0.3, 0.4, white, white, tile[theme]);
-      g.box(-0.55, 0, -0.25, 1.1, 0.12, 0.5, white, white, tile[theme]);
-      const frame = new Mesh(g.build(), theme === 'lava' ? this.lava : this.solid);
-      frame.castShadow = true;
-      const material = new MeshBasicMaterial({
-        color: THEME_COLORS[theme].portal,
-        transparent: true,
-        opacity: 0.75,
-        side: DoubleSide,
-      });
-      const inner = new Mesh(new PlaneGeometry(0.52, 2.08), material);
-      inner.position.y = 1.16;
-      const group = new Group();
-      group.add(frame, inner);
-      group.position.set(x + 0.5, h, y + 0.5);
-      if (turned) group.rotation.y = Math.PI / 2;
-      return { group, inner };
+    const inner = (theme: GateTheme) => {
+      const m = new Mesh(
+        new PlaneGeometry(1.05, 3.05),
+        new MeshBasicMaterial({
+          map: this.swirl,
+          color: THEME_COLORS[theme].portal,
+          transparent: true,
+          opacity: 0.9,
+          depthWrite: false,
+          side: DoubleSide,
+        }),
+      );
+      m.position.set(0, 1.85, 0);
+      return m;
     };
     for (const g of GATES) {
       const p = world.portals.get(g.id);
       if (!p) continue;
       const [gx, gy] = p.gate,
         [hx, hy] = p.home;
-      const atGate = portal(gx, gy, world.cell(gx, gy).h, g.theme, g.side === 'o' || g.side === 'w');
-      const home = portal(hx, hy, world.cell(hx, hy).h, g.theme, false);
-      this.portalGroup.add(atGate.group, home.group);
-      this.portalParts.set(g.id, { gateInner: atGate.inner, home: home.group, homeInner: home.inner, cell: p.gate });
+      const atGate = this.place(new Group(), gx, gy, world.cell(gx, gy).h, p.gateFacing);
+      const frame = parts();
+      portalFrame(frame, g.theme);
+      const gateInner = inner(g.theme);
+      atGate.add(...this.meshes(frame), gateInner);
+      const home = this.place(new Group(), hx, hy, world.cell(hx, hy).h, p.homeFacing);
+      const homeFrame = parts();
+      portalFrame(homeFrame, g.theme);
+      const homeInner = inner(g.theme);
+      home.add(...this.meshes(homeFrame), homeInner);
+      const stubs = this.place(new Group(), hx, hy, world.cell(hx, hy).h, p.homeFacing);
+      const stubParts = parts();
+      portalFrame(stubParts, g.theme, true);
+      stubs.add(...this.meshes(stubParts));
+      // Funken: kreisen um beide Portale, solange es aktiv ist
+      const sparks: Mesh[] = [];
+      for (const host of [atGate, home])
+        for (let i = 0; i < 6; i++) {
+          const spark = new Mesh(
+            this.sparkGeo,
+            new MeshBasicMaterial({ color: i % 2 ? '#ffffff' : THEME_COLORS[g.theme].portal }),
+          );
+          spark.userData.phase = i / 6;
+          host.add(spark);
+          sparks.push(spark);
+        }
+      this.portalGroup.add(atGate, home, stubs);
+      this.portalParts.set(g.id, { gateInner, home, homeInner, stubs, sparks, cell: p.gate });
     }
   }
 
   private syncPortals(state: State, sc: Scene) {
-    const shimmer = sc.reduced ? 0.75 : 0.62 + 0.18 * Math.sin(sc.now / 280);
+    const t = sc.now / 1000;
+    this.swirl.rotation = sc.reduced ? 0 : -t * 1.6;
+    const glow = sc.reduced ? 0.9 : 0.8 + 0.15 * Math.sin(t * 3);
     for (const [id, part] of this.portalParts) {
       const active = state.portals.includes(id);
       part.gateInner.visible = active && this.explored(part.cell[0], part.cell[1]);
       part.home.visible = active;
-      for (const m of [part.gateInner, part.homeInner]) (m.material as MeshBasicMaterial).opacity = shimmer;
+      part.stubs.visible = !active;
+      for (const m of [part.gateInner, part.homeInner]) (m.material as MeshBasicMaterial).opacity = glow;
+      for (const spark of part.sparks) {
+        spark.visible = active && !sc.reduced;
+        const a = (spark.userData.phase as number) * Math.PI * 2 + t * 1.3;
+        spark.position.set(Math.cos(a) * 0.8, 1.85 + Math.sin(a * 2 + t) * 1.3, Math.sin(a) * 0.35);
+      }
     }
   }
 
@@ -664,15 +538,17 @@ export class World3D {
     const solid = new Geo(),
       leaves = new Geo(),
       canopy = new Geo(),
-      water = new Geo();
+      water = new Geo(),
+      lava = new Geo(),
+      bright = new Geo();
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)
       for (let x = cx * CHUNK; x < (cx + 1) * CHUNK; x++) {
         const c = world.cell(x, y);
-        this.terrain(solid, water, world, c, x, y);
-        this.decoration(solid, leaves, canopy, c, x, y);
+        this.terrain(solid, water, lava, world, c, x, y);
+        this.decoration(solid, leaves, canopy, bright, c, x, y);
       }
     const meshes: Mesh[] = [];
-    const add = (g: Geo, mat: MeshLambertMaterial, shadows: boolean) => {
+    const add = (g: Geo, mat: MeshLambertMaterial | MeshBasicMaterial, shadows: boolean) => {
       if (g.empty) return;
       const m = new Mesh(g.build(), mat);
       m.castShadow = shadows;
@@ -684,11 +560,28 @@ export class World3D {
     add(canopy, this.canopy, true);
     add(leaves, this.foliage, false);
     add(water, this.water, false);
+    add(lava, this.lava, false);
+    add(bright, this.bright, false);
     return { meshes };
   }
 
-  private terrain(g: Geo, water: Geo, world: World, c: Cell, x: number, y: number) {
-    const heightOf = (n: Cell) => (n.ground === 'water' ? 0 : n.h);
+  private terrain(g: Geo, water: Geo, lava: Geo, world: World, c: Cell, x: number, y: number) {
+    // Unter Wolken ist nichts: Ihre Seiten reichen weit hinunter, damit sie über dem Himmel schweben
+    const heightOf = (n: Cell) => (n.ground === 'sky' ? -4 : n.ground === 'water' || n.ground === 'lava' ? 0 : n.h);
+    if (c.ground === 'sky') return;
+    if (c.ground === 'lava') {
+      g.quad([x, 0, y + 1], [x + 1, 0, y + 1], [x + 1, 0, y], [x, 0, y], [0, 1, 0], 'basalt', new Color('#ffffff'));
+      lava.quad(
+        [x, 0.6, y + 1],
+        [x + 1, 0.6, y + 1],
+        [x + 1, 0.6, y],
+        [x, 0.6, y],
+        [0, 1, 0],
+        'lava',
+        new Color('#ffffff'),
+      );
+      return;
+    }
     if (c.ground === 'water') {
       g.quad([x, 0, y + 1], [x + 1, 0, y + 1], [x + 1, 0, y], [x, 0, y], [0, 1, 0], 'sand', new Color('#9db0a0'));
       water.quad(
@@ -708,8 +601,7 @@ export class World3D {
     }
     const h = c.h;
     const stone = c.ground === 'stone';
-    const topTile: Tile = stone ? 'stone' : c.ground === 'sand' ? 'sand' : c.ground === 'path' ? 'path' : 'grassTop';
-    const sideTop: Tile = stone ? 'stone' : c.ground === 'sand' ? 'sand' : c.ground === 'path' ? 'dirt' : 'grassSide';
+    const [topTile, sideTop, below] = GROUND_TILES[c.ground];
     const shade = stone ? 0 : (c.shade ?? 0);
     const tint = new Color(1, 1, 1).multiplyScalar(0.93 + shade * 0.07);
     g.quad([x, h, y + 1], [x + 1, h, y + 1], [x + 1, h, y], [x, h, y], [0, 1, 0], topTile, tint);
@@ -721,8 +613,8 @@ export class World3D {
     ];
     for (const [dx, dy, n] of sides) {
       const nh = heightOf(world.cell(x + dx, y + dy));
-      for (let k = Math.max(0, nh); k < h; k++) {
-        const tile: Tile = k === h - 1 ? sideTop : stone ? 'stone' : 'dirt';
+      for (let k = Math.max(-4, nh); k < h; k++) {
+        const tile: Tile = k === h - 1 ? sideTop : below;
         const [y0, y1] = [k, k + 1];
         if (dy === 1) g.quad([x, y0, y + 1], [x + 1, y0, y + 1], [x + 1, y1, y + 1], [x, y1, y + 1], n, tile, tint);
         else if (dy === -1) g.quad([x + 1, y0, y], [x, y0, y], [x, y1, y], [x + 1, y1, y], n, tile, tint);
@@ -733,7 +625,7 @@ export class World3D {
     }
   }
 
-  private decoration(g: Geo, blades: Geo, canopy: Geo, c: Cell, x: number, y: number) {
+  private decoration(g: Geo, blades: Geo, canopy: Geo, bright: Geo, c: Cell, x: number, y: number) {
     const h = c.h;
     if (c.tufts) this.tufts(blades, x, y, h, c.tufts);
     switch (c.deco) {
@@ -776,8 +668,43 @@ export class World3D {
       case 'fence':
         this.fence(g, x, y, h);
         break;
-      case 'biggate':
-        this.bigGate(g, x, y, h);
+      case 'cactus':
+        g.box(x + 0.37, h, y + 0.37, 0.26, 1.35, 0.26, '#3f8f3a', '#5aab4a');
+        g.box(x + 0.13, h + 0.55, y + 0.42, 0.24, 0.16, 0.16, '#3f8f3a', '#5aab4a');
+        g.box(x + 0.13, h + 0.55, y + 0.42, 0.14, 0.55, 0.16, '#3f8f3a', '#5aab4a');
+        g.box(x + 0.63, h + 0.8, y + 0.42, 0.24, 0.16, 0.16, '#3f8f3a', '#5aab4a');
+        g.box(x + 0.73, h + 0.8, y + 0.42, 0.14, 0.45, 0.16, '#3f8f3a', '#5aab4a');
+        g.box(x + 0.44, h + 1.35, y + 0.44, 0.12, 0.1, 0.12, '#f08cc8'); // Blüte
+        break;
+      case 'crystal': {
+        const cc = c.color ?? '#b48cf0';
+        bright.box(x + 0.36, h, y + 0.36, 0.28, 1.15, 0.28, cc);
+        bright.box(x + 0.14, h, y + 0.5, 0.2, 0.7, 0.2, cc);
+        bright.box(x + 0.62, h, y + 0.22, 0.18, 0.55, 0.18, cc);
+        break;
+      }
+      case 'stalagmite':
+        g.box(x + 0.22, h, y + 0.22, 0.56, 0.5, 0.56, '#ffffff', null, 'cave');
+        g.box(x + 0.32, h + 0.5, y + 0.32, 0.36, 0.5, 0.36, '#ffffff', null, 'cave');
+        g.box(x + 0.41, h + 1.0, y + 0.41, 0.18, 0.45, 0.18, '#ffffff', null, 'cave');
+        break;
+      case 'bigshroom': {
+        const cap = c.color ?? '#d9473a';
+        g.box(x + 0.36, h, y + 0.36, 0.28, 1.4, 0.28, '#efe4d2', '#f7efe2');
+        canopy.box(x - 0.25, h + 1.4, y - 0.25, 1.5, 0.45, 1.5, cap, cap);
+        canopy.box(x + 0.05, h + 1.85, y + 0.05, 0.9, 0.25, 0.9, cap, cap);
+        for (const [dx, dz] of [
+          [0.1, 0.2],
+          [0.75, 0.55],
+          [0.3, 0.85],
+          [0.95, 0.05],
+        ])
+          canopy.box(x + dx - 0.15, h + 1.86, y + dz - 0.15, 0.2, 0.05, 0.2, '#ffffff');
+        break;
+      }
+      case 'cloudpuff':
+        g.box(x + 0.15, h, y + 0.3, 0.5, 0.25, 0.4, '#ffffff', null, 'cloud');
+        g.box(x + 0.4, h, y + 0.15, 0.4, 0.35, 0.45, '#ffffff', null, 'cloud');
         break;
       case 'hedge':
         canopy.box(x + 0.08, h, y + 0.08, 0.84, 0.75, 0.84, '#3a8a35', '#4fa84a', 'leaves');
@@ -836,6 +763,47 @@ export class World3D {
   private tree(g: Geo, canopy: Geo, x: number, y: number, h: number, kind: TreeKind) {
     const leaf = new Color(LEAF[kind]);
     const top = leaf.clone().lerp(new Color('#ffffff'), 0.18);
+    if (kind === 'pine' || kind === 'snowpine') {
+      // Tanne: drei Stufen, oben schmaler; die Schneetanne mit weißen Hauben
+      g.box(x + 0.4, h, y + 0.4, 0.2, 0.7, 0.2, '#7a5432', '#93683f', 'log', 'logTop');
+      const layers = [
+        [-0.25, 0.5, 1.5],
+        [0.0, 1.2, 1.0],
+        [0.2, 1.8, 0.6],
+      ] as const;
+      for (const [o, yy, w] of layers) {
+        canopy.box(x + o, h + yy, y + o, w, 0.6, w, leaf, top, 'leaves');
+        if (kind === 'snowpine')
+          canopy.box(x + o + 0.05, h + yy + 0.6, y + o + 0.05, w - 0.1, 0.12, w - 0.1, '#ffffff');
+      }
+      return;
+    }
+    if (kind === 'palm') {
+      // Palme: leicht schräger Stamm aus Stücken, oben Wedel im Kreuz und Kokosnüsse
+      for (let i = 0; i < 5; i++)
+        g.box(x + 0.38 + i * 0.04, h + i * 0.42, y + 0.38, 0.22, 0.42, 0.22, '#a77c46', '#c9a066', 'log', 'logTop');
+      const tx = x + 0.58,
+        ty = h + 2.1;
+      canopy.box(tx - 1.1, ty, y + 0.38, 2.4, 0.14, 0.32, leaf, top, 'leaves');
+      canopy.box(tx - 0.08, ty, y - 0.62, 0.32, 0.14, 2.3, leaf, top, 'leaves');
+      canopy.box(tx - 0.3, ty + 0.12, y + 0.18, 0.76, 0.2, 0.72, leaf, top, 'leaves');
+      // Wedelspitzen hängen nach unten
+      canopy.box(tx - 1.3, ty - 0.3, y + 0.4, 0.3, 0.32, 0.28, leaf, top, 'leaves');
+      canopy.box(tx + 1.25, ty - 0.3, y + 0.4, 0.3, 0.32, 0.28, leaf, top, 'leaves');
+      canopy.box(tx - 0.06, ty - 0.3, y - 0.85, 0.28, 0.32, 0.3, leaf, top, 'leaves');
+      canopy.box(tx - 0.06, ty - 0.3, y + 1.65, 0.28, 0.32, 0.3, leaf, top, 'leaves');
+      g.box(tx - 0.12, ty - 0.2, y + 0.42, 0.16, 0.16, 0.16, '#6b4423');
+      g.box(tx + 0.12, ty - 0.2, y + 0.58, 0.16, 0.16, 0.16, '#6b4423');
+      return;
+    }
+    if (kind === 'dead') {
+      // kahler Baum in den Lavabergen
+      g.box(x + 0.4, h, y + 0.4, 0.2, 1.5, 0.2, '#4a3426', '#5d3e21');
+      g.box(x + 0.15, h + 0.9, y + 0.45, 0.3, 0.1, 0.1, '#4a3426');
+      g.box(x + 0.6, h + 1.15, y + 0.45, 0.3, 0.1, 0.1, '#4a3426');
+      g.box(x + 0.15, h + 0.9, y + 0.45, 0.1, 0.4, 0.1, '#4a3426');
+      return;
+    }
     if (kind === 'birch') {
       g.box(x + 0.4, h, y + 0.4, 0.2, 1.6, 0.2, '#e8e4d8', '#f3efe6');
       for (const z of [0.3, 0.75, 1.15]) g.box(x + 0.39, h + z, y + 0.53, 0.22, 0.06, 0.08, '#3a3a44');
@@ -857,25 +825,6 @@ export class World3D {
   }
 
   /** Großes Tor im Felsen: Holzflügel mit Eisenbändern, oben ein Steinsturz; in der Mitte das Schloss */
-  private bigGate(g: Geo, x: number, y: number, h: number) {
-    const w = this.world!;
-    const isGate = (dx: number, dy: number) => w.cell(x + dx, y + dy).deco === 'biggate';
-    const across = isGate(1, 0) || isGate(-1, 0); // Tor liegt quer (Norden, Süden)
-    const middle = across ? isGate(1, 0) && isGate(-1, 0) : isGate(0, 1) && isGate(0, -1);
-    const iron = '#3a3a44';
-    if (across) {
-      g.box(x, h, y + 0.35, 1, 2.4, 0.3, '#8a5a30', '#a0703f', 'planks');
-      for (const z of [0.5, 1.7]) g.box(x, h + z, y + 0.3, 1, 0.12, 0.4, iron);
-      g.box(x - 0.02, h + 2.4, y + 0.2, 1.04, 0.45, 0.6, '#8f949b', '#a8adb3', 'stone');
-      if (middle) g.box(x + 0.38, h + 1.0, y + 0.25, 0.24, 0.3, 0.12, iron);
-    } else {
-      g.box(x + 0.35, h, y, 0.3, 2.4, 1, '#8a5a30', '#a0703f', 'planks');
-      for (const z of [0.5, 1.7]) g.box(x + 0.3, h + z, y, 0.4, 0.12, 1, iron);
-      g.box(x + 0.2, h + 2.4, y - 0.02, 0.6, 0.45, 1.04, '#8f949b', '#a8adb3', 'stone');
-      if (middle) g.box(x + 0.25, h + 1.0, y + 0.38, 0.12, 0.3, 0.24, iron);
-    }
-  }
-
   private fence(g: Geo, x: number, y: number, h: number) {
     const w = this.world!;
     const joins = (dx: number, dy: number) => {

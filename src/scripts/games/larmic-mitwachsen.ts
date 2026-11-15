@@ -294,6 +294,12 @@ class LarmicMitwachsen extends HTMLElement {
     if (at === this.seenAt) return;
     this.seenAt = at;
     const changed = this.fog.reveal(x, y, REVEAL);
+    // Blick durchs Tor: Steht die Figur vor einem großen Tor, lichtet sich der Nebel auch im Gang dahinter
+    for (const g of this.world.gates.values()) {
+      const [mx, my] = g.mid;
+      if (Math.max(Math.abs(x - mx), Math.abs(y - my)) > 8) continue;
+      for (const k of [4, 9, 14]) changed.push(...this.fog.reveal(mx + g.out[0] * k, my + g.out[1] * k, 4));
+    }
     if (changed.length) this.gl3d?.invalidate(changed);
   }
 

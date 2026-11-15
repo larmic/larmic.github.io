@@ -19,7 +19,21 @@ import {
   type SpeciesId,
 } from '../../data/games/mitwachsen';
 
-export type Ground = 'grass' | 'stone' | 'water' | 'path' | 'sand';
+export type Ground =
+  | 'grass'
+  | 'stone'
+  | 'water'
+  | 'path'
+  | 'sand'
+  // Welten hinter den Toren
+  | 'snow'
+  | 'ice'
+  | 'basalt'
+  | 'lava'
+  | 'cave'
+  | 'cloud'
+  | 'sky' // Leere zwischen den Wolken
+  | 'moss';
 export type Deco =
   | 'tree'
   | 'bush'
@@ -38,9 +52,32 @@ export type Deco =
   | 'boulder'
   | 'mushroom'
   | 'biggate'
-  | 'portal';
-export type TreeKind = 'oak' | 'birch' | 'autumn' | 'blossom';
-export type Portal = { gate: Point; gateExit: Point; home: Point; homeExit: Point };
+  | 'gatetower' // Turm eines großen Tors (fest; das Torhaus zeichnet die Ansicht)
+  | 'portal'
+  | 'portalside' // Säule eines Portals (fest)
+  | 'cactus'
+  | 'crystal'
+  | 'stalagmite'
+  | 'bigshroom'
+  | 'cloudpuff';
+export type TreeKind = 'oak' | 'birch' | 'autumn' | 'blossom' | 'pine' | 'snowpine' | 'palm' | 'dead';
+/** Portal je Tor: Feld am Tor und am Bett, je mit dem Feld davor (dort kommt man heraus) und der Blickrichtung */
+export type Portal = {
+  gate: Point;
+  gateExit: Point;
+  gateFacing: Point; // Richtung, in die das Portal am Tor schaut (zur Lichtung)
+  home: Point;
+  homeExit: Point;
+  homeFacing: Point; // zum Bett
+};
+/** Ein großes Tor: fünf Felder in einer Reihe, nach außen in eine Achsenrichtung, dahinter die Welt `id` */
+export type GatePlace = {
+  id: GateId;
+  cells: readonly Point[];
+  mid: Point;
+  out: Point; // nach außen (weg von der Lichtung)
+  angle: number; // Winkel von der Mitte aus: In dieser Richtung liegt die Welt des Tors
+};
 
 export type Cell = {
   h: number; // Oberkante in Ebenen: Wasser 0, Boden 1, Hügel bis 3
@@ -55,7 +92,9 @@ export type Cell = {
   gardenGate?: true; // Rosenbogen in der Hecke
   tree?: TreeKind; // Baumart bei deco 'tree'
   tufts?: number; // Grasbüschel auf dem Feld (nur Zierde, begehbar)
-  portal?: { id: GateId; side: 'gate' | 'home' }; // Portal (Tor-Seite oder über dem Bett)
+  portal?: { id: GateId; side: 'gate' | 'home' }; // Portal (am Tor oder am Bett)
+  biome?: GateId; // Welt hinter einem Tor
+  part?: { id: GateId; side?: 'gate' | 'home' }; // Turm eines Tors oder Säule eines Portals: gehört zu dieser Welt
   shade?: number; // Farbfleck im Boden: −1 dunkler … +1 heller (große, weiche Flecken)
 };
 
@@ -64,10 +103,10 @@ export type World = {
   cell(x: number, y: number): Cell;
   /** Wohnort jedes Tiers der Lichtung: nächstes vom Bett aus erreichbares Feld zum Wunschort */
   readonly spawns: ReadonlyMap<string, Point>; // je Tier-Kennung
-  /** Portale: je Tor eines daneben und eines über dem Bett, mit dem Feld, auf dem man herauskommt */
+  /** Portale: je Tor eines daneben und eines im Kreis um das Bett, mit dem Feld, auf dem man herauskommt */
   readonly portals: ReadonlyMap<GateId, Portal>;
-  /** Felder der großen Tore (hängen vom Seed ab, weil der Felsrand leicht unregelmäßig ist) */
-  readonly gates: ReadonlyMap<GateId, readonly Point[]>;
+  /** Die großen Tore: Lage und Reihenfolge würfelt der Seed */
+  readonly gates: ReadonlyMap<GateId, GatePlace>;
 };
 
 export const inRect = (r: Rect, x: number, y: number) => x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1;
@@ -95,55 +134,96 @@ function edge(seed: number, x: number, y: number) {
   const { rx, ry } = lichtung.shape;
   const d = (x / rx) ** 2 + (y / ry) ** 2;
   const wobble = 1 + (valueNoise(seed + 21, x, y, 4) - 0.5) * 0.3;
-  return d / wobble; // < 1 innen, 1 … ROCK_OUTER Felsen, darüber Landschaft
+  return d / wobble; // < 1 innen, darüber Felsen bis zum festen Außenrand (outside)
 }
-const ROCK_OUTER = 1.32;
+const ROCK_OUTER = 1.52; // fester Außenrand ohne Wackeln: Der Felsring ist überall mindestens gut zehn Felder dick
+const outside = (x: number, y: number) => (x / lichtung.shape.rx) ** 2 + (y / lichtung.shape.ry) ** 2 >= ROCK_OUTER;
 /** Felsring in Terrassen (nur fürs Auge, betreten kann man ihn nicht): innen 3, dann 4, außen 5 */
 const ringHeight = (e: number) => (e < 1.08 ? 3 : e < 1.16 ? 4 : 5);
 /** Bäume und Büsche stehen einzeln: im Umkreis von so vielen Feldern kein weiteres Hindernis */
 const OBSTACLE_GAP = 2;
 
-/** Die drei Felder eines großen Tores: in einer geraden Reihe, so tief wie das innerste Felsfeld der drei Spalten */
-function gateCells(seed: number, side: 'n' | 'o' | 's' | 'w'): Point[] {
-  const [dx, dy] = { n: [0, -1], s: [0, 1], o: [1, 0], w: [-1, 0] }[side];
-  const first = (off: number) => {
-    for (let t = 1; t < 160; t++) if (edge(seed, dx ? dx * t : off, dy ? dy * t : off) >= 1) return t;
-    return 160;
-  };
-  const t = Math.min(first(-1), first(0), first(1));
-  return [-1, 0, 1].map((off) => [dx ? dx * t : off, dy ? dy * t : off] as Point);
-}
+export const GATE_HALF = 2; // Tor: Mitte ± 2 Felder
+export const TOWER = 2; // Türme links und rechts, je zwei Felder breit
+const BAY_HALF = GATE_HALF + TOWER + 1; // Bucht vor dem Torhaus: so breit (Mitte ± 5), bis zur Lichtung frei
+const PORTAL_SIDE = 7; // das Portal steht so weit neben der Tormitte
+
+const sign = (v: number) => (v < 0 ? -1 : 1);
+/** Achse, die einer Richtung am nächsten kommt */
+const axis = (dx: number, dy: number): Point => (Math.abs(dx) >= Math.abs(dy) ? [sign(dx), 0] : [0, sign(dy)]);
+
+/** Ein Torplatz: Tor, Türme, Platz davor und Gang dahinter in Koordinaten (u entlang des Tors, t nach außen) */
+type Layout = GatePlace & {
+  depth: number; // t der Torreihe
+  at: (u: number, t: number) => Point;
+  portalDepth: number; // t des Portals neben dem Tor: vor dem Felsrand seiner Spalten
+  side: number; // Portal links (−1) oder rechts (+1) vom Tor
+};
 
 /**
- * Portale: neben dem Tor (drei Felder zur Seite, mindestens zwei nach innen, so weit, bis es frei auf der Lichtung
- * steht – der Felsrand wackelt) und über dem Bett (HOME.portals). Herauskommen jeweils auf dem Feld davor,
- * Richtung Lichtung bzw. Bett.
+ * Die großen Tore aus dem Seed: gleichmäßig um die Lichtung verteilt (mit etwas Spiel), in gewürfelter Reihenfolge.
+ * Jedes Tor steht in einer geraden Reihe, so tief im Fels wie die tiefste Stelle des Torhauses: davor ein freier
+ * Platz, dahinter ein Gang durch den Fels in seine Welt.
  */
-function portalsOf(seed: number): Map<GateId, Portal> {
+function layouts(seed: number): Layout[] {
+  const { rx, ry } = lichtung.shape;
+  const order = GATES.map((g, i) => ({ g, k: hash(seed, i, 91) })).sort((a, b) => a.k - b.k);
+  const start = rand01(seed, 5, 5, 3) * Math.PI * 2;
+  return order.map(({ g }, i) => {
+    const angle = start + (i * Math.PI * 2) / GATES.length + (rand01(seed, i, 0, 4) - 0.5) * 0.25;
+    const c = Math.cos(angle),
+      sn = Math.sin(angle);
+    const out = axis(ry * c, rx * sn); // Richtung der Ellipsen-Normale
+    const across: Point = out[0] ? [0, 1] : [1, 0];
+    const base = Math.round(across[0] ? c * rx : sn * ry); // Lage entlang des Tors
+    const at = (u: number, t: number): Point => [
+      across[0] * (base + u) + out[0] * t,
+      across[1] * (base + u) + out[1] * t,
+    ];
+    const first = (u: number) => {
+      for (let t = 1; t < 200; t++) if (edge(seed, ...at(u, t)) >= 1) return t;
+      return 200;
+    };
+    let depth = 0;
+    for (let u = -GATE_HALF - TOWER; u <= GATE_HALF + TOWER; u++) depth = Math.max(depth, first(u));
+    const cells: Point[] = [];
+    for (let u = -GATE_HALF; u <= GATE_HALF; u++) cells.push(at(u, depth));
+    const side = hash(seed, i, 92) % 2 ? 1 : -1;
+    let portalDepth = depth;
+    for (let k = -2; k <= 2; k++) portalDepth = Math.min(portalDepth, first(side * PORTAL_SIDE + k));
+    return { id: g.id, cells, mid: at(0, depth), out, angle, depth, at, side, portalDepth: portalDepth - 3 };
+  });
+}
+
+/** Portale: neben dem Tor auf dem Torplatz, zur Lichtung schauend; ihr Partner im Kreis um das Bett, in Torrichtung */
+function portalsOf(places: readonly Layout[]): Map<GateId, Portal> {
   const out = new Map<GateId, Portal>();
-  const inside = (x: number, y: number) => edge(seed, x, y) < 0.97;
-  for (const g of GATES) {
-    const [mx, my] = gateCells(seed, g.side)[1];
-    const [ix, iy] = { n: [0, 1], s: [0, -1], o: [-1, 0], w: [1, 0] }[g.side]; // nach innen
-    const [sx, sy] = g.side === 'n' || g.side === 's' ? [1, 0] : [0, 1]; // zur Seite
-    const at = (t: number): Point => [mx + ix * t + sx * 3, my + iy * t + sy * 3];
-    const free = (t: number) =>
-      [-1, 0, 1].every((o) => [t, t + 1, t + 2].every((u) => inside(at(u)[0] + sx * o, at(u)[1] + sy * o)));
-    let t = 2;
-    while (t < 40 && !free(t)) t++;
-    const [hx, hy] = HOME.portals[g.id];
-    out.set(g.id, {
-      gate: at(t),
-      gateExit: at(t + 1),
-      home: [hx, hy],
-      homeExit: [hx, hy + 1],
+  for (const p of places) {
+    const u = p.side * PORTAL_SIDE;
+    const r = HOME.portalRing;
+    const home: Point = [
+      HOME.bed[0] + Math.round(Math.cos(p.angle) * r),
+      HOME.bed[1] + Math.round(Math.sin(p.angle) * r),
+    ];
+    const homeFacing = axis(HOME.bed[0] - home[0], HOME.bed[1] - home[1]);
+    out.set(p.id, {
+      gate: p.at(u, p.portalDepth),
+      gateExit: p.at(u, p.portalDepth - 1),
+      gateFacing: [-p.out[0], -p.out[1]],
+      home,
+      homeExit: [home[0] + homeFacing[0], home[1] + homeFacing[1]],
+      homeFacing,
     });
   }
   return out;
 }
 
 /** Lichtung als feste Karte: Bett in der Mitte, Hügel, Teiche, Wäldchen, Blumenwiesen, Steine, Felsring, große Tore */
-function buildStart(seed: number, opts: { garden?: boolean }): { map: Map<string, Cell>; spawns: Map<string, Point> } {
+function buildStart(
+  seed: number,
+  places: readonly Layout[],
+  opts: { garden?: boolean },
+): { map: Map<string, Cell>; spawns: Map<string, Point> } {
   const map = new Map<string, Cell>();
   const set = (x: number, y: number, c: Cell) => map.set(key(x, y), c);
   const { rx, ry } = lichtung.shape;
@@ -161,7 +241,7 @@ function buildStart(seed: number, opts: { garden?: boolean }): { map: Map<string
   for (let y = -R; y <= R; y++)
     for (let x = -R; x <= R; x++) {
       const e = edge(seed, x, y);
-      if (e >= ROCK_OUTER) continue; // Landschaft
+      if (outside(x, y)) continue; // Landschaft
       if (e >= 1) {
         set(x, y, rock(ringHeight(e)));
         continue;
@@ -197,20 +277,44 @@ function buildStart(seed: number, opts: { garden?: boolean }): { map: Map<string
     }
   set(HOME.bed[0], HOME.bed[1], { ...grass('lichtung'), deco: 'bed', solid: true });
 
-  for (const g of GATES)
-    for (const [x, y] of gateCells(seed, g.side))
-      set(x, y, { ...grass('border'), ground: 'stone', deco: 'biggate', gate: g.id, solid: false });
+  // Große Tore: Platz davor frei, Tor und Türme in der Torreihe, dahinter ein Gang durch den Fels in die Welt
+  for (const p of places) {
+    const span = GATE_HALF + TOWER;
+    for (let u = -BAY_HALF; u <= BAY_HALF; u++)
+      for (let t = p.depth - 1; t >= p.depth - 60; t--) {
+        const [x, y] = p.at(u, t);
+        if (map.get(key(x, y))?.region === 'lichtung' && t < p.depth - 2) break; // weiter innen ist schon Lichtung
+        set(x, y, grass('lichtung'));
+      }
+    for (let u = -span; u <= span; u++) {
+      const [x, y] = p.at(u, p.depth);
+      if (Math.abs(u) <= GATE_HALF) set(x, y, { ...grass('border'), ground: 'stone', deco: 'biggate', gate: p.id });
+      else set(x, y, { ...rock(1), deco: 'gatetower', part: { id: p.id } });
+    }
+    for (let t = p.depth + 1; t < p.depth + 200; t++) {
+      let beyond = true;
+      for (let u = -span; u <= span; u++) {
+        const [x, y] = p.at(u, t);
+        if (Math.abs(u) > GATE_HALF) set(x, y, rock(ringHeight(1.1)));
+        else set(x, y, passage(seed, p.id, x, y));
+        if (!outside(x, y)) beyond = false;
+      }
+      if (beyond) break;
+    }
+  }
 
-  // Portale: Platz ringsum flach und frei, damit man hin- und herauskommt
-  for (const [id, p] of portalsOf(seed))
-    for (const [[px, py], side] of [
-      [p.gate, 'gate'],
-      [p.home, 'home'],
+  // Portale: drei Felder breit (Säule, Portal, Säule), Platz ringsum flach und frei
+  for (const [id, p] of portalsOf(places))
+    for (const [[px, py], [fx, fy], side] of [
+      [p.gate, p.gateFacing, 'gate'],
+      [p.home, p.homeFacing, 'home'],
     ] as const) {
-      for (let dy = -1; dy <= 2; dy++)
-        for (let dx = -1; dx <= 1; dx++)
+      for (let dy = -2; dy <= 2; dy++)
+        for (let dx = -2; dx <= 2; dx++)
           if (map.get(key(px + dx, py + dy))?.region === 'lichtung') set(px + dx, py + dy, grass('lichtung'));
       set(px, py, { ...grass('lichtung'), deco: 'portal', portal: { id, side } });
+      for (const o of [-1, 1])
+        set(px + fy * o, py + fx * o, { ...grass('lichtung'), deco: 'portalside', solid: true, part: { id, side } });
     }
 
   if (opts.garden) {
@@ -225,19 +329,15 @@ function buildStart(seed: number, opts: { garden?: boolean }): { map: Map<string
   }
   smooth(map);
 
-  // Vor jedem Tor ein freier Gang nach innen, bis er auf erreichbares Land trifft (Teiche, Bäume, Felsnischen)
+  // Vom Torplatz ein freier Gang nach innen, bis er auf erreichbares Land trifft (Teiche, Bäume)
   const before = new Set(reachOf(map).map(([x, y]) => key(x, y)));
-  for (const g of GATES) {
-    const [mx, my] = gateCells(seed, g.side)[1];
-    const [ix, iy] = { n: [0, 1], s: [0, -1], o: [-1, 0], w: [1, 0] }[g.side];
-    for (let t = 1; t < 100 && (t < 4 || !before.has(key(mx + ix * t, my + iy * t))); t++)
-      for (const o of [-1, 0, 1]) {
-        const x = mx + ix * t + iy * o,
-          y = my + iy * t + ix * o;
+  for (const p of places)
+    for (let t = p.depth - 3; t > p.depth - 200 && !before.has(key(...p.at(0, t))); t--)
+      for (const u of [-1, 0, 1]) {
+        const [x, y] = p.at(u, t);
         const c = map.get(key(x, y));
         if (c && (c.region === 'lichtung' || c.deco === 'rock')) set(x, y, { ...grass('lichtung'), h: c.h || 1 });
       }
-  }
   smooth(map);
 
   // Was man nicht erreichen kann, wird Fels: keine Ecken, die man sieht, aber nie betreten kann
@@ -346,27 +446,107 @@ function findSpawns(seed: number, map: Map<string, Cell>, reach: Point[]): Map<s
   return spawns;
 }
 
-/** Endlose Landschaft: sanfte Hügel (Stufen meist eine Ebene), Teiche mit Sandufer, Bäume, Büsche, Blumen */
-function wildCell(seed: number, x: number, y: number): Cell {
-  const n = valueNoise(seed, x, y, 11);
-  const h = n < 0.4 ? 1 : n < 0.66 ? 2 : 3;
-  const wet = valueNoise(seed + 1, x, y, 7);
-  if (h === 1 && wet < 0.17) return water('wild');
-  const c = grass('wild');
-  c.h = h;
-  if (h === 1 && wet < 0.23) {
-    c.ground = 'sand';
-    return c;
+/** Welt eines Feldes außerhalb der Lichtung: die des Tors, in dessen Richtung es liegt (Grenzen leicht gewellt) */
+function biomeOf(seed: number, places: readonly GatePlace[], x: number, y: number): GateId {
+  const { rx, ry } = lichtung.shape;
+  const a = Math.atan2(y / ry, x / rx) + (valueNoise(seed + 41, x, y, 24) - 0.5) * 0.3;
+  let best = places[0],
+    bestD = Infinity;
+  for (const p of places) {
+    const d = Math.abs(Math.atan2(Math.sin(a - p.angle), Math.cos(a - p.angle)));
+    if (d < bestD) [best, bestD] = [p, d];
   }
+  return best.id;
+}
+
+const CRYSTALS = ['#b48cf0', '#6fd6f0', '#f08cc8'];
+const CAPS = ['#d9473a', '#4f7fd9', '#e0a03a'];
+
+/**
+ * Endlose Landschaft in der Welt eines Tors: Höhen meist eine Stufe, dazu Boden, Wasser und Pflanzen des Themas.
+ * Wald (Bäume, Farne, Beeren), Eis (Schnee, zugefrorene Seen, Eisblöcke, Schneetannen), Sand (Dünen, Kakteen, Oasen
+ * mit Palmen), Wasser (Inseln mit Palmen), Lava (Basalt, glühende Seen, kahle Bäume), Höhle (dunkler Stein,
+ * leuchtende Kristalle, Tropfsteine), Wolken (Wolkeninseln über dem Himmel), Pilze (Moos und Riesenpilze).
+ */
+function biomeCell(seed: number, theme: GateId, x: number, y: number): Cell {
+  const n = valueNoise(seed, x, y, 11);
+  const wet = valueNoise(seed + 1, x, y, 7);
   const roll = rand01(seed, x, y, 2);
-  if (roll < 0.035) Object.assign(c, { deco: 'tree', solid: true });
-  else if (roll < 0.05) Object.assign(c, { deco: 'bush', solid: true });
-  else if (roll < 0.14) Object.assign(c, { deco: 'flower', color: flowerColor(seed, x, y) });
-  else if (roll < 0.165) c.deco = 'fern';
-  else if (roll < 0.175)
-    Object.assign(c, { h: h + 1, ground: 'stone' }); // Stein zum Klettern
-  else if (roll < 0.183) c.deco = 'mushroom';
-  return c;
+  const h = n < 0.4 ? 1 : n < 0.66 ? 2 : 3;
+  const c: Cell = { ...grass('wild'), h, biome: theme };
+  const tree = (kind: TreeKind) => Object.assign(c, { deco: 'tree', solid: true, tree: kind });
+  switch (theme) {
+    case 'wald':
+      if (h === 1 && wet < 0.14) return { ...water('wild'), biome: theme, deco: roll < 0.15 ? 'lily' : null };
+      if (roll < 0.11) tree((['oak', 'birch', 'pine', 'autumn'] as const)[hash(seed, x, y, 12) % 4]);
+      else if (roll < 0.14) Object.assign(c, { deco: 'bush', solid: true });
+      else if (roll < 0.22) c.deco = 'fern';
+      else if (roll < 0.25) c.deco = 'mushroom';
+      else if (roll < 0.3) Object.assign(c, { deco: 'flower', color: flowerColor(seed, x, y) });
+      return c;
+    case 'eis':
+      c.ground = 'snow';
+      if (h === 1 && wet < 0.2) return { ...c, ground: 'ice' }; // zugefrorener See, begehbar
+      if (roll < 0.06) tree('snowpine');
+      else if (roll < 0.09) Object.assign(c, { ground: 'ice', h: h + 1 }); // Eisblock zum Klettern
+      return c;
+    case 'sand': {
+      c.ground = 'sand';
+      const dune = valueNoise(seed + 2, x, y, 9);
+      c.h = dune < 0.45 ? 1 : dune < 0.7 ? 2 : 3;
+      if (wet < 0.1) return { ...water('wild'), biome: theme };
+      if (wet < 0.15)
+        return roll < 0.35
+          ? { ...c, h: 1, ground: 'grass', deco: 'tree', solid: true, tree: 'palm' }
+          : { ...c, h: 1, ground: 'grass' };
+      if (roll < 0.025) Object.assign(c, { deco: 'cactus', solid: true });
+      return c;
+    }
+    case 'wasser':
+      if (wet < 0.62) return { ...water('wild'), biome: theme, deco: roll < 0.04 ? 'lily' : null };
+      c.h = 1;
+      c.ground = wet < 0.7 ? 'sand' : 'grass';
+      if (roll < 0.08) tree('palm');
+      else if (c.ground === 'grass' && roll < 0.16)
+        Object.assign(c, { deco: 'flower', color: flowerColor(seed, x, y) });
+      return c;
+    case 'lava':
+      c.ground = 'basalt';
+      // glühende Flüsse und Seen: man kommt nicht hinein, sie leuchten nur
+      if (Math.abs(valueNoise(seed + 4, x, y, 14) - 0.5) < 0.045 || (h <= 2 && wet < 0.24))
+        return { ...c, h: 0, ground: 'lava' };
+      if (roll < 0.02) tree('dead');
+      else if (roll < 0.06) c.h = h + 1; // Basaltblock
+      return c;
+    case 'hoehle':
+      c.ground = 'cave';
+      if (roll < 0.04) Object.assign(c, { deco: 'crystal', solid: true, color: CRYSTALS[hash(seed, x, y, 13) % 3] });
+      else if (roll < 0.08) Object.assign(c, { deco: 'stalagmite', solid: true });
+      else if (roll < 0.11) c.deco = 'mushroom';
+      return c;
+    case 'wolken': {
+      const cloud = valueNoise(seed + 3, x, y, 8);
+      if (cloud < 0.42) return { ...c, h: 0, ground: 'sky' }; // Himmel zwischen den Wolken
+      c.ground = 'cloud';
+      c.h = cloud < 0.6 ? 1 : cloud < 0.75 ? 2 : 3;
+      if (roll < 0.08) c.deco = 'cloudpuff';
+      return c;
+    }
+    case 'pilze':
+      c.ground = 'moss';
+      if (roll < 0.06) Object.assign(c, { deco: 'bigshroom', solid: true, color: CAPS[hash(seed, x, y, 14) % 3] });
+      else if (roll < 0.2) c.deco = 'mushroom';
+      else if (roll < 0.24) c.deco = 'fern';
+      return c;
+  }
+}
+
+/** Gang hinter einem Tor durch den Fels: schon in seiner Welt, aber eben und frei (Wasser, Lava, Himmel werden Weg) */
+function passage(seed: number, id: GateId, x: number, y: number): Cell {
+  const c = biomeCell(seed, id, x, y);
+  const ground: Ground =
+    c.ground === 'water' ? 'sand' : c.ground === 'lava' ? 'basalt' : c.ground === 'sky' ? 'cloud' : c.ground;
+  return { ...c, h: 1, ground, deco: c.solid ? null : c.deco, solid: false, tree: undefined };
 }
 
 /**
@@ -396,23 +576,26 @@ function dress(seed: number, x: number, y: number, c: Cell): Cell {
 }
 
 export function createWorld(seed: number, opts: { garden?: boolean } = {}): World {
-  const { map: regions, spawns } = buildStart(seed, opts);
+  const places = layouts(seed);
+  const { map: regions, spawns } = buildStart(seed, places, opts);
   const cache = new ChunkCache<Cell>((cx, cy) => {
     const cells: Cell[] = [];
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)
       for (let x = cx * CHUNK; x < (cx + 1) * CHUNK; x++)
-        cells.push(dress(seed, x, y, regions.get(key(x, y)) ?? wildCell(seed, x, y)));
+        cells.push(dress(seed, x, y, regions.get(key(x, y)) ?? biomeCell(seed, biomeOf(seed, places, x, y), x, y)));
     return cells;
   });
-  const gates = new Map(GATES.map((g) => [g.id, gateCells(seed, g.side)] as const));
-  return { seed, cell: (x, y) => cache.get(x, y), gates, spawns, portals: portalsOf(seed) };
+  const gates = new Map<GateId, GatePlace>(
+    places.map(({ id, cells, mid, out, angle }) => [id, { id, cells, mid, out, angle }]),
+  );
+  return { seed, cell: (x, y) => cache.get(x, y), gates, spawns, portals: portalsOf(places) };
 }
 
 /** Höhe, auf der man auf einem Feld steht – null, wenn man dort nicht stehen kann */
 export function standHeight(world: World, open: readonly GateId[], x: number, y: number): number | null {
   const c = world.cell(x, y);
   if (c.gate) return open.includes(c.gate) ? 1 : null;
-  if (c.solid || c.ground === 'water') return null;
+  if (c.solid || c.ground === 'water' || c.ground === 'lava' || c.ground === 'sky') return null;
   return c.h;
 }
 

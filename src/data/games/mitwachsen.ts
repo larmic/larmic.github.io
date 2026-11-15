@@ -7,8 +7,8 @@ import { eyes, type Part } from '../../lib/games/front';
 export type RegionId = 'lichtung';
 export type SpeciesId =
   'hase' | 'igel' | 'schaf' | 'kuh' | 'biene' | 'ente' | 'frosch' | 'schildkroete' | 'fuchs' | 'eichhoernchen';
-export type GateId = 'nordtor' | 'osttor' | 'suedtor' | 'westtor';
-export type GateTheme = 'eis' | 'sand' | 'wasser' | 'lava' | 'hoehle';
+export type GateTheme = 'eis' | 'sand' | 'wasser' | 'lava' | 'hoehle' | 'wald' | 'wolken' | 'pilze';
+export type GateId = GateTheme; // je Welt genau ein Tor
 
 export type Rect = { x0: number; y0: number; x1: number; y1: number }; // Grenzen eingeschlossen
 export type Point = readonly [number, number];
@@ -26,8 +26,7 @@ export type Region = {
 
 export type Gate = {
   id: GateId;
-  kind: 'grosstor'; // großes Tor im Felsen, drei Felder breit
-  side: 'n' | 'o' | 's' | 'w'; // Himmelsrichtung von der Mitte aus
+  kind: 'grosstor'; // mächtiges Torhaus im Felsring: fünf Felder Tor, links und rechts je zwei Felder Turm
   region: RegionId; // Gegend, in der das Tor steht
   leadsTo: string; // was dahinter liegt (kommt später)
   theme: GateTheme; // Blöcke oben auf dem Tor verraten, worum es dahinter geht
@@ -54,8 +53,8 @@ export function regionAnimalList(region: Region): { id: string; species: Species
 }
 
 /**
- * Am Anfang gibt es nur die Lichtung mit dem Bett. Ringsum Felsen mit vier großen Toren, die vorerst zu sind.
- * Dahinter liegt die endlose Landschaft (später Wald, Blumenwiese, Teich, Lavaberge).
+ * Am Anfang gibt es nur die Lichtung mit dem Bett. Ringsum Felsen mit acht großen Toren, die vorerst zu sind.
+ * Dahinter liegen die Welten der Tore als endlose Landschaft.
  */
 export const REGIONS: readonly Region[] = [
   {
@@ -78,19 +77,19 @@ export const REGIONS: readonly Region[] = [
   },
 ];
 
+/**
+ * Die großen Tore: eines je Welt. Wo sie im Felsring stehen und in welcher Reihenfolge, würfelt der Seed jeder Welt.
+ * Hinter jedem Tor liegt in seiner Richtung die passende Landschaft. Vorerst sind alle verschlossen.
+ */
 export const GATES: readonly Gate[] = [
-  { id: 'nordtor', kind: 'grosstor', side: 'n', region: 'lichtung', leadsTo: 'Eiswelt', theme: 'eis', locked: true },
-  { id: 'osttor', kind: 'grosstor', side: 'o', region: 'lichtung', leadsTo: 'Sandwelt', theme: 'sand', locked: true },
-  {
-    id: 'suedtor',
-    kind: 'grosstor',
-    side: 's',
-    region: 'lichtung',
-    leadsTo: 'Wasserwelt',
-    theme: 'wasser',
-    locked: true,
-  },
-  { id: 'westtor', kind: 'grosstor', side: 'w', region: 'lichtung', leadsTo: 'Lavaberge', theme: 'lava', locked: true },
+  { id: 'eis', theme: 'eis', kind: 'grosstor', region: 'lichtung', leadsTo: 'Eiswelt', locked: true },
+  { id: 'sand', theme: 'sand', kind: 'grosstor', region: 'lichtung', leadsTo: 'Sandwelt', locked: true },
+  { id: 'wasser', theme: 'wasser', kind: 'grosstor', region: 'lichtung', leadsTo: 'Wasserwelt', locked: true },
+  { id: 'lava', theme: 'lava', kind: 'grosstor', region: 'lichtung', leadsTo: 'Lavaberge', locked: true },
+  { id: 'hoehle', theme: 'hoehle', kind: 'grosstor', region: 'lichtung', leadsTo: 'Höhlenwelt', locked: true },
+  { id: 'wald', theme: 'wald', kind: 'grosstor', region: 'lichtung', leadsTo: 'Wald', locked: true },
+  { id: 'wolken', theme: 'wolken', kind: 'grosstor', region: 'lichtung', leadsTo: 'Wolkenwelt', locked: true },
+  { id: 'pilze', theme: 'pilze', kind: 'grosstor', region: 'lichtung', leadsTo: 'Pilzwald', locked: true },
 ];
 
 export const HOME = {
@@ -103,8 +102,8 @@ export const HOME = {
     [-1, 1],
   ] as readonly Point[], // freie Plätze am Bett zum Aufwachen
   clear: 2, // so weit um das Bett bleibt es flach und frei
-  /** Partner-Portale in kleinem Abstand über dem Bett: erscheinen, sobald das Portal am Tor aktiviert ist */
-  portals: { nordtor: [-3, -4], osttor: [-1, -4], suedtor: [1, -4], westtor: [3, -4] } as Record<GateId, Point>,
+  /** Partner-Portale stehen im Kreis um das Bett, jedes in Richtung seines Tors; erscheinen mit der Aktivierung */
+  portalRing: 8,
   /** Garten für später: Er entsteht noch nicht in der Welt (createWorld mit { garden: true } für Tests) */
   garden: { x0: 3, y0: -3, x1: 6, y1: 0 } as Rect,
   gardenGate: [4, 1] as Point, // Rosenbogen in der Hecke; das Feld dahinter bleibt frei
@@ -307,13 +306,16 @@ export const figureParts = (l: Look): Part[] => [
 
 // ---------- Farben der Spielwelt (Spielgrafik wie die Texturen, nicht Oberfläche) ----------
 
-/** Farben der Themen-Blöcke auf den Toren: Seite, Oberseite, Leuchten (nur Lava leuchtet) */
+/** Farben je Welt: Seite und Oberseite der Themen-Blöcke, Leuchten (Lava), Farbe des Portals */
 export const THEME_COLORS: Record<GateTheme, { side: string; top: string; glow?: string; portal: string }> = {
   eis: { side: '#9fd6ef', top: '#e6f7ff', portal: '#9fe3ff' },
   sand: { side: '#d9bf7f', top: '#ecd9a2', portal: '#ffd98a' },
   wasser: { side: '#3f8fd8', top: '#8cc6f0', portal: '#4fb3ff' },
   lava: { side: '#e8541c', top: '#ffb347', glow: '#ff5a10', portal: '#ff7a1a' },
-  hoehle: { side: '#3c3f47', top: '#55596a', portal: '#8a6bd6' },
+  hoehle: { side: '#3c3f47', top: '#55596a', portal: '#a07cff' },
+  wald: { side: '#5d3e21', top: '#3f9a3c', portal: '#7fdc6a' },
+  wolken: { side: '#e9f1fb', top: '#ffffff', portal: '#ffe27a' },
+  pilze: { side: '#c8323a', top: '#f3efe6', portal: '#e08cff' },
 };
 
 export const GAME_COLORS = {

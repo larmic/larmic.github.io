@@ -97,7 +97,7 @@ function passages(world: World): Set<string> {
   let set = passageCache.get(world);
   if (!set) {
     const portalSpots = [...world.portals.values()].flatMap((p) => [p.gate, p.gateExit, p.home, p.homeExit]);
-    const spots = [...[...world.gates.values()].flat(), HOME.gardenGate, ...portalSpots];
+    const spots = [...[...world.gates.values()].flatMap((g) => g.cells), HOME.gardenGate, ...portalSpots];
     set = new Set(
       spots.flatMap(([x, y]) =>
         [

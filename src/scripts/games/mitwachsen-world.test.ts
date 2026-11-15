@@ -102,17 +102,15 @@ describe('Start auf der Lichtung', () => {
     });
 
     it(`Seed ${seed}: Die großen Tore liegen weit vom Bett`, () => {
-      for (const cells of w.gates.values()) {
-        const [x, y] = cells[1];
-        expect(Math.hypot(x - HOME.bed[0], y - HOME.bed[1])).toBeGreaterThan(60);
-      }
+      for (const { mid } of w.gates.values())
+        expect(Math.hypot(mid[0] - HOME.bed[0], mid[1] - HOME.bed[1])).toBeGreaterThan(60);
     });
 
     it(`Seed ${seed}: In der Landschaft klettert man eine Stufe hinauf und fällt beliebig tief herunter`, () => {
       let up = 0,
         down = 0;
       for (let y = 130; y < 170; y++)
-        for (let x = -50; x < 50; x++) {
+        for (let x = -200; x < 200; x++) {
           const a = standHeight(w, [], x, y),
             b = standHeight(w, [], x + 1, y);
           if (a === null || b === null) continue;
@@ -123,11 +121,21 @@ describe('Start auf der Lichtung', () => {
       expect(up + down).toBeGreaterThan(0); // es gibt Stellen mit großem Höhenunterschied
     });
 
-    it(`Seed ${seed}: Vier große Tore zu je drei Feldern, alle verschlossen`, () => {
+    it(`Seed ${seed}: Acht große Tore zu je fünf Feldern, alle verschlossen, mit Türmen daneben`, () => {
       expect([...w.gates.keys()].sort()).toEqual(GATES.map((g) => g.id).sort());
       for (const g of GATES) {
-        const cells = w.gates.get(g.id)!;
-        expect(cells).toHaveLength(3);
+        const { cells, out } = w.gates.get(g.id)!;
+        expect(cells).toHaveLength(5);
+        const [ax, ay] = [Math.abs(out[1]), Math.abs(out[0])]; // entlang der Torreihe
+        for (const k of [3, 4]) {
+          for (const [x, y] of [
+            [cells[2][0] + ax * k, cells[2][1] + ay * k],
+            [cells[2][0] - ax * k, cells[2][1] - ay * k],
+          ]) {
+            expect(w.cell(x, y).deco, `${g.id} Turm`).toBe('gatetower');
+            expect(standHeight(w, [], x, y)).toBeNull();
+          }
+        }
         for (const [x, y] of cells) {
           expect(w.cell(x, y).deco).toBe('biggate');
           expect(w.cell(x, y).gate).toBe(g.id);
@@ -137,20 +145,47 @@ describe('Start auf der Lichtung', () => {
       }
     });
 
-    it(`Seed ${seed}: Vor jedem großen Tor kommt man hin`, () => {
-      const set = new Set(reachable(w, [], START).map(([x, y]) => `${x},${y}`));
+    it(`Seed ${seed}: Vor jedem großen Tor kommt man hin, dahinter nie (auch nicht außen herum)`, () => {
+      const cells = reachable(w, [], START);
+      const set = new Set(cells.map(([x, y]) => `${x},${y}`));
       for (const g of GATES) {
-        const [mx, my] = w.gates.get(g.id)![1];
-        const front = Object.values(DIRS).some(([dx, dy]) => set.has(`${mx + dx},${my + dy}`));
-        expect(front, g.id).toBe(true);
+        const { cells: row, out } = w.gates.get(g.id)!;
+        for (const [x, y] of row) {
+          expect(set.has(`${x - out[0]},${y - out[1]}`), `${g.id} davor`).toBe(true);
+          expect(set.has(`${x + out[0]},${y + out[1]}`), `${g.id} dahinter`).toBe(false);
+          expect(w.cell(x + out[0], y + out[1]).biome, `${g.id} Gang in seine Welt`).toBe(g.id);
+        }
       }
+      expect(cells.some(([x, y]) => w.cell(x, y).biome)).toBe(false);
+    });
+
+    it(`Seed ${seed}: Hinter jedem Tor liegt in seiner Richtung seine Welt`, () => {
+      const { rx, ry } = lichtung.shape;
+      for (const { id, angle } of w.gates.values())
+        for (const k of [1.6, 2.2, 3]) {
+          const x = Math.round(Math.cos(angle) * rx * k),
+            y = Math.round(Math.sin(angle) * ry * k);
+          expect(w.cell(x, y).biome, `${id} bei ${x},${y}`).toBe(id);
+        }
     });
   }
 
-  it('Die drei Felder jedes großen Tores liegen in einer geraden Reihe (viele Seeds)', () => {
+  it('Lage und Reihenfolge der Tore würfelt der Seed', () => {
+    const a = createWorld(5),
+      b = createWorld(6);
+    const mids = (w: ReturnType<typeof createWorld>) => GATES.map((g) => w.gates.get(g.id)!.mid.join(',')).join(' ');
+    expect(mids(a)).not.toBe(mids(b));
+    expect(mids(a)).toBe(mids(createWorld(5)));
+  });
+
+  it('Die fünf Felder jedes großen Tores liegen in einer geraden Reihe, Tore weit auseinander (viele Seeds)', () => {
     for (let seed = 1; seed < 400; seed += 25) {
       const w = createWorld(seed * 4513);
-      for (const cells of w.gates.values()) {
+      const all = [...w.gates.values()];
+      for (const a of all)
+        for (const b of all)
+          if (a !== b) expect(Math.hypot(a.mid[0] - b.mid[0], a.mid[1] - b.mid[1])).toBeGreaterThan(30);
+      for (const { cells } of w.gates.values()) {
         const xs = new Set(cells.map(([x]) => x)),
           ys = new Set(cells.map(([, y]) => y));
         expect(xs.size === 1 || ys.size === 1, `Seed ${seed * 4513}`).toBe(true);
@@ -209,7 +244,7 @@ describe('Landschaft', () => {
 
 describe('Portale', () => {
   for (const seed of [1, 42, 2026]) {
-    it(`Seed ${seed}: neben jedem Tor ein erreichbares Portal, sein Partner über dem Bett`, () => {
+    it(`Seed ${seed}: neben jedem Tor ein erreichbares Portal, sein Partner im Kreis um das Bett`, () => {
       const w = createWorld(seed);
       const cells = new Set(reachable(w, [], START).map(([x, y]) => `${x},${y}`));
       for (const g of GATES) {
@@ -218,7 +253,10 @@ describe('Portale', () => {
         expect(w.cell(p.home[0], p.home[1]).portal).toEqual({ id: g.id, side: 'home' });
         expect(cells.has(`${p.gateExit[0]},${p.gateExit[1]}`), `${g.id} Ausgang am Tor`).toBe(true);
         expect(cells.has(`${p.homeExit[0]},${p.homeExit[1]}`), `${g.id} Ausgang am Bett`).toBe(true);
-        expect(Math.max(Math.abs(p.home[0] - HOME.bed[0]), Math.abs(p.home[1] - HOME.bed[1]))).toBeLessThanOrEqual(4);
+        expect(Math.hypot(p.home[0] - HOME.bed[0], p.home[1] - HOME.bed[1])).toBeLessThanOrEqual(HOME.portalRing + 1);
+        // Säulen links und rechts sind fest
+        const [fx, fy] = p.gateFacing;
+        for (const o of [-1, 1]) expect(w.cell(p.gate[0] + fy * o, p.gate[1] + fx * o).deco).toBe('portalside');
       }
     });
   }
