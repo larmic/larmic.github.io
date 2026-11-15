@@ -33,6 +33,13 @@ const { headingId } = Astro.props;
   Spielen gedacht. Nach 15 und 20 Minuten wird die Figur müde, nach 25 Minuten möchte sie ins Bett. Gesperrt wird
   nichts. Wann Schluss ist, entscheiden die Eltern.
 </p>
+<p class="mw-store">
+  Spielstand und Einstellungen bleiben nur im Browser dieses Geräts, ohne Cookies und ohne Übertragung. Mehr dazu in der
+  <a href="/datenschutz/" data-astro-reload>
+    Datenschutzerklärung
+  </a>
+  .
+</p>
 <p class="mw-sources">Quellen:</p>
 <ul class="mw-sources">
   <li>
@@ -89,7 +96,11 @@ const { headingId } = Astro.props;
     margin-top: 4px;
     padding-left: 20px;
   }
-  .mw-sources a {
+  .mw-store {
+    font-size: 0.9rem;
+  }
+  .mw-sources a,
+  .mw-store a {
     color: var(--ink);
   }
 </style>
