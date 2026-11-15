@@ -665,7 +665,6 @@ export class World3D {
   private decoration(g: Geo, blades: Geo, canopy: Geo, bright: Geo, c: Cell, x: number, y: number) {
     const h = c.h;
     if (c.tufts) this.tufts(blades, x, y, h, c.tufts);
-    if (c.roof) this.shelter(g, x, y, h);
     switch (c.deco) {
       case 'tree':
         this.tree(g, canopy, x, y, h, c.tree ?? 'oak');
@@ -767,6 +766,9 @@ export class World3D {
         }
         break;
       }
+      case 'shelterpilz':
+        this.shelterPilz(g, canopy, x, y, h);
+        break;
       case 'cloudpuff':
         g.box(x + 0.15, h, y + 0.3, 0.5, 0.25, 0.4, '#ffffff', null, 'cloud');
         g.box(x + 0.4, h, y + 0.15, 0.4, 0.35, 0.45, '#ffffff', null, 'cloud');
@@ -891,36 +893,38 @@ export class World3D {
 
   /** Großes Tor im Felsen: Holzflügel mit Eisenbändern, oben ein Steinsturz; in der Mitte das Schloss */
   /**
-   * Unterstand auf der Wiese, Feld für Feld: Pfosten an den Ecken, Balken vorn und hinten, ein leicht schräges
-   * Lattendach mit Lücken (hinten höher). Durch die Lücken sieht man die Tiere darunter auch von schräg oben.
+   * Riesenpilz auf der Wiese als Unterstand: dicker cremefarbener Stiel mit Kragen in der Mitte, darüber ein
+   * hoher, breiter roter Hut mit weißen Tupfen (Laub-Material: vor der Figur wird er durchsichtig). Der Hut sitzt so
+   * hoch, dass man die Tiere in den vorderen Reihen darunter sieht.
    */
-  private shelter(g: Geo, x: number, y: number, h: number) {
+  private shelterPilz(g: Geo, canopy: Geo, x: number, y: number, h: number) {
     const { x0, y0, x1, y1 } = HOME.shelter;
-    const wood = '#8a5a30',
-      woodTop = '#a0703f',
-      straw = '#d9b85a',
-      strawTop = '#ecd27a';
-    const top = (yy: number) => h + 2.25 - (yy - y0) * 0.16; // Dachhöhe an der Stelle yy
-    for (const [cx, cy] of [
-      [x0, y0],
-      [x1, y0],
-      [x0, y1],
-      [x1, y1],
-    ])
-      if (x === cx && y === cy) {
-        const px = x === x0 ? x + 0.05 : x + 0.77,
-          pz = y === y0 ? y + 0.05 : y + 0.77;
-        g.box(px, h, pz, 0.18, top(pz) - h, 0.18, wood, woodTop, 'planks');
-      }
-    if (y === y0) g.box(x, top(y + 0.1) - 0.18, y + 0.05, 1, 0.16, 0.16, wood, woodTop, 'planks');
-    if (y === y1) g.box(x, top(y + 0.85) - 0.18, y + 0.79, 1, 0.16, 0.16, wood, woodTop, 'planks');
-    for (let k = 0; k < 2; k++) {
-      const sx = x + 0.1 + k * 0.5; // breite Lücken: Man sieht die Tiere darunter
-      for (let j = 0; j < 4; j++) {
-        const sz = y + j * 0.25;
-        g.box(sx, top(sz + 0.12), sz, 0.22, 0.07, 0.25, straw, strawTop);
-      }
-    }
+    const stem = '#efe4d2',
+      stemTop = '#f7efe2',
+      red = '#d9473a',
+      redTop = '#e0574a';
+    g.box(x + 0.15, h, y + 0.15, 0.7, 3.2, 0.7, stem, stemTop);
+    g.box(x - 0.05, h + 2.2, y - 0.05, 1.1, 0.25, 1.1, stem, stemTop); // Kragen
+    const [cx0, cx1] = [x0 - 0.6, x1 + 1.6],
+      [cz0, cz1] = [y0 - 0.8, y1 + 1.8];
+    canopy.box(cx0, h + 3.2, cz0, cx1 - cx0, 0.45, cz1 - cz0, red, redTop); // Hutrand
+    canopy.box(cx0 + 0.9, h + 3.65, cz0 + 0.7, cx1 - cx0 - 1.8, 0.45, cz1 - cz0 - 1.4, red, redTop);
+    canopy.box(cx0 + 2.0, h + 4.1, cz0 + 1.3, cx1 - cx0 - 4.0, 0.35, cz1 - cz0 - 2.6, red, redTop); // Kuppe
+    canopy.box(cx0 + 0.05, h + 3.15, cz0 + 0.05, cx1 - cx0 - 0.1, 0.06, cz1 - cz0 - 0.1, '#f3e6c8'); // Lamellen unten
+    // weiße Tupfen auf den Stufen des Huts und vorn am Rand
+    for (const [dx, dz, step] of [
+      [0.3, 0.3, 0],
+      [7.6, 0.4, 0],
+      [0.4, 4.6, 0],
+      [7.5, 4.5, 0],
+      [1.4, 1.0, 1],
+      [5.6, 1.2, 1],
+      [2.0, 3.6, 1],
+      [5.2, 3.8, 1],
+      [3.6, 2.2, 2],
+    ] as const)
+      canopy.box(cx0 + dx, h + 3.65 + step * 0.45, cz0 + dz, 0.5, 0.06, 0.5, '#ffffff');
+    for (const dx of [0.8, 2.6, 4.6, 6.6]) canopy.box(cx0 + dx, h + 3.3, cz1 - 0.02, 0.5, 0.3, 0.04, '#ffffff');
   }
 
   private fence(g: Geo, x: number, y: number, h: number) {

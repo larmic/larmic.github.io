@@ -122,8 +122,8 @@ Rein in `mitwachsen-weather.ts`: Das Wetter folgt aus Seed, Tag (`state.day`) un
 | --- | --- |
 | Alle 5 Minuten Spielzeit (3000 Takte) ein neues Wetter: Sonne 50 %, Wolken 25 %, Regen 25 %; jeder Tag beginnt mit Sonne | „jeder Tag beginnt mit Sonne …“ |
 | Weicher Übergang über 20 s; nach dem Regen 1,5 Minuten Regenbogen | „wechselt weich …“, „nach dem Regen steht eine Weile ein Regenbogen …“ |
-| Regnet es, gehen die Tiere der Wiese unter den Unterstand (7 × 3 Felder oben auf der Wiese, `HOME.shelter`, `cell.roof`): jedes an einen eigenen Platz darunter oder, wenn er voll ist, dicht daneben, und bleibt dort; danach zurück an ihre Plätze. Sie verlassen die Wiese dabei nie | „Unterstand bei Regen“ |
-| Bild: Wolken dämpfen Sonne und Himmel, Regen fällt in feinen schrägen Strichen (nicht bei reduzierter Bewegung), der Regenbogen steht als Pixelbogen oben rechts. Der Unterstand hat Pfosten und ein Lattendach mit Lücken, damit man die Tiere darunter sieht | (Zeichnen) |
+| Regnet es, gehen die Tiere der Wiese unter den Riesenpilz (7 × 3 Felder oben auf der Wiese, `HOME.shelter`, `cell.roof`; der Stiel in der Mitte ist fest): jedes an einen eigenen Platz darunter, vorn zuerst, oder, wenn er voll ist, dicht daneben, und bleibt dort; danach zurück an ihre Plätze. Sie verlassen die Wiese dabei nie | „Unterstand bei Regen“ |
+| Bild: Wolken dämpfen Sonne und Himmel, Regen fällt in feinen schrägen Strichen (nicht bei reduzierter Bewegung), der Regenbogen steht als Pixelbogen oben rechts. Der Unterstand ist ein Riesenpilz (Fliegenpilz): cremefarbener Stiel mit Kragen in der Mitte, hoher roter Hut mit weißen Tupfen in Stufen; der Hut sitzt so hoch, dass man die Tiere in den vorderen Reihen darunter sieht, und wird vor der Figur durchsichtig wie Laub | (Zeichnen) |
 
 ## Nachwachsen
 

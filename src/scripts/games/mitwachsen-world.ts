@@ -61,7 +61,8 @@ export type Deco =
   | 'bigshroom'
   | 'cloudpuff'
   | 'trough' // Futtertrog auf der Wiese
-  | 'watertrough'; // Wassertrog
+  | 'watertrough' // Wassertrog
+  | 'shelterpilz'; // Stiel des Riesenpilzes auf der Wiese (zeichnet auch den Hut)
 export type TreeKind =
   'oak' | 'birch' | 'autumn' | 'red' | 'blossom' | 'winter' | 'pine' | 'snowpine' | 'palm' | 'dead';
 /** Portal je Tor: Feld am Tor und am Bett, je mit dem Feld davor (dort kommt man heraus) und der Blickrichtung */
@@ -341,6 +342,12 @@ function buildStart(
   for (let y = HOME.shelter.y0; y <= HOME.shelter.y1; y++)
     for (let x = HOME.shelter.x0; x <= HOME.shelter.x1; x++)
       set(x, y, { ...grass('lichtung'), garden: true, roof: true });
+  set(HOME.shelterStem[0], HOME.shelterStem[1], {
+    ...grass('lichtung'),
+    garden: true,
+    deco: 'shelterpilz',
+    solid: true,
+  });
   smooth(map);
 
   // Vom Torplatz ein freier Gang nach innen, bis er auf erreichbares Land trifft (Teiche, Bäume)

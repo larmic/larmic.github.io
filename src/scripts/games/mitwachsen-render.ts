@@ -701,24 +701,6 @@ export class Renderer {
     const c = grown(world.seed, state.day, x, y, world.cell(x, y)); // mit allem, was schon nachgewachsen ist
     const { ctx } = this;
     const h = c.h;
-    if (c.roof) {
-      // Unterstand: Pfosten an den Ecken, darüber ein Lattendach mit Lücken
-      const { x0, y0, x1, y1 } = HOME.shelter;
-      if ((x === x0 || x === x1) && (y === y0 || y === y1))
-        box(
-          ctx,
-          P,
-          x === x0 ? x + 0.05 : x + 0.77,
-          y === y0 ? y + 0.05 : y + 0.77,
-          h,
-          0.18,
-          0.18,
-          2.1,
-          '#8a5a30',
-          '#a0703f',
-        );
-      for (let k = 0; k < 2; k++) box(ctx, P, x + 0.1 + k * 0.5, y, h + 2.1, 0.22, 1, 0.07, '#d9b85a', '#ecd27a');
-    }
     if (c.tufts) this.tufts(P, x, y, h, c.tufts);
     switch (c.deco) {
       case 'tree':
@@ -853,6 +835,15 @@ export class Renderer {
           c.deco === 'trough' ? '#ecd27a' : '#7fc0f0',
         );
         break;
+      case 'shelterpilz': {
+        // Riesenpilz: Stiel mit Kragen, darüber der rote Hut mit Tupfen (über die ganze Breite des Unterstands)
+        const { x0, y0, x1, y1 } = HOME.shelter;
+        box(ctx, P, x + 0.15, y + 0.15, h, 0.7, 0.7, 3.2, '#efe4d2', '#f7efe2');
+        box(ctx, P, x0 - 0.6, y0 - 0.8, h + 3.2, x1 - x0 + 2.2, y1 - y0 + 2.6, 0.45, '#d9473a', '#e0574a');
+        box(ctx, P, x0 + 0.3, y0 - 0.1, h + 3.65, x1 - x0 + 0.4, y1 - y0 + 1.2, 0.45, '#d9473a', '#e0574a');
+        for (const dx of [0.5, 2.5, 4.5, 6.5]) box(ctx, P, x0 - 0.2 + dx, y1 + 1.0, h + 3.3, 0.5, 0.05, 0.3, '#ffffff');
+        break;
+      }
       case 'cloudpuff':
         box(ctx, P, x + 0.15, y + 0.3, h, 0.6, 0.4, 0.3, '#e6eef7', '#ffffff');
         break;

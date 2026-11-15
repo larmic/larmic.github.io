@@ -135,14 +135,18 @@ function random(s: State): number {
   return v;
 }
 
-/** Plätze bei Regen: erst die Felder unter dem Unterstand, dann die nächsten Felder der Wiese, von der Mitte aus */
+/**
+ * Plätze bei Regen: erst die Felder unter dem Riesenpilz, vorn zuerst (dort sieht man die Tiere unter dem Hutrand),
+ * dann die nächsten Felder der Wiese.
+ */
 const shelterCache = new WeakMap<World, [number, number][]>();
 function shelterSpots(world: World): [number, number][] {
   let out = shelterCache.get(world);
   if (!out) {
     const { x0, y0, x1, y1 } = HOME.shelter;
     const [cx, cy] = [(x0 + x1) / 2, (y0 + y1) / 2];
-    const near = (p: [number, number]) => (world.cell(p[0], p[1]).roof ? 0 : 1000) + Math.hypot(p[0] - cx, p[1] - cy);
+    const near = (p: [number, number]) =>
+      world.cell(p[0], p[1]).roof ? (y1 - p[1]) * 10 + Math.abs(p[0] - cx) : 1000 + Math.hypot(p[0] - cx, p[1] - cy);
     out = [...meadowSpots(world)].sort((a, b) => near(a) - near(b));
     shelterCache.set(world, out);
   }
