@@ -10,6 +10,7 @@ import type { World3D as World3DType } from './mitwachsen-3d';
 import { GAME_COLORS, GATES, HOME, LOOK, SPECIES, THEME_COLORS, TIRED_TALK } from '../../data/games/mitwachsen';
 import { Renderer, type Body, type Float, type Particle, type Scene } from './mitwachsen-render';
 import { Sfx } from './sfx';
+import { NOTE_COLORS, StoryPlayer } from './mitwachsen-story';
 import {
   DEFAULT_FIGURE,
   cleanName,
@@ -90,6 +91,8 @@ class LarmicMitwachsen extends HTMLElement {
   private lastInput = 0; // letzte Eingabe: Spielt lange niemand, setzt sich die Figur und liest
   private pose: Pose = 'stand';
   private sfx = new Sfx();
+  private story = new StoryPlayer(this.sfx); // Klangsteine
+  private listening = false; // die Figur sitzt am Klangstein und hört zu, bis sie losgeht
   private globals: AbortController | null = null;
   private timer: number | undefined;
   private raf = 0;
@@ -186,6 +189,7 @@ class LarmicMitwachsen extends HTMLElement {
     this.globals?.abort();
     this.globals = null;
     this.resize?.disconnect();
+    this.story.stop();
     this.sfx.close();
     clearTimeout(this.bubbleTimer);
     this.gl3d?.dispose();
@@ -355,6 +359,7 @@ class LarmicMitwachsen extends HTMLElement {
           this.pace.clear();
           this.save();
           this.stop();
+          this.story.stop();
           this.sfx.suspend();
         } else this.start();
       },
@@ -453,13 +458,19 @@ class LarmicMitwachsen extends HTMLElement {
     let persist = false;
     // Begegnung (Tier gefunden oder getroffen, Beeren, Füttern, Portal): Die Figur bleibt stehen, bis der Pfeil neu
     // gedrückt wird. Sonst liefe sie mit gehaltenem Pfeil gleich weiter und tauschte den Platz mit dem neuen Tier.
-    if (events.some((e) => ['sing', 'follow', 'pick', 'feed', 'portal', 'teleport'].includes(e.type)))
+    if (events.some((e) => ['sing', 'follow', 'pick', 'feed', 'portal', 'teleport', 'story'].includes(e.type)))
       this.pace.clear();
     for (const e of events) {
       switch (e.type) {
         case 'step':
         case 'swap':
           this.sfx.step(e.type === 'step' ? e.climb : 0);
+          this.listening = false;
+          break;
+        case 'story':
+          this.story.toggle(e.id);
+          this.listening = true;
+          persist ||= e.first;
           break;
         case 'bump':
           this.sfx.bump();
@@ -534,6 +545,7 @@ class LarmicMitwachsen extends HTMLElement {
           this.float('note', 'player', GAME_COLORS.note, now);
           break;
         case 'sleep':
+          this.story.stop();
           this.sfx.lullaby();
           this.nightSince = now;
           // Ins Bett gebracht: Der Tag ist zu Ende, morgen ist die Figur wieder ausgeschlafen
@@ -616,7 +628,8 @@ class LarmicMitwachsen extends HTMLElement {
     for (const id of this.bodies.keys()) if (!targets.has(id)) this.bodies.delete(id);
     for (const [id, t] of targets) {
       const ground = standHeight(this.world, this.state.openGates, t.x, t.y) ?? this.world.cell(t.x, t.y).h;
-      const sits = id === 'player' && (now < this.sitUntil || this.pose !== 'stand'); // müde oder lesend
+      const sits =
+        id === 'player' && (now < this.sitUntil || this.pose !== 'stand' || (this.listening && !!this.story.playing)); // müde, lesend, zuhörend
       const z = sits ? ground - 0.35 : ground; // sitzt im Gras
       let b = this.bodies.get(id);
       if (!b || snap || Math.abs(b.x - t.x) + Math.abs(b.y - t.y) > 2.5) b = { x: t.x, y: t.y, z, hop: 0 };
@@ -639,6 +652,14 @@ class LarmicMitwachsen extends HTMLElement {
     }
   }
 
+  /** Am Klangstein: Noten steigen auf, solange die Figur zuhört; Menü oder Hinweis halten die Geschichte an */
+  private storyFrame(t: number) {
+    if (this.paused()) this.story.stop();
+    const fresh = this.floats.some((f) => f.kind === 'note' && f.who === 'player' && t - f.born < 900);
+    if (this.listening && this.story.playing && !fresh && !this.reduced.matches)
+      this.float('note', 'player', NOTE_COLORS.top, t);
+  }
+
   private frame(t: number) {
     this.raf = requestAnimationFrame((n) => this.frame(n));
     const dt = Math.min(0.05, (t - (this.lastFrame || t)) / 1000);
@@ -649,6 +670,7 @@ class LarmicMitwachsen extends HTMLElement {
     const next = this.paused() ? null : this.pace.poll(t);
     if (next) this.apply({ type: 'move', dir: next });
     this.glide(dt, t);
+    this.storyFrame(t);
 
     const bump = t - (this.hops.get('bump') ?? -1e9);
     const shake = !this.reduced.matches && bump < 200 ? Math.sin(bump / 18) * 0.06 * (1 - bump / 200) : 0;

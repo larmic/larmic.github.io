@@ -18,6 +18,7 @@ import {
   type RegionId,
   type SpeciesId,
 } from '../../data/games/mitwachsen';
+import { BED_STONE, type StoryId } from '../../data/games/mitwachsen-stories';
 
 export type Ground =
   | 'grass'
@@ -62,7 +63,8 @@ export type Deco =
   | 'cloudpuff'
   | 'trough' // Futtertrog auf der Wiese
   | 'watertrough' // Wassertrog
-  | 'shelterpilz'; // Stiel des Riesenpilzes auf der Wiese (zeichnet auch den Hut)
+  | 'shelterpilz' // Stiel des Riesenpilzes auf der Wiese (zeichnet auch den Hut)
+  | 'klangstein'; // Stein mit schwebender Note: Hineinlaufen spielt die Geschichte des Ortes
 export type TreeKind =
   'oak' | 'birch' | 'autumn' | 'red' | 'blossom' | 'winter' | 'pine' | 'snowpine' | 'palm' | 'dead';
 /** Portal je Tor: Feld am Tor und am Bett, je mit dem Feld davor (dort kommt man heraus) und der Blickrichtung */
@@ -101,6 +103,7 @@ export type Cell = {
   part?: { id: GateId; side?: 'gate' | 'home' }; // Turm eines Tors oder Säule eines Portals: gehört zu dieser Welt
   shade?: number; // Farbfleck im Boden: −1 dunkler … +1 heller (große, weiche Flecken)
   tint?: string; // Farbe, mit der Gras und Blätter auf der Lichtung getönt sind (Stimmung der Richtung)
+  story?: StoryId; // Klangstein dieser Geschichte
 };
 
 export type World = {
@@ -114,6 +117,8 @@ export type World = {
   readonly portals: ReadonlyMap<GateId, Portal>;
   /** Die großen Tore: Lage und Reihenfolge würfelt der Seed */
   readonly gates: ReadonlyMap<GateId, GatePlace>;
+  /** Klangsteine: einer am Bett, einer vor jedem großen Tor */
+  readonly stones: ReadonlyMap<StoryId, Point>;
   /** Stimmung an einem Ort: Richtung des nächsten Tors und wie stark (0 am Bett … 1 am Felsring) */
   climate(x: number, y: number): Climate;
 };
@@ -223,6 +228,14 @@ function portalsOf(places: readonly Layout[]): Map<GateId, Portal> {
     });
   }
   return out;
+}
+
+/** Klangsteine: am Bett und vor jedem Tor gegenüber dem Portal, vor dem anderen Turm (der Gang zum Tor bleibt frei) */
+function stonesOf(places: readonly Layout[]): Map<StoryId, Point> {
+  return new Map<StoryId, Point>([
+    ['bett', BED_STONE],
+    ...places.map((p): [StoryId, Point] => [p.id, p.at(-p.side * (GATE_HALF + TOWER), p.depth - 2)]),
+  ]);
 }
 
 /** Lichtung als feste Karte: Bett in der Mitte, Hügel, Teiche, Wäldchen, Blumenwiesen, Steine, Felsring, große Tore */
@@ -355,6 +368,8 @@ function buildStart(
     deco: 'shelterpilz',
     solid: true,
   });
+  for (const [story, [x, y]] of stonesOf(places))
+    set(x, y, { ...grass('lichtung'), garden: map.get(key(x, y))?.garden, deco: 'klangstein', solid: true, story });
   smooth(map);
 
   // Vom Torplatz ein freier Gang nach innen, bis er auf erreichbares Land trifft (Teiche, Bäume)
@@ -697,6 +712,7 @@ export function createWorld(seed: number): World {
     spawns,
     spots,
     portals: portalsOf(places),
+    stones: stonesOf(places),
     climate: (x, y) => climateOf(seed, places, x, y),
   };
 }

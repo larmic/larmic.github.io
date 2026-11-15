@@ -27,6 +27,7 @@ function fakeWorld(cells: Record<string, Partial<Cell>> = {}): World {
     spots: [],
     climate: () => ({ id: 'eis', strength: 0 }),
     portals: new Map(),
+    stones: new Map(),
   };
 }
 const animal = (id: string, x: number, y: number, extra: Partial<Animal> = {}): Animal => ({
@@ -684,5 +685,41 @@ describe('Portale', () => {
     const s = initialState(world, { portals: ['lava', 'westtor' as never] });
     expect(s.portals).toEqual(['lava']);
     expect(progressOf(s).portals).toEqual(['lava']);
+  });
+});
+
+describe('Klangsteine', () => {
+  const withStone = () => fakeWorld({ '1,0': { deco: 'klangstein', solid: true, story: 'bett' } });
+
+  it('Hineinlaufen lässt die Geschichte erklingen, beim ersten Mal als neu; die Figur bleibt stehen', () => {
+    const w = withStone();
+    let r = run(awake(w, 0, 0), w, 'e');
+    expect(r.events).toEqual([{ type: 'story', id: 'bett', first: true }]);
+    expect([r.s.player.x, r.s.heard]).toEqual([0, ['bett']]);
+    r = run(r.s, w, 'e'); // noch einmal: hält die Geschichte an (das macht die Ansicht), ist aber nicht mehr neu
+    expect(r.events).toEqual([{ type: 'story', id: 'bett', first: false }]);
+  });
+
+  it('die Aktionstaste vor dem Stein geht genauso', () => {
+    const w = withStone();
+    const s = awake(w, 0, 0);
+    const r = run({ ...s, player: { ...s.player, dir: 'e' } }, w, ACT);
+    expect(types(r.events)).toEqual(['story']);
+  });
+
+  it('Tiere in der Nähe drehen sich zur Figur und bleiben stehen, als hörten sie zu', () => {
+    const w = withStone();
+    const r = run(awake(w, 0, 0, [animal('a', 0, 2, { rest: 1 }), animal('b', 0, 9, { rest: 1 })]), w, 'e');
+    expect(r.s.animals.map((a) => [a.dir, a.rest >= 30])).toEqual([
+      ['n', true],
+      ['s', false],
+    ]);
+  });
+
+  it('gehörte Geschichten kommen mit dem Spielstand wieder, unbekannte fallen weg', () => {
+    const world = createWorld(1);
+    const s = initialState(world, { heard: ['eis', 'bett'] });
+    expect(s.heard).toEqual(['eis', 'bett']);
+    expect(progressOf(s).heard).toEqual(['eis', 'bett']);
   });
 });

@@ -325,3 +325,29 @@ describe('Portale', () => {
     });
   }
 });
+
+describe('Klangsteine', () => {
+  for (const seed of [1, 42, 2026]) {
+    const w = createWorld(seed);
+    it(`Seed ${seed}: einer am Bett, einer vor jedem Tor; fest, erreichbar, der Weg zum Tor bleibt frei`, () => {
+      expect([...w.stones.keys()].sort()).toEqual(['bett', ...GATES.map((g) => g.id)].sort());
+      const reach = new Set(reachable(w, [], START, 200000).map(([x, y]) => `${x},${y}`));
+      for (const [id, [x, y]] of w.stones) {
+        const c = w.cell(x, y);
+        expect([c.deco, c.story, c.solid], id).toEqual(['klangstein', id, true]);
+        const sides = Object.values(DIRS).map(([dx, dy]) => `${x + dx},${y + dy}`);
+        expect(
+          sides.some((k) => reach.has(k)),
+          `${id}: man kommt heran`,
+        ).toBe(true);
+      }
+      for (const g of w.gates.values()) {
+        const [sx, sy] = w.stones.get(g.id)!;
+        // nicht im Tor und nicht direkt davor; die Bucht vor der Tormitte bleibt frei
+        for (const [x, y] of g.cells) expect(Math.abs(x - sx) + Math.abs(y - sy), g.id).toBeGreaterThan(1);
+        for (let k = 1; k <= 3; k++)
+          expect(reach.has(`${g.mid[0] - g.out[0] * k},${g.mid[1] - g.out[1] * k}`)).toBe(true);
+      }
+    });
+  }
+});

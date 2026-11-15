@@ -1,12 +1,12 @@
 # Konzept: Mitwachsen ab 3
 
-Das Kind läuft mit einer eigenen Figur durch eine endlose Voxel-Welt, findet verlorene Tiere, die singen, wenn man sie findet, bringt sie nach Hause auf die Wiese ums Bett und öffnet so nach und nach neue Gegenden. Zu jeder Gegend gibt es eine Geschichte, die der Elternteil vorliest. Zum Aufhören legt sich die Figur ins Bett, und es wird Nacht.
+Das Kind läuft mit einer eigenen Figur durch eine endlose Voxel-Welt, findet verlorene Tiere, die singen, wenn man sie findet, bringt sie nach Hause auf die Wiese ums Bett und öffnet so nach und nach neue Gegenden. Zu jedem Ort gibt es eine Geschichte, die ein Klangstein erzählt. Zum Aufhören legt sich die Figur ins Bett, und es wird Nacht.
 
 Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dokument beschreibt die erste Stufe (ab 3). Ein früher Prototyp (feste kleine Insel, Tiere treffen) liegt als Artefakt vor und hat gezeigt: Die Pfeiltasten beherrscht das Kind, die schräge Ansicht der Homepage passt aber nicht dazu (→ läuft dort nach rechts unten).
 
 ## Grundsätze
 
-1. **Kind steuert, Elternteil sitzt daneben.** Das Kind sieht keinen Text. Texte (Geschichten, Hinweise an Toren) sind zum Vorlesen.
+1. **Kind steuert, Elternteil sitzt daneben.** Das Kind sieht keinen Text. Texte (Hinweise an Toren) sind zum Vorlesen, Geschichten erzählt ein Klangstein.
 2. **Nichts geht schief.** Kein Fehlerton, kein Herunterfallen, kein Verlieren. Wände antworten mit einem Wackeln und „boing“.
 3. **Jede Taste tut etwas Freundliches.** Auch wildes Drücken ist gut.
 4. **Ritual zum Anfangen und Aufhören.** Die Figur wacht im Bett auf und legt sich dort wieder schlafen. Wann Schluss ist, entscheidet der Elternteil; gespeichert wird ohnehin laufend.
@@ -159,11 +159,54 @@ Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzel
 - **Aufwachen:** Nach dem Einschlafen reagiert das Spiel einige Sekunden nicht auf Tasten, damit wildes Drücken die Runde nicht sofort weiterführt. Danach bringt ein Tastendruck den Morgen.
 - **Start einer Runde:** Die Figur schläft im Bett, ein Tastendruck weckt sie. Dieser erste Druck schaltet auch den Ton frei (Autoplay-Regeln).
 
-## Geschichten
+## Klangsteine und Geschichten
 
-- Pro Gegend eine kurze Geschichte zum Vorlesen. Sie erscheint, wenn die Gegend zum ersten Mal betreten wird, und bleibt im Menü abrufbar.
-- Entwürfe schreibt Claude, der Vater passt sie an.
-- Kommen erst in Stufe 3; das MVP hat keine Texte.
+Das Kind kann noch nicht lesen, darum erzählen die Geschichten Klangsteine. Ein **Klangstein** ist ein kleiner Steinblock, über dem eine goldene Note schwebt (Gold heißt auf der ganzen Seite: hier kannst du etwas tun). Einer steht links vorn neben dem Bett, einer vor jedem großen Tor, gegenüber dem Portal vor dem anderen Turm.
+
+- **Hineinlaufen** spielt die Geschichte des Ortes, wie alles andere im Spiel ohne Leertaste. Noch einmal hineinlaufen hält sie an, ein anderer Stein löst den vorigen ab. Nichts spielt von selbst.
+- **Zuhören:** Solange die Figur stehen bleibt, sitzt sie am Stein, Noten steigen auf, und Tiere in der Nähe drehen sich zu ihr um und bleiben eine Weile stehen. Geht sie los, läuft die Geschichte weiter. Menü, Schlafen oder ein Wechsel des Tabs halten sie an.
+- **Neu oder schon gehört:** Die Note einer noch nie gehörten Geschichte ist größer und pulsiert sanft; danach schwebt sie ruhig. So sieht das Kind ohne Text, wo es etwas Neues gibt. Was gehört ist, wird gespeichert.
+- **Erst Musik, später die Stimme:** Jeder Ort hat eine kurze Melodie, die zu seiner Welt passt (am Bett ein Schlaflied, Eis hell und klirrend, Lava tief und brummend, in der Höhle mit Echo …), erzeugt im Browser wie alle Töne. Spricht der Vater einen Text ein, spielt die Melodie als Vorspiel und danach die Aufnahme. Fehlt eine Aufnahme, bleibt es bei der Melodie; so können die Texte nach und nach dazukommen.
+- **Aufnahmen einbauen:** Datei als `public/games/mitwachsen/stimme/<id>.m4a` ablegen (AAC, mono, etwa 30 bis 40 Sekunden, auf gleiche Lautstärke gebracht) und in `src/data/games/mitwachsen-stories.ts` bei `voice` eintragen. Ein Test prüft, dass jede eingetragene Datei da ist. Geladen wird sie erst, wenn das Kind in den Stein läuft; die Homepage lädt nichts davon.
+- **Die Texte** stehen in `src/data/games/mitwachsen-stories.ts` und hier wortgleich zum Vorlesen und Einsprechen; ein Test hält beide gleich. Wer einen Text ändert, ändert beide Stellen. Sie sind in der Du-Form geschrieben, ohne Angst und ohne Druck. Mehrere sagen bewusst „wenn du ein bisschen größer bist“: Die Tore gehen in späteren Altersstufen auf, das passt zu Mitwachsen.
+
+**Am Bett** (`bett`)
+
+> Guten Morgen! Du bist auf der Lichtung aufgewacht, und da steht dein Bett. Gestern haben die Tiere Verstecken gespielt. Dabei sind sie so weit weggelaufen, dass sie den Weg nach Hause nicht mehr finden. Jetzt sitzen sie irgendwo und warten, dass jemand kommt. Wenn du eins siehst, lauf einfach zu ihm hin. Es freut sich so sehr, dass es mit dir mitkommt. Und hier bei deinem Bett gibt es Futter und frisches Wasser für alle.
+
+**Tor zur Eiswelt** (`eis`)
+
+> Hinter diesem Tor ist es so kalt, dass sogar das Wasser zu Eis wird. Dort wohnt ein kleiner Pinguin, der den ganzen Tag auf dem Bauch übers Eis rutscht. Manchmal rutscht er bis ans Tor und schaut zu dir herüber. Noch ist das Tor zu. Aber wenn du ein bisschen größer bist, geht es auf, und dann rutscht ihr zusammen.
+
+**Tor zur Sandwelt** (`sand`)
+
+> Hinter diesem Tor liegt Sand, so weit du gucken kannst, ganz warm von der Sonne. Dort wohnt ein Kamel, das schon lange unterwegs ist und nicht mehr weiß, wo die Wasserstelle war. Hörst du, wie der Wind über die Sandhügel pfeift? Das Tor bleibt noch ein Weilchen zu. Irgendwann machen wir es auf und helfen dem Kamel beim Suchen.
+
+**Tor zur Wasserwelt** (`wasser`)
+
+> Hinter diesem Tor ist überall Wasser, mit kleinen Inseln dazwischen. Die Fische spielen dort gern Fangen, und eine Robbe klatscht dazu mit den Flossen. Wenn du ganz leise bist, kannst du die Wellen hören. Das Tor ist noch zu, aber die Robbe wartet schon auf dich.
+
+**Tor zu den Lavabergen** (`lava`)
+
+> Hinter diesem Tor sind hohe Berge, und ganz oben dampft es ein bisschen, so wie bei einem Kochtopf. Das sieht wilder aus, als es ist. Dort leben Salamander mit leuchtend orangen Punkten, die sich gern auf die warmen Steine legen und blinzeln. Wenn das Tor einmal aufgeht, bleiben wir auf den Wegen, dann kann gar nichts passieren.
+
+**Tor zur Höhlenwelt** (`hoehle`)
+
+> Hinter diesem Tor geht es unter die Erde, in eine große Höhle. Dunkel ist es dort aber nicht, denn an den Wänden wachsen Kristalle, die in allen Farben glitzern. Eine Fledermaus wohnt da. Sie schläft am Tag mit dem Kopf nach unten und wacht erst auf, wenn du ins Bett gehst. Vielleicht weckst du sie später einmal.
+
+**Tor zum Wald** (`wald`)
+
+> Hinter diesem Tor stehen so viele Bäume, dass die Sonne nur in kleinen Flecken bis auf den Boden kommt. Dort wohnen ein Reh und ein Specht, der den ganzen Tag an die Bäume klopft: tock, tock, tock. Das Tor ist noch zu. Aber der Specht klopft schon mal an, damit es bald aufgeht.
+
+**Tor zur Wolkenwelt** (`wolken`)
+
+> Hinter diesem Tor geht es hinauf bis zu den Wolken. Die sind dort so dick und weich, dass man darauf hüpfen kann wie auf einem Trampolin. Ein kleiner Drache fliegt da oben herum. Er ist ganz lieb und hat vor nichts Angst, nur vor Gewitter. Wenn du größer bist, darfst du mit ihm fliegen.
+
+**Tor zum Pilzwald** (`pilze`)
+
+> Hinter diesem Tor wachsen Pilze, so groß wie der bei deinem Bett, und nachts leuchten sie ein bisschen, blau und lila. Dort wohnen Schnecken, die ihr Haus immer mitnehmen und überhaupt keine Eile haben. Das Tor ist noch zu. Aber die Schnecken sagen, sie warten gern.
+
+**Später:** Die Geschichte am Bett wächst mit. Sind alle Tiere der Lichtung zu Hause, erzählt der Stein eine zweite („Schau mal, alle sind wieder da …“) als Abschluss der Stufe ab 3. Die Tiere hinter den Toren in den Texten sind Vorschläge; kommen die Welten, sollen sie dazu passen.
 
 ## Welten und Menü
 
@@ -199,14 +242,14 @@ Später (Mitwachsen): Zeiten im Menü einstellbar, wenn das Kind älter wird.
 ## Speichern
 
 - **localStorage**, alle Schlüssel mit Präfix `larmic.games.`: ein Index der Welten und je Welt ein eigener Schlüssel, damit eine kaputte Welt nicht alle anderen mitreißt.
-- **Format je Welt:** `{ v, game: 'mitwachsen', age, seed, worldName, figureName, openGates[], metAnimals[], homeAnimals[], position, visits }`. `age` ist die Altersstufe der Welt. Das Versionsfeld `v` hat eine getestete `migrate()`.
+- **Format je Welt:** `{ v, game: 'mitwachsen', age, seed, worldName, figureName, openGates[], metAnimals[], homeAnimals[], portals[], position, visits, day, explored, heard[] }`. `age` ist die Altersstufe der Welt. Das Versionsfeld `v` hat eine getestete `migrate()`.
 - **Zeitpunkte:** sofort bei jedem wichtigen Ereignis (Tier gefunden, Tor offen, Tier im Garten, schlafen, Welt gewechselt), zusätzlich alle 10 Sekunden die Position und beim Verlassen der Seite (`pagehide`, `visibilitychange`).
 - Alle Zugriffe in `try/catch`. Speichert der Browser nicht (privates Fenster), läuft das Spiel trotzdem.
 - Schlüssel und `game` bleiben auch bei einer Umbenennung der Reihe gleich oder werden in `migrate()` übernommen.
 
 ## Ton
 
-Alles per WebAudio erzeugt, keine Audiodateien. Kurz, warm, leise, nie schrill: Schritt, Wand („boing“), jedes Tier ein eigener Ton, Freund-Melodie, Tor geht auf, Schlaflied. Lautstärke und Zahl gleichzeitiger Stimmen sind begrenzt.
+Alles per WebAudio erzeugt; Audiodateien gibt es nur für eingesprochene Geschichten (siehe Klangsteine), und die lädt erst der Klangstein. Kurz, warm, leise, nie schrill: Schritt, Wand („boing“), jedes Tier ein eigener Ton, Freund-Melodie, Tor geht auf, Schlaflied, je Klangstein eine Melodie. Lautstärke und Zahl gleichzeitiger Stimmen sind begrenzt.
 
 ## Bewegung reduziert
 
@@ -262,7 +305,6 @@ Nur gesammelt, noch nicht ausgeplant.
 - **Tiere befreien:** Später sollen die Tiere nicht nur entdeckt, sondern befreit werden. Daran hängt auch, wie sich die großen Tore öffnen. Die Geschichte dazu fehlt noch: Wovon werden die Tiere befreit, und warum? (Für ein kleines Kind freundlich, ohne Bösewicht, der Angst macht.)
 - **Portale:** Umgesetzt für die großen Tore (siehe Spec). Noch offen: Der Heimweg-Pfeil zeigt auf das Portal, wenn der Weg darüber kürzer ist.
 - **Gemeinsame Welt:** Für ein höheres Alter: Man schickt anderen einen Link und spielt zu zweit in derselben Welt, z. B. Elternteil und Kind oder Kind und Freund. Braucht mehr als GitHub Pages (Verbindung zwischen zwei Browsern oder ein kleiner Dienst) und eine eigene Datenschutzprüfung.
-- **Geschichtenerzähler:** Der Vater spricht die Geschichten selbst ein, das Spiel kann sie vorspielen. Die Aufnahmen lägen als Audiodateien auf der Seite (keine externen Ressourcen). Ob das umgesetzt wird, ist offen.
 
 ## Offen
 

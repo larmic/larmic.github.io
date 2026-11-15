@@ -74,6 +74,7 @@ describe('Welten speichern', () => {
       portals: ['lava' as const],
       position: [3, 4] as [number, number],
       day: 5,
+      heard: ['bett' as const, 'eis' as const],
     };
     expect(progressFrom(withProgress(w, p))).toEqual(p);
   });
@@ -150,12 +151,14 @@ describe('Format und Umzug (migrate)', () => {
       day: -2.5,
       portals: ['lava', 'westtor', 3],
       explored: { '0,0': 42, '1,1': 'AAAA' },
+      heard: ['eis', 'bett', 'eis', 'nordtor', 'constructor', 7],
       worldName: '<script>Welt',
     };
     const w = migrate(raw)!;
     expect(w.day).toBe(0);
     expect(w.portals).toEqual(['lava']);
     expect(w.explored).toEqual({ '1,1': 'AAAA' });
+    expect(w.heard).toEqual(['bett', 'eis']); // unbekannte Geschichten fallen weg
     expect(w.openGates).toEqual(['eis']);
     expect(w.metAnimals).toEqual(['a', 'b']);
     expect(w.homeAnimals).toEqual([{ id: 'p', species: 'hase' }]);

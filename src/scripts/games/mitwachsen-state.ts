@@ -15,6 +15,7 @@ import {
   type RegionId,
   type SpeciesId,
 } from '../../data/games/mitwachsen';
+import type { StoryId } from '../../data/games/mitwachsen-stories';
 import { canStep, standHeight, wildAnimals, type World } from './mitwachsen-world';
 import { raining } from './mitwachsen-weather';
 
@@ -55,6 +56,7 @@ export type State = {
   day: number; // Tage, die die Welt schon erlebt hat (jedes Schlafen zählt einen); Blumen wachsen damit
   dayStart: number; // Takt, an dem der heutige Tag begann (Aufwachen): Das Wetter zählt ab hier, jeder Tag beginnt mit Sonne
   basket: boolean; // Korb mit Beeren auf dem Rücken (nach dem Pflücken, bis zum Futtertrog)
+  heard: StoryId[]; // Geschichten, deren Klangstein schon einmal erklungen ist
 };
 
 /** Was gespeichert wird */
@@ -65,6 +67,7 @@ export type Progress = {
   portals: GateId[];
   position: [number, number];
   day: number;
+  heard: StoryId[];
 };
 
 export type Cmd = { type: 'move'; dir: Dir } | { type: 'action' } | { type: 'tick' };
@@ -74,6 +77,7 @@ export type GameEvent =
   | { type: 'sing'; id: string; species: SpeciesId; first: boolean }
   | { type: 'follow'; id: string }
   | { type: 'swap'; id: string }
+  | { type: 'story'; id: StoryId; first: boolean } // Klangstein angelaufen: Melodie und Geschichte des Ortes
   | { type: 'aside'; id: string; species: SpeciesId } // ein Tier der Wiese macht der Figur Platz
   | { type: 'home'; id: string; species: SpeciesId } // auf der Wiese angekommen
   | { type: 'gate'; id: GateId }
@@ -232,6 +236,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     basket: false,
     day: saved.day ?? 0,
     dayStart: 0,
+    heard: (saved.heard ?? []).filter((id) => world.stones.has(id)),
   };
   openGates(s, []); // Tore, deren Tiere schon alle getroffen sind, stehen offen
   scatter(s, world); // jeder Besuch: Die Tiere wohnen woanders
@@ -268,6 +273,7 @@ export const progressOf = (s: State): Progress => ({
   portals: [...s.portals],
   position: [s.player.x, s.player.y],
   day: s.day,
+  heard: [...s.heard],
 });
 
 /** Tiere einer Gegend (Kennungen) – ein Tor öffnet, wenn alle davon getroffen sind */
@@ -383,6 +389,21 @@ function meetAnimal(s: State, world: World, animal: Animal, dir: Dir, events: Ga
   return true;
 }
 
+/**
+ * Klangstein angelaufen: Die Geschichte des Ortes erklingt (abspielen und anhalten macht die Ansicht). Tiere in der Nähe
+ * drehen sich zur Figur und bleiben eine Weile stehen, als hörten sie mit.
+ */
+function listen(s: State, id: StoryId, events: GameEvent[]) {
+  const first = !s.heard.includes(id);
+  if (first) s.heard = [...s.heard, id].sort();
+  for (const a of s.animals)
+    if (a.mode !== 'follow' && cheb(a.x, a.y, s.player.x, s.player.y) <= 3) {
+      a.dir = dirTo(s.player.x - a.x, s.player.y - a.y);
+      a.rest = Math.max(a.rest, 40);
+    }
+  events.push({ type: 'story', id, first });
+}
+
 /** Freies Feld neben einem Tier der Wiese, auf das es ausweichen kann: lieber seitlich als weiter geradeaus */
 function asideCell(s: State, world: World, a: Animal, dir: Dir): [number, number] | null {
   const sides: Dir[] = dir === 'e' || dir === 'w' ? ['n', 's'] : ['e', 'w'];
@@ -410,6 +431,8 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
     return sing(s, animal, true, events);
   }
   if (animal && meetAnimal(s, world, animal, dir, events)) return;
+  const story = world.cell(tx, ty).story;
+  if (story) return listen(s, story, events);
   // In einen Busch laufen: Die Figur pflückt die Beeren (sie wachsen nach); ohne Beeren ist er nur ein Hindernis
   if (world.cell(tx, ty).deco === 'bush' && !(`${tx},${ty}` in s.picked)) {
     s.picked[`${tx},${ty}`] = s.tick;
@@ -520,6 +543,8 @@ function action(s: State, world: World, events: GameEvent[]) {
     .sort((a, b) => Math.abs(a.x - p.x) + Math.abs(a.y - p.y) - (Math.abs(b.x - p.x) + Math.abs(b.y - p.y)));
   const front = s.animals.find((a) => a.x === fx && a.y === fy);
   if (front) return sing(s, front, true, events);
+  const story = world.cell(fx, fy).story;
+  if (story) return listen(s, story, events);
   if (isBed(fx, fy)) return sleep(s, world, events);
   // Bett daneben: schlafen, außer ein Tier steht näher als das Bett
   const man = (x: number, y: number) => Math.abs(x - p.x) + Math.abs(y - p.y);

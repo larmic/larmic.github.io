@@ -54,6 +54,7 @@ import {
 import { Geo, atlas, type Tile, type V3 } from './mitwachsen-geo';
 import { grown } from './mitwachsen-growth';
 import { gatehouse, parts, portalFrame, swirlCanvas, type Parts } from './mitwachsen-gatehouse';
+import { StoneNotes, stoneInto } from './mitwachsen-story-3d';
 import type { Scene } from './mitwachsen-render';
 import type { State } from './mitwachsen-state';
 import type { Cell, TreeKind, World } from './mitwachsen-world';
@@ -167,6 +168,7 @@ export class World3D {
   private signs = new Group();
   private signKey = '';
   private sleeper = new Group();
+  private notes = new StoneNotes(); // Noten über den Klangsteinen
   private size = { w: 1, h: 1 };
   private world: World | null = null;
 
@@ -211,7 +213,16 @@ export class World3D {
     sc.near = 1;
     sc.far = 60;
     this.sun.shadow.bias = -0.0008;
-    this.scene.add(this.sun, this.sun.target, this.hemi, this.signs, this.sleeper, this.gateGroup, this.portalGroup);
+    this.scene.add(
+      this.sun,
+      this.sun.target,
+      this.hemi,
+      this.signs,
+      this.sleeper,
+      this.gateGroup,
+      this.portalGroup,
+      this.notes.group,
+    );
   }
 
   /**
@@ -386,6 +397,7 @@ export class World3D {
     this.syncSigns(state);
     this.syncSleeper(state);
     this.syncPortals(state, sc);
+    this.notes.update(state.heard, sc.now, sc.reduced);
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -407,6 +419,7 @@ export class World3D {
     this.fogDirty = true;
     this.buildGates(world);
     this.buildPortals(world);
+    this.notes.build(world);
     for (const c of this.chunks.values())
       for (const m of c.meshes) {
         this.scene.remove(m);
@@ -786,6 +799,9 @@ export class World3D {
       }
       case 'shelterpilz':
         this.shelterPilz(g, canopy, x, y, h);
+        break;
+      case 'klangstein':
+        stoneInto(g, x, y, h);
         break;
       case 'cloudpuff':
         g.box(x + 0.15, h, y + 0.3, 0.5, 0.25, 0.4, '#ffffff', null, 'cloud');

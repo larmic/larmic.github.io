@@ -42,7 +42,7 @@ Bei Änderungen am Verhalten Spec und Tests mitziehen.
 
 Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst tun sie nichts.
 
-`step` liefert den neuen Zustand und **Ereignisse** für Ton, Bild und Speichern: `step` (mit Kletterrichtung), `bump`, `sing` (mit `first`), `follow`, `swap`, `aside` (ein Tier der Wiese macht Platz), `home`, `gate`, `portal` (aktiviert), `teleport` (gereist, mit Ziel `gate` oder `home`), `pick` (Beeren gepflückt), `regrow` (Beeren nachgewachsen), `feed` (Beeren in den Futtertrog, mit den Tieren der Wiese), `call`, `sleep`, `wake`.
+`step` liefert den neuen Zustand und **Ereignisse** für Ton, Bild und Speichern: `step` (mit Kletterrichtung), `bump`, `sing` (mit `first`), `follow`, `swap`, `aside` (ein Tier der Wiese macht Platz), `story` (Klangstein angelaufen, mit `first`), `home`, `gate`, `portal` (aktiviert), `teleport` (gereist, mit Ziel `gate` oder `home`), `pick` (Beeren gepflückt), `regrow` (Beeren nachgewachsen), `feed` (Beeren in den Futtertrog, mit den Tieren der Wiese), `call`, `sleep`, `wake`.
 
 ## Regeln
 
@@ -61,6 +61,17 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 11. **Umherlaufen:** Freie Tiere ruhen 8 bis 25 Takte, dann gehen sie einen Schritt oder drehen sich. Sie bleiben in ihrem Zuhause (Gegend, Stück der Landschaft oder Wiese ums Bett) und nie auf einem Feld an einem Durchgang (Tore, Portale und deren Nachbarfelder); wer außerhalb steht (nach einem Platztausch), zieht heim, ein Tier der Wiese dabei nur über die Wiese. Steht die Figur daneben, bleiben sie stehen und schauen sie an. *Tests: „bleibt stehen und schaut …“, „läuft umher, aber nur in seinem Zuhause“, „Durchgänge bleiben frei“*
 11a. **Wechselnde Plätze:** Beim Öffnen einer Welt und an jedem neuen Morgen (Aufwachen) bekommen alle frei umherlaufenden Tiere der Lichtung neue Plätze: zufällige erreichbare Felder der Lichtung (`world.spots`, nicht auf der Wiese, nicht an Durchgängen), mindestens 8 Felder vom Bett und 5 voneinander. Der Zufall kommt aus dem Zustand (Seed der Welt und Zahl der Besuche), gleiche Befehle ergeben weiter den gleichen Zustand. Tiere der Wiese bleiben, wo sie sind. *Tests: „Tiere an wechselnden Stellen“*
 12. **Landschaft:** Tiere der Landschaft gibt es in den Stücken um die Figur (Abstand 1). Ab Abstand 3 verschwinden frei laufende wieder. Gleiche Welt, gleiches Stück: gleiche Tiere am gleichen Platz.
+13. **Klangsteine:** Läuft die Figur in einen Klangstein (oder steht davor und nutzt die Aktion), erklingt seine Geschichte (Ereignis `story`); die Figur bleibt stehen. Beim ersten Mal ist sie neu (`first`) und wird als gehört gespeichert (`heard`). Tiere in drei Feldern Umkreis drehen sich zur Figur und bleiben mindestens 40 Takte stehen. Abspielen und Anhalten (noch einmal hineinlaufen) macht die Ansicht, ebenso das Anhalten bei Menü, Schlafen und Tab-Wechsel. *Tests: „Klangsteine“ (state, world), „Geschichten der Klangsteine“ (`mitwachsen-stories.test.ts`)*
+
+## Klangsteine
+
+| Regel | Tests |
+| --- | --- |
+| Einer am Bett (`BED_STONE`, außerhalb des freien Platzes ums Bett), einer vor jedem großen Tor gegenüber dem Portal; fest, erreichbar, die Bucht vor dem Tor bleibt frei | „einer am Bett, einer vor jedem Tor …“ |
+| Zu jedem Stein gibt es eine Geschichte mit Titel, Text und Melodie; die Texte stehen wortgleich in `docs/games/mitwachsen.md` | „gibt es am Bett und für jedes große Tor“, „stehen wortgleich in der Doku …“ |
+| Melodien sind kürzer als 5 s und bleiben in der Pentatonik (klingen zu den Tieren) | „Melodien sind kurz …“ |
+| Eine Aufnahme (`voice`) wird nur eingetragen, wenn die Datei unter `public/` liegt; ohne Aufnahme bleibt es bei der Melodie | „jede eingetragene Aufnahme liegt wirklich unter public/“ |
+| Gehörte Geschichten kommen mit dem Spielstand wieder, unbekannte fallen weg | „gehörte Geschichten kommen mit dem Spielstand wieder …“, „verwirft unbekannte Tore …“ (save) |
 
 ## Welt
 
@@ -168,7 +179,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Was | Regel |
 | --- | --- |
 | Schlüssel | `larmic.games.index` (Liste der Welten, aktuelle Welt), `larmic.games.world.<id>` je Welt, `larmic.games.muted` |
-| Format | `{ v: 4, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, homeAnimals, portals, position, visits, day, explored }`; `day` zählt die Tage (fehlt er, ist es Tag 0); `portals` sind die aktiven Portale (Unbekanntes fällt weg); `explored` ist der Nebel je Stück (fehlt er, beginnt die Welt im Nebel); `age` ist die Altersstufe der Welt (bisher nur 3) |
+| Format | `{ v: 4, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, homeAnimals, portals, position, visits, day, explored, heard }`; `heard` sind die schon gehörten Geschichten (fehlt es, ist keine gehört); `day` zählt die Tage (fehlt er, ist es Tag 0); `portals` sind die aktiven Portale (Unbekanntes fällt weg); `explored` ist der Nebel je Stück (fehlt er, beginnt die Welt im Nebel); `age` ist die Altersstufe der Welt (bisher nur 3) |
 | Umzug | Version 1 (Arbeitstitel `game: 'threeyear'`, ohne Alter) → 2 (Alter 3) → 3 (`penAnimals` heißt jetzt `homeAnimals`) → 4 (Start auf der Lichtung: gefundene Tiere des alten Zuhauses, die es auf der Lichtung gibt, bleiben gefunden; Tore, Garten und Position beginnen neu). Ältere Indizes werden übernommen |
 | Wann | sofort bei gefunden, Garten, Tor, Portal, Reise, Schlafen, Weltwechsel und Umbenennen; sonst alle 10 s; beim Verlassen der Seite |
 | Fehler | Jeder Zugriff fängt Fehler ab. Ohne Speicher läuft das Spiel bis zum Neuladen weiter. |
@@ -197,6 +208,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Verlorene Tiere | noch nicht gefunden: kleines Fragezeichen über dem Kopf (wippt leicht, außer bei reduzierter Bewegung) |
 | Tiere auf der Wiese | ab und zu steigt ein kleines Herz auf (nicht bei reduzierter Bewegung); beim Ankommen hüpfen sie, rufen ihren Ton und funkeln |
 | Wiese ums Bett | offen, Blumen am Rand; Futtertrog aus Holz mit Heu und Möhren, Wassertrog |
+| Klangsteine | grauer Steinblock, darüber eine goldene Achtelnote, die schwebt und sich leicht dreht; noch nie gehört: größer und sanft pulsierend (bei reduzierter Bewegung still, aber größer). Beim Zuhören sitzt die Figur, solange sie stehen bleibt, und Noten steigen auf; Melodie über WebAudio, Aufnahme danach als Audiodatei, die erst jetzt geladen wird |
 | Beerenbüsche | niedrig und rund in zwei Stufen, mit roten Beeren oben und vorn, damit man sie nicht für Baumwipfel hält (erster Spieltest) |
 | Natur | Grasbüschel, Farne, Pilze, bemooste Findlinge (blockieren, nur auf Hügeln); Bäume als Eiche, Birke, Herbst- oder Blütenbaum, in Gruppen; Farbflecken im Boden. Reine Zierde aus dem Seed, die Regeln ändern sich nicht |
 | Licht und Leben | weiche Schatten unter Bäumen, Büschen, Tieren und Figur; warmes Licht von oben links, leichter Dunst oben, dunklere Ränder; glitzerndes Wasser mit hellem Ufer; tagsüber Schmetterlinge und Pollen, nachts Glühwürmchen (Bewegtes nicht bei reduzierter Bewegung) |

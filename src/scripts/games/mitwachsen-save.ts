@@ -5,6 +5,7 @@
 
 import { GATES, REGIONS, SPECIES, animalId, type GateId, type SpeciesId } from '../../data/games/mitwachsen';
 import type { HomeAnimal, Progress } from './mitwachsen-state';
+import { STORIES, type StoryId } from '../../data/games/mitwachsen-stories';
 
 export const PREFIX = 'larmic.games.';
 export const INDEX_KEY = `${PREFIX}index`;
@@ -32,6 +33,7 @@ export type SavedWorld = {
   visits: number;
   day: number; // Tage der Welt (jedes Schlafen einer), Blumen und Pilze wachsen damit
   explored: Record<string, string>; // Nebel: erkundete Felder je Stück (Base64), siehe mitwachsen-fog.ts
+  heard: StoryId[]; // Geschichten, deren Klangstein schon erklungen ist
 };
 export type Index = {
   v: typeof VERSION; // Index von Version 1 hat dasselbe Format und wird übernommen
@@ -81,6 +83,7 @@ export function newWorld(
     day: 0,
     explored: {},
     portals: [],
+    heard: [],
   };
 }
 
@@ -150,6 +153,7 @@ export function migrate(input: unknown): SavedWorld | null {
     visits: typeof raw.visits === 'number' && raw.visits >= 0 ? Math.floor(raw.visits) : 0,
     day: typeof raw.day === 'number' && raw.day >= 0 && Number.isFinite(raw.day) ? Math.floor(raw.day) : 0,
     portals: strings(raw.portals).filter((g): g is GateId => gates.has(g)),
+    heard: [...new Set(strings(raw.heard))].filter((id): id is StoryId => Object.hasOwn(STORIES, id)).sort(),
     explored: isRecord(raw.explored)
       ? Object.fromEntries(Object.entries(raw.explored).filter(([, v]) => typeof v === 'string') as [string, string][])
       : {},
@@ -230,6 +234,7 @@ export const withProgress = (world: SavedWorld, p: Progress): SavedWorld => ({
   portals: [...p.portals],
   position: [...p.position],
   day: p.day,
+  heard: [...p.heard],
 });
 
 /** Fortschritt einer gespeicherten Welt für den Spielstart */
@@ -240,4 +245,5 @@ export const progressFrom = (w: SavedWorld): Progress => ({
   portals: [...w.portals],
   position: [...w.position],
   day: w.day,
+  heard: [...w.heard],
 });

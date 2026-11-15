@@ -43,6 +43,7 @@ import {
   type SpeciesId,
 } from '../../data/games/mitwachsen';
 import { grown } from './mitwachsen-growth';
+import { drawStone } from './mitwachsen-story';
 import type { WeatherLook } from './mitwachsen-weather';
 import type { Pose } from './mitwachsen-tired';
 import type { Climate } from './mitwachsen-world';
@@ -846,6 +847,9 @@ export class Renderer {
       }
       case 'cloudpuff':
         box(ctx, P, x + 0.15, y + 0.3, h, 0.6, 0.4, 0.3, '#e6eef7', '#ffffff');
+        break;
+      case 'klangstein':
+        drawStone(ctx, P, x, y, h, state.heard.includes(c.story!), sc.now, sc.reduced);
         break;
       case 'gate':
         this.fence(P, world, x, y, h, 1 - (sc.gates.get(c.gate!) ?? 0));

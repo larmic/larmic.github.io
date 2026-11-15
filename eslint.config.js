@@ -42,17 +42,17 @@ export default defineConfig(
     files: ['src/scripts/games/larmic-mitwachsen.ts'],
     rules: {
       complexity: ['error', 31],
-      'max-lines': ['error', { max: 812, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 96, skipBlankLines: true, skipComments: true }],
+      'max-lines': ['error', { max: 832, skipBlankLines: true, skipComments: true }],
+      'max-lines-per-function': ['error', { max: 103, skipBlankLines: true, skipComments: true }],
     },
   },
   {
     files: ['src/scripts/games/mitwachsen-3d.ts'],
     rules: {
-      complexity: ['error', 35],
+      complexity: ['error', 36],
       'max-depth': ['error', 6],
-      'max-lines': ['error', { max: 941, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 130, skipBlankLines: true, skipComments: true }],
+      'max-lines': ['error', { max: 957, skipBlankLines: true, skipComments: true }],
+      'max-lines-per-function': ['error', { max: 133, skipBlankLines: true, skipComments: true }],
     },
   },
   {
@@ -69,9 +69,9 @@ export default defineConfig(
   {
     files: ['src/scripts/games/mitwachsen-render.ts'],
     rules: {
-      complexity: ['error', 56],
-      'max-lines': ['error', { max: 981, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 169, skipBlankLines: true, skipComments: true }],
+      complexity: ['error', 57],
+      'max-lines': ['error', { max: 985, skipBlankLines: true, skipComments: true }],
+      'max-lines-per-function': ['error', { max: 172, skipBlankLines: true, skipComments: true }],
     },
   },
   { files: ['src/scripts/games/mitwachsen-save.ts'], rules: { complexity: ['error', 26] } },
@@ -79,16 +79,16 @@ export default defineConfig(
     files: ['src/scripts/games/mitwachsen-state.ts'],
     rules: {
       complexity: ['error', 27],
-      'max-lines': ['error', { max: 549, skipBlankLines: true, skipComments: true }],
+      'max-lines': ['error', { max: 569, skipBlankLines: true, skipComments: true }],
     },
   },
   {
     files: ['src/scripts/games/mitwachsen-world.ts'],
     rules: {
-      complexity: ['error', 76],
+      complexity: ['error', 78],
       'max-depth': ['error', 5],
-      'max-lines': ['error', { max: 641, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 137, skipBlankLines: true, skipComments: true }],
+      'max-lines': ['error', { max: 650, skipBlankLines: true, skipComments: true }],
+      'max-lines-per-function': ['error', { max: 139, skipBlankLines: true, skipComments: true }],
     },
   },
   { files: ['src/scripts/larmic-island.ts'], rules: { complexity: ['error', 26] } },

@@ -3,6 +3,7 @@
 // Der Browser erlaubt Ton erst nach einer Geste: `unlock()` aus einem Tasten- oder Klick-Handler aufrufen.
 
 import type { Tone } from '../../data/games/mitwachsen';
+import type { Melody } from '../../data/games/mitwachsen-stories';
 
 const MAX_VOICES = 6;
 
@@ -38,7 +39,7 @@ export class Sfx {
     this.ctx = null;
   }
 
-  private note(freq: number, len: number, wave: OscillatorType, gain: number, slide = 1, delay = 0) {
+  private note(freq: number, len: number, wave: OscillatorType, gain: number, slide = 1, delay = 0, dest?: AudioNode) {
     const ctx = this.ctx;
     // Das Limit gilt nur für sofort erklingende Töne (Dauerdrücken); Melodien sind schon eingeplant und dürfen zu Ende spielen.
     // Ein gerade fortgesetzter Context (resume läuft asynchron) spielt eingeplante Töne nach.
@@ -52,7 +53,7 @@ export class Sfx {
     env.gain.setValueAtTime(0.0001, t);
     env.gain.exponentialRampToValueAtTime(gain, t + 0.012);
     env.gain.exponentialRampToValueAtTime(0.0001, t + len);
-    osc.connect(env).connect(this.out);
+    osc.connect(env).connect(dest ?? this.out);
     this.voices++;
     osc.onended = () => this.voices--;
     osc.start(t);
@@ -107,6 +108,22 @@ export class Sfx {
   }
   wake() {
     [523.25, 659.25, 783.99].forEach((f, i) => this.note(f, 0.18, 'sine', 0.1, 1, i * 0.12));
+  }
+  /** Melodie eines Klangsteins über eine eigene Leitung; liefert eine Funktion, die sie sanft ausblendet */
+  melody(m: Melody): () => void {
+    const ctx = this.ctx;
+    if (this.muted || !ctx || !this.out) return () => undefined;
+    const bus = ctx.createGain();
+    bus.connect(this.out);
+    let at = 0;
+    for (const [freq, len, gain] of m.notes) {
+      this.note(freq, len, m.wave, gain ?? 0.1, 1, at + 0.05, bus);
+      at += len + m.gap;
+    }
+    return () => {
+      bus.gain.setTargetAtTime(0, ctx.currentTime, 0.04);
+      setTimeout(() => bus.disconnect(), 400);
+    };
   }
   lullaby() {
     [783.99, 659.25, 587.33, 523.25, 392].forEach((f, i) => this.note(f, 0.42, 'sine', 0.08, 1, i * 0.38));
