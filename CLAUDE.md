@@ -12,7 +12,7 @@ npm run lint     # Guard-Gate: ESLint – muss grün sein
 npm run format   # Prettier; `npm run format:check` ist das Guard-Gate
 npm run arch     # Guard-Gate: Architekturregeln (dependency-cruiser) – muss grün sein
 npm run build    # statische Seite nach dist/
-npm run verify   # Guard-Gate nach dem Build: gültiges HTML, keine toten internen Links, Bundle-Gate (Homepage ohne Spiel, JS-Budget)
+npm run verify   # Guard-Gate nach dem Build: gültiges HTML, keine toten internen Links und Sprungmarken, Bundle-Gate (Homepage ohne Spiel, JS-Budget), Seiten-Gate (keine externen Ressourcen, alte Adressen leiten weiter)
 npm run test:e2e # Guard-Gate nach dem Build: Smoke-Test im Browser (Playwright, e2e/): Insel, Detailseiten, Spiel, alte Adressen, ohne Konsolenfehler; einmalig: npx playwright install chromium
 npm run gates    # alle Gates in der Reihenfolge der Pipeline
 # Git-Hook .githooks/pre-commit (aktiviert durch npm install) prüft vor jedem Commit Formatierung, Lint, Architektur, Tests
@@ -44,7 +44,7 @@ Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run chec
 - Materialfarben stehen für Themen: Holz = Architektur, Metall = DevOps/Infrastruktur, Kristall = KI und Event Storming, Gras = Testing. Block und Icon-Farben nur in `src/data/materials.ts` ändern, Flächen/Slots/Rahmen in `tokens.css`.
 - Alle Inhalte bleiben im HTML; Interaktion ist Zusatz (Seite muss ohne JavaScript lesbar sein).
 - Keine Logos, Figuren oder Texturen aus Minecraft oder Hytale – nur eigene Voxel-Grafik.
-- Keine externen Ressourcen ohne Klick des Nutzers (Schriften lokal, YouTube und Kommentare per Zwei-Klick).
+- Keine externen Ressourcen ohne Klick des Nutzers (Schriften lokal, YouTube und Kommentare per Zwei-Klick). Geprüft durch `npm run verify:dist` (Logik in `scripts/dist.ts`).
 - Animationen respektieren `prefers-reduced-motion`.
 - Die Homepage bleibt schlank (geprüft durch `npm run verify:bundles`, Logik in `scripts/bundles.ts`): Seiten außerhalb von `/spiele/` laden kein Spiel und kein Three.js und höchstens 32 KB JavaScript; die Spielseite lädt 3D nur nachträglich per `import()`.
 - Die Insel ist auf allen Seiten die einzige Navigation. Neue Seiten mit Insel nutzen `IslandPage.astro` und setzen `rest`. Keine Text-Navigation einbauen.
