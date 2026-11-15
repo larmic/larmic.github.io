@@ -4,6 +4,7 @@ import { HOME, animalId } from '../../data/games/mitwachsen';
 import {
   SLEEP_LOCK,
   SWAP_WINDOW,
+  WAKE_GRACE,
   initialState,
   progressOf,
   regionAnimals,
@@ -52,6 +53,12 @@ function run(s: State, world: World, ...cmds: (Cmd | Dir)[]) {
   return { s, events };
 }
 const ACT: Cmd = { type: 'action' };
+const DIRS_TO_BED: [number, number, Dir][] = [
+  [1, 0, 'e'],
+  [-1, 0, 'w'],
+  [0, 1, 's'],
+  [0, -1, 'n'],
+];
 const TICK: Cmd = { type: 'tick' };
 const types = (e: GameEvent[]) => e.map((x) => x.type);
 
@@ -79,6 +86,26 @@ describe('Aufwachen und Schlafen', () => {
     expect(s.sleeping).toBe(true);
     s = run(s, world, TICK, TICK).s;
     expect(run(s, world, ACT).s.sleeping).toBe(false);
+  });
+
+  it('läuft ins Bett und schläft ein, ganz ohne Aktionstaste', () => {
+    const world = createWorld(1);
+    const [bx, by] = HOME.bed;
+    const r = run(awake(world, bx + 1, by), world, 'w');
+    expect(types(r.events)).toEqual(['sleep']);
+    expect(r.s.sleeping).toBe(true);
+  });
+
+  it('gleich nach dem Aufwachen ist das Bett nur ein Hindernis', () => {
+    const world = createWorld(1);
+    let s = run(initialState(world), world, 'e').s; // wach neben dem Bett
+    expect(s.sleeping).toBe(false);
+    const toBed = DIRS_TO_BED.find(
+      ([dx, dy]) => s.player.x + dx === HOME.bed[0] && s.player.y + dy === HOME.bed[1],
+    )![2];
+    expect(types(run(s, world, toBed).events)).toEqual(['bump']);
+    for (let i = 0; i < WAKE_GRACE; i++) s = run(s, world, TICK).s;
+    expect(run(s, world, toBed).s.sleeping).toBe(true);
   });
 
   it('schickt folgende Tiere beim Schlafen heim', () => {

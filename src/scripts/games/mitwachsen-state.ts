@@ -18,6 +18,7 @@ import {
 import { canStep, standHeight, wildAnimals, type World } from './mitwachsen-world';
 
 export const SLEEP_LOCK = 30; // Takte nach dem Einschlafen, in denen Tasten nicht wecken (3 s)
+export const WAKE_GRACE = 15; // Takte nach dem Aufwachen, in denen das Bett nur ein Hindernis ist (1,5 s)
 export const SWAP_WINDOW = 15; // Takte, in denen zweimal Hineinlaufen den Platz tauscht (1,5 s)
 export const WILD_RADIUS = 1; // Stücke um die Figur, in denen Tiere der Landschaft unterwegs sind
 export const WILD_KEEP = 2; // ab diesem Abstand verschwinden sie wieder (und tauchen später an ihrem Platz auf)
@@ -42,6 +43,7 @@ export type State = {
   player: { x: number; y: number; dir: Dir };
   sleeping: boolean;
   sleptAt: number;
+  wokeAt: number;
   animals: Animal[];
   followers: string[]; // Reihenfolge = Platz in der Kette hinter der Figur
   met: string[];
@@ -178,6 +180,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     player: { x: HOME.bed[0], y: HOME.bed[1], dir: 's' },
     sleeping: true,
     sleptAt: -SLEEP_LOCK, // die erste Taste weckt sofort
+    wokeAt: -WAKE_GRACE,
     animals,
     followers: [],
     met: [...(saved.met ?? [])].sort(),
@@ -314,6 +317,8 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
       return;
     }
   }
+  // Ins Bett laufen: Die Figur legt sich schlafen (nicht gleich nach dem Aufwachen, sonst schläft sie aus Versehen ein)
+  if (world.cell(tx, ty).deco === 'bed' && s.tick - s.wokeAt >= WAKE_GRACE) return sleep(s, world, events);
   if (!canStep(world, s.openGates, p.x, p.y, tx, ty)) {
     events.push({ type: 'bump' });
     return;
@@ -464,6 +469,7 @@ function wake(s: State, world: World, events: GameEvent[]) {
     freeNear(s, world, HOME.bed, (x, y) => world.cell(x, y).region === 'lichtung' && !world.cell(x, y).garden);
   if (!spot) return;
   s.sleeping = false;
+  s.wokeAt = s.tick;
   s.player.x = spot[0];
   s.player.y = spot[1];
   s.player.dir = 's';

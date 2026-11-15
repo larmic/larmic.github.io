@@ -190,7 +190,8 @@ function buildStart(
       const meadow = valueNoise(seed + 33, x, y, 12) > 0.6; // Blumenwiesen
       const far = near > HOME.clear + 1 && !obstacleNear(x, y);
       if (far && roll < (forest ? 0.07 : 0.012)) Object.assign(c, { deco: 'tree', solid: true });
-      else if (far && roll < (forest ? 0.09 : 0.02)) Object.assign(c, { deco: 'bush', solid: true });
+      else if (far && roll < (forest ? 0.09 : 0.02))
+        Object.assign(c, { deco: 'bush', solid: true }); // Beerenbusch
       else if (roll < (meadow ? 0.45 : 0.12)) Object.assign(c, { deco: 'flower', color: flowerColor(seed, x, y) });
       else if (roll < (meadow ? 0.47 : 0.145)) c.deco = forest ? 'mushroom' : 'fern';
       else if (far && roll < (meadow ? 0.475 : 0.16)) Object.assign(c, { h: c.h + 1, ground: 'stone' }); // Stein zum Klettern

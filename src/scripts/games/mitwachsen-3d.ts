@@ -69,6 +69,17 @@ import type { State } from './mitwachsen-state';
 import type { Cell, TreeKind, World } from './mitwachsen-world';
 
 export const PITCH = (55 * Math.PI) / 180; // Neigung der Kamera: 90° wäre senkrecht von oben
+/** Beeren am Busch: [x, Höhe, z] im Feld; oben auf der Kuppe und an der Vorderseite (zur Kamera) */
+const BERRIES = [
+  [0.3, 0.66, 0.34],
+  [0.56, 0.66, 0.5],
+  [0.42, 0.66, 0.62],
+  [0.2, 0.3, 0.85],
+  [0.5, 0.18, 0.85],
+  [0.72, 0.34, 0.85],
+  [0.05, 0.22, 0.5],
+  [0.88, 0.26, 0.4],
+] as const;
 const DISTANCE = 18; // Abstand der Kamera zur Figur
 const RADIUS = 2; // Stücke um die Figur, die als Mesh vorliegen (5 × 5 = 80 × 80 Felder)
 const BUILD_PER_FRAME = 2; // neue Stücke je Bild, damit nichts ruckelt
@@ -715,7 +726,10 @@ export class World3D {
         this.tree(g, canopy, x, y, h, c.tree ?? 'oak');
         break;
       case 'bush':
-        canopy.box(x + 0.08, h, y + 0.12, 0.84, 0.72, 0.76, '#3f9a3c', '#5ab651', 'leaves');
+        // Beerenbusch: niedrig und rund (zwei Stufen), rote Beeren oben und vorn – kein Baumwipfel
+        canopy.box(x + 0.08, h, y + 0.12, 0.84, 0.5, 0.76, '#3f9a3c', '#5ab651', 'leaves');
+        canopy.box(x + 0.2, h + 0.5, y + 0.22, 0.6, 0.16, 0.56, '#3f9a3c', '#5ab651', 'leaves');
+        for (const [bx, by, bz] of BERRIES) g.box(x + bx, h + by, y + bz, 0.09, 0.09, 0.09, '#c8323a', '#ef5b5b');
         break;
       case 'flower':
         g.box(x + 0.47, h, y + 0.47, 0.06, 0.18, 0.06, '#3f9a3c');

@@ -16,11 +16,11 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 | Eingabe | Wirkung |
 | --- | --- |
 | Pfeiltasten | Figur geht ein Feld in Bildschirmrichtung (→ nach rechts, ↑ nach oben). Gedrückt halten: höchstens etwa 4 Felder pro Sekunde, Autorepeat des Systems wird ignoriert. |
-| Leertaste, Enter, jede andere Taste | Aktion, je nach Ort (siehe unten). Modifikatoren, Tab, Esc und F-Tasten bleiben frei. |
+| Leertaste und andere Tasten | Ab 3 ohne Wirkung. Alles geht durch Hineinlaufen: in ein Tier (es folgt), ins Bett (schlafen), in ein Portal (reisen). |
 | Maus | Nur für das Menü (Zahnrad). Das Kind spielt mit der Tastatur und öffnet es nicht aus Versehen. |
-| Touch | Auf Handy und Tablet: Steuerkreuz unten links, Aktionsknopf mit Herz unten rechts, im selben ruhigen Takt. |
+| Touch | Auf Handy und Tablet: Steuerkreuz unten links, im selben ruhigen Takt. |
 
-**Aktion je nach Ort:** neben einem Tier → es singt (siehe Tiere). Am Bett → schlafen. Sonst → die Figur ruft, folgende Tiere rücken auf.
+**Erster Spieltest:** Eine Aktionstaste war für den Dreijährigen ein Schritt zu viel. Darum gibt es ab 3 nur Laufen. Die Regeln kennen die Aktion weiter (singen, schlafen, rufen); eine spätere Altersstufe kann sie wieder an eine Taste binden.
 
 ## Ansicht und Kamera
 
@@ -34,7 +34,7 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 
 - **Endlos**, berechnet aus einem **Seed**. Derselbe Seed ergibt immer dieselbe Welt. Gespeichert werden nur Seed und Fortschritt, nie die Landschaft.
 - **Start auf der Lichtung:** Am Anfang gibt es nur das **Bett** in der Mitte einer großen Lichtung (gut 160 × 136 Felder) mit sanften Hügeln, mehreren Teichen, einzelnen Bäumen, Blumenwiesen und Steinen zum Klettern. Keine Mauer, kein Garten: Das entwickelt sich mit der Zeit.
-- **Frei zugänglich (aus dem ersten Spieltest):** Ein Dreijähriger kommt um einen Baum herum, bei mehreren dicht beieinander wird es schwierig. Darum stehen Bäume und Büsche einzeln, mit Platz ringsum. Keine Stufe ist höher als eins, so kommt man überall hinauf und nirgends in eine Ecke, aus der es nicht herausgeht. Die Tore liegen weit weg.
+- **Frei zugänglich (aus dem ersten Spieltest):** Ein Dreijähriger kommt um einen Baum herum, bei mehreren dicht beieinander wird es schwierig. Darum stehen Bäume und Büsche einzeln, mit Platz ringsum. Büsche tragen rote Beeren, damit man sie nicht für Baumspitzen hält. Keine Stufe ist höher als eins, so kommt man überall hinauf und nirgends in eine Ecke, aus der es nicht herausgeht. Die Tore liegen weit weg.
 - **Ringsum natürliche Felsen** mit leicht unregelmäßigem Rand, in Terrassen ansteigend. Sie sind eine feste Grenze: Man kann sie weder besteigen noch hineinfallen, darin vier **große Tore** (Norden, Osten, Süden, Westen). Sie sind vorerst verschlossen; dahinter liegen später Eiswelt, Sandwelt, Wasserwelt und Lavaberge. Vorerst ist nur die Lichtung spielbar.
 - **Nebel:** Zu sehen ist nur, was das Kind schon erkundet hat. Dahinter verschwindet die Welt weich im Dunst, wie echter Nebel, und zeigt sich beim Herumlaufen (gespeichert).
 - Hinter den Toren: endlose, berechnete Landschaft in Stücken (16 × 16 Felder).
@@ -118,7 +118,7 @@ Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzel
 1. Jedes Tier hat eine **Heimat-Gegend** und wandert dort langsam umher.
 2. Steht die Figur direkt neben einem Tier, **bleibt es stehen** und schaut sie an.
 3. **Aktion neben einem Tier:** Es hüpft und **singt seinen eigenen Ton** (alle aus derselben Pentatonik, klingt immer zusammen). Beim ersten Mal gilt es als **gefunden** und bekommt ein Herz. Danach **folgt** es der Figur im Gänsemarsch, bis es im Garten ist oder die Figur schläft. Über folgenden Tieren schwebt ein kleines Herz.
-4. **Hineinlaufen in ein Tier** genügt (aus dem ersten Spieltest: die Leertaste war zu viel): Es singt, bekommt beim ersten Mal ein Herz und folgt. Läuft die Figur in ein Tier, das schon folgt, tauschen beide sofort den Platz. So kann die Figur immer umdrehen und bleibt nie eingeklemmt. Die Aktionstaste bleibt für das Bett und zum Singen-Lassen.
+4. **Hineinlaufen in ein Tier** genügt (aus dem ersten Spieltest: die Leertaste war zu viel): Es singt, bekommt beim ersten Mal ein Herz und folgt. Läuft die Figur in ein Tier, das schon folgt, tauschen beide sofort den Platz. So kann die Figur immer umdrehen und bleibt nie eingeklemmt. Ins Bett geht es genauso: hineinlaufen.
 5. **Aktion neben einem folgenden Tier:** Es singt noch einmal, sonst ändert sich nichts.
 6. **Aktion neben einem Tier im Garten:** Es singt und hüpft, folgt aber nicht. Es ist zu Hause und bleibt gern im Garten.
 7. **Schläft die Figur**, laufen folgende Tiere in ihre Heimat-Gegend zurück.
@@ -128,7 +128,7 @@ Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzel
 ## Bett, Nacht, später der Garten
 
 - **Garten (später):** Hecke mit einem Rosenbogen am Zuhause, in dem gefundene Tiere wohnen. Er gehört noch nicht zum Start; Regeln und Tests dafür stehen schon (das Feld hinter dem Rosenbogen bleibt frei, Tiere im Garten bleiben dort).
-- **Bett:** Aktion am Bett → die Figur legt sich hin, der Himmel wird dunkel, Sterne gehen auf, eine leise Melodie spielt, es wird gespeichert.
+- **Bett:** Ins Bett laufen → die Figur legt sich hin (direkt nach dem Aufwachen noch nicht, damit sie nicht aus Versehen wieder einschläft), der Himmel wird dunkel, Sterne gehen auf, eine leise Melodie spielt, es wird gespeichert.
 - **Aufwachen:** Nach dem Einschlafen reagiert das Spiel einige Sekunden nicht auf Tasten, damit wildes Drücken die Runde nicht sofort weiterführt. Danach bringt ein Tastendruck den Morgen.
 - **Start einer Runde:** Die Figur schläft im Bett, ein Tastendruck weckt sie. Dieser erste Druck schaltet auch den Ton frei (Autoplay-Regeln).
 

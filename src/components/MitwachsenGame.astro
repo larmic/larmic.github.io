@@ -1,7 +1,7 @@
 ---
 // Spielfläche von Mitwachsen: Das Spiel steht für sich, ohne Navigation der Seite. Oben links das Menü für Eltern
 // (mit dem Weg zurück zur Homepage), in der Mitte der Name der Figur, rechts die Karte. Auf Touch-Geräten unten ein
-// Steuerkreuz und ein Aktionsknopf. Das Kind spielt sonst mit der Tastatur. Ohne JavaScript bleibt ein Text für Eltern.
+// Steuerkreuz. Das Kind spielt sonst mit den Pfeiltasten; eine Aktionstaste gibt es ab 3 nicht. Ohne JavaScript bleibt ein Text für Eltern.
 // Wird die Figur müde, erscheint über ihr eine Sprechblase; der Hinweis für Eltern zur Bildschirmzeit kommt beim ersten
 // Öffnen und ist über Menü und Sprechblase wieder zu öffnen.
 // Logik: src/scripts/games/ · Konzept: docs/games/mitwachsen.md
@@ -72,18 +72,13 @@ import MitwachsenParentInfo from './MitwachsenParentInfo.astro';
         </svg>
       </button>
     </div>
-    <button type="button" class="mw-act" aria-label="Aktion: Tier begrüßen, rufen oder schlafen">
-      <svg viewBox="0 0 7 6" shape-rendering="crispEdges" aria-hidden="true">
-        <path d="M1 0h2v1h1v-1h2v1h1v2h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1v-2h1z" fill="currentColor"></path>
-      </svg>
-    </button>
   </div>
 
   <noscript>
     <div class="mw-noscript pxbox paper">
       <p>
-        Dieses Spiel für Dreijährige braucht JavaScript. Es läuft ganz im Browser, mit Pfeiltasten und Leertaste, und
-        ist zum gemeinsamen Spielen mit einem Elternteil gedacht.
+        Dieses Spiel für Dreijährige braucht JavaScript. Es läuft ganz im Browser, mit den Pfeiltasten, und ist zum
+        gemeinsamen Spielen mit einem Elternteil gedacht.
       </p>
       <MitwachsenParentInfo headingId="mw-info-title-noscript" />
     </div>
@@ -217,7 +212,7 @@ import MitwachsenParentInfo from './MitwachsenParentInfo.astro';
     position: absolute;
     inset: auto 16px 16px;
     display: none;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-end;
     pointer-events: none;
     z-index: 1;
@@ -236,8 +231,7 @@ import MitwachsenParentInfo from './MitwachsenParentInfo.astro';
     grid-template-rows: repeat(3, 56px);
     gap: 4px;
   }
-  .mw-key,
-  .mw-act {
+  .mw-key {
     pointer-events: auto;
     touch-action: none;
     user-select: none;
@@ -261,8 +255,7 @@ import MitwachsenParentInfo from './MitwachsenParentInfo.astro';
     height: 100%;
   }
   .mw-key:active,
-  .mw-key.down,
-  .mw-act:active {
+  .mw-key.down {
     transform: translateY(3px);
   }
   .mw-key-n {
@@ -276,19 +269,6 @@ import MitwachsenParentInfo from './MitwachsenParentInfo.astro';
   }
   .mw-key-s {
     grid-area: 3 / 2;
-  }
-  .mw-act svg {
-    width: 52%;
-    height: 52%;
-    color: #e0577a;
-  }
-  .mw-act {
-    display: grid;
-    place-items: center;
-    width: 96px;
-    height: 96px;
-    margin-bottom: 30px;
-    background: var(--gold);
   }
   .mw-name {
     display: flex;
@@ -516,11 +496,6 @@ import MitwachsenParentInfo from './MitwachsenParentInfo.astro';
     }
     .mw-key {
       padding: 9px;
-    }
-    .mw-act {
-      width: 72px;
-      height: 72px;
-      margin-bottom: 0;
     }
     .mw-touch {
       inset: auto 12px 12px;

@@ -305,19 +305,22 @@ class LarmicMitwachsen extends HTMLElement {
         if (this.paused() || e.metaKey || e.ctrlKey || e.altKey || FREE_KEYS.has(e.key) || /^F\d+$/.test(e.key)) return;
         const t = e.target as HTMLElement | null;
         if (t?.closest('input, textarea, select')) return;
-        // Buttons bleiben bedienbar (Enter, im Menü auch die Leertaste). Zurück und Zahnrad oben: Die Leertaste gehört
-        // dem Spiel, sonst öffnet das Kind nach einem Mausklick von Papa das Menü statt zu singen.
+        // Buttons bleiben bedienbar (Enter, im Menü auch die Leertaste). Zahnrad oben: Die Leertaste drückt es nicht,
+        // sonst öffnet das Kind nach einem Mausklick von Papa das Menü.
         if (t?.closest('button, a') && (e.key === 'Enter' || (e.key === ' ' && !t.closest('.mw-top, .mw-touch'))))
           return;
+        const dir = KEYS[e.key];
+        // Ab 3 gibt es keine Aktionstaste: Tiere und Bett gehen durch Hineinlaufen. Die Leertaste tut nichts
+        // (sie scrollt auch nicht und drückt keinen Button); andere Tasten bleiben frei.
+        if (!dir) {
+          if (e.key === ' ') e.preventDefault();
+          return;
+        }
         e.preventDefault();
         if (e.repeat) return; // gehaltene Pfeile laufen über den eigenen Takt (poll im Bild), nicht über das System
-        const dir = KEYS[e.key];
-        const now = performance.now();
         this.sfx.unlock();
-        if (dir) {
-          const go = this.pace.press(dir, now);
-          if (go) this.apply({ type: 'move', dir: go });
-        } else if (this.pace.action(now)) this.apply({ type: 'action' });
+        const go = this.pace.press(dir, performance.now());
+        if (go) this.apply({ type: 'move', dir: go });
       },
       { signal },
     );
@@ -388,7 +391,7 @@ class LarmicMitwachsen extends HTMLElement {
   }
 
   /**
-   * Touch-Steuerung: Steuerkreuz und Aktionsknopf laufen über denselben ruhigen Takt wie die Tastatur.
+   * Touch-Steuerung: Das Steuerkreuz läuft über denselben ruhigen Takt wie die Tastatur.
    * Nach der ersten Berührung erscheint die Steuerung auch auf Geräten mit Maus (z. B. Laptop mit Touchscreen).
    */
   private listenTouch(signal: AbortSignal) {
@@ -422,15 +425,6 @@ class LarmicMitwachsen extends HTMLElement {
       for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'])
         key.addEventListener(type, up, { signal });
     }
-    this.querySelector('.mw-act')!.addEventListener(
-      'pointerdown',
-      (e) => {
-        e.preventDefault();
-        this.sfx.unlock();
-        if (this.pace.action(performance.now())) this.apply({ type: 'action' });
-      },
-      { signal },
-    );
   }
 
   /** Ereignisse der Regeln: Töne, Herzen, Noten, Tore, Nacht – und sofort speichern, was zählt */
