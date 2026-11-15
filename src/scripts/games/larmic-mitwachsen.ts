@@ -458,7 +458,11 @@ class LarmicMitwachsen extends HTMLElement {
     let persist = false;
     // Begegnung (Tier gefunden oder getroffen, Beeren, Füttern, Portal): Die Figur bleibt stehen, bis der Pfeil neu
     // gedrückt wird. Sonst liefe sie mit gehaltenem Pfeil gleich weiter und tauschte den Platz mit dem neuen Tier.
-    if (events.some((e) => ['sing', 'follow', 'pick', 'feed', 'portal', 'teleport', 'story'].includes(e.type)))
+    if (
+      events.some((e) =>
+        ['sing', 'follow', 'pick', 'fill', 'feed', 'pour', 'portal', 'teleport', 'story'].includes(e.type),
+      )
+    )
       this.pace.clear();
     for (const e of events) {
       switch (e.type) {
@@ -512,14 +516,10 @@ class LarmicMitwachsen extends HTMLElement {
           this.gl3d?.rebuild([chunkOf(e.x, e.y).join(',')]);
           break;
         }
+        case 'fill':
         case 'feed':
-          // Beeren im Futtertrog: Alle Tiere der Wiese hüpfen und bekommen ein Herz
-          this.sfx.feed();
-          this.burst('player', ['#c8323a', '#ef5b5b', '#ffd47e'], 16);
-          e.ids.forEach((id, i) => {
-            this.hops.set(id, now);
-            this.float('heart', id, GAME_COLORS.heart, now + 100 + i * 60);
-          });
+        case 'pour':
+          this.trough(e, now);
           break;
         case 'regrow':
           this.gl3d?.rebuild([chunkOf(e.x, e.y).join(',')]);
@@ -650,6 +650,25 @@ class LarmicMitwachsen extends HTMLElement {
       b.hop = snap ? 0 : Math.sin(moving * Math.PI) * 0.14 + (sung < 320 ? Math.sin((sung / 320) * Math.PI) * 0.3 : 0);
       this.bodies.set(id, b);
     }
+  }
+
+  /** Eimer geschöpft, Beeren im Futtertrog oder Wasser im Wassertrog */
+  private trough(e: Extract<GameEvent, { type: 'fill' | 'feed' | 'pour' }>, now: number) {
+    if (e.type === 'fill') {
+      // Es gluckert, die Figur hüpft, ein paar Tropfen spritzen
+      this.sfx.fill();
+      this.hops.set('player', now);
+      this.burst('player', ['#3f8fd8', '#7fc0f0', '#ffffff'], 12);
+      return;
+    }
+    // Alle Tiere der Wiese hüpfen und bekommen ein Herz
+    if (e.type === 'feed') this.sfx.feed();
+    else this.sfx.pour();
+    this.burst('player', e.type === 'feed' ? ['#c8323a', '#ef5b5b', '#ffd47e'] : ['#3f8fd8', '#7fc0f0', '#ffd47e'], 16);
+    e.ids.forEach((id, i) => {
+      this.hops.set(id, now);
+      this.float('heart', id, GAME_COLORS.heart, now + 100 + i * 60);
+    });
   }
 
   /** Am Klangstein: Noten steigen auf, solange die Figur zuhört; Menü oder Hinweis halten die Geschichte an */

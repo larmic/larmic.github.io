@@ -45,6 +45,7 @@ import {
   THEME_COLORS,
   figureParts,
   BASKET_PARTS,
+  BUCKET_PARTS,
   BOOK_PARTS,
   SLEEPY_EYES,
   type GateId,
@@ -1005,14 +1006,15 @@ export class World3D {
       m.rotation.y = YAW[dir];
     };
     if (!state.sleeping) {
-      // Korb auf dem Rücken, Buch beim Lesen; beim Lesen schaut die Figur zum Betrachter
+      // Korb auf dem Rücken, Eimer in der Hand, Buch beim Lesen; beim Lesen schaut die Figur zum Betrachter
       const book = sc.pose !== 'stand';
       const doze = sc.pose === 'doze';
       const turning = sc.pose === 'read' && !sc.reduced && sc.now % 5000 < 450; // alle paar Sekunden umblättern
-      const key = `player${state.basket ? '-basket' : ''}${book ? '-book' : ''}${turning ? '-turn' : ''}${doze ? '-doze' : ''}`;
+      const key = `player${state.basket ? '-basket' : ''}${state.bucket ? '-bucket' : ''}${book ? '-book' : ''}${turning ? '-turn' : ''}${doze ? '-doze' : ''}`;
       const parts = [
         ...figureParts(this.look),
         ...(state.basket ? BASKET_PARTS : []),
+        ...(state.bucket ? BUCKET_PARTS : []),
         ...(book ? BOOK_PARTS(this.look, turning) : []),
         ...(doze ? SLEEPY_EYES(this.look) : []),
       ];

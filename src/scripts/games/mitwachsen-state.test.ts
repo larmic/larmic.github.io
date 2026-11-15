@@ -159,9 +159,9 @@ describe('Laufen und Klettern', () => {
       '0,1': { deco: 'tree', solid: true },
       '-1,0': { deco: 'biggate', gate: 'eis' },
     });
-    const { s, events } = run(awake(w, 0, 0), w, 'e', 's', 'w');
+    const { s, events } = run(awake(w, 0, 0), w, 'e', 's', 'w', 'e');
     expect([s.player.x, s.player.y]).toEqual([0, 0]);
-    expect(types(events)).toEqual(['bump', 'bump', 'bump']);
+    expect(types(events)).toEqual(['fill', 'bump', 'bump', 'bump']); // am Wasser erst den Eimer füllen, hinein geht es nie
   });
 });
 
@@ -443,6 +443,38 @@ describe('Korb mit Beeren', () => {
     expect(r.events).toEqual([{ type: 'feed', ids: ['lichtung:hase'] }]);
     expect(r.s.basket).toBe(false);
     expect([r.s.player.x, r.s.player.y]).toEqual([0, 0]);
+  });
+});
+
+describe('Eimer mit Wasser', () => {
+  it('am Wasser schöpft die Figur einen Eimer voll; am Wassertrog kommt das Wasser hinein, alle Tiere der Wiese freuen sich', () => {
+    const w = fakeWorld({
+      '1,0': { ground: 'water', h: 0 },
+      '-1,0': { deco: 'watertrough', solid: true, garden: true },
+      '0,2': { garden: true },
+    });
+    let s = awake(w, 0, 0, [animal('lichtung:hase', 0, 2, { mode: 'home', home: { kind: 'garden' } })]);
+    expect(types(run(s, w, 'w').events)).toEqual(['bump']); // ohne Eimer ist der Trog nur ein Hindernis
+    let r = run(s, w, 'e');
+    expect(r.events).toEqual([{ type: 'fill', x: 1, y: 0 }]);
+    s = r.s;
+    expect([s.bucket, s.player.x]).toEqual([true, 0]); // die Figur bleibt am Ufer stehen
+    expect(types(run(s, w, 'e').events)).toEqual(['bump']); // voller Eimer: Wasser ist wieder nur Wasser
+    r = run(s, w, 'w');
+    expect(r.events).toEqual([{ type: 'pour', ids: ['lichtung:hase'] }]);
+    expect(r.s.bucket).toBe(false);
+  });
+
+  it('Korb und Eimer trägt die Figur gleichzeitig; jeder Trog nimmt nur das Seine', () => {
+    const w = fakeWorld({
+      '1,0': { ground: 'water', h: 0 },
+      '0,1': { deco: 'trough', solid: true },
+      '0,-1': { deco: 'bush', solid: true },
+    });
+    let s = run(awake(w, 0, 0), w, 'e', 'n').s;
+    expect([s.basket, s.bucket]).toEqual([true, true]);
+    s = run(s, w, 's').s;
+    expect([s.basket, s.bucket]).toEqual([false, true]);
   });
 });
 

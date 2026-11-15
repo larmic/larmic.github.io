@@ -101,6 +101,15 @@ export class Sfx {
       this.note(f, 0.14, 'triangle', 0.09, 1, i * 0.09),
     );
   }
+  /** Eimer schöpfen: zweimal ein tiefes Gluckern */
+  fill() {
+    this.note(330, 0.12, 'sine', 0.09, 0.6);
+    this.note(392, 0.14, 'sine', 0.08, 0.55, 0.13);
+  }
+  /** Wasser in den Trog: ein plätschernder Lauf nach unten, dann fröhlich hinauf */
+  pour() {
+    [1046.5, 880, 783.99, 659.25, 783.99, 1046.5].forEach((f, i) => this.note(f, 0.1, 'sine', 0.07, 0.9, i * 0.07));
+  }
   /** Gähnen: ein langer, sinkender Ton, leise darunter ein zweiter */
   yawn() {
     this.note(330, 0.9, 'sine', 0.07, 0.55);

@@ -409,6 +409,13 @@ export const BASKET_PARTS: Part[] = [
   [-0.2, -0.05, 0.74, 0.05, 0.06, 0.04, '#3f9a3c', '#5ab651'], // Blatt
 ];
 
+/** Eimer mit Wasser in der rechten Hand (nach dem Schöpfen am Wasser, bis zum Wassertrog) */
+export const BUCKET_PARTS: Part[] = [
+  [-0.11, 0.27, 0.06, 0.22, 0.2, 0.22, '#98a3ae', '#3f8fd8'], // Eimer aus Blech, oben Wasser
+  [-0.115, 0.265, 0.25, 0.23, 0.21, 0.03, '#76818c'], // Rand
+  [-0.01, 0.36, 0.28, 0.02, 0.02, 0.08, '#5d6873'], // Henkel bis zur Hand
+];
+
 /**
  * Großes, aufgeschlagenes Buch auf dem Schoß, wenn niemand spielt: Die weißen Seiten mit Zeilen zeigen nach oben,
  * so erkennt man es auch von schräg oben. `turning`: Eine Seite steht gerade hoch (umblättern).

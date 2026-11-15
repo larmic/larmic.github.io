@@ -56,6 +56,7 @@ export type State = {
   day: number; // Tage, die die Welt schon erlebt hat (jedes Schlafen zählt einen); Blumen wachsen damit
   dayStart: number; // Takt, an dem der heutige Tag begann (Aufwachen): Das Wetter zählt ab hier, jeder Tag beginnt mit Sonne
   basket: boolean; // Korb mit Beeren auf dem Rücken (nach dem Pflücken, bis zum Futtertrog)
+  bucket: boolean; // Eimer mit Wasser in der Hand (nach dem Schöpfen, bis zum Wassertrog)
   heard: StoryId[]; // Geschichten, deren Klangstein schon einmal erklungen ist
 };
 
@@ -86,6 +87,8 @@ export type GameEvent =
   | { type: 'pick'; x: number; y: number } // Beeren gepflückt
   | { type: 'regrow'; x: number; y: number } // neue Beeren am Busch
   | { type: 'feed'; ids: string[] } // Beeren in den Futtertrog: diese Tiere der Wiese freuen sich
+  | { type: 'fill'; x: number; y: number } // Eimer am Wasser gefüllt
+  | { type: 'pour'; ids: string[] } // Wasser in den Wassertrog: diese Tiere der Wiese freuen sich
   | { type: 'call' }
   | { type: 'sleep' }
   | { type: 'wake' };
@@ -234,6 +237,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     portals: (saved.portals ?? []).filter((id) => world.portals.has(id)),
     picked: {},
     basket: false,
+    bucket: false,
     day: saved.day ?? 0,
     dayStart: 0,
     heard: (saved.heard ?? []).filter((id) => world.stones.has(id)),
@@ -404,6 +408,23 @@ function listen(s: State, id: StoryId, events: GameEvent[]) {
   events.push({ type: 'story', id, first });
 }
 
+/**
+ * Ans Wasser laufen: Die Figur schöpft einen Eimer voll. Mit vollem Eimer in den Wassertrog: Das Wasser kommt hinein,
+ * alle Tiere der Wiese freuen sich (wie die Beeren am Futtertrog). Liefert true, wenn der Zug damit erledigt ist.
+ */
+function water(s: State, world: World, tx: number, ty: number, events: GameEvent[]): boolean {
+  const c = world.cell(tx, ty);
+  if (!s.bucket && c.ground === 'water') {
+    s.bucket = true;
+    events.push({ type: 'fill', x: tx, y: ty });
+    return true;
+  }
+  if (!s.bucket || c.deco !== 'watertrough') return false;
+  s.bucket = false;
+  events.push({ type: 'pour', ids: s.animals.filter((a) => a.mode === 'home').map((a) => a.id) });
+  return true;
+}
+
 /** Freies Feld neben einem Tier der Wiese, auf das es ausweichen kann: lieber seitlich als weiter geradeaus */
 function asideCell(s: State, world: World, a: Animal, dir: Dir): [number, number] | null {
   const sides: Dir[] = dir === 'e' || dir === 'w' ? ['n', 's'] : ['e', 'w'];
@@ -446,6 +467,7 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
     events.push({ type: 'feed', ids: s.animals.filter((a) => a.mode === 'home').map((a) => a.id) });
     return;
   }
+  if (water(s, world, tx, ty, events)) return;
   // Ins Bett laufen: Die Figur legt sich schlafen (nicht gleich nach dem Aufwachen, sonst schläft sie aus Versehen ein)
   if (world.cell(tx, ty).deco === 'bed' && s.tick - s.wokeAt >= WAKE_GRACE) return sleep(s, world, events);
   if (!canStep(world, s.openGates, p.x, p.y, tx, ty)) {
