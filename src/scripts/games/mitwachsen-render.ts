@@ -28,7 +28,6 @@ import {
 import {
   GAME_COLORS,
   GATES,
-  HOME,
   REGIONS,
   SPECIES,
   animalId,
@@ -58,6 +57,7 @@ export type Scene = {
   now: number;
   look: Look;
   reduced: boolean; // prefers-reduced-motion: nichts wippt, steigt oder funkelt
+  bottomInset: number; // Platz unten für die Touch-Steuerung (die Leiste rückt darüber)
 };
 
 const PAL_SAND: Palette = { D: [['#e3cf95', 1]], d: [['#d4bd7d', 1]], e: [['#efdeaa', 1]] };
@@ -179,7 +179,6 @@ export class Renderer {
       }
     }
     this.effects(P, sc);
-    this.homeArrow(P, state, sc);
     if (sc.night > 0) this.nightSky(sc);
     this.life(sc);
     this.album(state, sc);
@@ -201,7 +200,7 @@ export class Renderer {
     const size = Math.floor(Math.max(26, Math.min(52, 44 * sc.zoom, room / count)));
     const total = count * size + (count - 1) * gap + (groups.length - 1) * (groupGap - gap);
     let x = Math.round((sc.width - total) / 2);
-    const y = Math.round(sc.height - size - 14);
+    const y = Math.round(sc.height - size - 14 - sc.bottomInset);
     const atHomeIds = new Set(state.garden.map((p) => p.id));
     const following = new Set(state.followers);
     for (const group of groups) {
@@ -681,42 +680,6 @@ export class Renderer {
       ctx.fillStyle = p.color;
       ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
     }
-  }
-
-  /** Pfeil am Bildschirmrand zum Bett, sobald es nicht mehr zu sehen ist */
-  private homeArrow(P: Projection, state: State, sc: Scene) {
-    if (state.sleeping) return;
-    const [bx, by] = P(HOME.bed[0] + 0.5, HOME.bed[1] + 0.5, 1);
-    const m = 40 * sc.zoom;
-    const top = 70 + 20 * sc.zoom; // unter Zurück, Name und Menü sieht man das Bett nicht
-    if (bx > m && bx < sc.width - m && by > top && by < sc.height - m) return;
-    const cx = sc.width / 2,
-      cy = sc.height / 2;
-    const ang = Math.atan2(by - cy, bx - cx);
-    // Auf den Rand der Fläche projizieren
-    const sx = (sc.width / 2 - m) / Math.abs(Math.cos(ang) || 1e-6);
-    const sy = (Math.sin(ang) < 0 ? cy - top : sc.height - m - cy) / Math.abs(Math.sin(ang) || 1e-6);
-    const r = Math.min(sx, sy);
-    const bob = sc.reduced ? 0 : Math.sin(sc.now / 250) * 4 * sc.zoom;
-    const ax = cx + Math.cos(ang) * (r + bob),
-      ay = cy + Math.sin(ang) * (r + bob);
-    const { ctx } = this;
-    ctx.save();
-    ctx.translate(ax, ay);
-    ctx.rotate(ang);
-    const s = 18 * sc.zoom;
-    ctx.beginPath();
-    ctx.moveTo(s, 0);
-    ctx.lineTo(-s * 0.6, -s * 0.8);
-    ctx.lineTo(-s * 0.2, 0);
-    ctx.lineTo(-s * 0.6, s * 0.8);
-    ctx.closePath();
-    ctx.fillStyle = GAME_COLORS.arrow;
-    ctx.strokeStyle = GAME_COLORS.ink;
-    ctx.lineWidth = 3 * sc.zoom;
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
   }
 
   private nightSky(sc: Scene) {

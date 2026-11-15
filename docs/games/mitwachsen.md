@@ -17,18 +17,17 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 | --- | --- |
 | Pfeiltasten | Figur geht ein Feld in Bildschirmrichtung (→ nach rechts, ↑ nach oben). Gedrückt halten: höchstens etwa 4 Felder pro Sekunde, Autorepeat des Systems wird ignoriert. |
 | Leertaste, Enter, jede andere Taste | Aktion, je nach Ort (siehe unten). Modifikatoren, Tab, Esc und F-Tasten bleiben frei. |
-| Maus | Nur für Menü (Zahnrad) und Zurück-Button. Das Kind spielt mit der Tastatur und öffnet sie nicht aus Versehen. |
+| Maus | Nur für das Menü (Zahnrad). Das Kind spielt mit der Tastatur und öffnet es nicht aus Versehen. |
+| Touch | Auf Handy und Tablet: Steuerkreuz unten links, Aktionsknopf mit Herz unten rechts, im selben ruhigen Takt. |
 
 **Aktion je nach Ort:** neben einem Tier → es singt (siehe Tiere). Am Bett → schlafen. Sonst → die Figur ruft, folgende Tiere rücken auf.
-
-Ohne Tastatur (Handy, Tablet) zeigt die Seite einen Hinweis für Eltern, dass das Spiel Pfeiltasten braucht. Große Pfeilfelder am Bildrand wären später möglich, gehören aber nicht ins MVP.
 
 ## Ansicht und Kamera
 
 - **3D-Ansicht:** echtes 3D mit Three.js, Kamera schräg von oben (etwa 55°, im Code einstellbar), Sonnenlicht mit Schatten, Nebel in der Ferne. Texturen wie in `src/lib/voxel/textures.ts`, pixelig. Three.js lädt erst beim Spielstart nach, die Homepage nie (Bundle-Gate).
 - **2D-Ansicht von vorn** als Rückfall ohne WebGL und während 3D lädt: Blöcke zeigen Ober- und Vorderseite.
 - **Die Figur bleibt in der Bildmitte**, die Kamera folgt ihr weich, die Welt läuft darunter durch. Gezeichnet wird nur, was im Bild ist.
-- **Heimweg-Pfeil:** Liegt das Zuhause außerhalb des Bildes, zeigt ein Pfeil am Bildschirmrand dorthin.
+- **Karte** oben rechts: zeigt mehr als das Bild. Liegt das Zuhause außerhalb der Karte, zeigt ein Pfeil am Kartenrand dorthin.
 - **Farben:** Farben der Spielwelt (Tiere, Herzen, Nacht, Sterne) sind Spielgrafik wie die Texturen und stehen in einer Spiel-Palette, nicht in `tokens.css`. Herzen sind rosa oder rot, nicht Gold. Tafeln sind aus Holz mit Pixel-Rahmen in Tinte, Umrisse fehlender Tiere in Tinte. Oberfläche (Zahnrad, Menü, Buttons) nutzt die Tokens und `.pxbtn`; Gold bleibt die Farbe für klickbare Aktionen.
 
 ## Welt
@@ -128,7 +127,7 @@ Bei `prefers-reduced-motion`: Die Kamera springt feldweise mit, ohne Nachgleiten
 Seiten und Navigation (ob der Einstieg auf der Insel sichtbar ist, ist noch offen):
 
 - **`/spiele/`** als Seite mit Insel (`IslandPage.astro`, `rest="spiele"`): Einleitung für Eltern aus dem README, die Reihe als Kisten (eine pro Jahr), ein Standbild und ein Link zum Spiel. Mitziehen: `ROUTES` und `RestId` in `island-layout.ts`, Sprechblasen in `site.ts`, `docs/specs/insel.md`, die Tests der Insel, die Tabelle in `docs/design-system.md` und die schmale Ansicht.
-- **`/spiele/mitwachsen/`** als Seite ohne Insel wie Impressum und 404, mit schlankem Layout. Oben in der Ecke neben dem Zahnrad ein goldener Zurück-Button wie in `SubHero.astro` (Ziel `/spiele/`), nur per Maus. Keine Text-Navigation. Die Liste der Seiten ohne Insel in `CLAUDE.md` wird um die Spielseite ergänzt.
+- **`/spiele/mitwachsen/`** als Seite ohne Insel wie Impressum und 404, mit schlankem Layout. Das Spiel steht für sich: kein Zurück-Button, der Weg zur Homepage liegt im Menü für Eltern. Keine Text-Navigation. Die Liste der Seiten ohne Insel in `CLAUDE.md` wird um die Spielseite ergänzt.
 
 Fest:
 

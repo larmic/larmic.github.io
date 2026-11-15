@@ -1,19 +1,12 @@
 ---
-// Spielfläche von Mitwachsen: Canvas über die ganze Höhe, oben Zurück, Name der Figur und Menü für Eltern.
-// Das Kind spielt mit der Tastatur; Zurück und Menü sind nur per Maus erreichbar gedacht (sie reagieren aber auch
-// auf Tab und Enter). Ohne JavaScript bleibt ein kurzer Text für Eltern.
+// Spielfläche von Mitwachsen: Das Spiel steht für sich, ohne Navigation der Seite. Oben links das Menü für Eltern
+// (mit dem Weg zurück zur Homepage), in der Mitte der Name der Figur, rechts die Karte. Auf Touch-Geräten unten ein
+// Steuerkreuz und ein Aktionsknopf. Das Kind spielt sonst mit der Tastatur. Ohne JavaScript bleibt ein Text für Eltern.
 // Logik: src/scripts/games/ · Konzept: docs/games/mitwachsen.md
 ---
 
 <larmic-mitwachsen class="mw">
   <div class="mw-top">
-    <a class="pxbtn small back mw-btn" href="/" data-astro-reload>
-      <svg width="16" height="16" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true">
-        <path d="M2 3h1v2h-1z M3 2h1v4h-1z M4 1h1v6h-1z" fill="currentColor"></path>
-      </svg>
-      <span class="mw-btn-text">Zurück</span>
-    </a>
-    <div class="mw-name"></div>
     <button type="button" class="pxbtn small mw-btn mw-gear" aria-label="Menü für Eltern">
       <svg width="20" height="20" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">
         <path
@@ -23,10 +16,42 @@
         ></path>
       </svg>
     </button>
+    <div class="mw-name"></div>
+    <canvas class="mw-map pxbox" role="img" aria-label="Karte mit dem Weg nach Hause"></canvas>
   </div>
 
   <canvas class="mw-canvas3d" aria-hidden="true"></canvas>
   <canvas class="mw-canvas" role="img" aria-label="Spielwelt: eine Figur auf einer Voxel-Insel mit Tieren"></canvas>
+
+  <div class="mw-touch">
+    <div class="mw-pad" role="group" aria-label="Laufen">
+      <button type="button" class="mw-key mw-key-n" data-dir="n" aria-label="hoch">
+        <svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true">
+          <path d="M3 1h2v1h1v1h1v1h-6v-1h1v-1h1z M3 4h2v3h-2z" fill="currentColor"></path>
+        </svg>
+      </button>
+      <button type="button" class="mw-key mw-key-w" data-dir="w" aria-label="links">
+        <svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true">
+          <path d="M3 1h2v1h1v1h1v1h-6v-1h1v-1h1z M3 4h2v3h-2z" fill="currentColor" transform="rotate(-90 4 4)"></path>
+        </svg>
+      </button>
+      <button type="button" class="mw-key mw-key-e" data-dir="e" aria-label="rechts">
+        <svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true">
+          <path d="M3 1h2v1h1v1h1v1h-6v-1h1v-1h1z M3 4h2v3h-2z" fill="currentColor" transform="rotate(90 4 4)"></path>
+        </svg>
+      </button>
+      <button type="button" class="mw-key mw-key-s" data-dir="s" aria-label="runter">
+        <svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true">
+          <path d="M3 1h2v1h1v1h1v1h-6v-1h1v-1h1z M3 4h2v3h-2z" fill="currentColor" transform="rotate(180 4 4)"></path>
+        </svg>
+      </button>
+    </div>
+    <button type="button" class="mw-act" aria-label="Aktion: Tier begrüßen, rufen oder schlafen">
+      <svg viewBox="0 0 7 6" shape-rendering="crispEdges" aria-hidden="true">
+        <path d="M1 0h2v1h1v-1h2v1h1v2h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1v-2h1z" fill="currentColor"></path>
+      </svg>
+    </button>
+  </div>
 
   <noscript>
     <div class="mw-noscript pxbox paper">
@@ -72,9 +97,14 @@
       </button>
     </section>
 
-    <button type="button" class="pxbtn small" data-act="close">
-      Weiterspielen
-    </button>
+    <div class="mw-row">
+      <button type="button" class="pxbtn small" data-act="close">
+        Weiterspielen
+      </button>
+      <a class="mw-link" href="/" data-astro-reload>
+        Zur Homepage
+      </a>
+    </div>
   </dialog>
 </larmic-mitwachsen>
 
@@ -119,6 +149,90 @@
   }
   .mw-gear {
     padding: 0 14px;
+  }
+  .mw-map {
+    width: 168px;
+    height: 168px;
+    image-rendering: pixelated;
+    background: #e4edf3;
+  }
+  /* Steuerung für Touch: nur auf Geräten ohne Maus (oder nach der ersten Berührung) */
+  .mw-touch {
+    position: absolute;
+    inset: auto 16px 16px;
+    display: none;
+    justify-content: space-between;
+    align-items: flex-end;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .mw.touch .mw-touch {
+    display: flex;
+  }
+  @media (hover: none) and (pointer: coarse) {
+    .mw-touch {
+      display: flex;
+    }
+  }
+  .mw-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 56px);
+    grid-template-rows: repeat(3, 56px);
+    gap: 4px;
+  }
+  .mw-key,
+  .mw-act {
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    color: var(--ink);
+    border: 0;
+    cursor: pointer;
+    box-shadow:
+      var(--px-3),
+      inset 0 -5px 0 rgba(0, 0, 0, 0.18),
+      inset 0 3px 0 rgba(255, 255, 255, 0.5);
+  }
+  .mw-key {
+    display: grid;
+    place-items: center;
+    padding: 12px;
+    background: rgba(255, 253, 247, 0.85);
+  }
+  .mw-key svg {
+    width: 100%;
+    height: 100%;
+  }
+  .mw-key:active,
+  .mw-key.down,
+  .mw-act:active {
+    transform: translateY(3px);
+  }
+  .mw-key-n {
+    grid-area: 1 / 2;
+  }
+  .mw-key-w {
+    grid-area: 2 / 1;
+  }
+  .mw-key-e {
+    grid-area: 2 / 3;
+  }
+  .mw-key-s {
+    grid-area: 3 / 2;
+  }
+  .mw-act svg {
+    width: 52%;
+    height: 52%;
+    color: #e0577a;
+  }
+  .mw-act {
+    display: grid;
+    place-items: center;
+    width: 96px;
+    height: 96px;
+    margin-bottom: 30px;
+    background: var(--gold);
   }
   .mw-name {
     display: flex;
@@ -251,8 +365,9 @@
     margin-top: 8px;
   }
   @media (max-width: 560px) {
-    .mw-btn-text {
-      display: none;
+    .mw-map {
+      width: 120px;
+      height: 120px;
     }
     .mw-name :global(span) {
       width: 24px;

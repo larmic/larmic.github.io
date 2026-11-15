@@ -23,6 +23,7 @@ import {
   type Store,
 } from './mitwachsen-save';
 import { InputPace, STEP_MS } from './input-pace';
+import { drawMap } from './mitwachsen-map';
 import { initialState, progressOf, step, type Cmd, type GameEvent, type State } from './mitwachsen-state';
 import { createWorld, standHeight, type World } from './mitwachsen-world';
 
@@ -89,6 +90,10 @@ class LarmicMitwachsen extends HTMLElement {
   private dayAt = 0;
   private resize: ResizeObserver | null = null;
   private readonly reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  private map!: HTMLCanvasElement;
+  private mapCtx!: CanvasRenderingContext2D;
+  private lastMap = 0;
+  private touchUi!: HTMLElement;
   private r3d: World3DType | null = null; // 3D-Ansicht, solange sie zeichnen kann
   private gl3d: World3DType | null = null; // die geladene 3D-Ansicht, auch wenn ihr Kontext gerade fehlt
 
@@ -96,6 +101,9 @@ class LarmicMitwachsen extends HTMLElement {
     this.canvas = this.querySelector('canvas.mw-canvas')!;
     this.ctx = this.canvas.getContext('2d')!;
     this.menu = this.querySelector('dialog')!;
+    this.map = this.querySelector('canvas.mw-map')!;
+    this.mapCtx = this.map.getContext('2d')!;
+    this.touchUi = this.querySelector('.mw-touch')!;
     this.renderer = new Renderer(this.ctx);
     this.store = browserStore();
     this.sfx.muted = this.store.getItem('larmic.games.muted') === '1';
@@ -225,7 +233,8 @@ class LarmicMitwachsen extends HTMLElement {
         if (t?.closest('input, textarea, select')) return;
         // Buttons bleiben bedienbar (Enter, im Menü auch die Leertaste). Zurück und Zahnrad oben: Die Leertaste gehört
         // dem Spiel, sonst öffnet das Kind nach einem Mausklick von Papa das Menü statt zu singen.
-        if (t?.closest('button, a') && (e.key === 'Enter' || (e.key === ' ' && !t.closest('.mw-top')))) return;
+        if (t?.closest('button, a') && (e.key === 'Enter' || (e.key === ' ' && !t.closest('.mw-top, .mw-touch'))))
+          return;
         e.preventDefault();
         if (e.repeat) return; // gehaltene Pfeile laufen über den eigenen Takt (poll im Bild), nicht über das System
         const dir = KEYS[e.key];
@@ -263,6 +272,7 @@ class LarmicMitwachsen extends HTMLElement {
     window.addEventListener('pagehide', () => this.save(), { signal });
 
     this.querySelector('.mw-gear')!.addEventListener('click', () => this.openMenu(), { signal });
+    this.listenTouch(signal);
     // Beim Schließen gibt der Dialog den Fokus ans Zahnrad zurück; die Leertaste öffnete dann sofort wieder das Menü
     this.menu.addEventListener(
       'close',
@@ -274,6 +284,44 @@ class LarmicMitwachsen extends HTMLElement {
     );
     this.menu.addEventListener('click', (e) => this.menuClick(e), { signal });
     this.menu.addEventListener('change', (e) => this.menuChange(e), { signal });
+  }
+
+  /**
+   * Touch-Steuerung: Steuerkreuz und Aktionsknopf laufen über denselben ruhigen Takt wie die Tastatur.
+   * Nach der ersten Berührung erscheint die Steuerung auch auf Geräten mit Maus (z. B. Laptop mit Touchscreen).
+   */
+  private listenTouch(signal: AbortSignal) {
+    document.addEventListener('touchstart', () => this.classList.add('touch'), { signal, passive: true, once: true });
+    for (const key of this.querySelectorAll<HTMLElement>('.mw-key')) {
+      const dir = key.dataset.dir as Dir;
+      const up = () => {
+        key.classList.remove('down');
+        this.pace.release(dir);
+      };
+      key.addEventListener(
+        'pointerdown',
+        (e) => {
+          e.preventDefault();
+          key.setPointerCapture(e.pointerId);
+          key.classList.add('down');
+          this.sfx.unlock();
+          const go = this.pace.press(dir, performance.now());
+          if (go) this.apply({ type: 'move', dir: go });
+        },
+        { signal },
+      );
+      for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'])
+        key.addEventListener(type, up, { signal });
+    }
+    this.querySelector('.mw-act')!.addEventListener(
+      'pointerdown',
+      (e) => {
+        e.preventDefault();
+        this.sfx.unlock();
+        if (this.pace.action(performance.now())) this.apply({ type: 'action' });
+      },
+      { signal },
+    );
   }
 
   /** Ereignisse der Regeln: Töne, Herzen, Noten, Tore, Nacht – und sofort speichern, was zählt */
@@ -374,6 +422,9 @@ class LarmicMitwachsen extends HTMLElement {
     // Etwa 18 Felder breit, auf großen Schirmen nicht riesig, auf kleinen nicht winzig
     this.size = { w, h, dpr, zoom: Math.min(1.25, Math.max(0.5, w / (18 * 64))) };
     this.gl3d?.resize(w, h, dpr);
+    const m = this.map.clientWidth;
+    this.map.width = Math.round(m * dpr);
+    this.map.height = Math.round(m * dpr);
   }
 
   /** Bildschirmpunkt eines Weltpunkts – aus der 3D-Kamera, sonst aus der Ansicht von vorn */
@@ -478,6 +529,7 @@ class LarmicMitwachsen extends HTMLElement {
       now: t,
       look: LOOK,
       reduced: this.reduced.matches,
+      bottomInset: this.touchUi.offsetParent ? this.touchUi.offsetHeight + 16 : 0,
     };
     if (this.r3d) {
       // 3D-Welt, darüber die durchsichtige 2D-Ebene mit Zeichen, Pfeil, Nacht und Leiste
@@ -485,6 +537,14 @@ class LarmicMitwachsen extends HTMLElement {
       this.ctx.clearRect(0, 0, w, h);
       this.renderer.overlay(this.state, scene, this.r3d.project);
     } else this.renderer.draw(this.world, this.state, scene);
+    // Karte etwa zehnmal pro Sekunde
+    if (t - this.lastMap > 100) {
+      this.lastMap = t;
+      const m = this.map.clientWidth;
+      this.mapCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.mapCtx.imageSmoothingEnabled = false;
+      drawMap(this.mapCtx, this.world, this.state, player.x, player.y, m, () => true, this.reduced.matches ? 0 : t);
+    }
   }
 
   // ---------- Kopf und Menü ----------

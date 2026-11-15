@@ -111,7 +111,9 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Licht und Leben | weiche Schatten unter Bäumen, Büschen, Tieren und Figur; warmes Licht von oben links, leichter Dunst oben, dunklere Ränder; glitzerndes Wasser mit hellem Ufer; tagsüber Schmetterlinge und Pollen, nachts Glühwürmchen (Bewegtes nicht bei reduzierter Bewegung) |
 | Leiste unten | ein Platz je Tier, nach Gegenden gruppiert, dahinter Tiere der Landschaft, die im Garten wohnen: heller Platz mit Umriss und Fragezeichen = noch verloren, Holz mit Tier in Farbe = gefunden, Gras = zu Hause im Garten, Herz = folgt gerade |
 | Tafel am Tor | Tiere der Gegend auf dem Brett: gefundene in Farbe, verlorene als Umriss |
-| Heimweg-Pfeil | am Bildrand Richtung Bett, solange das Bett nicht zu sehen ist |
+| Karte | oben rechts, genordet wie die Kamera, etwa 41 × 41 Felder um die Figur: Felder in ihren Farben, die Figur als Punkt, das Bett als Häuschen. Liegt das Bett außerhalb, zeigt ein Pfeil am Kartenrand nach Hause |
+| Touch-Steuerung | auf Geräten ohne Maus (oder nach der ersten Berührung): Steuerkreuz unten links, Aktionsknopf mit Herz unten rechts, im selben ruhigen Takt wie die Tastatur; die Leiste rückt darüber |
+| Kopf | oben links Zahnrad (Menü für Eltern, darin auch der Weg zur Homepage), Mitte Name der Figur, rechts Karte. Kein Zurück-Button: Das Spiel steht für sich |
 | Nacht | dunkler Himmel mit Sternen und Mond, die Figur liegt im Bett, Zzz steigt auf |
 | Menü | Zahnrad oben rechts: Welten wählen, neue Welt, Namen, Welt-Code kopieren, Ton, Vollbild. Das Spiel pausiert, solange es offen ist |
 | Reduzierte Bewegung | keine Partikel, Noten und Zzz, kein Gleiten und Hüpfen, Tore und Nacht ohne Überblendung; Töne bleiben |
