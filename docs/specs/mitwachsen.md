@@ -112,7 +112,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Was | Regel |
 | --- | --- |
 | Ansicht | **3D** mit Three.js (WebGL): Kamera schräg von oben (55°) aus Süden, folgt der Figur; echtes Sonnenlicht mit Schatten, Himmel und Nebel in der Ferne. Three.js wird erst beim Spielstart per `import()` nachgeladen (Bundle-Gate). Darüber liegt ein durchsichtiges 2D-Canvas für Zeichen über den Tieren, Herzen, Noten, Heimweg-Pfeil, Nacht, Schmetterlinge und die Leiste. Ohne WebGL bleibt die **2D-Ansicht von vorn** (Reihe für Reihe von hinten nach vorn), sie läuft auch, bis 3D geladen ist |
-| Verdeckte Figur | In 3D erscheint die Figur als heller Umriss, wo Bäume, Hecken oder Hügel sie verdecken; in 2D wird sie halb durchsichtig obenauf gezeichnet |
+| Verdeckte Figur | In 3D wird halb durchsichtig, was zwischen Kamera und Figur steht (Baumkronen, Hügel, Felsen auf Körperhöhe oder darüber): ein weicher Kreis um die Sichtlinie, bis zu drei von vier Pixeln weggelassen, die Figur selbst bleibt unverändert. In 2D wird die Figur halb durchsichtig obenauf gezeichnet |
 | Große Tore | Holz mit Eisenbändern, Steinsturz; obendrauf Themen-Blöcke (Eis, Sand, Wasser, Lava, später Höhle), die verraten, welche Welt dahinter liegt. Lava leuchtet auch nachts |
 | Nebel | keine Blöcke: Die Welt verblasst am Rand des Erkundeten weich in die Himmelsfarbe und verschwindet im Dunst. 3D: Nebel-Maske (128 × 128 Felder um die Figur, zweimal weich verwischt) als Textur, ein Shader-Zusatz mischt nach der Beleuchtung in die Himmelsfarbe (nachts dunkel). 2D: Unerkundetes bleibt leer, am Rand heller Dunst |
 | Hochformat | In 3D rückt die Kamera im Hochformat weiter weg (bis 1,8-fach), der Nebel rückt mit |

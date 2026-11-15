@@ -24,8 +24,6 @@ import {
   Mesh,
   MeshLambertMaterial,
   NearestFilter,
-  GreaterDepth,
-  MeshBasicMaterial,
   PCFShadowMap,
   PerspectiveCamera,
   Scene as ThreeScene,
@@ -297,25 +295,16 @@ export class World3D {
     mwFogOrigin: { value: new Vector2(0, 0) },
     mwFogSize: { value: FOG_N },
     mwFogTint: { value: SKY.clone() },
+    // Durchblick: Was zwischen Kamera und Figur steht, wird dort halb durchsichtig
+    mwEye: { value: new Vector3() },
+    mwTarget: { value: new Vector3() },
   };
   private fogDirty = true;
   private fogKey = '';
   private entity = new MeshLambertMaterial({ vertexColors: true });
-  // Umriss der Figur, nur wo sie verdeckt ist (hinter Bäumen, Hecken, Hügeln): Tiefentest umgekehrt
-  private xray = new MeshBasicMaterial({
-    color: '#ffffff',
-    transparent: true,
-    opacity: 0.45,
-    depthFunc: GreaterDepth,
-    depthWrite: false,
-  });
-  private ghost: Mesh | null = null;
   private dark = new MeshLambertMaterial({ color: GAME_COLORS.silhouette }); // verlorene Tiere auf den Tafeln
   private lava!: MeshLambertMaterial; // leuchtet auch nachts
   private themes = new Group(); // Blöcke oben auf den großen Toren
-  // Die Figur selbst wird nach ihrem Umriss gezeichnet (beides im durchsichtigen Durchgang): Der Umriss sieht so nur
-  // die Welt, nicht die eigenen Körperteile, und die Figur deckt ihn ab, wo sie sichtbar ist
-  private hero = new MeshLambertMaterial({ vertexColors: true, transparent: true, opacity: 1 });
   private chunks = new Map<string, Chunk>();
   private models = new Map<string, BufferGeometry>();
   private bodies = new Map<string, Mesh>();
@@ -360,7 +349,13 @@ export class World3D {
     this.scene.add(this.sun, this.sun.target, this.hemi, this.signs, this.sleeper, this.themes);
   }
 
-  /** Shader-Zusatz: Farbe nach der Beleuchtung je nach Nebel-Maske in die Himmelsfarbe mischen */
+  /**
+   * Shader-Zusatz für die Welt:
+   * – Nebel: Farbe nach der Beleuchtung je nach Nebel-Maske in die Himmelsfarbe mischen.
+   * – Durchblick: Nah an der Sichtlinie Kamera → Figur, vor der Figur und auf Körperhöhe oder darüber (Baumkronen,
+   *   Hügel, Felsen) werden Pixel im 2 × 2-Muster weggelassen, bis zu drei von vier, zum Rand hin immer weniger.
+   *   So sieht man die Figur zwischen vielen Bäumen; die Figur selbst bleibt unverändert.
+   */
   private withFog(material: MeshLambertMaterial) {
     material.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, this.fogUniforms);
@@ -371,13 +366,28 @@ export class World3D {
           '#include <begin_vertex>\n  vMwWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;',
         );
       shader.fragmentShader =
-        'uniform sampler2D mwFogMap;\nuniform vec2 mwFogOrigin;\nuniform float mwFogSize;\nuniform vec3 mwFogTint;\nvarying vec3 vMwWorld;\n' +
-        shader.fragmentShader.replace(
-          '#include <tonemapping_fragment>',
-          'float mwSeen = texture2D(mwFogMap, (vMwWorld.xz - mwFogOrigin) / mwFogSize).r;\n' +
-            '  gl_FragColor.rgb = mix(mwFogTint, gl_FragColor.rgb, smoothstep(0.08, 0.92, mwSeen));\n' +
+        'uniform sampler2D mwFogMap;\nuniform vec2 mwFogOrigin;\nuniform float mwFogSize;\nuniform vec3 mwFogTint;\n' +
+        'uniform vec3 mwEye;\nuniform vec3 mwTarget;\nvarying vec3 vMwWorld;\n' +
+        shader.fragmentShader
+          .replace(
+            '#include <clipping_planes_fragment>',
+            '#include <clipping_planes_fragment>\n' +
+              '  vec3 mwDir = normalize(mwTarget - mwEye);\n' +
+              '  float mwLen = distance(mwTarget, mwEye);\n' +
+              '  float mwT = dot(vMwWorld - mwEye, mwDir);\n' +
+              '  float mwD = distance(vMwWorld, mwEye + mwDir * mwT);\n' +
+              '  if (mwT < mwLen - 0.8 && vMwWorld.y > mwTarget.y - 0.7) {\n' +
+              '    float mwCut = 0.75 * smoothstep(1.7, 0.9, mwD);\n' +
+              '    float mwBayer = (mod(floor(gl_FragCoord.x), 2.0) * 2.0 + mod(floor(gl_FragCoord.y), 2.0)) / 4.0;\n' +
+              '    if (mwBayer < mwCut) discard;\n' +
+              '  }',
+          )
+          .replace(
             '#include <tonemapping_fragment>',
-        );
+            'float mwSeen = texture2D(mwFogMap, (vMwWorld.xz - mwFogOrigin) / mwFogSize).r;\n' +
+              '  gl_FragColor.rgb = mix(mwFogTint, gl_FragColor.rgb, smoothstep(0.08, 0.92, mwSeen));\n' +
+              '#include <tonemapping_fragment>',
+          );
     };
     material.customProgramCacheKey = () => 'mw-fog';
   }
@@ -434,8 +444,7 @@ export class World3D {
     for (const g of this.models.values()) g.dispose();
     this.models.clear();
     this.solid.map?.dispose();
-    for (const m of [this.solid, this.foliage, this.water, this.lava, this.entity, this.xray, this.hero, this.dark])
-      m.dispose();
+    for (const m of [this.solid, this.foliage, this.water, this.lava, this.entity, this.dark]) m.dispose();
     this.fogTex.dispose();
     this.sun.shadow.dispose();
     this.renderer.dispose();
@@ -467,6 +476,8 @@ export class World3D {
     fog.far = dist + 40;
     this.camera.position.set(tx, ty + dist * Math.sin(PITCH), tz + dist * Math.cos(PITCH));
     this.camera.lookAt(tx, ty, tz);
+    this.fogUniforms.mwEye.value.copy(this.camera.position);
+    this.fogUniforms.mwTarget.value.set(tx, ty + 0.9, tz);
     // Sonne von links oben vorn; Schatten folgen der Figur
     this.sun.position.set(tx - 9, ty + 22, tz + 7);
     this.sun.target.position.set(tx, ty, tz);
@@ -791,15 +802,13 @@ export class World3D {
   private syncBodies(state: State, sc: Scene) {
     const seen = new Set<string>();
     const place = (id: string, geo: BufferGeometry, scale: number, dir: Dir) => {
-      const material = id === 'player' ? this.hero : this.entity;
       const b = sc.bodies.get(id);
       if (!b) return;
       seen.add(id);
       let m = this.bodies.get(id);
       if (!m) {
-        m = new Mesh(geo, material);
+        m = new Mesh(geo, this.entity);
         m.castShadow = true;
-        if (id === 'player') m.renderOrder = 11;
         this.scene.add(m);
         this.bodies.set(id, m);
       }
@@ -809,17 +818,6 @@ export class World3D {
       m.rotation.y = YAW[dir];
     };
     if (!state.sleeping) place('player', this.model('player', figureParts(this.look)), 1, state.player.dir);
-    const me = this.bodies.get('player');
-    if (!this.ghost) {
-      this.ghost = new Mesh(this.model('player', figureParts(this.look)), this.xray);
-      this.ghost.renderOrder = 10;
-      this.scene.add(this.ghost);
-    }
-    this.ghost.visible = !!me && !state.sleeping;
-    if (me) {
-      this.ghost.position.copy(me.position);
-      this.ghost.rotation.copy(me.rotation);
-    }
     for (const a of state.animals) {
       const b = sc.bodies.get(a.id);
       if (b && !this.explored(Math.round(b.x), Math.round(b.y))) continue; // Tiere im Nebel bleiben verborgen
