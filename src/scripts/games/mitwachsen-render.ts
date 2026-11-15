@@ -578,7 +578,7 @@ export class Renderer {
     if (sc.reduced || sc.mood.strength <= 0) return;
     const { ctx } = this;
     const t = sc.now / 1000;
-    const s = sc.mood.strength;
+    const s = sc.mood.strength * 0.5; // nur eine Ahnung der Welt hinter dem Tor
     const W = sc.width,
       H = sc.height,
       z = sc.zoom;
@@ -994,7 +994,7 @@ export class Renderer {
     const light = MOOD_LIGHT[sc.mood.id];
     if (light && sc.mood.strength > 0 && !sc.lit3d) {
       ctx.globalCompositeOperation = 'multiply';
-      ctx.globalAlpha = 0.12 * sc.mood.strength;
+      ctx.globalAlpha = 0.08 * sc.mood.strength;
       ctx.fillStyle = light.color;
       ctx.fillRect(0, 0, sc.width, sc.height);
       ctx.globalCompositeOperation = 'source-over';
@@ -1005,7 +1005,7 @@ export class Renderer {
       ctx.fillRect(0, 0, sc.width, sc.height);
     }
     // Richtung Eistor fällt Schnee statt Regen
-    const snowy = sc.mood.id === 'eis' ? Math.min(1, sc.mood.strength * 1.4) : 0;
+    const snowy = sc.mood.id === 'eis' ? Math.max(0, sc.mood.strength - 0.6) * 2 : 0; // nur nah am Eistor
     const rain = sc.weather.rain * (1 - snowy),
       snow = sc.weather.rain * snowy;
     if (snow > 0 && !sc.reduced) {

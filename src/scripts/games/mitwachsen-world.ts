@@ -468,7 +468,7 @@ function findSpawns(seed: number, map: Map<string, Cell>, land: Point[]): Map<st
 function climateOf(seed: number, places: readonly GatePlace[], x: number, y: number): Climate {
   const { rx, ry } = lichtung.shape;
   const d = Math.sqrt((x / rx) ** 2 + (y / ry) ** 2);
-  const t = Math.max(0, Math.min(1, (d - 0.3) / 0.6));
+  const t = Math.max(0, Math.min(1, (d - 0.45) / 0.5)); // erst ab knapp der Hälfte des Wegs zum Rand
   return { id: biomeOf(seed, places, x, y), strength: t * t * (3 - 2 * t) };
 }
 
@@ -498,34 +498,35 @@ function withClimate(seed: number, c: Cell, cl: Climate, x: number, y: number): 
   if (s <= 0.02 || c.region !== 'lichtung' || c.garden || c.ground === 'water') return c;
   const out: Cell = { ...c };
   const tint = CLIMATE_TINT[cl.id];
-  if (tint) out.tint = mix('#ffffff', tint, s * 0.55); // zart: das Gras bleibt Gras
+  if (tint) out.tint = mix('#ffffff', tint, s * 0.35); // zart: das Gras bleibt Gras
   const roll = rand01(seed, x, y, 51);
   const patch = valueNoise(seed + 52, x, y, 5); // Flecken statt Salz und Pfeffer
   const grassy = c.ground === 'grass';
   const tree = c.deco === 'tree';
   switch (cl.id) {
+    // Nur eine Ahnung der Welt: vereinzelte Flecken nah am Rand, einzelne Bäume (die Welt selbst liegt hinter dem Tor)
     case 'eis':
-      if (grassy && patch < (s - 0.35) * 1.6) out.ground = 'snow';
-      if (tree && roll < s * 1.2) out.tree = 'winter';
+      if (grassy && patch < (s - 0.55) * 0.3) out.ground = 'snow';
+      if (tree && roll < (s - 0.4) * 0.6) out.tree = 'winter';
       break;
     case 'sand':
-      if (grassy && patch < (s - 0.6) * 1.2) out.ground = 'sand';
+      if (grassy && patch < (s - 0.65) * 0.3) out.ground = 'sand';
       break;
     case 'lava':
-      if (grassy && patch < (s - 0.65) * 0.8) out.ground = 'basalt';
-      if (tree && roll < (s - 0.6) * 1.5) out.tree = 'dead';
+      if (grassy && patch < (s - 0.7) * 0.25) out.ground = 'basalt';
+      if (tree && roll < (s - 0.7) * 0.4) out.tree = 'dead';
       break;
     case 'hoehle':
-      if (grassy && patch < (s - 0.5) * 0.8) out.ground = 'stone';
+      if (grassy && patch < (s - 0.65) * 0.3) out.ground = 'stone';
       break;
     case 'pilze':
-      if (grassy && patch < (s - 0.45) * 1.4) out.ground = 'moss';
+      if (grassy && patch < (s - 0.6) * 0.3) out.ground = 'moss';
       break;
     case 'wald':
-      if (tree && roll < s * 1.3) out.tree = roll < s * 0.6 ? 'red' : 'autumn';
+      if (tree && roll < (s - 0.3) * 0.7) out.tree = roll < (s - 0.3) * 0.3 ? 'red' : 'autumn';
       break;
     case 'wasser':
-      if (tree && roll < s * 1.3) out.tree = 'blossom';
+      if (tree && roll < (s - 0.3) * 0.7) out.tree = 'blossom';
       break;
   }
   // Wo der Boden kein Gras mehr ist, wachsen keine Grasbüschel; auf Schnee blüht nichts

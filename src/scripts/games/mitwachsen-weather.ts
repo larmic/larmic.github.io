@@ -44,6 +44,6 @@ export function weatherLook(seed: number, day: number, tick: number): WeatherLoo
 
 /** Wind: überall eine leichte Brise, stärker Richtung Wolken und Wald und bei Wolken und Regen (0 … 1) */
 export function windAt(mood: Climate, look: WeatherLook): number {
-  const dir = mood.id === 'wolken' ? 0.8 : mood.id === 'wald' ? 0.45 : 0;
+  const dir = mood.id === 'wolken' ? 0.4 : mood.id === 'wald' ? 0.25 : 0;
   return Math.min(1, 0.15 + dir * mood.strength + look.cloud * 0.15 + look.rain * 0.25);
 }

@@ -53,6 +53,6 @@ describe('Wetter', () => {
     expect(windAt({ id: 'eis', strength: 0 }, calm)).toBeCloseTo(0.15);
     expect(windAt({ id: 'wolken', strength: 1 }, calm)).toBeGreaterThan(windAt({ id: 'wald', strength: 1 }, calm));
     expect(windAt({ id: 'eis', strength: 0 }, { cloud: 1, rain: 1, rainbow: 0 })).toBeGreaterThan(0.5);
-    expect(windAt({ id: 'wolken', strength: 1 }, { cloud: 1, rain: 1, rainbow: 0 })).toBe(1);
+    expect(windAt({ id: 'wolken', strength: 1 }, { cloud: 1, rain: 1, rainbow: 0 })).toBeGreaterThan(0.9);
   });
 });

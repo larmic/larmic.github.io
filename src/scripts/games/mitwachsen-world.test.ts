@@ -242,12 +242,22 @@ describe('Stimmung der Richtungen', () => {
         }
     });
 
-    it(`Seed ${seed}: Richtung Eis Schnee, Richtung Wald Herbst, Richtung Wasser Blüten, Richtung Pilze Moos`, () => {
+    it(`Seed ${seed}: nah am Rand eine Ahnung der Welt: vereinzelt Schnee, Herbst- und Blütenbäume, Moos`, () => {
       const isTree = (c: Cell) => c.deco === 'tree';
-      expect(share(strong.get('eis')!, (c) => c.ground === 'snow')).toBeGreaterThan(0.2);
-      expect(share(strong.get('wald')!, (c) => c.tree === 'autumn' || c.tree === 'red', isTree)).toBeGreaterThan(0.6);
-      expect(share(strong.get('wasser')!, (c) => c.tree === 'blossom', isTree)).toBeGreaterThan(0.6);
-      expect(share(strong.get('pilze')!, (c) => c.ground === 'moss')).toBeGreaterThan(0.15);
+      const snow = share(strong.get('eis')!, (c) => c.ground === 'snow');
+      expect(snow).toBeGreaterThan(0.01);
+      expect(snow).toBeLessThan(0.2); // nur Flecken, keine Schneelandschaft
+      // Baumarten nur prüfen, wo am Rand genug Bäume stehen
+      const trees = (id: string) => strong.get(id)!.filter(isTree).length;
+      if (trees('wald') >= 8)
+        expect(share(strong.get('wald')!, (c) => c.tree === 'autumn' || c.tree === 'red', isTree)).toBeGreaterThan(
+          0.15,
+        );
+      if (trees('wasser') >= 8)
+        expect(share(strong.get('wasser')!, (c) => c.tree === 'blossom', isTree)).toBeGreaterThan(0.15);
+      const moss = share(strong.get('pilze')!, (c) => c.ground === 'moss');
+      expect(moss).toBeGreaterThan(0.005);
+      expect(moss).toBeLessThan(0.2);
       expect(share(strong.get('sand')!, (c) => !!c.tint)).toBeGreaterThan(0.5);
     });
   }

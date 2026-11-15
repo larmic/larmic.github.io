@@ -96,7 +96,7 @@ Die Regeln kennen den Nebel nicht: Er betrifft nur, was gezeichnet wird.
 
 ## Stimmung der Richtungen
 
-Die Lichtung kündigt auf dem Weg an, was hinter einem Tor wartet. `world.climate(x, y)` liefert die Welt des nächsten Tors (wie hinter dem Felsring, Grenzen leicht gewellt) und die Stärke: 0 bis 30 % des Wegs zum Rand, dann weich ansteigend bis 1 am Felsring. Alles aus dem Seed; nur Boden, Baumart und Farben ändern sich, keine Höhen, nichts versperrt (die Regeln bleiben gleich).
+Die Lichtung gibt auf dem Weg nur eine Ahnung dessen, was hinter einem Tor wartet; die eigentliche Welt beginnt erst hinter dem Tor. `world.climate(x, y)` liefert die Welt des nächsten Tors (wie hinter dem Felsring, Grenzen leicht gewellt) und die Stärke: 0 bis knapp zur Hälfte des Wegs zum Rand, dann weich ansteigend bis 1 am Felsring. Flecken (Schnee, Sand, Basalt, Stein, Moos) gibt es nur vereinzelt nah am Rand (höchstens etwa jedes zehnte Feld), besondere Bäume mischen sich unter die normalen; Teilchen und Wind halb so stark, Schnee fällt nur ganz nah am Eistor. Alles aus dem Seed; nur Boden, Baumart und Farben ändern sich, keine Höhen, nichts versperrt (die Regeln bleiben gleich).
 
 | Richtung | Stimmung | Test |
 | --- | --- | --- |
