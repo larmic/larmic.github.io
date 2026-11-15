@@ -30,6 +30,7 @@ import {
   GATES,
   REGIONS,
   SPECIES,
+  THEME_COLORS,
   animalId,
   figureParts,
   type GateId,
@@ -584,6 +585,9 @@ export class Renderer {
           for (const z of [0.5, 1.7]) box(ctx, P, x, y + 0.3, h + z, 1, 0.4, 0.12, '#3a3a44');
           box(ctx, P, x - 0.02, y + 0.2, h + 2.4, 1.04, 0.6, 0.45, '#8f949b', '#a8adb3');
         }
+        // Themen-Block oben auf dem Tor: verrät, welche Welt dahinter liegt
+        const theme = THEME_COLORS[GATES.find((g) => g.id === c.gate)?.theme ?? 'hoehle'];
+        box(ctx, P, x + 0.1, y + 0.1, h + 2.85, 0.8, 0.8, 0.8, theme.side, theme.top);
         break;
       }
       case 'gate':

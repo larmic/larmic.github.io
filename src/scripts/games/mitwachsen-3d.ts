@@ -52,7 +52,17 @@ import {
   type Grid,
   type Palette,
 } from '../../lib/voxel/textures';
-import { GAME_COLORS, GATES, HOME, REGIONS, SPECIES, figureParts, type Look } from '../../data/games/mitwachsen';
+import {
+  GAME_COLORS,
+  GATES,
+  HOME,
+  REGIONS,
+  SPECIES,
+  THEME_COLORS,
+  figureParts,
+  type GateTheme,
+  type Look,
+} from '../../data/games/mitwachsen';
 import type { Scene } from './mitwachsen-render';
 import type { State } from './mitwachsen-state';
 import type { Cell, TreeKind, World } from './mitwachsen-world';
@@ -66,7 +76,21 @@ const FOG_N = 128; // Nebel-Maske: 128 × 128 Felder um die Figur (8 × 8 Stück
 // ---------- Textur-Kacheln ----------
 
 type Tile =
-  'grassTop' | 'grassSide' | 'dirt' | 'stone' | 'sand' | 'path' | 'leaves' | 'log' | 'logTop' | 'planks' | 'white';
+  | 'grassTop'
+  | 'grassSide'
+  | 'dirt'
+  | 'stone'
+  | 'sand'
+  | 'path'
+  | 'leaves'
+  | 'log'
+  | 'logTop'
+  | 'planks'
+  | 'white'
+  | 'lava'
+  | 'ice'
+  | 'cave'
+  | 'water';
 const TILES: Tile[] = [
   'grassTop',
   'grassSide',
@@ -79,11 +103,20 @@ const TILES: Tile[] = [
   'logTop',
   'planks',
   'white',
+  'lava',
+  'ice',
+  'cave',
+  'water',
 ];
 const TPX = 16; // Pixel je Kachel: 8 × 8-Raster mit feiner Körnung in 2 × 2 Unterpixeln
 const COLS = 4;
 const PAL_SAND: Palette = { D: [['#e3cf95', 1]], d: [['#d4bd7d', 1]], e: [['#efdeaa', 1]] };
 const PAL_PATH: Palette = { D: [['#c9a46e', 1]], d: [['#b48d58', 1]], e: [['#d8b783', 1]] };
+// Themen-Blöcke auf den großen Toren
+const PAL_LAVA: Palette = { D: [['#ff7a1a', 1]], d: [['#b8380a', 1]], e: [['#ffd34d', 1]] };
+const PAL_ICE: Palette = { S: [['#bfe6f5', 1]], s: [['#a2d6ee', 1]], r: [['#f2fbff', 1]] };
+const PAL_CAVE: Palette = { S: [['#3c3f47', 1]], s: [['#2a2c33', 1]], r: [['#5a5f70', 1]] };
+const PAL_WATER: Palette = { D: [['#3f8fd8', 1]], d: [['#2f6fb8', 1]], e: [['#8cc6f0', 1]] };
 // Blätter in Grau: Die Baumart färbt sie über die Vertex-Farbe (grün, orange, rosa)
 const PAL_LEAVES_GRAY: Palette = {
   F: [['#e6e6e6', 1]],
@@ -103,6 +136,10 @@ const SOURCES: Record<Tile, [Grid, Palette] | null> = {
   logTop: [LOG_TOP, PAL_LOG],
   planks: [PLANKS, PAL_SHELF],
   white: null,
+  lava: [DIRT, PAL_LAVA],
+  ice: [STONE, PAL_ICE],
+  cave: [STONE, PAL_CAVE],
+  water: [DIRT, PAL_WATER],
 };
 
 function atlas(): CanvasTexture {
@@ -274,6 +311,8 @@ export class World3D {
   });
   private ghost: Mesh | null = null;
   private dark = new MeshLambertMaterial({ color: GAME_COLORS.silhouette }); // verlorene Tiere auf den Tafeln
+  private lava!: MeshLambertMaterial; // leuchtet auch nachts
+  private themes = new Group(); // Blöcke oben auf den großen Toren
   // Die Figur selbst wird nach ihrem Umriss gezeichnet (beides im durchsichtigen Durchgang): Der Umriss sieht so nur
   // die Welt, nicht die eigenen Körperteile, und die Figur deckt ihn ab, wo sie sichtbar ist
   private hero = new MeshLambertMaterial({ vertexColors: true, transparent: true, opacity: 1 });
@@ -295,10 +334,17 @@ export class World3D {
     this.renderer.shadowMap.type = PCFShadowMap;
     const tex = atlas();
     this.solid = new MeshLambertMaterial({ map: tex, vertexColors: true });
+    this.lava = new MeshLambertMaterial({
+      map: tex,
+      vertexColors: true,
+      emissive: THEME_COLORS.lava.glow,
+      emissiveMap: tex,
+      emissiveIntensity: 0.7,
+    });
     this.foliage = new MeshLambertMaterial({ vertexColors: true, side: DoubleSide });
     this.fogTex.magFilter = LinearFilter;
     this.fogTex.minFilter = LinearFilter;
-    for (const m of [this.solid, this.foliage, this.water]) this.withFog(m);
+    for (const m of [this.solid, this.foliage, this.water, this.lava]) this.withFog(m);
     this.scene.background = SKY.clone();
     this.scene.fog = new Fog(SKY.clone(), 26, 58);
     this.sun.castShadow = true;
@@ -311,7 +357,7 @@ export class World3D {
     sc.near = 1;
     sc.far = 60;
     this.sun.shadow.bias = -0.0008;
-    this.scene.add(this.sun, this.sun.target, this.hemi, this.signs, this.sleeper);
+    this.scene.add(this.sun, this.sun.target, this.hemi, this.signs, this.sleeper, this.themes);
   }
 
   /** Shader-Zusatz: Farbe nach der Beleuchtung je nach Nebel-Maske in die Himmelsfarbe mischen */
@@ -388,7 +434,8 @@ export class World3D {
     for (const g of this.models.values()) g.dispose();
     this.models.clear();
     this.solid.map?.dispose();
-    for (const m of [this.solid, this.foliage, this.water, this.entity, this.xray, this.hero, this.dark]) m.dispose();
+    for (const m of [this.solid, this.foliage, this.water, this.lava, this.entity, this.xray, this.hero, this.dark])
+      m.dispose();
     this.fogTex.dispose();
     this.sun.shadow.dispose();
     this.renderer.dispose();
@@ -447,6 +494,7 @@ export class World3D {
   private reset(world: World) {
     this.world = world;
     this.fogDirty = true;
+    this.buildThemes(world);
     for (const c of this.chunks.values())
       for (const m of c.meshes) {
         this.scene.remove(m);
@@ -454,6 +502,29 @@ export class World3D {
       }
     this.chunks.clear();
     this.signKey = '';
+  }
+
+  /** Blöcke oben auf den großen Toren: verraten, welche Welt dahinter liegt (Eis, Sand, Wasser, Lava, Höhle) */
+  private buildThemes(world: World) {
+    for (const child of [...this.themes.children]) {
+      this.themes.remove(child);
+      (child as Mesh).geometry.dispose();
+    }
+    const tile: Record<GateTheme, Tile> = { eis: 'ice', sand: 'sand', wasser: 'water', lava: 'lava', hoehle: 'cave' };
+    for (const gate of GATES) {
+      const cells = world.gates.get(gate.id);
+      if (!cells) continue;
+      const g = new Geo();
+      const white = new Color('#ffffff');
+      cells.forEach(([x, y], i) => {
+        const h = world.cell(x, y).h + 2.85; // Oberkante des Steinsturzes
+        g.box(x + 0.1, h, y + 0.1, 0.8, 0.8, 0.8, white, white, tile[gate.theme]);
+        if (i === 1) g.box(x + 0.2, h + 0.8, y + 0.2, 0.6, 0.6, 0.6, white, white, tile[gate.theme]);
+      });
+      const m = new Mesh(g.build(), gate.theme === 'lava' ? this.lava : this.solid);
+      m.castShadow = true;
+      this.themes.add(m);
+    }
   }
 
   // ---------- Stücke der Welt ----------

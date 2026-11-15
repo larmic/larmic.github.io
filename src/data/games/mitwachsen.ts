@@ -8,6 +8,7 @@ export type RegionId = 'lichtung';
 export type SpeciesId =
   'hase' | 'igel' | 'schaf' | 'kuh' | 'biene' | 'ente' | 'frosch' | 'schildkroete' | 'fuchs' | 'eichhoernchen';
 export type GateId = 'nordtor' | 'osttor' | 'suedtor' | 'westtor';
+export type GateTheme = 'eis' | 'sand' | 'wasser' | 'lava' | 'hoehle';
 
 export type Rect = { x0: number; y0: number; x1: number; y1: number }; // Grenzen eingeschlossen
 export type Point = readonly [number, number];
@@ -27,6 +28,7 @@ export type Gate = {
   side: 'n' | 'o' | 's' | 'w'; // Himmelsrichtung von der Mitte aus
   region: RegionId; // Gegend, in der das Tor steht
   leadsTo: string; // was dahinter liegt (kommt später)
+  theme: GateTheme; // Blöcke oben auf dem Tor verraten, worum es dahinter geht
   locked: boolean; // vorerst verschlossen; öffnet nicht, auch wenn alle Tiere gefunden sind
   sign?: Point; // Tafel mit den Tieren der Gegend (noch keine)
 };
@@ -59,10 +61,18 @@ export const REGIONS: readonly Region[] = [
 ];
 
 export const GATES: readonly Gate[] = [
-  { id: 'nordtor', kind: 'grosstor', side: 'n', region: 'lichtung', leadsTo: 'Wald', locked: true },
-  { id: 'osttor', kind: 'grosstor', side: 'o', region: 'lichtung', leadsTo: 'Blumenwiese', locked: true },
-  { id: 'suedtor', kind: 'grosstor', side: 's', region: 'lichtung', leadsTo: 'Teich', locked: true },
-  { id: 'westtor', kind: 'grosstor', side: 'w', region: 'lichtung', leadsTo: 'Lavaberge', locked: true },
+  { id: 'nordtor', kind: 'grosstor', side: 'n', region: 'lichtung', leadsTo: 'Eiswelt', theme: 'eis', locked: true },
+  { id: 'osttor', kind: 'grosstor', side: 'o', region: 'lichtung', leadsTo: 'Sandwelt', theme: 'sand', locked: true },
+  {
+    id: 'suedtor',
+    kind: 'grosstor',
+    side: 's',
+    region: 'lichtung',
+    leadsTo: 'Wasserwelt',
+    theme: 'wasser',
+    locked: true,
+  },
+  { id: 'westtor', kind: 'grosstor', side: 'w', region: 'lichtung', leadsTo: 'Lavaberge', theme: 'lava', locked: true },
 ];
 
 export const HOME = {
@@ -276,6 +286,15 @@ export const figureParts = (l: Look): Part[] => [
 ];
 
 // ---------- Farben der Spielwelt (Spielgrafik wie die Texturen, nicht Oberfläche) ----------
+
+/** Farben der Themen-Blöcke auf den Toren: Seite, Oberseite, Leuchten (nur Lava leuchtet) */
+export const THEME_COLORS: Record<GateTheme, { side: string; top: string; glow?: string }> = {
+  eis: { side: '#9fd6ef', top: '#e6f7ff' },
+  sand: { side: '#d9bf7f', top: '#ecd9a2' },
+  wasser: { side: '#3f8fd8', top: '#8cc6f0' },
+  lava: { side: '#e8541c', top: '#ffb347', glow: '#ff5a10' },
+  hoehle: { side: '#3c3f47', top: '#55596a' },
+};
 
 export const GAME_COLORS = {
   heart: '#e0577a',

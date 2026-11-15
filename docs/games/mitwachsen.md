@@ -34,7 +34,7 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 
 - **Endlos**, berechnet aus einem **Seed**. Derselbe Seed ergibt immer dieselbe Welt. Gespeichert werden nur Seed und Fortschritt, nie die Landschaft.
 - **Start auf der Lichtung:** Am Anfang gibt es nur das **Bett** in der Mitte einer großen Lichtung (gut 100 × 90 Felder) mit Hügeln, mehreren Teichen, Wäldchen, Blumenwiesen und Steinen zum Klettern. Keine Mauer, kein Garten: Das entwickelt sich mit der Zeit.
-- **Ringsum natürliche Felsen** mit leicht unregelmäßigem Rand, in Terrassen ansteigend (man kann hinaufklettern und schauen, aber nicht hinüber), darin vier **große Tore** (Norden, Osten, Süden, Westen). Sie sind vorerst verschlossen; dahinter liegen später Wald, Blumenwiese, Teich und Lavaberge. Vorerst ist nur die Lichtung spielbar.
+- **Ringsum natürliche Felsen** mit leicht unregelmäßigem Rand, in Terrassen ansteigend (man kann hinaufklettern und schauen, aber nicht hinüber), darin vier **große Tore** (Norden, Osten, Süden, Westen). Sie sind vorerst verschlossen; dahinter liegen später Eiswelt, Sandwelt, Wasserwelt und Lavaberge. Vorerst ist nur die Lichtung spielbar.
 - **Nebel:** Zu sehen ist nur, was das Kind schon erkundet hat. Dahinter verschwindet die Welt weich im Dunst, wie echter Nebel, und zeigt sich beim Herumlaufen (gespeichert).
 - Hinter den Toren: endlose, berechnete Landschaft in Stücken (16 × 16 Felder).
 - **Höhen:** Eine Stufe hinauf geht automatisch mit einem kleinen Hüpfer, auch auf Steine und Felsen; dann Stufe für Stufe weiter. Herunter geht immer, egal wie tief.
@@ -45,7 +45,7 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 | | |
 | --- | --- |
 | Tiere zum Entdecken | alle zehn: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte |
-| Tore | Nordtor (Wald), Osttor (Blumenwiese), Südtor (Teich), Westtor (Lavaberge), alle vorerst zu |
+| Tore | Nordtor (Eiswelt), Osttor (Sandwelt), Südtor (Wasserwelt), Westtor (Lavaberge), alle vorerst zu. Oben auf dem Steinsturz jedes Tors liegen Blöcke, die verraten, was dahinter wartet: Eis, Sand, Wasser, leuchtende Lava |
 
 Die Leiste unten ist die **Liste der entdeckten Tiere**: Umriss mit Fragezeichen = noch nicht entdeckt, in Farbe = entdeckt, Herz = folgt gerade. Einen Garten, in den sie ziehen, gibt es am Anfang nicht. Wie sich die Tore später öffnen, hängt an der Geschichte (siehe Ideen: Tiere befreien).
 
@@ -156,7 +156,7 @@ Gespielt wird direkt auf der Homepage: Sobald eine Stufe spielbar ist, spielt de
 
 Nur gesammelt, noch nicht ausgeplant.
 
-- **Höhle** als eigene Gegend.
+- **Höhlenwelt** mit dunklen Blöcken, z. B. hinter einem Höhleneingang in den Felsen der Lichtung (das Thema `hoehle` gibt es schon).
 - **Lavaberge** als eigene Gegend hinter dem Westtor: glühende Lava zwischen dunklen Felsen, ganz ungefährlich (die Figur kommt nicht hinein, die Lava leuchtet nur warm).
 - **Tiere befreien:** Später sollen die Tiere nicht nur entdeckt, sondern befreit werden. Daran hängt auch, wie sich die großen Tore öffnen. Die Geschichte dazu fehlt noch: Wovon werden die Tiere befreit, und warum? (Für ein kleines Kind freundlich, ohne Bösewicht, der Angst macht.)
 - **Garten:** entsteht mit der Zeit am Bett; Regeln und Tests stehen schon (siehe Bett, Nacht, später der Garten).
