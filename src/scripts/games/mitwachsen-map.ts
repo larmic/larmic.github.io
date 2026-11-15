@@ -47,7 +47,7 @@ function colorOf(c: Cell): string {
   if (c.ground === 'stone' || c.deco === 'rock' || c.deco === 'boulder') return COLORS.stone;
   if (c.ground === 'sand') return COLORS.sand;
   if (c.ground === 'path') return COLORS.path;
-  return COLORS.grass[Math.max(0, Math.min(3, c.h - 1))];
+  return COLORS.grass[Math.max(0, Math.min(COLORS.grass.length - 1, c.h - 1))] ?? COLORS.water;
 }
 
 /**

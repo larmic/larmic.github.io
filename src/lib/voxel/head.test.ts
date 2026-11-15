@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { C, V, HEAD_FACES, headView } from './head';
 
 const visible = (yaw: number, pitch = 0) =>
-  headView(yaw, pitch).flatMap((f, i) => (f.matrix ? [HEAD_FACES[i].id] : []));
+  headView(yaw, pitch).flatMap((f, i) => (f.matrix ? [HEAD_FACES[i]!.id] : []));
 
 /** Zahl auf 9 Stellen genau (für toEqual mit Listen) */
 const near = (n: number): unknown => expect.closeTo(n, 9);
@@ -12,9 +12,9 @@ describe('headView', () => {
     const [top, front, right] = headView(0, 0);
     expect(visible(0)).toEqual(['top', 'front', 'right']);
     // Matrizen der Figur in figure.ts: topM(0, −0,5, 22), leftM(0, 8,5, 22), rightM(10, 8,5, 22)
-    expect(top.matrix).toEqual([C, C / 2, -C, C / 2, 0.5 * C, (-0.5 * C) / 2 - 22 * V].map(near));
-    expect(front.matrix).toEqual([C, C / 2, 0, V, -8.5 * C, (8.5 * C) / 2 - 22 * V].map(near));
-    expect(right.matrix).toEqual([C, -C / 2, 0, V, 1.5 * C, (18.5 * C) / 2 - 22 * V].map(near));
+    expect(top!.matrix).toEqual([C, C / 2, -C, C / 2, 0.5 * C, (-0.5 * C) / 2 - 22 * V].map(near));
+    expect(front!.matrix).toEqual([C, C / 2, 0, V, -8.5 * C, (8.5 * C) / 2 - 22 * V].map(near));
+    expect(right!.matrix).toEqual([C, -C / 2, 0, V, 1.5 * C, (18.5 * C) / 2 - 22 * V].map(near));
   });
 
   it('schattiert wie die übrige Figur: oben 6 % weiß, Gesicht 5 %, rechte Seite 22 % schwarz', () => {

@@ -152,8 +152,8 @@ export function atlas(): CanvasTexture {
     const [grid, pal] = src;
     const px = TPX / grid.length;
     grid.forEach((row, r) => {
-      for (let c = 0; c < row.length; c++)
-        for (const [color, alpha] of pal[row[c]] ?? []) {
+      for (const [c, ch] of [...row].entries())
+        for (const [color, alpha] of pal[ch] ?? []) {
           ctx.globalAlpha = alpha;
           ctx.fillStyle = color;
           ctx.fillRect(ox + c * px, oy + r * px, px, px);

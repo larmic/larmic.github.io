@@ -40,7 +40,7 @@ export const animalId = (region: RegionId, species: SpeciesId, n = 1) =>
 
 /** Art eines Tiers der Gegenden aus seiner Kennung (Tiere der Landschaft: null) */
 export function speciesOf(id: string): SpeciesId | null {
-  const [region, species] = id.split(':');
+  const [region, species = ''] = id.split(':');
   return REGIONS.some((r) => r.id === region) && Object.hasOwn(SPECIES, species) ? (species as SpeciesId) : null;
 }
 
@@ -56,7 +56,7 @@ export function regionAnimalList(region: Region): { id: string; species: Species
  * Am Anfang gibt es nur die Lichtung mit dem Bett. Ringsum Felsen mit acht großen Toren, die vorerst zu sind.
  * Dahinter liegen die Welten der Tore als endlose Landschaft.
  */
-export const REGIONS: readonly Region[] = [
+export const REGIONS: readonly [Region, ...Region[]] = [
   {
     id: 'lichtung',
     name: 'Lichtung',

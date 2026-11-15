@@ -17,7 +17,9 @@ const sparks = ['#ffffff', '#f0a531', '#ffffff', '#f0a531', '#ffffff', '#f0a531'
 const section = rest.split('/')[0];
 // Startbild ohne JavaScript: Die Figur steht schon auf ihrem Block, die Brücken dorthin stehen
 const route = d.routes[rest];
-const at = route[route.length - 1];
+const at = route?.at(-1);
+if (!route || !at)
+  throw new Error(`Insel: Für die Seite ist rest="${rest}" gesetzt, einen solchen Block gibt es nicht`);
 const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
 ---
 

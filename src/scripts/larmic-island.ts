@@ -217,6 +217,7 @@ class LarmicIsland extends HTMLElement {
     this.headKey = key;
     headView(yaw, pitch).forEach((face, i) => {
       const g = this.faces[i];
+      if (!g) return;
       if (face.matrix) {
         g.setAttribute('transform', `matrix(${face.matrix.map((n) => n.toFixed(3)).join(',')})`);
         g.style.display = '';

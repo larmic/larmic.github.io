@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { CHUNK, ChunkCache, chunkOf } from './chunks';
-import { hash, nextRandom, rand01, valueNoise } from './rng';
+import { CHUNK, ChunkCache, chunkOf, fromKey } from './chunks';
+import { cycle, hash, nextRandom, pick, rand01, valueNoise } from './rng';
 
 describe('Zufall aus dem Seed', () => {
   it('liefert für dieselben Eingaben immer dieselbe Zahl, für andere eine andere', () => {
@@ -72,5 +72,24 @@ describe('Stücke der Welt', () => {
     cache.get(CHUNK, 0);
     cache.get(2 * CHUNK, 0);
     expect(cache.get(0, 0)).toBe(0);
+  });
+});
+
+describe('Auswahl aus Listen', () => {
+  it('wählt zu einer Zahl in [0, 1) ein Element, reihum fängt es vorn wieder an', () => {
+    expect([0, 0.33, 0.34, 0.99].map((r) => pick(['a', 'b', 'c'], r))).toEqual(['a', 'a', 'b', 'c']);
+    expect([0, 1, 2, 3, 7].map((i) => cycle(['a', 'b', 'c'], i))).toEqual(['a', 'b', 'c', 'a', 'b']);
+  });
+
+  it('meldet eine leere Liste, statt undefined weiterzugeben', () => {
+    expect(() => pick([], 0.5)).toThrow(RangeError);
+    expect(() => cycle([], 3)).toThrow(RangeError);
+  });
+});
+
+describe('Feld-Schlüssel', () => {
+  it('liest „x,y“ zurück, auch negativ; Kaputtes wird NaN statt still 0', () => {
+    expect(fromKey('3,-7')).toEqual([3, -7]);
+    expect(fromKey('5')).toEqual([5, NaN]);
   });
 });

@@ -57,24 +57,24 @@ function foreignInTag(name: string, attrs: string): string[] {
 }
 
 /** Adressen in CSS: url(…) und @import */
-const cssUrls = (css: string) => [...css.matchAll(/(?:url\(\s*['"]?|@import\s+['"])([^'")]+)/gi)].map((m) => m[1]);
+const cssUrls = (css: string) => [...css.matchAll(/(?:url\(\s*['"]?|@import\s+['"])([^'")]+)/gi)].map((m) => m[1]!);
 
 /** Externe Ressourcen, die eine Seite beim Laden von selbst holen würde */
 export function externalResources(html: string): string[] {
   const found: string[] = [];
-  for (const [, tag, attrs] of html.matchAll(/<([a-z][\w-]*)\b([^>]*)>/gi))
+  for (const [, tag = '', attrs = ''] of html.matchAll(/<([a-z][\w-]*)\b([^>]*)>/gi))
     if (tag.toLowerCase() !== 'a') found.push(...foreignInTag(tag.toLowerCase(), attrs));
-  for (const [, css] of html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi))
+  for (const [, css = ''] of html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi))
     for (const url of cssUrls(css)) if (isForeign(url)) found.push(`<style> ${url}`);
   return found;
 }
 
 /** Ziel einer Weiterleitungsseite (<meta http-equiv="refresh" content="0;url=…">), sonst null */
 export function redirectTarget(html: string): string | null {
-  for (const [, attrs] of html.matchAll(/<meta\b([^>]*)>/gi)) {
+  for (const [, attrs = ''] of html.matchAll(/<meta\b([^>]*)>/gi)) {
     if ((attr(attrs, 'http-equiv') ?? '').toLowerCase() !== 'refresh') continue;
     const m = (attr(attrs, 'content') ?? '').match(/url\s*=\s*(.+)$/i);
-    return m ? m[1].trim() : null;
+    return m?.[1]?.trim() ?? null;
   }
   return null;
 }

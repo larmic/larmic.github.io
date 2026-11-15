@@ -3,9 +3,9 @@
 // Ereignisse, die zurückkommen (Töne, Herzen, Speichern). Zufall kommt aus einer Folge im Zustand.
 // Spezifikation: docs/specs/mitwachsen.md
 
-import { chunkOf } from '../../lib/games/chunks';
+import { chunkOf, fromKey } from '../../lib/games/chunks';
 import { DIRS, type Dir } from '../../lib/games/front';
-import { hash, nextRandom } from '../../lib/games/rng';
+import { cycle, hash, nextRandom, pick } from '../../lib/games/rng';
 import {
   GATES,
   HOME,
@@ -194,7 +194,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     }
   const cells = meadowSpots(world);
   garden.forEach((p, i) => {
-    const [x, y] = cells[i % cells.length];
+    const [x, y] = cycle(cells, i);
     animals.push({
       id: p.id,
       species: p.species,
@@ -243,7 +243,7 @@ function scatter(s: State, world: World) {
   for (const a of s.animals) {
     if (a.mode !== 'wander' || a.home.kind !== 'region') continue;
     for (let tries = 0; tries < 80; tries++) {
-      const [x, y] = spots[Math.floor(random(s) * spots.length)];
+      const [x, y] = pick(spots, random(s));
       if (cheb(x, y, HOME.bed[0], HOME.bed[1]) < 8 || !atHome(world, a.home, x, y)) continue; // nicht an Toren
       if (placed.some(([px, py]) => cheb(x, y, px, py) < 5) || occupied(s, x, y, a.id)) continue;
       [a.x, a.y] = [x, y];
@@ -296,7 +296,7 @@ function tick(s: State, world: World, events: GameEvent[]) {
   for (const [k, at] of Object.entries(s.picked))
     if (s.tick - at >= BERRY_REGROW) {
       delete s.picked[k];
-      const [x, y] = k.split(',').map(Number);
+      const [x, y] = fromKey(k);
       events.push({ type: 'regrow', x, y });
     }
   if (s.sleeping) return; // nachts ist es still
@@ -307,7 +307,7 @@ function tick(s: State, world: World, events: GameEvent[]) {
   const homes = s.animals.filter((a) => a.mode === 'home');
   for (const a of s.animals) {
     if (a.mode === 'follow') continue;
-    const goal = wet && a.mode === 'home' ? dry[homes.indexOf(a) % dry.length] : a.spawn;
+    const goal = wet && a.mode === 'home' ? cycle(dry, homes.indexOf(a)) : a.spawn;
     const gap = Math.abs(a.x - goal[0]) + Math.abs(a.y - goal[1]);
     // Gerade heimgekommen oder Regen: Es läuft zu seinem Platz auf der Wiese bzw. unter dem Dach
     const arriving = a.mode === 'home' && gap > (wet ? 0 : 2);
@@ -324,7 +324,7 @@ function tick(s: State, world: World, events: GameEvent[]) {
     if (--a.rest > 0) continue;
     a.rest = arriving ? 3 : 8 + Math.floor(random(s) * 18);
     if (!arriving && random(s) < 0.3) {
-      a.dir = ALL_DIRS[Math.floor(random(s) * 4)];
+      a.dir = pick(ALL_DIRS, random(s));
       continue;
     }
     // Außerhalb des Zuhauses (nach einem Platztausch) zieht es heim, sonst läuft es zufällig
@@ -333,7 +333,7 @@ function tick(s: State, world: World, events: GameEvent[]) {
     const order =
       away || arriving
         ? [...ALL_DIRS].sort((p, q) => dist(a, p, goal) - dist(a, q, goal))
-        : [ALL_DIRS[Math.floor(random(s) * 4)]];
+        : [pick(ALL_DIRS, random(s))];
     for (const d of order) {
       const [dx, dy] = DIRS[d];
       const tx = a.x + dx,
@@ -446,7 +446,7 @@ function bringHome(s: State, world: World, events: GameEvent[]) {
     );
     const start = Math.floor(random(s) * spots.length);
     for (let k = 0; k < spots.length; k++) {
-      const spot = spots[(start + k) % spots.length];
+      const spot = cycle(spots, start + k);
       if (taken.has(`${spot[0]},${spot[1]}`)) continue;
       a.spawn = spot;
       break;
@@ -495,7 +495,7 @@ function action(s: State, world: World, events: GameEvent[]) {
   const fx = p.x + dx,
     fy = p.y + dy;
   const isBed = (x: number, y: number) => x === HOME.bed[0] && y === HOME.bed[1];
-  const near = s.animals
+  const [nearest] = s.animals
     .filter((a) => cheb(a.x, a.y, p.x, p.y) <= 1)
     .sort((a, b) => Math.abs(a.x - p.x) + Math.abs(a.y - p.y) - (Math.abs(b.x - p.x) + Math.abs(b.y - p.y)));
   const front = s.animals.find((a) => a.x === fx && a.y === fy);
@@ -504,9 +504,9 @@ function action(s: State, world: World, events: GameEvent[]) {
   // Bett daneben: schlafen, außer ein Tier steht näher als das Bett
   const man = (x: number, y: number) => Math.abs(x - p.x) + Math.abs(y - p.y);
   const bedNear = cheb(p.x, p.y, HOME.bed[0], HOME.bed[1]) <= 1;
-  if (bedNear && (!near.length || man(near[0].x, near[0].y) >= man(HOME.bed[0], HOME.bed[1])))
+  if (bedNear && (!nearest || man(nearest.x, nearest.y) >= man(HOME.bed[0], HOME.bed[1])))
     return sleep(s, world, events);
-  if (near.length) return sing(s, near[0], true, events);
+  if (nearest) return sing(s, nearest, true, events);
   events.push({ type: 'call' });
 }
 

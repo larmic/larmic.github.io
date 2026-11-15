@@ -105,6 +105,12 @@ export type Scene = ReturnType<typeof buildScene>;
 type Step = { c: Cell; b: boolean; fall: boolean };
 
 // Zeichenreihenfolge von hinten nach vorn: erst nach i + j + k, dann nach Höhe, dann nach i
+/** Eintrag einer Szenenbeschreibung, auf den sich ein anderer bezieht – fehlt er, ist die Beschreibung kaputt */
+function need<T>(value: T | undefined, what: string): T {
+  if (value === undefined) throw new Error(`Szene unvollständig: ${what} fehlt`);
+  return value;
+}
+
 const depthOrder = (a: Cell, b: Cell) => a[0] + a[1] + a[2] - (b[0] + b[1] + b[2]) || a[2] - b[2] || a[0] - b[0];
 
 export function buildScene(def: SceneDef, avatar: Avatar) {
@@ -141,7 +147,7 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
     ...Object.fromEntries(Object.entries(def.eggs ?? {}).map(([id, e]) => [id, e.route])),
   };
   const steps = (rid: string): Step[] => {
-    const d = allRoutes[rid];
+    const d = need(allRoutes[rid], `Weg ${rid}`);
     const start: Step[] = d.via
       ? steps(d.via)
       : d.walk.map(([i, j]) => ({ c: [i, j, 0] as Cell, b: false, fall: false }));
@@ -159,7 +165,7 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
   const bridgesRaw: { X: number; Y: number; c: Cell }[] = [];
   const nodesRaw: Record<string, { fx: number; fy: number; f: 'L' | 'R'; b: boolean; k?: number; fall?: boolean }[]> =
     {};
-  const targets: Record<string, { X: number; Y: number; c: Cell; tag: Tag }> = {};
+  const targets: Record<string, { X: number; Y: number; c: Cell; tag: Tag; nav: Pick<NavItem, 'id'> & NavMeta }> = {};
   for (const [rid, d] of Object.entries(allRoutes)) {
     let prev = def.home;
     nodesRaw[rid] = steps(rid).map(({ c, b, fall }) => {
@@ -192,12 +198,13 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
     if (!def.routes[rid]) continue; // Easter Egg: kein Zielblock, kein Etikett
 
     const [X, Y] = pos(...d.target);
-    targets[rid] = { X, Y, c: d.target, tag: d.tag };
     xs.push(X, X + CUBE_W);
     ys.push(Y, Y + CUBE_H);
+    const meta = need(def.meta[rid], `Etikett für ${rid}`);
+    targets[rid] = { X, Y, c: d.target, tag: d.tag, nav: { id: rid, ...meta } };
     // Platz für das Etikett. Kisten zeigen ihres nur beim Zeigen und dürfen dann über den Rand ragen.
-    if (!def.meta[rid].parent) {
-      const tw = Math.max(125, def.meta[rid].label.length * 10 + 30);
+    if (!meta.parent) {
+      const tw = Math.max(125, meta.label.length * 10 + 30);
       const half = Math.max(60, (tw - 5) / 2);
       if (d.tag === 'B') {
         ys.push(Y + CUBE_H + TAG_ROOM);
@@ -251,14 +258,13 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
       ]),
     ),
     bridges: bridgesRaw.map((b) => ({ x: px(b.X), y: py(b.Y), w: W, z: zi(b.c) })),
-    nav: Object.keys(def.routes).map((id) => ({
-      id,
-      ...def.meta[id],
-      x: px(targets[id].X),
-      y: py(targets[id].Y),
+    nav: Object.values(targets).map(({ X, Y, c, tag, nav }) => ({
+      ...nav,
+      x: px(X),
+      y: py(Y),
       w: W,
-      z: zi(targets[id].c, 1),
-      tag: targets[id].tag,
+      z: zi(c, 1),
+      tag,
     })),
     front: front.map(({ c, kind }) => {
       const [X, Y] = pos(...c);

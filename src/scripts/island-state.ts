@@ -32,13 +32,15 @@ export type FigureState = {
   placed: number; // gesetzte Blöcke – für die Arm-Animation
 };
 
-const section = (id: string) => id.split('/')[0];
-const last = (route: RouteNode[]) => route[route.length - 1];
+const section = (id: string) => id.split('/')[0] ?? id;
+const last = (route: RouteNode[]) => route.at(-1);
+/** Weg zu einem Block; unbekannte Blöcke haben keinen Weg, die Figur bleibt dann in der Inselmitte */
+const routeOf = (world: World, id: string): RouteNode[] => world.routes[id] ?? [];
 
 /** Figur steht auf dem Ruheblock, alle Brücken dorthin stehen. */
 export function restPose(world: World, rest: string): Pick<FigureState, 'route' | 'pos' | 'built' | 'facing'> {
-  const route = world.routes[rest];
-  return { route: rest, pos: route.length, built: route.length, facing: last(route).f };
+  const route = routeOf(world, rest);
+  return { route: rest, pos: route.length, built: route.length, facing: last(route)?.f ?? 'L' };
 }
 
 export function initialState(world: World, rest: string): FigureState {
@@ -82,12 +84,13 @@ export function target(state: FigureState): string {
 
 /** Länge des gemeinsamen Anfangs zweier Wege: Bis dorthin muss die Figur nicht zurück. */
 export function common(world: World, a: string, b: string): number {
-  const ra = world.routes[a];
-  const rb = world.routes[b];
-  let n = 0;
-  while (n < ra.length && n < rb.length && !ra[n].fall && !rb[n].fall && ra[n].x === rb[n].x && ra[n].y === rb[n].y)
-    n += 1;
-  return n;
+  const ra = routeOf(world, a);
+  const rb = routeOf(world, b);
+  for (let n = 0; ; n++) {
+    const p = ra[n];
+    const q = rb[n];
+    if (!p || !q || p.fall || q.fall || p.x !== q.x || p.y !== q.y) return n;
+  }
 }
 
 /** Ein Takt. */
@@ -95,9 +98,9 @@ export function step(state: FigureState, world: World): FigureState {
   const goal = target(state);
   const tick = state.tick + 1;
   const s: FigureState = { ...state, tick, crumbling: state.crumbling.filter((c) => c.until > tick) };
-  const route = world.routes[s.route];
+  const route = routeOf(world, s.route);
 
-  if (s.pos > 0 && route[s.pos - 1].fall) {
+  if (s.pos > 0 && route[s.pos - 1]?.fall) {
     // Sturz läuft immer bis zum Respawn auf dem Ruheblock durch
     if (s.falling < FALL_TICKS) return { ...s, falling: s.falling + 1 };
     const stillAtBlog = !s.hover || s.hover === 'blog';
@@ -114,24 +117,25 @@ export function step(state: FigureState, world: World): FigureState {
 
   if (goal === s.route) {
     // Vorwärts: Block setzen (oder es versuchen, wenn dort nichts ist), dann draufsteigen
-    if (s.pos >= route.length) return s;
     const next = route[s.pos];
+    if (!next) return s;
     if ((next.b || next.fall) && s.built <= s.pos) return { ...s, built: s.pos + 1, placed: s.placed + 1 };
     return { ...s, pos: s.pos + 1, facing: next.f, steps: s.steps + 1 };
   }
 
-  // Zurück bis zur Abzweigung: hinter der Figur bröckeln die Brückenblöcke weg
+  return stepBack(s, world, goal, route);
+}
+
+/** Zurück bis zur Abzweigung: hinter der Figur bröckeln die Brückenblöcke weg */
+function stepBack(s: FigureState, world: World, goal: string, route: RouteNode[]): FigureState {
   let built = s.built;
-  while (built > s.pos && !route[built - 1].b) built -= 1;
-  if (built > s.pos) {
-    return {
-      ...s,
-      built: built - 1,
-      crumbling: [...s.crumbling, { bridge: route[built - 1].k!, until: tick + CRUMBLE_TICKS }],
-    };
+  while (built > s.pos && !route[built - 1]?.b) built -= 1;
+  const bridge = built > s.pos ? route[built - 1]?.k : undefined;
+  if (bridge !== undefined) {
+    return { ...s, built: built - 1, crumbling: [...s.crumbling, { bridge, until: s.tick + CRUMBLE_TICKS }] };
   }
   if (s.pos > common(world, s.route, goal)) {
-    return { ...s, built, pos: s.pos - 1, facing: route[s.pos - 1].f === 'L' ? 'R' : 'L', steps: s.steps + 1 };
+    return { ...s, built, pos: s.pos - 1, facing: route[s.pos - 1]?.f === 'L' ? 'R' : 'L', steps: s.steps + 1 };
   }
   // An der Abzweigung geht der neue Weg weiter, gemeinsame Brücken bleiben stehen
   return { ...s, built: s.pos === 0 ? 0 : built, route: goal, facing: s.pos === 0 ? 'L' : s.facing };
@@ -139,9 +143,9 @@ export function step(state: FigureState, world: World): FigureState {
 
 /** Steht die Figur am Ziel und ist nichts mehr in Bewegung? Dann kann der Takt aufhören. */
 export function isSettled(state: FigureState, world: World): boolean {
-  const route = world.routes[state.route];
+  const route = routeOf(world, state.route);
   return (
-    target(state) === state.route && state.pos >= route.length && !last(route).fall && state.crumbling.length === 0
+    target(state) === state.route && state.pos >= route.length && !last(route)?.fall && state.crumbling.length === 0
   );
 }
 
@@ -163,19 +167,19 @@ export type FigureView = {
 
 /** Was zu zeichnen ist. `bubbles` sind die Sprüche je Bereich (src/data/site.ts). */
 export function view(state: FigureState, world: World, bubbles: Record<string, string>): FigureView {
-  const route = world.routes[state.route];
-  const at = state.pos > 0 ? route[state.pos - 1] : world.home;
+  const route = routeOf(world, state.route);
+  const at = route[state.pos - 1] ?? world.home; // pos 0 (Index −1): Inselmitte
   const standingBridges = new Set(route.slice(0, state.built).flatMap((n) => (n.k === undefined ? [] : [n.k])));
 
   // Kisten eines Bereichs: sichtbar, solange er angezeigt wird oder die Figur noch auf seinen Brücken unterwegs ist
   const openSections = new Set([section(state.rest)]);
-  if (state.route.includes('/') && state.pos > world.routes[section(state.route)].length)
+  if (state.route.includes('/') && state.pos > routeOf(world, section(state.route)).length)
     openSections.add(section(state.route));
 
   const held = new Set(
     Object.keys(world.routes).filter((id) => {
-      const r = world.routes[id];
-      return !last(r).fall && state.pos >= r.length && common(world, id, state.route) === r.length;
+      const r = routeOf(world, id);
+      return !last(r)?.fall && state.pos >= r.length && common(world, id, state.route) === r.length;
     }),
   );
 
@@ -186,7 +190,7 @@ export function view(state: FigureState, world: World, bubbles: Record<string, s
     state.route === pose.route && state.pos === pose.pos && state.falling === 0 && target(state) === state.rest;
   const inTree = state.route === 'tree' && state.pos === world.routes.tree?.length && target(state) === 'tree';
   const text = inTree
-    ? bubbles.tree
+    ? (bubbles.tree ?? '')
     : state.show404
       ? BUBBLE_404
       : state.rest.includes('/')

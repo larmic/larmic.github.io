@@ -48,5 +48,6 @@ Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run chec
 - Animationen respektieren `prefers-reduced-motion`.
 - Die Homepage bleibt schlank (geprüft durch `npm run verify:bundles`, Logik in `scripts/bundles.ts`): Seiten außerhalb von `/spiele/` laden kein Spiel und kein Three.js und höchstens 32 KB JavaScript; die Spielseite lädt 3D nur nachträglich per `import()`.
 - Die Insel ist auf allen Seiten die einzige Navigation. Neue Seiten mit Insel nutzen `IslandPage.astro` und setzen `rest`. Keine Text-Navigation einbauen.
+- TypeScript prüft jeden Index-Zugriff (`noUncheckedIndexedAccess`): fehlende Einträge behandeln; Auswahl aus Listen über `pick`/`cycle` (`src/lib/games/rng.ts`), Feld-Schlüssel über `fromKey` (`chunks.ts`). `!` nur, wo die Stelle selbst zeigt, dass der Eintrag existiert, und in Tests.
 - Skripte laufen wegen der View Transitions nur einmal: Klicks über `document` delegieren, nicht an Elemente hängen.
 - Alte Adressen (`/#workshops`, `/#videos`, `/workshops/#workshop-<id>`, `/videos/#video-<id>`, `/about/`, `/spiele/threeyear/`, `/spiele/mitwachsen/` – heute die Seite zum Spiel mit „Spiel starten“) müssen funktionieren.

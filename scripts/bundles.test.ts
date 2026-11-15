@@ -21,7 +21,7 @@ describe('Bundle-Gate', () => {
   });
 
   it('folgt statischen Importen, aber nicht dynamischen', () => {
-    expect(staticImports(files['/_astro/game.js'])).toEqual(['./shared.js']);
+    expect(staticImports(files['/_astro/game.js']!)).toEqual(['./shared.js']);
     expect(loaded(page('/_astro/game.js'), read).sort()).toEqual(['/_astro/game.js', '/_astro/shared.js']);
   });
 
@@ -35,7 +35,7 @@ describe('Bundle-Gate', () => {
   });
 
   it('meldet ein überschrittenes Budget', () => {
-    const tight: Rule[] = [{ ...RULES[0], budget: 10 }];
+    const tight: Rule[] = [{ ...RULES[0]!, budget: 10 }];
     expect(check('index.html', page('/_astro/home.js'), read, tight)[0]).toMatch(/Bytes JavaScript/);
   });
 

@@ -94,7 +94,7 @@ export function gatehouse(p: Parts, theme: GateTheme) {
         [0.7, -0.9],
         [1.8, -1.6],
         [-0.2, -1.9],
-      ])
+      ] as const)
         block(p.solid, x0 + dx, TOWER_H + 0.5, dz - 0.25, x0 + dx + 0.35, TOWER_H + 0.56, dz + 0.1, '#ffffff');
       for (const dx of [0.2, 1.4])
         block(p.solid, x0 + dx, TOWER_H - 0.1, 0.9, x0 + dx + 0.35, TOWER_H + 0.25, 0.92, '#ffffff');
@@ -110,7 +110,7 @@ export function gatehouse(p: Parts, theme: GateTheme) {
         [TOWER_W - 0.6, 0.05],
         [0, -DEPTH],
         [TOWER_W - 0.6, -DEPTH],
-      ])
+      ] as const)
         wallBlock(x0 + dx, TOWER_H, dz, x0 + dx + 0.6, TOWER_H + 0.6, dz + 0.6);
   }
 
@@ -149,7 +149,7 @@ function decorate(p: Parts, theme: GateTheme) {
           [-0.6, 1.4],
           [0, 2.1],
           [0.55, 1.2],
-        ])
+        ] as const)
           block(
             p.bright,
             cx + dx - 0.18,

@@ -25,7 +25,7 @@ function coverage(svg: string, W: number, H: number): Map<string, Set<string>> {
   expect(
     [...out.values()].every((s) =>
       [...s].every((c) => {
-        const [x, y] = c.split(',').map(Number);
+        const [x = 0, y = 0] = c.split(',').map(Number);
         return x < W && y < H;
       }),
     ),
@@ -57,7 +57,7 @@ describe('gridSvg', () => {
     const pal: Palette = {};
     for (const ch of new Set(grid.join('')))
       if (ch !== '.') pal[ch] = [[`#${ch.charCodeAt(0).toString(16).padStart(6, '0')}`, 1]];
-    const W = grid[0].length;
+    const W = grid[0]!.length;
     const H = grid.length;
     const cov = coverage(gridSvg(grid, pal), W, H);
     const painted = new Set([...cov.values()].flatMap((s) => [...s]));

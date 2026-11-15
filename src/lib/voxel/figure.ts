@@ -57,10 +57,10 @@ function headSvg(avatar: Avatar): string {
     '<g class="fig-head">' +
     headView(0, 0)
       .map((v, i) => {
-        const { grid, extra } = tex[i];
-        const id = HEAD_FACES[i].id;
+        const { grid, extra } = tex[i]!; // headView liefert die Seiten in derselben Reihenfolge
+        const id = HEAD_FACES[i]!.id;
         const m = v.matrix ? ` transform="matrix(${v.matrix.map(f).join(',')})"` : ' style="display: none"';
-        const shade = `<rect class="fhs" width="${grid[0].length}" height="${grid.length}" fill="${id === 'top' ? '#ffffff' : '#000'}" opacity="${f(v.shade)}"/>`;
+        const shade = `<rect class="fhs" width="${grid[0]?.length ?? 0}" height="${grid.length}" fill="${id === 'top' ? '#ffffff' : '#000'}" opacity="${f(v.shade)}"/>`;
         return `<g class="fh" data-face="${id}"${m}>${gridSvg(grid, pal)}${extra}${shade}</g>`;
       })
       .join('') +

@@ -3,8 +3,8 @@
 // endlose Landschaft aus Rauschen, berechnet in Stücken. Ums Bett die Wiese, auf der gefundene Tiere zu Hause sind.
 // Spezifikation: docs/specs/mitwachsen.md
 
-import { CHUNK, ChunkCache } from '../../lib/games/chunks';
-import { hash, rand01, valueNoise } from '../../lib/games/rng';
+import { CHUNK, ChunkCache, fromKey } from '../../lib/games/chunks';
+import { cycle, hash, rand01, valueNoise } from '../../lib/games/rng';
 import {
   GAME_COLORS,
   GATES,
@@ -131,6 +131,13 @@ const flowerColor = (seed: number, x: number, y: number) =>
   GAME_COLORS.flowers[hash(seed, x, y, 7) % GAME_COLORS.flowers.length];
 
 const lichtung = REGIONS[0];
+/** Die vier Nachbarfelder */
+const NEIGHBOURS = [
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
+] as const;
 
 /** Rand der Lichtung: Ellipse mit leichtem Wackeln aus dem Seed, damit der Felsring natürlich aussieht */
 function edge(seed: number, x: number, y: number) {
@@ -383,13 +390,8 @@ function smooth(map: Map<string, Cell>) {
     for (const [k, cell] of map) {
       let c = cell;
       if (!land(c) || c.gate) continue;
-      const [x, y] = k.split(',').map(Number);
-      for (const [dx, dy] of [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [0, -1],
-      ]) {
+      const [x, y] = fromKey(k);
+      for (const [dx, dy] of NEIGHBOURS) {
         const n = map.get(key(x + dx, y + dy));
         if (!land(n) || c.h <= n!.h + 1) continue;
         map.set(k, (c = { ...c, h: n!.h + 1 }));
@@ -413,12 +415,7 @@ function reachOf(map: Map<string, Cell>): Point[] {
     const [x, y] = queue.shift()!;
     reach.push([x, y]);
     const h = stand(x, y)!;
-    for (const [dx, dy] of [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1],
-    ]) {
+    for (const [dx, dy] of NEIGHBOURS) {
       const k = key(x + dx, y + dy);
       const to = stand(x + dx, y + dy);
       if (seen.has(k) || to === null || to - h > 1) continue;
@@ -547,7 +544,7 @@ function withClimate(seed: number, c: Cell, cl: Climate, x: number, y: number): 
 function biomeOf(seed: number, places: readonly GatePlace[], x: number, y: number): GateId {
   const { rx, ry } = lichtung.shape;
   const a = Math.atan2(y / ry, x / rx) + (valueNoise(seed + 41, x, y, 24) - 0.5) * 0.3;
-  let best = places[0],
+  let best = places[0]!, // Tore gibt es immer
     bestD = Infinity;
   for (const p of places) {
     const d = Math.abs(Math.atan2(Math.sin(a - p.angle), Math.cos(a - p.angle)));
@@ -575,7 +572,7 @@ function biomeCell(seed: number, theme: GateId, x: number, y: number): Cell {
   switch (theme) {
     case 'wald':
       if (h === 1 && wet < 0.14) return { ...water('wild'), biome: theme, deco: roll < 0.15 ? 'lily' : null };
-      if (roll < 0.11) tree((['oak', 'birch', 'pine', 'autumn'] as const)[hash(seed, x, y, 12) % 4]);
+      if (roll < 0.11) tree(cycle(['oak', 'birch', 'pine', 'autumn'] as const, hash(seed, x, y, 12)));
       else if (roll < 0.14) Object.assign(c, { deco: 'bush', solid: true });
       else if (roll < 0.22) c.deco = 'fern';
       else if (roll < 0.25) c.deco = 'mushroom';
@@ -743,7 +740,7 @@ export function wildAnimals(world: World, cx: number, cy: number): WildSpawn[] {
       const c = world.cell(x, y);
       if (c.region !== 'wild' || standHeight(world, [], x, y) === null || out.some((o) => o.x === x && o.y === y))
         continue;
-      out.push({ id: `wild:${cx}:${cy}:${n}`, species: WILD_SPECIES[(h >>> 16) % WILD_SPECIES.length], x, y });
+      out.push({ id: `wild:${cx}:${cy}:${n}`, species: cycle(WILD_SPECIES, h >>> 16), x, y });
       break;
     }
   }

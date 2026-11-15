@@ -12,16 +12,17 @@ export type Rule = {
 /** Skripte, die eine Seite lädt: <script src> und <link rel="modulepreload"> */
 export function scriptsOf(html: string): string[] {
   const out = new Set<string>();
-  for (const m of html.matchAll(/<script\b[^>]*\bsrc="([^"]+\.js)"/g)) out.add(m[1]);
-  for (const m of html.matchAll(/<link\b[^>]*\brel="modulepreload"[^>]*\bhref="([^"]+\.js)"/g)) out.add(m[1]);
+  for (const m of html.matchAll(/<script\b[^>]*\bsrc="([^"]+\.js)"/g)) out.add(m[1]!);
+  for (const m of html.matchAll(/<link\b[^>]*\brel="modulepreload"[^>]*\bhref="([^"]+\.js)"/g)) out.add(m[1]!);
   return [...out];
 }
 
 /** Statische, relative Importe eines (auch minifizierten) Moduls; `import("…")` wird ausgelassen */
 export function staticImports(code: string): string[] {
   const out = new Set<string>();
-  for (const m of code.matchAll(/\bimport\s*(?:[\w$*{}\s,]+?\s*from\s*)?["'](\.{1,2}\/[^"']+\.js)["']/g)) out.add(m[1]);
-  for (const m of code.matchAll(/\bexport\s*(?:\*|\{[^}]*\})\s*from\s*["'](\.{1,2}\/[^"']+\.js)["']/g)) out.add(m[1]);
+  for (const m of code.matchAll(/\bimport\s*(?:[\w$*{}\s,]+?\s*from\s*)?["'](\.{1,2}\/[^"']+\.js)["']/g))
+    out.add(m[1]!);
+  for (const m of code.matchAll(/\bexport\s*(?:\*|\{[^}]*\})\s*from\s*["'](\.{1,2}\/[^"']+\.js)["']/g)) out.add(m[1]!);
   return [...out];
 }
 

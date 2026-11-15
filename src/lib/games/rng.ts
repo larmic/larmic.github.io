@@ -27,6 +27,16 @@ export function nextRandom(state: number): [number, number] {
   return [((t ^ (t >>> 14)) >>> 0) / 4294967296, s >>> 0];
 }
 
+/** Element einer Liste; eine leere Liste ist ein Fehler im Aufrufer */
+function must<T>(item: T | undefined): T {
+  if (item === undefined) throw new RangeError('Element aus leerer Liste verlangt');
+  return item;
+}
+/** Element einer nicht leeren Liste zu einer Zufallszahl r in [0, 1) */
+export const pick = <T>(list: readonly T[], r: number): T => must(list[Math.floor(r * list.length)]);
+/** Element einer nicht leeren Liste reihum: i = Länge fängt wieder vorn an */
+export const cycle = <T>(list: readonly T[], i: number): T => must(list[i % list.length]);
+
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
 /** Weiches Rauschen in [0, 1): Zufallswerte auf einem Gitter im Abstand `scale`, dazwischen weich überblendet */

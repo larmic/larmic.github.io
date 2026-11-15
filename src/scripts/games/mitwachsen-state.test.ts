@@ -74,7 +74,7 @@ describe('Aufwachen und Schlafen', () => {
     expect([s0.player.x, s0.player.y]).toEqual([...HOME.bed]);
     const { s, events } = run(s0, world, 'e');
     expect(s.sleeping).toBe(false);
-    expect([s.player.x, s.player.y]).toEqual([...HOME.wake[0]]);
+    expect([s.player.x, s.player.y]).toEqual([...HOME.wake[0]!]);
     expect(types(events)).toEqual(['wake']);
   });
 
@@ -119,7 +119,7 @@ describe('Aufwachen und Schlafen', () => {
     s = run(s, w, ACT).s;
     expect(s.sleeping).toBe(true);
     expect(s.followers).toEqual([]);
-    expect(s.animals[0].mode).toBe('wander');
+    expect(s.animals[0]!.mode).toBe('wander');
   });
 });
 
@@ -203,7 +203,7 @@ describe('Tiere', () => {
     const s = run(awake(w, 0, 0, [animal('a', 1, 0)]), w, 'e').s; // folgt jetzt
     const r = run(s, w, 'e');
     expect(types(r.events)).toEqual(['swap']);
-    expect([r.s.player.x, r.s.animals[0].x]).toEqual([1, 0]);
+    expect([r.s.player.x, r.s.animals[0]!.x]).toEqual([1, 0]);
     expect(r.s.followers).toEqual(['a']);
   });
 
@@ -237,7 +237,7 @@ describe('Tiere', () => {
     const w = fakeWorld();
     let s = awake(w, 0, 0, [animal('a', 1, 1, { rest: 1 })]);
     for (let i = 0; i < 50; i++) s = run(s, w, TICK).s;
-    expect([s.animals[0].x, s.animals[0].y, s.animals[0].dir]).toEqual([1, 1, 'w']);
+    expect([s.animals[0]!.x, s.animals[0]!.y, s.animals[0]!.dir]).toEqual([1, 1, 'w']);
   });
 
   it('läuft umher, aber nur in seinem Zuhause', () => {
@@ -249,11 +249,11 @@ describe('Tiere', () => {
     const visited = new Set<string>();
     for (let i = 0; i < 2000; i++) {
       s = run(s, w, TICK).s;
-      visited.add(`${s.animals[0].x},${s.animals[0].y}`);
+      visited.add(`${s.animals[0]!.x},${s.animals[0]!.y}`);
     }
     expect(visited.size).toBeGreaterThan(4);
     for (const k of visited) {
-      const [x, y] = k.split(',').map(Number);
+      const [x = 0, y = 0] = k.split(',').map(Number);
       expect(Math.abs(x) <= 2 && Math.abs(y) <= 2, k).toBe(true);
     }
   });
@@ -535,7 +535,7 @@ describe('Invarianten bei wildem Drücken', () => {
         for (let i = 0; i < 4000; i++) {
           r = (Math.imul(r, 1103515245) + 12345) >>> 0;
           const pick = r % 10;
-          const cmd: Cmd = pick < 6 ? { type: 'move', dir: DIRS[(r >>> 8) % 4] } : pick < 8 ? ACT : TICK;
+          const cmd: Cmd = pick < 6 ? { type: 'move', dir: DIRS[(r >>> 8) % 4]! } : pick < 8 ? ACT : TICK;
           s = step(s, world, cmd).state;
           if (!s.sleeping) expect(standHeight(world, s.openGates, s.player.x, s.player.y)).not.toBeNull();
           const spots = s.animals.map((a) => `${a.x},${a.y}`);
@@ -584,7 +584,7 @@ describe('Durchgänge bleiben frei', () => {
 });
 
 /** Richtung von einem Feld zum Nachbarfeld */
-const toward = (from: readonly number[], to: readonly number[]): Dir =>
+const toward = (from: readonly [number, number], to: readonly [number, number]): Dir =>
   to[0] > from[0] ? 'e' : to[0] < from[0] ? 'w' : to[1] > from[1] ? 's' : 'n';
 
 describe('Portale', () => {

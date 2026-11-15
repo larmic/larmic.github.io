@@ -33,7 +33,7 @@ export type TiredEvent = 'yawn' | 'bed';
 export const freshDay = (now: number): Tired => ({ played: 0, seen: now, told: 0 });
 
 /** Ab wann der n-te Hinweis kommt (0, 1: gähnen; ab 2: ins Bett, danach alle 3 Minuten) */
-const hintAt = (n: number) => (n < YAWN_AT.length ? YAWN_AT[n] : BED_AT + (n - YAWN_AT.length) * BED_AGAIN);
+const hintAt = (n: number) => YAWN_AT[n] ?? BED_AT + (n - YAWN_AT.length) * BED_AGAIN;
 
 /**
  * Zeit fortschreiben. `active`: Gerade wird gespielt (Seite sichtbar, Menü zu, Figur wach).

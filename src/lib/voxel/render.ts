@@ -24,20 +24,29 @@ function rect(x: number, y: number, w: number, h: number, extra = ''): string {
   return `<rect${x ? ` x="${f(x)}"` : ''}${y ? ` y="${f(y)}"` : ''} width="${f(w)}" height="${f(h)}"${extra}/>`;
 }
 
+type Box = [x: number, y: number, w: number, h: number];
+const widthOf = (grid: Grid) => grid[0]?.length ?? 0;
+/** Schlüssel einer Farbschicht: Ebene|Farbe|Deckkraft */
+function parseKey(key: string): [layer: number, fill: string, op: number] {
+  const [layer = '0', fill = '', op = '1'] = key.split('|');
+  return [Number(layer), fill, Number(op)];
+}
+
 // Zellen einer Farbe zu möglichst wenigen Rechtecken zusammenfassen
-function cellsToRects(cells: Set<string>): number[][] {
+function cellsToRects(cells: Set<string>): Box[] {
   const rows = new Map<number, number[]>();
   for (const c of cells) {
-    const [x, y] = c.split(',').map(Number);
+    const [x = 0, y = 0] = c.split(',').map(Number);
     if (!rows.has(y)) rows.set(y, []);
     rows.get(y)!.push(x);
   }
-  const runs: number[][] = [];
+  const runs: [x: number, y: number, w: number][] = [];
   for (const [y, xs] of rows) {
     xs.sort((a, b) => a - b);
-    let start = xs[0];
-    let prev = xs[0];
-    for (const x of [...xs.slice(1), NaN]) {
+    const [first = 0, ...rest] = xs;
+    let start = first;
+    let prev = first;
+    for (const x of [...rest, NaN]) {
       if (x === prev + 1) {
         prev = x;
         continue;
@@ -47,9 +56,9 @@ function cellsToRects(cells: Set<string>): number[][] {
     }
   }
   runs.sort((a, b) => a[0] - b[0] || a[2] - b[2] || a[1] - b[1]);
-  const out: number[][] = [];
+  const out: Box[] = [];
   for (const [x, y, w] of runs) {
-    const last = out[out.length - 1];
+    const last = out.at(-1);
     if (last && last[0] === x && last[2] === w && last[1] + last[3] === y) last[3] += 1;
     else out.push([x, y, w, 1]);
   }
@@ -58,7 +67,7 @@ function cellsToRects(cells: Set<string>): number[][] {
 
 export function gridSvg(grid: Grid, pal: Palette): string {
   const H = grid.length;
-  const W = grid[0].length;
+  const W = widthOf(grid);
   const cells = new Map<string, Set<string>>();
   let full = true;
   grid.forEach((row, y) => {
@@ -77,31 +86,30 @@ export function gridSvg(grid: Grid, pal: Palette): string {
     });
   });
   const out: string[] = [];
-  let baseKey: string | null = null;
-  if (full) {
-    baseKey = [...cells.keys()]
-      .filter((k) => k.startsWith('0|'))
-      .sort((a, b) => cells.get(b)!.size - cells.get(a)!.size)[0];
-    const [, fill, op] = baseKey.split('|');
-    out.push(rect(0, 0, W, H, attr(fill, Number(op))));
+  // Deckt das Raster alles ab, wird die häufigste Farbe der untersten Schicht ein Rechteck über alles
+  const baseKey = full
+    ? [...cells.keys()].filter((k) => k.startsWith('0|')).sort((a, b) => cells.get(b)!.size - cells.get(a)!.size)[0]
+    : undefined;
+  if (baseKey) {
+    const [, fill, op] = parseKey(baseKey);
+    out.push(rect(0, 0, W, H, attr(fill, op)));
   }
-  const keys = [...cells.keys()].sort((a, b) => {
-    const la = Number(a.split('|')[0]);
-    const lb = Number(b.split('|')[0]);
-    return la - lb || cells.get(b)!.size - cells.get(a)!.size || a.localeCompare(b);
-  });
+  const keys = [...cells.keys()].sort(
+    (a, b) => parseKey(a)[0] - parseKey(b)[0] || cells.get(b)!.size - cells.get(a)!.size || a.localeCompare(b),
+  );
   for (const key of keys) {
     if (key === baseKey) continue;
-    const [, fill, op] = key.split('|');
+    const [, fill, op] = parseKey(key);
     const rs = cellsToRects(cells.get(key)!);
-    if (rs.length === 1) out.push(rect(rs[0][0], rs[0][1], rs[0][2], rs[0][3], attr(fill, Number(op))));
-    else out.push(`<g${attr(fill, Number(op))}>` + rs.map((r) => rect(r[0], r[1], r[2], r[3])).join('') + '</g>');
+    const [only] = rs;
+    if (only && rs.length === 1) out.push(rect(...only, attr(fill, op)));
+    else out.push(`<g${attr(fill, op)}>` + rs.map((r) => rect(...r)).join('') + '</g>');
   }
   return out.join('');
 }
 
 export function face(m: Matrix, grid: Grid, pal: Palette, shade?: [string, number], extra = ''): string {
-  const W = grid[0].length;
+  const W = widthOf(grid);
   const H = grid.length;
   let s = `<g transform="matrix(${m.map(f).join(',')})">` + gridSvg(grid, pal) + extra;
   if (shade) s += rect(0, 0, W, H, attr(shade[0], shade[1]));
@@ -127,9 +135,9 @@ export function cube(id: string, T: Grid, L: Grid, R: Grid, pal: Palette, exL = 
 
 // Kachel als eigenständiges SVG (für CSS-Hintergründe)
 export function tileDataUri(grid: Grid, pal: Palette, px = 6): string {
-  const W = grid[0].length * px;
+  const W = widthOf(grid) * px;
   const H = grid.length * px;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${grid[0].length} ${grid.length}" shape-rendering="crispEdges">${gridSvg(grid, pal)}</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${widthOf(grid)} ${grid.length}" shape-rendering="crispEdges">${gridSvg(grid, pal)}</svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 

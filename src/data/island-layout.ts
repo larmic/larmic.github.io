@@ -29,7 +29,7 @@ function islandBlocks(): Blocks {
     [2, 3],
     [3, 2],
     [3, 3],
-  ])
+  ] as const)
     put([i, j, -3], 'stone');
   put([3, 3, -4], 'stone');
   const [ti, tj] = [1, 0];
@@ -41,7 +41,7 @@ function islandBlocks(): Blocks {
     [1, 0],
     [0, -1],
     [0, 1],
-  ])
+  ] as const)
     put([ti + di, tj + dj, 3], 'leaves');
   put([ti, tj, 4], 'leaves');
   return B;
@@ -175,9 +175,11 @@ export function buildWorld(children: Record<Section, ChildItem[]>, avatar: Avata
   const NAV_META = navMeta(avatar);
   const routes: Record<string, RouteDef> = {};
   const meta: Record<string, NavMeta> = {};
-  for (const id of Object.keys(ROUTES)) {
-    routes[id] = ROUTES[id];
-    meta[id] = NAV_META[id];
+  for (const [id, route] of Object.entries(ROUTES)) {
+    routes[id] = route;
+    const m = NAV_META[id];
+    if (!m) throw new Error(`Insel: Für ${id} fehlt das Etikett (navMeta)`);
+    meta[id] = m;
     if (id !== 'workshops' && id !== 'videos' && id !== 'spiele') continue;
     const slots = CHILD_SLOTS[id];
     if (children[id].length > slots.length)
@@ -186,7 +188,7 @@ export function buildWorld(children: Record<Section, ChildItem[]>, avatar: Avata
       );
     children[id].forEach((it, n) => {
       const cid = `${id}/${it.id}`;
-      routes[cid] = { walk: [], via: id, ...slots[n] };
+      routes[cid] = { walk: [], via: id, ...slots[n]! }; // genug Plätze: oben geprüft
       meta[cid] = {
         label: it.label,
         sym: it.block,

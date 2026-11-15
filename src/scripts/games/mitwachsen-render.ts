@@ -47,7 +47,7 @@ import type { WeatherLook } from './mitwachsen-weather';
 import type { Pose } from './mitwachsen-tired';
 import type { Climate } from './mitwachsen-world';
 import type { State } from './mitwachsen-state';
-import { hash } from '../../lib/games/rng';
+import { cycle, hash } from '../../lib/games/rng';
 import type { Cell, TreeKind, World } from './mitwachsen-world';
 
 /** Gleitende Position eines Wesens auf dem Bildschirm (in Feldern), dazu Hüpfer und Blickrichtung */
@@ -108,7 +108,7 @@ const ASK = ['.qqq.', 'q...q', '...q.', '..q..', '.....', '..q..']; // Fragezeic
 
 function sprite(ctx: CanvasRenderingContext2D, grid: string[], color: string, cx: number, bottom: number, px: number) {
   ctx.fillStyle = color;
-  const w = grid[0].length;
+  const w = grid[0]?.length ?? 0;
   grid.forEach((row, r) => {
     for (let c = 0; c < w; c++)
       if (row[c] !== '.')
@@ -444,7 +444,7 @@ export class Renderer {
         ty = y + 0.15 + ((r >>> 8) % 65) / 100;
       for (let b = 0; b < 3; b++) {
         const bh = 0.2 + ((r >>> (12 + b * 3)) % 7) / 36;
-        box(this.ctx, P, tx + b * 0.055, ty + (b === 1 ? -0.02 : 0), h, 0.045, 0.02, bh, greens[(r + b) % 4]);
+        box(this.ctx, P, tx + b * 0.055, ty + (b === 1 ? -0.02 : 0), h, 0.045, 0.02, bh, cycle(greens, r + b));
       }
     }
   }
@@ -595,7 +595,7 @@ export class Renderer {
             20 +
             Math.sin(t * 2 + i) * 10 * z;
           const flip = Math.sin(t * 4 + i) > 0;
-          ctx.fillStyle = colors[i % 4];
+          ctx.fillStyle = cycle(colors, i);
           ctx.fillRect(Math.round(x), Math.round(y), (flip ? 8 : 5) * z, (flip ? 5 : 8) * z);
         }
         break;
@@ -659,7 +659,7 @@ export class Renderer {
         const y = (((Math.sin(t * 0.17 + i * 1.3) + 1) / 2) * 0.6 + 0.15) * sc.height + Math.sin(t * 3 + i) * 6;
         const flap = Math.sin(t * 14 + i) > 0 ? 1 : 0.4;
         const s = 3 * sc.zoom;
-        ctx.fillStyle = wings[i % 4];
+        ctx.fillStyle = cycle(wings, i);
         ctx.fillRect(x - s * 2 * flap, y - s, s * 2 * flap, s * 1.6);
         ctx.fillRect(x, y - s, s * 2 * flap, s * 1.6);
         ctx.fillStyle = '#1d2838';

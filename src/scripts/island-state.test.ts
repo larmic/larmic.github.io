@@ -40,7 +40,7 @@ function settle(state: FigureState, max = 400) {
   expect(isSettled(s, world), 'kommt zur Ruhe').toBe(true);
   return { s, trail };
 }
-const endOf = (id: string) => world.routes[id].at(-1)!;
+const endOf = (id: string) => world.routes[id]!.at(-1)!;
 const standsOn = (s: FigureState, id: string) => expect(view(s, world, BUBBLES).at).toEqual(endOf(id));
 const passes = (trail: { x: number; y: number }[], p: { x: number; y: number }) =>
   trail.some((t) => t.x === p.x && t.y === p.y);
@@ -50,7 +50,7 @@ describe('Figur auf der Insel', () => {
     const s = initialState(world, 'about');
     standsOn(s, 'about');
     const v = view(s, world, BUBBLES);
-    expect(v.standingBridges.size).toBe(world.routes.about.filter((n) => n.b).length);
+    expect(v.standingBridges.size).toBe(world.routes.about!.filter((n) => n.b).length);
     expect(v.bubble).toEqual({ text: BUBBLE_IDLE, visible: true, error: false });
     expect(isSettled(s, world)).toBe(true);
   });
@@ -64,7 +64,7 @@ describe('Figur auf der Insel', () => {
     ({ s } = settle(leave(s, 'videos')));
     standsOn(s, 'about');
     expect(view(s, world, BUBBLES).standingBridges).toEqual(
-      new Set(world.routes.about.flatMap((n) => (n.k === undefined ? [] : [n.k]))),
+      new Set(world.routes.about!.flatMap((n) => (n.k === undefined ? [] : [n.k]))),
     );
   });
 
@@ -75,7 +75,7 @@ describe('Figur auf der Insel', () => {
       const next = step(s, world);
       if (next.crumbling.length > s.crumbling.length) sawCrumble = true;
       if (next.pos > s.pos && next.route === s.route) {
-        const node = world.routes[next.route][next.pos - 1];
+        const node = world.routes[next.route]![next.pos - 1]!;
         if (node.b) expect(next.built, 'Block steht, bevor sie draufsteigt').toBeGreaterThanOrEqual(next.pos);
       }
       s = next;
@@ -110,7 +110,7 @@ describe('Figur auf der Insel', () => {
     for (let i = 0; i < 200 && !isSettled(s, world); i++) {
       s = step(s, world);
       for (const c of s.crumbling)
-        if (world.routes[pair.b].some((n) => n.k === c.bridge) && before.has(c.bridge)) neverCrumbledShared = false;
+        if (world.routes[pair.b]!.some((n) => n.k === c.bridge) && before.has(c.bridge)) neverCrumbledShared = false;
     }
     standsOn(s, pair.b);
     expect(neverCrumbledShared).toBe(true);
@@ -147,7 +147,7 @@ describe('Figur auf der Insel', () => {
     const { s } = settle(aim(initialState(world, 'about'), 'tree'));
     standsOn(s, 'tree');
     expect(view(s, world, BUBBLES).bubble).toEqual({ text: 'T', visible: true, error: false });
-    expect(world.routes.tree.filter((n) => n.b)).toHaveLength(2);
+    expect(world.routes.tree!.filter((n) => n.b)).toHaveLength(2);
   });
 
   it('läuft nach select zum neuen Ruheblock, öffnet dessen Bereich und schließt den alten, sobald sie ihn verlassen hat', () => {

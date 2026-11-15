@@ -34,7 +34,7 @@ describe('Ruhiger Takt der Eingabe', () => {
     const times = steps(pace, 0, 2000);
     expect(times[0]).toBeGreaterThanOrEqual(HOLD_MS);
     expect(times[0]).toBeLessThanOrEqual(HOLD_MS + 16);
-    for (let i = 1; i < times.length; i++) expect(times[i] - times[i - 1]).toBeLessThan(STEP_MS + 17);
+    for (let i = 1; i < times.length; i++) expect(times[i]! - times[i - 1]!).toBeLessThan(STEP_MS + 17);
   });
 
   it('wildes Tippen ist nicht schneller als Halten', () => {

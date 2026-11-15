@@ -32,9 +32,9 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
-import { CHUNK, chunkOf } from '../../lib/games/chunks';
+import { CHUNK, chunkOf, fromKey } from '../../lib/games/chunks';
 import type { Dir, Part, Projection } from '../../lib/games/front';
-import { hash } from '../../lib/games/rng';
+import { cycle, hash } from '../../lib/games/rng';
 import {
   GAME_COLORS,
   GATES,
@@ -289,14 +289,14 @@ export class World3D {
               const ii = i + di,
                 jj = j + dj;
               if (ii < 0 || jj < 0 || ii >= FOG_N || jj >= FOG_N) continue;
-              sum += a[jj * FOG_N + ii];
+              sum += a[jj * FOG_N + ii] ?? 0;
               n++;
             }
           b[j * FOG_N + i] = sum / n;
         }
       a = b;
     }
-    for (let k = 0; k < a.length; k++) this.fogData[k] = Math.round(a[k] * 255);
+    for (let k = 0; k < a.length; k++) this.fogData[k] = Math.round((a[k] ?? 0) * 255);
     this.fogTex.needsUpdate = true;
     // Texel i liegt mittig auf Feld ox + i: Ursprung so, dass (x + 0,5 − ox) / N die Texelmitte trifft
     this.fogUniforms.mwFogOrigin.value.set(ox, oy);
@@ -562,13 +562,13 @@ export class World3D {
       .filter((k) => want.has(k))
       .sort((a, b) => {
         const d = (k: string) => {
-          const [cx, cy] = k.split(',').map(Number);
+          const [cx, cy] = fromKey(k);
           return Math.hypot(cx - pcx, cy - pcy);
         };
         return d(a) - d(b);
       });
     for (const k of stale.slice(0, BUILD_PER_FRAME + 1)) {
-      const [cx, cy] = k.split(',').map(Number);
+      const [cx, cy] = fromKey(k);
       const fresh = this.buildChunk(world, cx, cy);
       for (const m of this.chunks.get(k)?.meshes ?? []) {
         this.scene.remove(m);
@@ -753,7 +753,7 @@ export class World3D {
           [0.75, 0.55],
           [0.3, 0.85],
           [0.95, 0.05],
-        ])
+        ] as const)
           canopy.box(x + dx - 0.15, h + 1.86, y + dz - 0.15, 0.2, 0.05, 0.2, '#ffffff');
         break;
       }
@@ -765,7 +765,7 @@ export class World3D {
           [0.8, 0.2],
           [0.1, 0.72],
           [0.8, 0.72],
-        ])
+        ] as const)
           g.box(x + fx, h, y + fz, 0.1, 0.12, 0.1, '#7a5432');
         g.box(x + 0.05, h + 0.12, y + 0.15, 0.9, 0.08, 0.72, '#8a5a30', '#a0703f', 'planks');
         g.box(x + 0.05, h + 0.2, y + 0.15, 0.9, 0.28, 0.08, '#8a5a30', '#a0703f', 'planks');
@@ -779,7 +779,7 @@ export class World3D {
             [0.25, 0.35],
             [0.55, 0.5],
             [0.7, 0.3],
-          ])
+          ] as const)
             g.box(x + fx, h + 0.46, y + fz, 0.14, 0.06, 0.06, '#f08a3c'); // Möhren
         }
         break;
@@ -822,7 +822,7 @@ export class World3D {
         cz = y + 0.15 + ((r >>> 8) % 70) / 100;
       const bh = 0.22 + ((r >>> 16) % 8) / 40;
       const s = 0.09;
-      const c = greens[r % 4];
+      const c = cycle(greens, r);
       // zwei gekreuzte Halm-Flächen, von beiden Seiten sichtbar
       blades.quad(
         [cx - s, h, cz - s],

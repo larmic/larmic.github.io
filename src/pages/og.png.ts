@@ -9,14 +9,21 @@ import { AVATAR } from '../data/avatar';
 const W = 1200;
 const H = 630;
 
+/** viewBox eines erzeugten SVG als [x, y, Breite, Höhe] */
+function viewBox(svg: string): [number, number, number, number] {
+  const box = svg
+    .match(/viewBox="([^"]+)"/)?.[1]
+    ?.split(' ')
+    .map(Number);
+  if (box?.length !== 4) throw new Error('Vorschaubild: SVG ohne viewBox');
+  return box as [number, number, number, number];
+}
+
 export async function GET() {
   const scene = await islandScene();
-  const [sx0, sy0, sw, sh] = scene.sceneSvg
-    .match(/viewBox="([^"]+)"/)![1]
-    .split(' ')
-    .map(Number);
+  const [sx0, sy0, sw, sh] = viewBox(scene.sceneSvg);
   const uses = scene.sceneSvg.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
-  const at = (pctX: number, pctY: number) => [sx0 + (pctX / 100) * sw, sy0 + (pctY / 100) * sh];
+  const at = (pctX: number, pctY: number): [number, number] => [sx0 + (pctX / 100) * sw, sy0 + (pctY / 100) * sh];
 
   // Die vier Bereichs-Blöcke wie auf der Seite (ohne Wippen), Kisten sind im Vorschaubild zu
   const blocks = scene.data.nav
@@ -28,10 +35,7 @@ export async function GET() {
     .join('');
 
   // Figur auf dem Startfeld in der Inselmitte; Fußpunkt und Größe wie in Island.astro
-  const [fx0, fy0, fw, fh] = scene.figureSvg
-    .match(/viewBox="([^"]+)"/)![1]
-    .split(' ')
-    .map(Number);
+  const [fx0, fy0, fw, fh] = viewBox(scene.figureSvg);
   const figW = (Number(scene.fig.w) / 100) * sw;
   const figH = (figW * fh) / fw;
   const [hx, hy] = at(scene.data.home.x, scene.data.home.y);

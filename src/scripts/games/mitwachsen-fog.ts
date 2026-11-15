@@ -9,6 +9,8 @@ export const REVEAL = 7; // so weit sieht die Figur um sich herum
 export const START_REVEAL = 10; // so viel ist am Anfang um das Bett zu sehen
 const BYTES = (CHUNK * CHUNK) / 8;
 
+/** Ist Bit i gesetzt? */
+const isSet = (bits: Uint8Array, i: number) => ((bits[i >> 3] ?? 0) & (1 << (i & 7))) !== 0;
 const toBase64 = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes));
 function fromBase64(text: string): Uint8Array | null {
   try {
@@ -41,7 +43,7 @@ export class Fog {
     const bits = this.chunks.get(`${cx},${cy}`);
     if (!bits) return false;
     const i = (y - cy * CHUNK) * CHUNK + (x - cx * CHUNK);
-    return (bits[i >> 3] & (1 << (i & 7))) !== 0;
+    return isSet(bits, i);
   }
 
   /** Kreis um (x, y) erkunden; liefert die Stücke, in denen sich etwas geändert hat */
@@ -60,8 +62,8 @@ export class Fog {
           this.chunks.set(key, bits);
         }
         const i = (py - cy * CHUNK) * CHUNK + (px - cx * CHUNK);
-        if (bits[i >> 3] & (1 << (i & 7))) continue;
-        bits[i >> 3] |= 1 << (i & 7);
+        if (isSet(bits, i)) continue;
+        bits[i >> 3] = (bits[i >> 3] ?? 0) | (1 << (i & 7));
         changed.add(key);
       }
     return [...changed];

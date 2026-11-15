@@ -12,6 +12,8 @@ export function getStaticPaths() {
 }
 
 export async function GET({ params }: { params: { icon: string } }) {
-  const { size, background } = ICONS[params.icon];
+  const icon = ICONS[params.icon];
+  if (!icon) return new Response(null, { status: 404 });
+  const { size, background } = icon;
   return new Response(new Uint8Array(await iconPng(size, background)), { headers: { 'Content-Type': 'image/png' } });
 }

@@ -32,9 +32,9 @@ export const cellAt = (
 
 /** Textur-Raster auf eine Fläche malen: Jede Farbschicht [Farbe, Deckkraft] einzeln (wie render.ts) */
 function paint(ctx: CanvasRenderingContext2D, grid: Grid, pal: Palette) {
-  for (let r = 0; r < grid.length; r++)
-    for (let c = 0; c < grid[r].length; c++) {
-      for (const [color, alpha] of pal[grid[r][c]] ?? []) {
+  for (const [r, row] of grid.entries())
+    for (const [c, ch] of [...row].entries()) {
+      for (const [color, alpha] of pal[ch] ?? []) {
         ctx.globalAlpha = alpha;
         ctx.fillStyle = color;
         ctx.fillRect(c, r, 1.03, 1.03); // leicht überlappen, sonst blitzen Fugen durch

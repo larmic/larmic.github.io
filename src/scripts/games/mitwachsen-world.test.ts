@@ -19,7 +19,7 @@ function reachable(world: World, open: GateId[], start: readonly [number, number
   return [...seen].map((k) => k.split(',').map(Number) as [number, number]);
 }
 const lichtung = REGIONS[0];
-const START = HOME.wake[0];
+const START = HOME.wake[0]!;
 const SEEDS = [1, 42, 2026, 7, 99, 123456, 15838, 23757, 55433, 95028];
 
 describe('Welt aus dem Seed', () => {
@@ -92,7 +92,7 @@ describe('Start auf der Lichtung', () => {
       /** Hindernisse im Umkreis von zwei Feldern um (x, y), ohne (x, y) selbst */
       const neighbours = (x: number, y: number) =>
         [-2, -1, 0, 1, 2]
-          .flatMap((dy) => [-2, -1, 0, 1, 2].map((dx) => [x + dx, y + dy]))
+          .flatMap((dy) => [-2, -1, 0, 1, 2].map((dx): [number, number] => [x + dx, y + dy]))
           .filter(([nx, ny]) => (nx !== x || ny !== y) && solid(nx, ny));
       let trees = 0;
       for (let y = -lichtung.shape.ry; y <= lichtung.shape.ry; y++)
@@ -128,13 +128,14 @@ describe('Start auf der Lichtung', () => {
       expect([...w.gates.keys()].sort()).toEqual(GATES.map((g) => g.id).sort());
       for (const g of GATES) {
         const { cells, out } = w.gates.get(g.id)!;
+        const [mx, my] = cells[2]!; // mittleres Torfeld
         expect(cells).toHaveLength(5);
         const [ax, ay] = [Math.abs(out[1]), Math.abs(out[0])]; // entlang der Torreihe
         for (const k of [3, 4]) {
           for (const [x, y] of [
-            [cells[2][0] + ax * k, cells[2][1] + ay * k],
-            [cells[2][0] - ax * k, cells[2][1] - ay * k],
-          ]) {
+            [mx + ax * k, my + ay * k],
+            [mx - ax * k, my - ay * k],
+          ] as const) {
             expect(w.cell(x, y).deco, `${g.id} Turm`).toBe('gatetower');
             expect(standHeight(w, [], x, y)).toBeNull();
           }

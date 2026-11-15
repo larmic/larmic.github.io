@@ -6,6 +6,12 @@ export const CHUNK = 16;
 /** Stück, in dem ein Feld liegt (auch für negative Koordinaten) */
 export const chunkOf = (x: number, y: number): [number, number] => [Math.floor(x / CHUNK), Math.floor(y / CHUNK)];
 
+/** Feld aus einem Schlüssel „x,y“ (so stehen Felder in Maps und im Spielstand) */
+export function fromKey(key: string): [number, number] {
+  const [x = NaN, y = NaN] = key.split(',').map(Number);
+  return [x, y];
+}
+
 /** Zwischenspeicher für Stücke. `make` berechnet ein Stück als Liste von CHUNK × CHUNK Feldern (zeilenweise). */
 export class ChunkCache<T> {
   private readonly chunks = new Map<string, T[]>();
@@ -25,6 +31,6 @@ export class ChunkCache<T> {
       if (this.chunks.size >= this.limit) this.chunks.delete(this.chunks.keys().next().value!);
       this.chunks.set(key, chunk);
     }
-    return chunk[(y - cy * CHUNK) * CHUNK + (x - cx * CHUNK)];
+    return chunk[(y - cy * CHUNK) * CHUNK + (x - cx * CHUNK)]!; // Stücke sind immer CHUNK × CHUNK groß
   }
 }

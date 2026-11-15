@@ -24,10 +24,10 @@ describe('Blumen und Pilze wachsen nach', () => {
     expect(count(0)).toEqual({ flowers: 0, mushrooms: 0 });
     const days = [1, 3, 6, 10].map(count);
     for (let i = 1; i < days.length; i++) {
-      expect(days[i].flowers).toBeGreaterThan(days[i - 1].flowers);
-      expect(days[i].mushrooms).toBeGreaterThanOrEqual(days[i - 1].mushrooms);
+      expect(days[i]!.flowers).toBeGreaterThan(days[i - 1]!.flowers);
+      expect(days[i]!.mushrooms).toBeGreaterThanOrEqual(days[i - 1]!.mushrooms);
     }
-    expect(days[3].mushrooms).toBeGreaterThan(0);
+    expect(days[3]!.mushrooms).toBeGreaterThan(0);
     expect(count(100).flowers).toBe(count(MAX_FLOWERS / 0.012 + 5).flowers);
   });
 

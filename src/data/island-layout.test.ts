@@ -18,8 +18,8 @@ const full = () =>
 
 /** Prozentangaben der Szene zurück in Szenen-Einheiten (Würfel CUBE_W × CUBE_H) */
 function units(scene: Scene) {
-  const [x0, y0, w, h] = scene.sceneSvg
-    .match(/viewBox="([^"]+)"/)![1]
+  const [x0 = 0, y0 = 0, w = 0, h = 0] = scene.sceneSvg
+    .match(/viewBox="([^"]+)"/)![1]!
     .split(' ')
     .map(Number);
   return (p: { x: number; y: number }) => ({ X: x0 + (p.x / 100) * w, Y: y0 + (p.y / 100) * h });
@@ -33,9 +33,9 @@ describe('buildWorld', () => {
   it('legt jede Kiste in den Baum: Ihr Weg beginnt mit dem kompletten Weg ihres Bereichs', () => {
     const { routes, nav } = full().data;
     for (const n of nav.filter((x) => x.parent)) {
-      const parent = routes[n.parent!];
-      expect(routes[n.id].slice(0, parent.length)).toEqual(parent);
-      expect(routes[n.id].length).toBeGreaterThan(parent.length);
+      const parent = routes[n.parent!]!;
+      expect(routes[n.id]!.slice(0, parent.length)).toEqual(parent);
+      expect(routes[n.id]!.length).toBeGreaterThan(parent.length);
     }
   });
 
@@ -88,8 +88,8 @@ describe('buildWorld', () => {
     const at = units(scene);
     for (const id of ['about', 'workshops']) {
       // erste Brücke direkt an der Inselkante: Der Inselblock davor muss darüber liegen
-      const first = scene.data.routes[id].find((n) => n.b)!;
-      const bridge = scene.data.bridges[first.k!];
+      const first = scene.data.routes[id]!.find((n) => n.b)!;
+      const bridge = scene.data.bridges[first.k!]!;
       const b = at(bridge);
       const covering = scene.data.front.filter((f) => {
         const p = at(f);
@@ -119,6 +119,6 @@ describe('buildWorld', () => {
     const egg = scene.data.eggs.find((e) => e.id === 'tree')!;
     expect(egg.w).toBeGreaterThan(0);
     expect(egg.h).toBeGreaterThan(0);
-    expect(scene.data.routes.tree.at(-1)!.fall).toBeUndefined();
+    expect(scene.data.routes.tree!.at(-1)!.fall).toBeUndefined();
   });
 });

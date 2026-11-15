@@ -69,7 +69,7 @@ function browserStore(): Store {
     };
   }
 }
-const randomSeed = () => crypto.getRandomValues(new Uint32Array(1))[0];
+const randomSeed = () => crypto.getRandomValues(new Uint32Array(1))[0]!;
 const randomId = () => randomSeed().toString(36) + Date.now().toString(36);
 
 class LarmicMitwachsen extends HTMLElement {
@@ -569,7 +569,7 @@ class LarmicMitwachsen extends HTMLElement {
         vx: Math.cos(a) * v,
         vy: -Math.abs(Math.sin(a)) * v * 1.4 - 1,
         life: 40 + (i % 5) * 6,
-        color: colors[i % colors.length],
+        color: colors[i % colors.length]!,
         size: (3 + (i % 3) * 2) * zoom,
       });
     }
