@@ -1,6 +1,6 @@
 # Spec: Mitwachsen (Stufe ab 3)
 
-Verhalten des Spiels unter `/spiele/mitwachsen/` (die alte Adresse `/spiele/threeyear/` leitet dorthin weiter). Konzept und Hintergrund: [docs/games/mitwachsen.md](../games/mitwachsen.md).
+Verhalten des Spiels unter `/spiele/mitwachsen/spielen/` (die alte Adresse `/spiele/threeyear/` leitet dorthin weiter; `/spiele/mitwachsen/` ist die Seite für Eltern mit „Spiel starten“). Konzept und Hintergrund: [docs/games/mitwachsen.md](../games/mitwachsen.md).
 
 Umgesetzt ist es in reinen, getesteten Teilen und einer Web Component:
 

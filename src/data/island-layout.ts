@@ -1,4 +1,4 @@
-// Die Insel von larmic.de: feste Blöcke, Startfeld, Wege zu den vier Bereichen, Plätze für die Kisten der Einträge
+// Die Insel von larmic.de: feste Blöcke, Startfeld, Wege zu den fünf Bereichen, Plätze für die Kisten der Einträge
 // und das Easter Egg am Baum. Gebaut wird sie mit der Szenen-Engine aus src/lib/voxel/world.ts.
 // Rein und ohne Astro, damit sie sich testen lässt (island-layout.test.ts); das Laden der Inhalte steckt in island.ts.
 import {
@@ -86,20 +86,37 @@ const ROUTES: Record<string, RouteDef> = {
     tag: 'B',
   },
   blog: { walk: [[4, 3]], bridge: [], target: [7, 3, -2], tag: 'B', fall: [5, 3, 0] },
+  spiele: {
+    walk: [
+      [3, 2],
+      [4, 2],
+      [4, 1],
+    ],
+    bridge: [
+      [5, 1, 0],
+      [6, 1, 0],
+    ],
+    target: [7, 1, 0], // so tief, dass die Sprechblase der Figur nicht über das Etikett der Workshops reicht
+    tag: 'R',
+  },
 };
 const navMeta = (avatar: Avatar): Record<string, NavMeta> => ({
   about: { label: 'Über mich', sym: 'head', delay: '0s', p1: avatar.skin, p2: avatar.hair, href: '/' },
   workshops: { label: 'Workshops', sym: 'board', delay: '-1.1s', p1: '#f39a3d', p2: '#5aa6e8', href: '/workshops/' },
   videos: { label: 'Videos', sym: 'screen', delay: '-2.2s', p1: '#ee4b3e', p2: '#454b59', href: '/videos/' },
   blog: { label: 'Blog', sym: 'shelf', delay: '-0.6s', p1: '#c0453a', p2: '#3f6fb5' },
+  spiele: { label: 'Spiele', sym: 'dice', delay: '-1.6s', p1: '#f6f3ec', p2: '#c0453a', href: '/spiele/' },
 });
 
 // Kisten der Einträge: feste Plätze rund um ihren Bereichs-Block, Weg = Brücke(n) vom Bereichs-Block aus
-export type Section = 'workshops' | 'videos';
+export type Section = 'workshops' | 'videos' | 'spiele';
 
 /** Ruheblock einer Seite: ein Bereich oder die Kiste eines Eintrags. Tippfehler fallen so schon bei `npm run check` auf. */
 export type RestId = 'about' | Section | `${Section}/${string}`;
 const CHILD_SLOTS: Record<Section, Pick<RouteDef, 'bridge' | 'target' | 'tag'>[]> = {
+  spiele: [
+    { bridge: [[8, 1, 0]], target: [9, 1, -1], tag: 'B' }, // rechts, Stufe runter, Etikett darunter (rechts wäre es am Rand abgeschnitten)
+  ],
   workshops: [
     { bridge: [[3, -4, 3]], target: [3, -5, 4], tag: 'R' }, // oben rechts, Treppe hoch
     { bridge: [[2, -3, 3]], target: [1, -3, 4], tag: 'L' }, // oben links, Treppe hoch
@@ -161,7 +178,7 @@ export function buildWorld(children: Record<Section, ChildItem[]>, avatar: Avata
   for (const id of Object.keys(ROUTES)) {
     routes[id] = ROUTES[id];
     meta[id] = NAV_META[id];
-    if (id !== 'workshops' && id !== 'videos') continue;
+    if (id !== 'workshops' && id !== 'videos' && id !== 'spiele') continue;
     const slots = CHILD_SLOTS[id];
     if (children[id].length > slots.length)
       throw new Error(

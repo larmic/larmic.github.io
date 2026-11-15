@@ -22,6 +22,7 @@ export const BUBBLES = {
   about: 'Das bin ich. Entwicklung, Architektur und KI mit Leitplanken.',
   workshops: 'Lass uns gemeinsam modellieren!',
   videos: 'Popcorn bereit? Hier sind meine Talks.',
+  spiele: 'Spielzeit!',
   tree: 'Schöne Aussicht!', // Easter Egg: oben im Baum
 };
 

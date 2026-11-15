@@ -1,0 +1,57 @@
+---
+// Seite eines Spiels für Eltern: worum es geht, für wen, worauf geachtet ist. Gespielt wird unter /spiele/<id>/spielen/.
+import { getCollection, render } from 'astro:content';
+import IslandPage from '../../../layouts/IslandPage.astro';
+import VoxelIcon from '../../../components/VoxelIcon.astro';
+
+export async function getStaticPaths() {
+  const games = await getCollection('games');
+  return games.map((g) => ({ params: { id: g.id }, props: { g } }));
+}
+const { g } = Astro.props;
+const { Content } = await render(g);
+const play = `/spiele/${g.id}/spielen/`;
+const facts = [
+  ['Alter', g.data.age],
+  ['Gespielt', g.data.together],
+  ['Steuerung', g.data.controls],
+  ['Läuft', g.data.device],
+  ['Kosten', 'kostenlos, ohne Werbung'],
+  ['Spielstand', 'bleibt im eigenen Browser'],
+];
+---
+
+<IslandPage
+  title={`${g.data.short} – Kinderspiel`}
+  description={g.data.teaser}
+  rest={`spiele/${g.id}`}
+  cta={{ label: 'Spiel starten', href: play }}
+>
+  <div class="panel-head">
+    <VoxelIcon block="pilz" size={64} />
+    <div>
+      <h1>{g.data.title}</h1>
+      <p>{g.data.teaser}</p>
+    </div>
+  </div>
+  <dl class="facts">
+    {facts.map(([term, value]) => (
+      <div>
+        <dt>{term}</dt>
+        <dd>{value}</dd>
+      </div>
+    ))}
+  </dl>
+  {g.data.claim && <p class="claim pxsm th-spiel">{g.data.claim}</p>}
+  <div class="prose">
+    <Content />
+    <p>
+      <a class="pxbtn" href={play} data-astro-reload>
+        Spiel starten
+      </a>
+    </p>
+  </div>
+  <a class="backlink" href="/spiele/">
+    Alle Spiele
+  </a>
+</IslandPage>

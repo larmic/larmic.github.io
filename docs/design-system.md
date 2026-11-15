@@ -75,6 +75,7 @@ Die Ziele bilden einen Baum: Insel → Bereich → Kiste. Jedes Ziel hat eine ei
 | Über mich | `/` |
 | Workshops / ein Workshop | `/workshops/`, `/workshops/<id>/` |
 | Videos / ein Video | `/videos/`, `/videos/<id>/` |
+| Spiele / ein Spiel | `/spiele/`, `/spiele/<id>/` (Spielwürfel als Bereich, Kiste mit Fliegenpilz-Block; Fläche `th-spiel` im Himmelblau der Insel, weil Spiele kein Themen-Material sind). Gespielt wird unter `/spiele/<id>/spielen/` |
 | Blog | keine – die Figur fällt |
 
 **Die Figur steht immer auf dem Block der angezeigten Seite.** Die Kisten eines Bereichs poppen auf, sobald er offen ist, und verschwinden, wenn die Figur ihn verlassen hat. Kisten haben die Themenfarbe ihres Eintrags; ihr Etikett erscheint beim Zeigen und an der gewählten Kiste.

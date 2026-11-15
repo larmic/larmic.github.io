@@ -1,4 +1,4 @@
-// Die Insel mit allen Kisten: Workshops und Videos aus den Inhalten, jede Kiste in ihrer Themenfarbe.
+// Die Insel mit allen Kisten: Workshops und Videos aus den Inhalten, jede Kiste in ihrer Themenfarbe; dazu die Spiele.
 import { getCollection } from 'astro:content';
 import type { Scene } from '../lib/voxel/world';
 import { AVATAR } from './avatar';
@@ -6,6 +6,7 @@ import { buildWorld } from './island-layout';
 import { MATERIALS, type Material } from './materials';
 
 type Entry = { id: string; data: { short: string; material: Material; order: number } };
+type Game = { id: string; data: { short: string; order: number } };
 
 const items = (section: 'workshops' | 'videos', entries: Entry[]) =>
   entries
@@ -25,6 +26,10 @@ export async function islandScene(): Promise<Scene> {
     {
       workshops: items('workshops', await getCollection('workshops', ({ data }) => !data.draft)),
       videos: items('videos', await getCollection('videos')),
+      // Spiele: Kiste mit Fliegenpilz-Block (wie der Riesenpilz im Spiel), kein Themen-Material
+      spiele: ((await getCollection('games')) as Game[])
+        .sort((a, b) => a.data.order - b.data.order)
+        .map((g) => ({ id: g.id, label: g.data.short, block: 'pilz', href: `/spiele/${g.id}/` })),
     },
     AVATAR,
   );

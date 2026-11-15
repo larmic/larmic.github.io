@@ -13,7 +13,8 @@ const items = (section: string, n: number): ChildItem[] =>
   }));
 
 // So viele Einträge, wie es Plätze gibt: Hier müssen Geometrie und Wege noch stimmen
-const full = () => buildWorld({ workshops: items('workshops', 4), videos: items('videos', 4) }, AVATAR);
+const full = () =>
+  buildWorld({ workshops: items('workshops', 4), videos: items('videos', 4), spiele: items('spiele', 1) }, AVATAR);
 
 /** Prozentangaben der Szene zurück in Szenen-Einheiten (Würfel CUBE_W × CUBE_H) */
 function units(scene: Scene) {
@@ -107,10 +108,10 @@ describe('buildWorld', () => {
   });
 
   it('bricht bei mehr Einträgen als Plätzen mit einer Meldung ab, die sagt, was zu tun ist', () => {
-    expect(() => buildWorld({ workshops: items('workshops', 5), videos: [] }, AVATAR)).toThrow(
+    expect(() => buildWorld({ workshops: items('workshops', 5), videos: [], spiele: [] }, AVATAR)).toThrow(
       /CHILD_SLOTS.*draft: true/,
     );
-    expect(() => buildWorld({ workshops: [], videos: items('videos', 5) }, AVATAR)).toThrow(/Plätze/);
+    expect(() => buildWorld({ workshops: [], videos: items('videos', 5), spiele: [] }, AVATAR)).toThrow(/Plätze/);
   });
 
   it('hat für den Baum eine Hover-Fläche und einen Weg ohne Sturz', () => {

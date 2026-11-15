@@ -2,8 +2,8 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// Reine Weiterleitungen gehören nicht in die Sitemap, die Kinderspiele (noch) auch nicht
-const redirectPages = /^\/(about|tags|categories)\/$|^\/spiele\//;
+// Reine Weiterleitungen gehören nicht in die Sitemap, die Spiele selbst (/spiele/<id>/spielen/) auch nicht
+const redirectPages = /^\/(about|tags|categories)\/$|^\/spiele\/(threeyear\/|[^/]+\/spielen\/)$/;
 
 export default defineConfig({
   site: 'https://larmic.de',
@@ -17,6 +17,6 @@ export default defineConfig({
     '/tags': '/',
     '/categories': '/',
     // Arbeitstitel des Kinderspiels
-    '/spiele/threeyear': '/spiele/mitwachsen/',
+    '/spiele/threeyear': '/spiele/mitwachsen/spielen/',
   },
 });

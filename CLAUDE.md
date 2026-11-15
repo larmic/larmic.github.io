@@ -21,10 +21,10 @@ Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run chec
 
 ## Aufbau
 
-- `src/pages/` – Seiten: `/` (Über mich), `/workshops/`, `/workshops/<id>/`, `/videos/`, `/videos/<id>/`, `/impressum/`, 404, `/spiele/mitwachsen/` (Kinderspiel Mitwachsen, Seite ohne Insel, vorerst nur per direkter Adresse und nicht in der Sitemap; `/spiele/threeyear/` leitet dorthin)
+- `src/pages/` – Seiten: `/` (Über mich), `/workshops/`, `/workshops/<id>/`, `/videos/`, `/videos/<id>/`, `/impressum/`, 404, `/spiele/`, `/spiele/<id>/` (Spiele für Eltern beschrieben, Inhalte in `src/content/games/`), `/spiele/mitwachsen/spielen/` (das Kinderspiel selbst, Seite ohne Insel, `noindex`, nicht in der Sitemap; `/spiele/threeyear/` leitet dorthin)
 - `src/layouts/PlainPage.astro` – Layout der Seiten ohne Insel (Impressum, Datenschutz, 404)
 - `src/layouts/IslandPage.astro` – Layout aller Seiten mit Insel: Kopf bleibt beim Seitenwechsel stehen (`transition:persist`), `rest` sagt der Figur, wo sie steht
-- `src/content/` – Workshops und Videos als Markdown, Schema in `src/content.config.ts`
+- `src/content/` – Workshops, Videos und Spiele als Markdown, Schema in `src/content.config.ts`
 - `src/components/` – Astro-Komponenten, die Insel in `Island.astro`, der Kopf ohne Insel (Impressum) in `SubHero.astro`
 - `src/scripts/island-state.ts` – Zustandsmaschine der Figur (rein, getestet); `larmic-island.ts` – Web Component dazu (DOM, Takt, Kopfblick)
 - Kinderspiel Mitwachsen: `src/lib/games/` (Zufall, Stücke, Ansicht von vorn – generisch, läuft im Browser), `src/data/games/mitwachsen.ts` (Gegenden, Tiere, Figur), `src/scripts/games/` (Welt, Regeln und Speichern rein und getestet; `larmic-mitwachsen.ts` Web Component, `mitwachsen-3d.ts` 3D-Ansicht mit Three.js (wird per `import()` nachgeladen; dazu `mitwachsen-geo.ts` Textur-Atlas und Baukasten, `mitwachsen-gatehouse.ts` Torhäuser und Portale), `mitwachsen-tired.ts` Müde werden (Medienzeit), `mitwachsen-render.ts` 2D-Ansicht und Ebene darüber, `input-pace.ts` ruhiger Takt, `sfx.ts` Töne), `src/components/MitwachsenGame.astro`
@@ -48,4 +48,4 @@ Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run chec
 - Die Homepage bleibt schlank (geprüft durch `npm run verify:bundles`, Logik in `scripts/bundles.ts`): Seiten außerhalb von `/spiele/` laden kein Spiel und kein Three.js und höchstens 32 KB JavaScript; die Spielseite lädt 3D nur nachträglich per `import()`.
 - Die Insel ist auf allen Seiten die einzige Navigation. Neue Seiten mit Insel nutzen `IslandPage.astro` und setzen `rest`. Keine Text-Navigation einbauen.
 - Skripte laufen wegen der View Transitions nur einmal: Klicks über `document` delegieren, nicht an Elemente hängen.
-- Alte Adressen (`/#workshops`, `/#videos`, `/workshops/#workshop-<id>`, `/videos/#video-<id>`, `/about/`, `/spiele/threeyear/`) müssen funktionieren.
+- Alte Adressen (`/#workshops`, `/#videos`, `/workshops/#workshop-<id>`, `/videos/#video-<id>`, `/about/`, `/spiele/threeyear/`, `/spiele/mitwachsen/` – heute die Seite zum Spiel mit „Spiel starten“) müssen funktionieren.

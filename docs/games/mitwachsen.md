@@ -216,8 +216,9 @@ Bei `prefers-reduced-motion`: Die Kamera springt feldweise mit, ohne Nachgleiten
 
 Seiten und Navigation (ob der Einstieg auf der Insel sichtbar ist, ist noch offen):
 
-- **`/spiele/`** als Seite mit Insel (`IslandPage.astro`, `rest="spiele"`): Einleitung für Eltern aus dem README, die Reihe als Kisten (eine pro Jahr), ein Standbild und ein Link zum Spiel. Mitziehen: `ROUTES` und `RestId` in `island-layout.ts`, Sprechblasen in `site.ts`, `docs/specs/insel.md`, die Tests der Insel, die Tabelle in `docs/design-system.md` und die schmale Ansicht.
-- **`/spiele/mitwachsen/`** als Seite ohne Insel wie Impressum und 404, mit schlankem Layout. Das Spiel steht für sich: kein Zurück-Button, der Weg zur Homepage liegt im Menü für Eltern. Keine Text-Navigation. Die Liste der Seiten ohne Insel in `CLAUDE.md` wird um die Spielseite ergänzt.
+- **`/spiele/`** als Seite mit Insel (`IslandPage.astro`, `rest="spiele"`): Bereich „Spiele“ mit Spielwürfel rechts unter den Workshops, darunter je Spiel eine Kiste (Mitwachsen: Fliegenpilz-Block). Die Spiele stehen als Markdown in `src/content/games/`.
+- **`/spiele/mitwachsen/`** als Seite für Eltern im Stil der Workshop-Seiten: für wen, warum es das Spiel gibt, worauf geachtet ist, ein Standbild, „Spiel starten“.
+- **`/spiele/mitwachsen/spielen/`** ist das Spiel selbst, ohne Insel und ohne Zurück-Button; der Weg zur Homepage liegt im Menü für Eltern. `noindex`, nicht in der Sitemap.
 
 Fest:
 
@@ -265,7 +266,6 @@ Nur gesammelt, noch nicht ausgeplant.
 
 ## Offen
 
-- Einstieg auf der Insel: sichtbar als „Spiele“ oder eher versteckt? Soll die Spielseite von Suchmaschinen ausgeschlossen werden (`noindex`, dann auch aus der Sitemap filtern)?
 - Werden die Berge später eine eigene Gegend?
 - Wie viele Tiere laufen in der berechneten Landschaft?
 - Aussehen der Figur (Haar- und Pullifarbe).

@@ -23,6 +23,7 @@ const world: World = buildWorld(
   {
     workshops: entries('workshops', ['ddd', 'es', 'ms']),
     videos: entries('videos', ['tc', 'hex', 'es', 'unit']),
+    spiele: entries('spiele', ['mitwachsen']),
   },
   AVATAR,
 ).data;

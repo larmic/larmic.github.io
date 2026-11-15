@@ -6,7 +6,7 @@ Die Insel ist die Navigation der Seite. Eine Figur zeigt, wo man gerade ist, und
 
 | Begriff | Bedeutung |
 | --- | --- |
-| **Ziel** | Ein Block, zu dem die Figur laufen kann: `about`, `workshops`, `videos`, `blog`, eine Kiste wie `workshops/event_storming` oder das Easter Egg `tree`. |
+| **Ziel** | Ein Block, zu dem die Figur laufen kann: `about`, `workshops`, `videos`, `spiele`, `blog`, eine Kiste wie `workshops/event_storming` oder `spiele/mitwachsen` oder das Easter Egg `tree`. |
 | **Weg** | Folge von Feldern von der Inselmitte zu einem Ziel. Jedes Feld ist ein vorhandener Block, ein Brückenblock (wird gesetzt) oder beim Blog das Feld, auf dem sie ins Leere tritt. |
 | **Baum der Wege** | Der Weg einer Kiste beginnt mit dem kompletten Weg ihres Bereichs (Insel → Bereich → Kiste). Gleiche Felder teilen sich einen Brückenblock. |
 | **Ruheblock** (`rest`) | Ziel der angezeigten Seite. Dort steht die Figur, wenn sie nirgendwo anders hin will. |

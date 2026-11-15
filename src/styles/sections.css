@@ -229,6 +229,10 @@
   background: var(--grass-bg);
   color: var(--ink);
 }
+.th-spiel {
+  background: var(--sky-3); /* Spiele: kein Themen-Material, sondern der Himmel der Insel */
+  color: var(--ink);
+}
 .th-ki a {
   color: var(--crystal-link);
 }
