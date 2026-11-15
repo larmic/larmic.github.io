@@ -498,7 +498,7 @@ function withClimate(seed: number, c: Cell, cl: Climate, x: number, y: number): 
   if (s <= 0.02 || c.region !== 'lichtung' || c.garden || c.ground === 'water') return c;
   const out: Cell = { ...c };
   const tint = CLIMATE_TINT[cl.id];
-  if (tint) out.tint = mix('#ffffff', tint, Math.min(1, s * 1.1));
+  if (tint) out.tint = mix('#ffffff', tint, s * 0.55); // zart: das Gras bleibt Gras
   const roll = rand01(seed, x, y, 51);
   const patch = valueNoise(seed + 52, x, y, 5); // Flecken statt Salz und Pfeffer
   const grassy = c.ground === 'grass';

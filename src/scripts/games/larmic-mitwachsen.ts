@@ -704,6 +704,7 @@ class LarmicMitwachsen extends HTMLElement {
       weather,
       pose: this.pose,
       mood,
+      lit3d: !!this.r3d,
       wind: this.reduced.matches ? 0 : windAt(mood, weather),
       floats,
       particles: this.particles,

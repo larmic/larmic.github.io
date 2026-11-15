@@ -112,7 +112,7 @@ Die Lichtung kündigt auf dem Weg an, was hinter einem Tor wartet. `world.climat
 
 Leben: Herbstblätter wehen Richtung Wald, Funken glimmen Richtung Lava, Sporen schweben Richtung Pilze, Glühwürmchen leuchten Richtung Höhle auch am Tag (nicht bei reduzierter Bewegung). Wind (`windAt`, getestet): überall eine leichte Brise, stärker Richtung Wolken und Wald und bei Wolken und Regen; die Grasbüschel wiegen sich (Shader, bei reduzierter Bewegung still).
 
-Licht: Sonne und Himmelslicht nehmen Farbe und Helligkeit der Richtung an, in der die Figur steht (`MOOD_LIGHT`); in 2D eine leichte Tönung.
+Licht: Sonne und Himmelslicht nehmen leicht Farbe und Helligkeit der Richtung an, in der die Figur steht (`MOOD_LIGHT`, höchstens gut ein Drittel); das Gras ist zart getönt (höchstens gut die Hälfte). In 2D eine ganz leichte Tönung; in 3D keine Tönung auf der Ebene darüber (dort würde sie zu einem flächigen Schleier). Die Farben der Welt bleiben erkennbar.
 
 ## Wetter und Unterstand
 

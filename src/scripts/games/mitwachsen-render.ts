@@ -68,6 +68,7 @@ export type Scene = {
   pose: Pose; // was die wache Figur tut, wenn niemand spielt (lesen, einnicken)
   mood: Climate; // Stimmung dort, wo die Figur steht (Richtung des nächsten Tors, Stärke)
   wind: number; // 0 still … 1 windig (Gras wiegt sich, Blätter fliegen)
+  lit3d: boolean; // die 3D-Ansicht liegt darunter und färbt das Licht selbst
   floats: Float[];
   particles: Particle[];
   now: number;
@@ -988,11 +989,12 @@ export class Renderer {
   private weather(sc: Scene) {
     const { ctx } = this;
     const { cloud, rainbow } = sc.weather;
-    // Licht der Richtung: warm, kühl oder dämmrig, je näher am Tor, desto mehr
+    // Licht der Richtung, nur in der 2D-Ansicht (in 3D färbt die Sonne selbst; auf der durchsichtigen Ebene darüber
+    // würde Multiplizieren zu einem flächigen Schleier): ganz leicht, je näher am Tor, desto mehr
     const light = MOOD_LIGHT[sc.mood.id];
-    if (light && sc.mood.strength > 0) {
+    if (light && sc.mood.strength > 0 && !sc.lit3d) {
       ctx.globalCompositeOperation = 'multiply';
-      ctx.globalAlpha = 0.35 * sc.mood.strength;
+      ctx.globalAlpha = 0.12 * sc.mood.strength;
       ctx.fillStyle = light.color;
       ctx.fillRect(0, 0, sc.width, sc.height);
       ctx.globalCompositeOperation = 'source-over';

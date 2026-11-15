@@ -367,9 +367,9 @@ export class World3D {
     // Licht der Richtung: Farbe und Helligkeit der Sonne, je näher am Tor, desto mehr
     const light = MOOD_LIGHT[sc.mood.id];
     const m = light ? sc.mood.strength : 0;
-    this.sun.color.set('#ffffff').lerp(new Color(light?.color ?? '#ffffff'), m * 0.8);
-    this.hemi.color.set(HEMI_SKY).lerp(new Color(light?.color ?? HEMI_SKY), m * 0.5);
-    const bright = 1 + ((light?.bright ?? 1) - 1) * m;
+    this.sun.color.set('#ffffff').lerp(new Color(light?.color ?? '#ffffff'), m * 0.35);
+    this.hemi.color.set(HEMI_SKY).lerp(new Color(light?.color ?? HEMI_SKY), m * 0.2);
+    const bright = 1 + ((light?.bright ?? 1) - 1) * m * 0.6;
     this.sun.intensity = 2.4 * day * (1 - 0.5 * cloud) * bright; // Wolken dämpfen die Sonne
     this.hemi.intensity = 1.35 * (1 - sc.night * 0.6) * (1 - 0.15 * cloud);
     const sky = SKY.clone()
