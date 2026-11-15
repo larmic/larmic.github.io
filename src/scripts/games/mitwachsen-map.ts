@@ -6,7 +6,7 @@ import { HOME } from '../../data/games/mitwachsen';
 import type { State } from './mitwachsen-state';
 import type { Cell, World } from './mitwachsen-world';
 
-export const MAP_RADIUS = 20; // Felder vom Mittelpunkt bis zum Rand
+export const MAP_RADIUS = 28; // Felder vom Mittelpunkt bis zum Rand
 
 const COLORS = {
   fog: '#e4edf3',

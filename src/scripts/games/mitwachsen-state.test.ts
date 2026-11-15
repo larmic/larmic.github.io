@@ -21,6 +21,7 @@ function fakeWorld(cells: Record<string, Partial<Cell>> = {}): World {
     seed: 1,
     cell: (x, y) => ({ h: 1, ground: 'grass', deco: null, region: 'lichtung', solid: false, ...cells[`${x},${y}`] }),
     gates: new Map(),
+    spawns: new Map(),
   };
 }
 const animal = (id: string, x: number, y: number, extra: Partial<Animal> = {}): Animal => ({
@@ -119,6 +120,14 @@ describe('Laufen und Klettern', () => {
     r = run(r.s, w, 'w');
     expect(r.events).toEqual([{ type: 'step', climb: -1 }]);
     r = run(awake(w, 1, 2), w, 'n'); // von 1 auf 3: zwei Stufen hoch
+    expect(types(r.events)).toEqual(['bump']);
+  });
+
+  it('fällt beliebig tief herunter, steigt aber nur eine Stufe hinauf', () => {
+    const w = fakeWorld({ '0,0': { h: 4 }, '1,0': { h: 1 } });
+    let r = run(awake(w, 0, 0), w, 'e');
+    expect(r.events).toEqual([{ type: 'step', climb: -3 }]);
+    r = run(r.s, w, 'w'); // zurück hinauf: drei Stufen
     expect(types(r.events)).toEqual(['bump']);
   });
 

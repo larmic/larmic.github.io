@@ -4,7 +4,7 @@ import { GATES, HOME, REGIONS, type GateId } from '../../data/games/mitwachsen';
 import { canStep, createWorld, standHeight, wildAnimals, type World } from './mitwachsen-world';
 
 /** Alle Felder, die von `start` aus zu Fuß erreichbar sind (bis `limit` Felder) */
-function reachable(world: World, open: GateId[], start: readonly [number, number], limit = 6000) {
+function reachable(world: World, open: GateId[], start: readonly [number, number], limit = 30000) {
   const seen = new Set<string>([`${start[0]},${start[1]}`]);
   const queue: [number, number][] = [[start[0], start[1]]];
   while (queue.length && seen.size < limit) {
@@ -51,22 +51,31 @@ describe('Start auf der Lichtung', () => {
       for (const [x, y] of HOME.wake) expect(standHeight(w, [], x, y)).not.toBeNull();
     });
 
-    it(`Seed ${seed}: Alle Tiere der Lichtung sind vom Bett aus erreichbar, die Landschaft nicht`, () => {
+    it(`Seed ${seed}: Alle zehn Tiere wohnen erreichbar auf der Lichtung, die Landschaft bleibt draußen`, () => {
       const cells = reachable(w, [], START);
       const set = new Set(cells.map(([x, y]) => `${x},${y}`));
-      for (const a of lichtung.animals) {
-        expect(w.cell(a.at[0], a.at[1]).region, a.species).toBe('lichtung');
-        const around = [
-          [0, 0],
-          [1, 0],
-          [-1, 0],
-          [0, 1],
-          [0, -1],
-        ].some(([dx, dy]) => set.has(`${a.at[0] + dx},${a.at[1] + dy}`));
-        expect(around, a.species).toBe(true);
+      expect(w.spawns.size).toBe(lichtung.animals.length);
+      for (const [species, [x, y]] of w.spawns) {
+        expect(w.cell(x, y).region, species).toBe('lichtung');
+        expect(set.has(`${x},${y}`), species).toBe(true);
       }
       expect(cells.some(([x, y]) => w.cell(x, y).region === 'wild')).toBe(false);
-      expect(cells.length).toBeLessThan(600); // die Lichtung ist überschaubar
+      expect(cells.length).toBeGreaterThan(3000); // groß genug zum Erkunden
+    });
+
+    it(`Seed ${seed}: Man klettert eine Stufe hinauf und fällt beliebig tief herunter`, () => {
+      let up = 0,
+        down = 0;
+      for (let y = -40; y < 40; y++)
+        for (let x = -50; x < 50; x++) {
+          const a = standHeight(w, [], x, y),
+            b = standHeight(w, [], x + 1, y);
+          if (a === null || b === null) continue;
+          expect(canStep(w, [], x, y, x + 1, y)).toBe(b - a <= 1);
+          if (b - a >= 2) up++;
+          if (a - b >= 2) down++;
+        }
+      expect(up + down).toBeGreaterThan(0); // es gibt Stellen mit großem Höhenunterschied
     });
 
     it(`Seed ${seed}: Vier große Tore zu je drei Feldern, alle verschlossen`, () => {
@@ -117,7 +126,7 @@ describe('Landschaft', () => {
       for (let x = -40; x < 40; x++) {
         const a = w.cell(x, y),
           b = w.cell(x + 1, y);
-        if (a.ground === 'water' || b.ground === 'water') continue;
+        if (a.ground !== 'grass' || b.ground !== 'grass') continue; // Wasser und Klettersteine zählen nicht
         total++;
         if (Math.abs(a.h - b.h) > 1) steep++;
       }

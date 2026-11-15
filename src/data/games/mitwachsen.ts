@@ -17,6 +17,7 @@ export type Region = {
   name: string;
   /** Ellipse um die Mitte (0, 0), deren Rand leicht unregelmäßig ist; darum liegen Felsen */
   shape: { rx: number; ry: number };
+  /** Tiere mit ungefährem Wohnort; die Welt sucht das nächste Feld, das vom Bett aus erreichbar ist */
   animals: readonly { species: SpeciesId; at: Point }[];
 };
 
@@ -41,13 +42,18 @@ export const REGIONS: readonly Region[] = [
   {
     id: 'lichtung',
     name: 'Lichtung',
-    shape: { rx: 12, ry: 10 },
+    shape: { rx: 54, ry: 46 }, // gut 20-mal so groß wie die erste Lichtung: Hier soll man erkunden
     animals: [
-      { species: 'hase', at: [-6, 4] },
-      { species: 'igel', at: [5, 5] },
-      { species: 'eichhoernchen', at: [8, -2] },
-      { species: 'schaf', at: [-7, -3] },
-      { species: 'ente', at: [-1, -5] },
+      { species: 'hase', at: [-8, 6] },
+      { species: 'igel', at: [9, 8] },
+      { species: 'schaf', at: [-22, -12] },
+      { species: 'eichhoernchen', at: [24, -16] },
+      { species: 'ente', at: [-6, -24] },
+      { species: 'kuh', at: [30, 18] },
+      { species: 'fuchs', at: [-34, 20] },
+      { species: 'frosch', at: [14, 32] },
+      { species: 'biene', at: [-18, 34] },
+      { species: 'schildkroete', at: [38, -6] },
     ],
   },
 ];
@@ -73,9 +79,6 @@ export const HOME = {
   garden: { x0: 3, y0: -3, x1: 6, y1: 0 } as Rect,
   gardenGate: [4, 1] as Point, // Rosenbogen in der Hecke; das Feld dahinter bleibt frei
 };
-
-/** Kleiner Teich auf der Lichtung */
-export const POND = { cx: -3, cy: -6, rx: 2.4, ry: 1.6 };
 
 // ---------- Tiere ----------
 

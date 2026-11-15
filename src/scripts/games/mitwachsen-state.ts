@@ -131,9 +131,10 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
   const atHomeIds = new Set(garden.map((p) => p.id));
   const animals: Animal[] = [];
   for (const r of REGIONS)
-    for (const { species, at } of r.animals) {
+    for (const { species } of r.animals) {
       const id = animalId(r.id, species);
-      if (!atHomeIds.has(id))
+      const at = world.spawns.get(species); // die Welt kennt den erreichbaren Wohnort
+      if (at && !atHomeIds.has(id))
         animals.push({
           id,
           species,

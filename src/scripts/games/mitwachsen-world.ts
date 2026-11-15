@@ -9,7 +9,6 @@ import {
   GAME_COLORS,
   GATES,
   HOME,
-  POND,
   REGIONS,
   WILD_SPECIES,
   type GateId,
@@ -59,6 +58,8 @@ export type Cell = {
 export type World = {
   readonly seed: number;
   cell(x: number, y: number): Cell;
+  /** Wohnort jedes Tiers der Lichtung: nächstes vom Bett aus erreichbares Feld zum Wunschort */
+  readonly spawns: ReadonlyMap<SpeciesId, Point>;
   /** Felder der großen Tore (hängen vom Seed ab, weil der Felsrand leicht unregelmäßig ist) */
   readonly gates: ReadonlyMap<GateId, readonly Point[]>;
 };
@@ -75,8 +76,8 @@ const ring = (r: Rect): Point[] =>
   cellsOf({ x0: r.x0 - 1, y0: r.y0 - 1, x1: r.x1 + 1, y1: r.y1 + 1 }).filter(([x, y]) => !inRect(r, x, y));
 
 const grass = (region: Cell['region']): Cell => ({ h: 1, ground: 'grass', deco: null, region, solid: false });
-// Fels ist nur eine Stufe höher als der Boden: In der Ansicht von vorn verdeckt er sonst die Reihe dahinter
-const rock = (): Cell => ({ h: 2, ground: 'stone', deco: 'rock', region: 'border', solid: true });
+// Fels kann man besteigen (eine Stufe hoch geht immer); der Felsring hält die Figur über seine Höhe auf
+const rock = (h: number): Cell => ({ h, ground: 'stone', deco: 'rock', region: 'border', solid: false });
 const water = (region: Cell['region']): Cell => ({ h: 0, ground: 'water', deco: null, region, solid: false });
 const flowerColor = (seed: number, x: number, y: number) =>
   GAME_COLORS.flowers[hash(seed, x, y, 7) % GAME_COLORS.flowers.length];
@@ -88,59 +89,70 @@ function edge(seed: number, x: number, y: number) {
   const { rx, ry } = lichtung.shape;
   const d = (x / rx) ** 2 + (y / ry) ** 2;
   const wobble = 1 + (valueNoise(seed + 21, x, y, 4) - 0.5) * 0.3;
-  return d / wobble; // < 1 innen, 1 … 1,55 Felsen, darüber Landschaft
+  return d / wobble; // < 1 innen, 1 … ROCK_OUTER Felsen, darüber Landschaft
 }
-const ROCK_OUTER = 1.55;
+const ROCK_OUTER = 1.32;
+/**
+ * Felsring in Terrassen: innen 3 (vom Hügel aus erreichbar), dann 4, außen 6. Von 4 auf 6 sind es zwei Stufen:
+ * Man kann auf die Felsen klettern und schauen, aber nicht hinüber. Von außen (Landschaft höchstens 3) auch nicht.
+ */
+const ringHeight = (e: number) => (e < 1.08 ? 3 : e < 1.16 ? 4 : 6);
 
 /** Die drei Felder eines großen Tores: in einer geraden Reihe, so tief wie das innerste Felsfeld der drei Spalten */
 function gateCells(seed: number, side: 'n' | 'o' | 's' | 'w'): Point[] {
   const [dx, dy] = { n: [0, -1], s: [0, 1], o: [1, 0], w: [-1, 0] }[side];
   const first = (off: number) => {
-    for (let t = 1; t < 40; t++) if (edge(seed, dx ? dx * t : off, dy ? dy * t : off) >= 1) return t;
-    return 40;
+    for (let t = 1; t < 160; t++) if (edge(seed, dx ? dx * t : off, dy ? dy * t : off) >= 1) return t;
+    return 160;
   };
   const t = Math.min(first(-1), first(0), first(1));
   return [-1, 0, 1].map((off) => [dx ? dx * t : off, dy ? dy * t : off] as Point);
 }
 
-/** Die Lichtung als feste Karte: Bett in der Mitte, Teich, Hügel, Bäume, Felsring, große Tore */
-function buildStart(seed: number, opts: { garden?: boolean }): Map<string, Cell> {
+/** Lichtung als feste Karte: Bett in der Mitte, Hügel, Teiche, Wäldchen, Blumenwiesen, Steine, Felsring, große Tore */
+function buildStart(
+  seed: number,
+  opts: { garden?: boolean },
+): { map: Map<string, Cell>; spawns: Map<SpeciesId, Point> } {
   const map = new Map<string, Cell>();
   const set = (x: number, y: number, c: Cell) => map.set(key(x, y), c);
   const { rx, ry } = lichtung.shape;
-  const spawns = new Set(lichtung.animals.map((a) => key(a.at[0], a.at[1])));
-  const R = Math.ceil(Math.max(rx, ry) * 1.6);
+  const R = Math.ceil(Math.max(rx, ry) * 1.25) + 2;
 
   for (let y = -R; y <= R; y++)
     for (let x = -R; x <= R; x++) {
       const e = edge(seed, x, y);
       if (e >= ROCK_OUTER) continue; // Landschaft
       if (e >= 1) {
-        set(x, y, { ...rock(), h: 2 + (hash(seed, x, y, 22) % 2) });
+        set(x, y, rock(ringHeight(e)));
         continue;
       }
       const c = grass('lichtung');
       const near = Math.max(Math.abs(x - HOME.bed[0]), Math.abs(y - HOME.bed[1]));
-      if (near <= HOME.clear || spawns.has(key(x, y))) {
-        set(x, y, c); // am Bett und an den Startplätzen der Tiere flach und frei
+      if (near <= HOME.clear) {
+        set(x, y, c); // am Bett flach und frei
         continue;
       }
-      const p = ((x - POND.cx) / POND.rx) ** 2 + ((y - POND.cy) / POND.ry) ** 2;
       const roll = rand01(seed, x, y, 1);
-      if (p <= 1) {
-        set(x, y, { ...water('lichtung'), deco: roll < 0.25 ? 'lily' : null });
+      const wet = valueNoise(seed + 31, x, y, 9);
+      if (wet < 0.15 && near > HOME.clear + 2) {
+        set(x, y, { ...water('lichtung'), deco: roll < 0.2 ? 'lily' : null });
         continue;
       }
-      if (p <= 1.8) {
-        set(x, y, { ...c, ...(roll < 0.4 ? { deco: 'reed' as const } : { ground: 'sand' as const }) });
+      if (wet < 0.2 && near > HOME.clear + 1) {
+        set(x, y, { ...c, ...(roll < 0.35 ? { deco: 'reed' as const } : { ground: 'sand' as const }) });
         continue;
       }
-      if (valueNoise(seed + 30, x, y, 6) > 0.66 && e < 0.8) c.h = 2;
-      if (roll < 0.05 && near > HOME.clear + 1) Object.assign(c, { deco: 'tree', solid: true });
-      else if (roll < 0.065) Object.assign(c, { deco: 'bush', solid: true });
-      else if (roll < 0.2) Object.assign(c, { deco: 'flower', color: flowerColor(seed, x, y) });
-      else if (roll < 0.22) c.deco = 'fern';
-      else if (roll < 0.23) c.deco = 'mushroom';
+      const hill = valueNoise(seed + 30, x, y, 10);
+      c.h = near <= HOME.clear + 2 ? 1 : hill < 0.45 ? 1 : hill < 0.68 ? 2 : 3;
+      const forest = valueNoise(seed + 32, x, y, 16) > 0.62; // Wäldchen
+      const meadow = valueNoise(seed + 33, x, y, 12) > 0.6; // Blumenwiesen
+      const far = near > HOME.clear + 1;
+      if (far && roll < (forest ? 0.28 : 0.025)) Object.assign(c, { deco: 'tree', solid: true });
+      else if (far && roll < (forest ? 0.32 : 0.04)) Object.assign(c, { deco: 'bush', solid: true });
+      else if (roll < (meadow ? 0.45 : 0.12)) Object.assign(c, { deco: 'flower', color: flowerColor(seed, x, y) });
+      else if (roll < (meadow ? 0.47 : 0.145)) c.deco = forest ? 'mushroom' : 'fern';
+      else if (far && roll < (meadow ? 0.475 : 0.16)) Object.assign(c, { h: c.h + 1, ground: 'stone' }); // Stein zum Klettern
       set(x, y, c);
     }
   set(HOME.bed[0], HOME.bed[1], { ...grass('lichtung'), deco: 'bed', solid: true });
@@ -159,7 +171,52 @@ function buildStart(seed: number, opts: { garden?: boolean }): Map<string, Cell>
       deco: 'arch',
     });
   }
-  return map;
+  return { map, spawns: findSpawns(map) };
+}
+
+/** Wohnorte der Tiere: Felder der Lichtung, die vom Bett aus zu Fuß erreichbar sind, je nah am Wunschort */
+function findSpawns(map: Map<string, Cell>): Map<SpeciesId, Point> {
+  const stand = (x: number, y: number) => {
+    const c = map.get(key(x, y));
+    return !c || c.solid || c.ground === 'water' || c.gate ? null : c.h;
+  };
+  const reach: Point[] = [];
+  const seen = new Set<string>();
+  const queue: Point[] = HOME.wake.filter(([x, y]) => stand(x, y) !== null);
+  for (const p of queue) seen.add(key(p[0], p[1]));
+  while (queue.length) {
+    const [x, y] = queue.shift()!;
+    reach.push([x, y]);
+    const h = stand(x, y)!;
+    for (const [dx, dy] of [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ]) {
+      const k = key(x + dx, y + dy);
+      const to = stand(x + dx, y + dy);
+      if (seen.has(k) || to === null || to - h > 1) continue;
+      seen.add(k);
+      queue.push([x + dx, y + dy]);
+    }
+  }
+  const taken = new Set<string>();
+  const spawns = new Map<SpeciesId, Point>();
+  for (const { species, at } of lichtung.animals) {
+    let best: Point | null = null,
+      bestD = Infinity;
+    for (const p of reach) {
+      const c = map.get(key(p[0], p[1]))!;
+      if (c.region !== 'lichtung' || taken.has(key(p[0], p[1]))) continue;
+      const d = (p[0] - at[0]) ** 2 + (p[1] - at[1]) ** 2;
+      if (d < bestD) [best, bestD] = [p, d];
+    }
+    if (!best) continue;
+    taken.add(key(best[0], best[1]));
+    spawns.set(species, best);
+  }
+  return spawns;
 }
 
 /** Endlose Landschaft: sanfte Hügel (Stufen meist eine Ebene), Teiche mit Sandufer, Bäume, Büsche, Blumen */
@@ -179,7 +236,8 @@ function wildCell(seed: number, x: number, y: number): Cell {
   else if (roll < 0.05) Object.assign(c, { deco: 'bush', solid: true });
   else if (roll < 0.14) Object.assign(c, { deco: 'flower', color: flowerColor(seed, x, y) });
   else if (roll < 0.165) c.deco = 'fern';
-  else if (roll < 0.175 && h >= 2) Object.assign(c, { deco: 'boulder', solid: true });
+  else if (roll < 0.175)
+    Object.assign(c, { h: h + 1, ground: 'stone' }); // Stein zum Klettern
   else if (roll < 0.183) c.deco = 'mushroom';
   return c;
 }
@@ -211,7 +269,7 @@ function dress(seed: number, x: number, y: number, c: Cell): Cell {
 }
 
 export function createWorld(seed: number, opts: { garden?: boolean } = {}): World {
-  const regions = buildStart(seed, opts);
+  const { map: regions, spawns } = buildStart(seed, opts);
   const cache = new ChunkCache<Cell>((cx, cy) => {
     const cells: Cell[] = [];
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)
@@ -220,7 +278,7 @@ export function createWorld(seed: number, opts: { garden?: boolean } = {}): Worl
     return cells;
   });
   const gates = new Map(GATES.map((g) => [g.id, gateCells(seed, g.side)] as const));
-  return { seed, cell: (x, y) => cache.get(x, y), gates };
+  return { seed, cell: (x, y) => cache.get(x, y), gates, spawns };
 }
 
 /** Höhe, auf der man auf einem Feld steht – null, wenn man dort nicht stehen kann */
@@ -231,7 +289,7 @@ export function standHeight(world: World, open: readonly GateId[], x: number, y:
   return c.h;
 }
 
-/** Ein Schritt geht, wenn man auf beiden Feldern stehen kann und höchstens eine Ebene hoch oder runter muss */
+/** Ein Schritt geht, wenn man auf beiden Feldern stehen kann und höchstens eine Ebene hinauf muss; herunter geht immer */
 export function canStep(
   world: World,
   open: readonly GateId[],
@@ -242,7 +300,7 @@ export function canStep(
 ): boolean {
   const from = standHeight(world, open, fx, fy);
   const to = standHeight(world, open, tx, ty);
-  return from !== null && to !== null && Math.abs(to - from) <= 1;
+  return from !== null && to !== null && to - from <= 1;
 }
 
 // ---------- Tiere der endlosen Landschaft ----------
