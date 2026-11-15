@@ -94,6 +94,17 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 
 Die Regeln kennen den Nebel nicht: Er betrifft nur, was gezeichnet wird.
 
+## Nachwachsen
+
+Rein in `mitwachsen-growth.ts`. Jedes Schlafen zählt einen Tag (`state.day`, gespeichert als `day`). Nur Zierde, die Regeln ändern sich nicht.
+
+| Regel | Test |
+| --- | --- |
+| Mit jedem Tag blüht auf freier Wiese der Lichtung mehr (1,2 % der Felder je Tag, höchstens 12 %), dazu Pilze (0,3 % je Tag, höchstens 3 %) | „am ersten Tag wächst nichts dazu …“ |
+| Was einmal gewachsen ist, bleibt an späteren Tagen | „was gewachsen ist, bleibt …“ |
+| Nur freie Wiese der Lichtung; Bäume, Wasser, Steine und die Welten hinter den Toren bleiben | „nur auf freier Wiese …“ |
+| Jedes Schlafen zählt einen Tag, der Tag kommt mit dem Spielstand wieder | „jedes Schlafen zählt einen Tag …“ |
+
 ## Müde werden (Medienzeit)
 
 Rein in `mitwachsen-tired.ts`, die Uhr gehört zum Kind (ein Wert je Browser, `larmic.games.mitwachsen.tired`), nicht zur Welt.
@@ -125,7 +136,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Was | Regel |
 | --- | --- |
 | Schlüssel | `larmic.games.index` (Liste der Welten, aktuelle Welt), `larmic.games.world.<id>` je Welt, `larmic.games.muted` |
-| Format | `{ v: 4, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, homeAnimals, portals, position, visits, explored }`; `portals` sind die aktiven Portale (Unbekanntes fällt weg); `explored` ist der Nebel je Stück (fehlt er, beginnt die Welt im Nebel); `age` ist die Altersstufe der Welt (bisher nur 3) |
+| Format | `{ v: 4, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, homeAnimals, portals, position, visits, day, explored }`; `day` zählt die Tage (fehlt er, ist es Tag 0); `portals` sind die aktiven Portale (Unbekanntes fällt weg); `explored` ist der Nebel je Stück (fehlt er, beginnt die Welt im Nebel); `age` ist die Altersstufe der Welt (bisher nur 3) |
 | Umzug | Version 1 (Arbeitstitel `game: 'threeyear'`, ohne Alter) → 2 (Alter 3) → 3 (`penAnimals` heißt jetzt `homeAnimals`) → 4 (Start auf der Lichtung: gefundene Tiere des alten Zuhauses, die es auf der Lichtung gibt, bleiben gefunden; Tore, Garten und Position beginnen neu). Ältere Indizes werden übernommen |
 | Wann | sofort bei gefunden, Garten, Tor, Portal, Reise, Schlafen, Weltwechsel und Umbenennen; sonst alle 10 s; beim Verlassen der Seite |
 | Fehler | Jeder Zugriff fängt Fehler ab. Ohne Speicher läuft das Spiel bis zum Neuladen weiter. |

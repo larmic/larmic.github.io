@@ -49,6 +49,7 @@ import {
   type Look,
 } from '../../data/games/mitwachsen';
 import { Geo, atlas, type Tile, type V3 } from './mitwachsen-geo';
+import { grown } from './mitwachsen-growth';
 import { gatehouse, parts, portalFrame, swirlCanvas, type Parts } from './mitwachsen-gatehouse';
 import type { Scene } from './mitwachsen-render';
 import type { State } from './mitwachsen-state';
@@ -149,6 +150,7 @@ export class World3D {
   >();
   private chunks = new Map<string, Chunk>();
   private picked: Record<string, number> = {}; // Büsche ohne Beeren (aus den Regeln)
+  private day = 0; // Tag der Welt: bestimmt, was nachgewachsen ist
   private models = new Map<string, BufferGeometry>();
   private bodies = new Map<string, Mesh>();
   private signs = new Group();
@@ -319,6 +321,11 @@ export class World3D {
     if (this.world !== world) this.reset(world);
     this.explored = sc.explored;
     this.picked = state.picked;
+    if (state.day !== this.day) {
+      // ein neuer Tag: Stücke neu bauen, denn es sind Blumen und Pilze nachgewachsen
+      this.day = state.day;
+      this.rebuild([...this.chunks.keys()]);
+    }
     const cam = sc.cam;
     const tx = cam.x + 0.5,
       tz = cam.y + 0.5;
@@ -544,7 +551,7 @@ export class World3D {
       bright = new Geo();
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)
       for (let x = cx * CHUNK; x < (cx + 1) * CHUNK; x++) {
-        const c = world.cell(x, y);
+        const c = grown(world.seed, this.day, x, y, world.cell(x, y)); // mit allem, was schon nachgewachsen ist
         this.terrain(solid, water, lava, world, c, x, y);
         this.decoration(solid, leaves, canopy, bright, c, x, y);
       }

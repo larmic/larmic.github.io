@@ -73,6 +73,7 @@ describe('Welten speichern', () => {
       openGates: ['eis' as const],
       portals: ['lava' as const],
       position: [3, 4] as [number, number],
+      day: 5,
     };
     expect(progressFrom(withProgress(w, p))).toEqual(p);
   });

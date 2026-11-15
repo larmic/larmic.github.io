@@ -150,6 +150,7 @@ Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzel
 
 ## Bett, Nacht und die Wiese
 
+- **Die Wiese wächst:** Jedes Schlafen ist ein neuer Tag. Mit jedem Tag blühen mehr Blumen auf der Lichtung, und Pilze sprießen. So sieht dein Kind, dass Zeit vergeht.
 - **Wiese ums Bett:** offen, ohne Zaun, mit Futtertrog (Heu und Möhren) und Wassertrog. Hier wohnen die gefundenen Tiere.
 - **Bett:** Ins Bett laufen → die Figur legt sich hin (direkt nach dem Aufwachen noch nicht, damit sie nicht aus Versehen wieder einschläft), der Himmel wird dunkel, Sterne gehen auf, eine leise Melodie spielt, es wird gespeichert.
 - **Aufwachen:** Nach dem Einschlafen reagiert das Spiel einige Sekunden nicht auf Tasten, damit wildes Drücken die Runde nicht sofort weiterführt. Danach bringt ein Tastendruck den Morgen.

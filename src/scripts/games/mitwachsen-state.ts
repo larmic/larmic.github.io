@@ -53,6 +53,7 @@ export type State = {
   portals: GateId[]; // aktivierte Portale (je Tor eines, mit Partner über dem Bett)
   lastBump: { id: string; tick: number } | null;
   picked: Record<string, number>; // Büsche ohne Beeren: "x,y" → Takt des Pflückens (nicht gespeichert)
+  day: number; // Tage, die die Welt schon erlebt hat (jedes Schlafen zählt einen); Blumen wachsen damit
   basket: boolean; // Korb mit Beeren auf dem Rücken (nach dem Pflücken, bis zum Futtertrog)
 };
 
@@ -63,6 +64,7 @@ export type Progress = {
   openGates: GateId[];
   portals: GateId[];
   position: [number, number];
+  day: number;
 };
 
 export type Cmd = { type: 'move'; dir: Dir } | { type: 'action' } | { type: 'tick' };
@@ -201,6 +203,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     lastBump: null,
     picked: {},
     basket: false,
+    day: saved.day ?? 0,
   };
   openGates(s, []); // Tore, deren Tiere schon alle getroffen sind, stehen offen
   scatter(s, world); // jeder Besuch: Die Tiere wohnen woanders
@@ -236,6 +239,7 @@ export const progressOf = (s: State): Progress => ({
   openGates: [...s.openGates],
   portals: [...s.portals],
   position: [s.player.x, s.player.y],
+  day: s.day,
 });
 
 /** Tiere einer Gegend (Kennungen) – ein Tor öffnet, wenn alle davon getroffen sind */
@@ -501,6 +505,7 @@ function openGates(s: State, events: GameEvent[]) {
 
 function sleep(s: State, world: World, events: GameEvent[]) {
   s.sleeping = true;
+  s.day++; // über Nacht wächst die Wiese
   s.sleptAt = s.tick;
   s.lastBump = null;
   // Folgende Tiere gehen heim: Tiere der Gegenden an ihren Platz, Tiere der Landschaft tauchen dort später wieder auf

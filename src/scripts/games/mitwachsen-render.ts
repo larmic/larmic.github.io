@@ -38,6 +38,7 @@ import {
   type Look,
   type SpeciesId,
 } from '../../data/games/mitwachsen';
+import { grown } from './mitwachsen-growth';
 import type { State } from './mitwachsen-state';
 import { hash } from '../../lib/games/rng';
 import type { Cell, TreeKind, World } from './mitwachsen-world';
@@ -587,7 +588,7 @@ export class Renderer {
 
   private deco(P: Projection, world: World, state: State, sc: Scene, x: number, y: number) {
     if (!sc.explored(x, y)) return;
-    const c = world.cell(x, y);
+    const c = grown(world.seed, state.day, x, y, world.cell(x, y)); // mit allem, was schon nachgewachsen ist
     const { ctx } = this;
     const h = c.h;
     if (c.tufts) this.tufts(P, x, y, h, c.tufts);

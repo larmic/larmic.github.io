@@ -30,6 +30,7 @@ export type SavedWorld = {
   portals: GateId[]; // aktivierte Portale
   position: [number, number];
   visits: number;
+  day: number; // Tage der Welt (jedes Schlafen einer), Blumen und Pilze wachsen damit
   explored: Record<string, string>; // Nebel: erkundete Felder je Stück (Base64), siehe mitwachsen-fog.ts
 };
 export type Index = {
@@ -77,6 +78,7 @@ export function newWorld(
     homeAnimals: [],
     position: [0, 0],
     visits: 0,
+    day: 0,
     explored: {},
     portals: [],
   };
@@ -146,6 +148,7 @@ export function migrate(input: unknown): SavedWorld | null {
     homeAnimals: garden.map((p) => ({ id: p.id, species: p.species as SpeciesId })),
     position: pos ? (raw.position as [number, number]) : [0, 0],
     visits: typeof raw.visits === 'number' && raw.visits >= 0 ? Math.floor(raw.visits) : 0,
+    day: typeof raw.day === 'number' && raw.day >= 0 && Number.isFinite(raw.day) ? Math.floor(raw.day) : 0,
     portals: strings(raw.portals).filter((g): g is GateId => gates.has(g)),
     explored: isRecord(raw.explored)
       ? Object.fromEntries(Object.entries(raw.explored).filter(([, v]) => typeof v === 'string') as [string, string][])
@@ -226,6 +229,7 @@ export const withProgress = (world: SavedWorld, p: Progress): SavedWorld => ({
   homeAnimals: [...p.garden],
   portals: [...p.portals],
   position: [...p.position],
+  day: p.day,
 });
 
 /** Fortschritt einer gespeicherten Welt für den Spielstart */
@@ -235,4 +239,5 @@ export const progressFrom = (w: SavedWorld): Progress => ({
   openGates: [...w.openGates],
   portals: [...w.portals],
   position: [...w.position],
+  day: w.day,
 });

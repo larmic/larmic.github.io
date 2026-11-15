@@ -284,6 +284,19 @@ const meadowWorld = () => {
   return fakeWorld(cells);
 };
 
+describe('Tage', () => {
+  it('jedes Schlafen zählt einen Tag; der Tag kommt mit dem Spielstand wieder', () => {
+    const world = createWorld(1);
+    let s = initialState(world, { day: 4 });
+    expect(s.day).toBe(4);
+    s = run(s, world, 'e').s;
+    s = { ...s, player: { ...s.player, x: HOME.bed[0] + 1, y: HOME.bed[1], dir: 'w' } };
+    s = run(s, world, ACT).s;
+    expect(s.day).toBe(5);
+    expect(progressOf(s).day).toBe(5);
+  });
+});
+
 describe('Tiere an wechselnden Stellen', () => {
   const world = createWorld(3);
   const where = (s: State) =>
