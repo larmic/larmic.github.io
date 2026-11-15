@@ -57,6 +57,12 @@ jobs:
       - name: Guard-Gate – HTML und interne Links der fertigen Seite
         run: npm run verify
 
+      - name: Browser für den Smoke-Test installieren
+        run: npx playwright install --with-deps chromium
+
+      - name: Guard-Gate – Smoke-Test im Browser (Insel, Spiel, alte Adressen)
+        run: npm run test:e2e
+
       - name: Fertige Seite für den Deploy-Job bereitstellen
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0

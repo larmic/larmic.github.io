@@ -25,7 +25,8 @@ Die Seite läuft dann unter http://localhost:4321 und lädt Änderungen sofort n
 | `npm run format` / `format:check` | Prettier formatiert bzw. prüft den Code. `format:check` ist Guard-Gate |
 | `npm run arch` | Architekturregeln (dependency-cruiser, `.dependency-cruiser.cjs`): Schichten `lib` → `data` → Oberfläche, Browser-Code ohne Build-Code. Guard-Gate |
 | `npm run build` | Erzeugt die fertige Seite in `dist/` |
-| `npm run verify` | Prüft die fertige Seite in `dist/`: gültiges HTML (html-validate) und keine toten internen Links (linkinator). Guard-Gate nach dem Build |
+| `npm run verify` | Prüft die fertige Seite in `dist/`: gültiges HTML (html-validate), keine toten internen Links (linkinator) und das Bundle-Gate (Homepage ohne Spiel, JavaScript-Budget). Guard-Gate nach dem Build |
+| `npm run test:e2e` | Smoke-Test im Browser (Playwright, `e2e/`): Startseite und Insel, Detailseiten, das Kinderspiel, alte Adressen, ohne Fehler in der Konsole. Guard-Gate nach dem Build; einmalig `npx playwright install chromium` |
 | `npm run preview` | Zeigt den gebauten Stand aus `dist/` lokal an |
 | `npm run gates` | Alle Guard-Gates in der Reihenfolge der Pipeline, inklusive Build |
 
@@ -102,8 +103,9 @@ Auf der Seite steht „KI mit Leitplanken“ – hier sind sie. Jeder Commit lä
 | Lint | typische Fehler in TypeScript und Astro | ESLint |
 | Architektur | Schichten: `lib` ist generisch, `data` kennt keine Oberfläche, Browser-Code bekommt keinen Build-Code, keine Zyklen | dependency-cruiser |
 | Typen und Inhalte | TypeScript strikt, Markdown-Inhalte gegen ihr Schema | astro check |
-| Unit-Tests | Zustandsmaschine der Figur (Spec: [docs/specs/insel.md](docs/specs/insel.md)), Geometrie der Insel, Kopf, Pixel-Raster | Vitest |
-| Fertige Seite | gültiges HTML, keine toten internen Links | html-validate, linkinator |
+| Unit-Tests | Zustandsmaschine der Figur (Spec: [docs/specs/insel.md](docs/specs/insel.md)), Geometrie der Insel, Kopf, Pixel-Raster, Regeln und Welt des Kinderspiels (Spec: [docs/specs/mitwachsen.md](docs/specs/mitwachsen.md)) | Vitest |
+| Fertige Seite | gültiges HTML, keine toten internen Links, Homepage ohne Spiel und im JavaScript-Budget | html-validate, linkinator, Bundle-Gate |
+| Im Browser | Insel und Seitenwechsel, Detailseiten, das Kinderspiel startet, alte Adressen führen weiter, keine Fehler in der Konsole | Playwright |
 
 Lokal laufen alle zusammen mit `npm run gates`. Zusätzlich prüft ein Git-Hook (`.githooks/pre-commit`) vor jedem Commit die schnellen Gates – Formatierung, Lint, Architektur, Unit-Tests – in wenigen Sekunden. `npm install` aktiviert ihn automatisch; im Notfall überspringt `git commit --no-verify` ihn. Dass die Gates wirklich etwas fangen, ist geprüft: absichtlich eingebaute Fehler (überlappende Kisten, übersprungene Felder, verbotene Imports, tote Links, kaputtes HTML) lassen sie scheitern.
 
@@ -111,7 +113,7 @@ Lokal laufen alle zusammen mit `npm run gates`. Zusätzlich prüft ein Git-Hook 
 
 Die Pipeline `.github/workflows/deploy.yml` läuft bei jedem Pull Request (auch von Renovate) und bei jedem Push auf `main`. Sie hat zwei Jobs:
 
-1. **Guard-Gates und Build** – nur mit Leserechten: installiert die Abhängigkeiten (`npm ci`), durchläuft die Guard-Gates (Formatierung, Lint, Architektur, Typen und Inhalte, Unit-Tests), baut die Seite und prüft das Ergebnis (`npm run verify`).
+1. **Guard-Gates und Build** – nur mit Leserechten: installiert die Abhängigkeiten (`npm ci`), durchläuft die Guard-Gates (Formatierung, Lint, Architektur, Typen und Inhalte, Unit-Tests), baut die Seite und prüft das Ergebnis (`npm run verify`) und im Browser (`npm run test:e2e`).
 2. **Deploy auf GitHub Pages** – nur auf `main`, erst wenn Job 1 grün ist: veröffentlicht die fertige Seite mit `actions/deploy-pages`. Er braucht nur die Rechte `pages: write` und `id-token: write`, keine Schreibrechte aufs Repo, und installiert und baut nichts.
 
 So laufen die Install-Skripte neuer Paketversionen nie mit einem Schreib-Token. Für einen Branch ohne Pull Request läuft die Pipeline nicht – Änderungen kommen per Pull Request nach `main`.

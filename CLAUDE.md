@@ -13,11 +13,12 @@ npm run format   # Prettier; `npm run format:check` ist das Guard-Gate
 npm run arch     # Guard-Gate: Architekturregeln (dependency-cruiser) – muss grün sein
 npm run build    # statische Seite nach dist/
 npm run verify   # Guard-Gate nach dem Build: gültiges HTML, keine toten internen Links, Bundle-Gate (Homepage ohne Spiel, JS-Budget)
+npm run test:e2e # Guard-Gate nach dem Build: Smoke-Test im Browser (Playwright, e2e/): Insel, Detailseiten, Spiel, alte Adressen, ohne Konsolenfehler; einmalig: npx playwright install chromium
 npm run gates    # alle Gates in der Reihenfolge der Pipeline
 # Git-Hook .githooks/pre-commit (aktiviert durch npm install) prüft vor jedem Commit Formatierung, Lint, Architektur, Tests
 ```
 
-Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run check`, `npm test`, `npm run build` und `npm run verify` ausführen.
+Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run check`, `npm test`, `npm run build`, `npm run verify` und `npm run test:e2e` ausführen.
 
 ## Aufbau
 

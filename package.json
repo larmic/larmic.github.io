@@ -18,8 +18,9 @@
     "verify:links": "linkinator dist --recurse --skip \"^https?://(?!localhost|127\\\\.0\\\\.0\\\\.1)\"",
     "verify:bundles": "node scripts/verify-bundles.ts",
     "verify": "npm run verify:html && npm run verify:links && npm run verify:bundles",
-    "gates": "npm run format:check && npm run lint && npm run arch && npm run check && npm test && npm run build && npm run verify",
-    "prepare": "git config core.hooksPath .githooks || true"
+    "gates": "npm run format:check && npm run lint && npm run arch && npm run check && npm test && npm run build && npm run verify && npm run test:e2e",
+    "prepare": "git config core.hooksPath .githooks || true",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.0",
     "@types/three": "^0.187.0",
     "dependency-cruiser": "^18.7.0",
     "eslint": "^10.14.0",
