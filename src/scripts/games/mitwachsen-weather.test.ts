@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BLOCK, FADE, RAINBOW, kindOf, raining, weatherLook } from './mitwachsen-weather';
+import { BLOCK, FADE, RAINBOW, kindOf, raining, weatherLook, windAt } from './mitwachsen-weather';
 
 describe('Wetter', () => {
   it('jeder Tag beginnt mit Sonne; danach gibt es Sonne, Wolken und Regen, gleich bei gleichem Seed und Tag', () => {
@@ -46,5 +46,13 @@ describe('Wetter', () => {
         expect(weatherLook(3, day, b * BLOCK + RAINBOW + 1).rainbow).toBe(0);
       }
     expect(seen).toBeGreaterThan(0);
+  });
+
+  it('Wind: überall eine leichte Brise, am stärksten Richtung Wolken, bei Regen mehr', () => {
+    const calm = { cloud: 0, rain: 0, rainbow: 0 };
+    expect(windAt({ id: 'eis', strength: 0 }, calm)).toBeCloseTo(0.15);
+    expect(windAt({ id: 'wolken', strength: 1 }, calm)).toBeGreaterThan(windAt({ id: 'wald', strength: 1 }, calm));
+    expect(windAt({ id: 'eis', strength: 0 }, { cloud: 1, rain: 1, rainbow: 0 })).toBeGreaterThan(0.5);
+    expect(windAt({ id: 'wolken', strength: 1 }, { cloud: 1, rain: 1, rainbow: 0 })).toBe(1);
   });
 });

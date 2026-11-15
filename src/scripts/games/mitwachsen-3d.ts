@@ -139,6 +139,9 @@ export class World3D {
     // Durchblick: Was zwischen Kamera und Figur steht, wird dort halb durchsichtig
     mwEye: { value: new Vector3() },
     mwTarget: { value: new Vector3() },
+    // Wind: Grasbüschel wiegen sich
+    mwTime: { value: 0 },
+    mwWind: { value: 0 },
   };
   private fogDirty = true;
   private fogKey = '';
@@ -191,7 +194,8 @@ export class World3D {
     this.swirl.colorSpace = SRGBColorSpace;
     this.fogTex.magFilter = LinearFilter;
     this.fogTex.minFilter = LinearFilter;
-    for (const m of [this.solid, this.foliage, this.water, this.lava, this.bright]) this.withFog(m, false);
+    for (const m of [this.solid, this.water, this.lava, this.bright]) this.withFog(m, false);
+    this.withFog(this.foliage, false, true);
     this.withFog(this.canopy, true);
     this.withFog(this.gateSolid, true);
     this.scene.background = SKY.clone();
@@ -217,14 +221,20 @@ export class World3D {
    *   weniger. So sieht man die Figur zwischen vielen Bäumen. Boden und Felsen bleiben fest (unter ihrer Oberfläche
    *   ist nichts, ein Loch zeigte den Himmel).
    */
-  private withFog(material: MeshLambertMaterial | MeshBasicMaterial, seeThrough: boolean) {
+  private withFog(material: MeshLambertMaterial | MeshBasicMaterial, seeThrough: boolean, sway = false) {
     material.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, this.fogUniforms);
+      // Wind (nur Grasbüschel): Spitzen schwingen seitlich, der Fuß bleibt stehen (Höhe über dem Boden = fract(y))
+      const swayCode = sway
+        ? '\n  float mwUp = fract(transformed.y);\n' +
+          '  transformed.x += sin(mwTime * 2.3 + transformed.x * 1.7 + transformed.z * 1.3) * mwWind * mwUp * 0.6;\n' +
+          '  transformed.z += cos(mwTime * 1.9 + transformed.x * 1.1) * mwWind * mwUp * 0.25;'
+        : '';
       shader.vertexShader =
-        'varying vec3 vMwWorld;\n' +
+        'varying vec3 vMwWorld;\nuniform float mwTime;\nuniform float mwWind;\n' +
         shader.vertexShader.replace(
           '#include <begin_vertex>',
-          '#include <begin_vertex>\n  vMwWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;',
+          '#include <begin_vertex>' + swayCode + '\n  vMwWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;',
         );
       shader.fragmentShader =
         'uniform sampler2D mwFogMap;\nuniform vec2 mwFogOrigin;\nuniform float mwFogSize;\nuniform vec3 mwFogTint;\n' +
@@ -252,7 +262,7 @@ export class World3D {
               '#include <tonemapping_fragment>',
           );
     };
-    material.customProgramCacheKey = () => (seeThrough ? 'mw-fog-see' : 'mw-fog');
+    material.customProgramCacheKey = () => (seeThrough ? 'mw-fog-see' : sway ? 'mw-fog-sway' : 'mw-fog');
   }
 
   /** Nebel-Maske neu berechnen: erkundet = 1, dann zweimal weich verwischt (sanfter Übergang über 2–3 Felder) */
@@ -347,6 +357,8 @@ export class World3D {
     this.camera.lookAt(tx, ty, tz);
     this.fogUniforms.mwEye.value.copy(this.camera.position);
     this.fogUniforms.mwTarget.value.set(tx, ty + 0.9, tz);
+    this.fogUniforms.mwTime.value = sc.now / 1000;
+    this.fogUniforms.mwWind.value = sc.wind;
     // Sonne von links oben vorn; Schatten folgen der Figur
     this.sun.position.set(tx - 9, ty + 22, tz + 7);
     this.sun.target.position.set(tx, ty, tz);

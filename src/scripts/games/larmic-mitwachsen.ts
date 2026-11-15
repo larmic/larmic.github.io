@@ -29,7 +29,7 @@ import { drawMap } from './mitwachsen-map';
 import { Fog, REVEAL, START_REVEAL } from './mitwachsen-fog';
 import { initialState, progressOf, step, type Cmd, type GameEvent, type State } from './mitwachsen-state';
 import { createWorld, standHeight, type World } from './mitwachsen-world';
-import { weatherLook } from './mitwachsen-weather';
+import { weatherLook, windAt } from './mitwachsen-weather';
 import { idlePose, type Pose } from './mitwachsen-tired';
 import { advance, evening, freshDay, loadTired, saveTired, type Tired, type TiredEvent } from './mitwachsen-tired';
 
@@ -688,6 +688,8 @@ class LarmicMitwachsen extends HTMLElement {
     for (const [id, since] of this.gates) gates.set(id, since === 0 ? 1 : fade(since, 900));
 
     const { dpr, w, h, zoom } = this.size;
+    const mood = this.world.climate(Math.round(player.x), Math.round(player.y));
+    const weather = weatherLook(this.world.seed, this.state.day, this.state.tick);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.ctx.imageSmoothingEnabled = false;
     const scene: Scene = {
@@ -699,9 +701,10 @@ class LarmicMitwachsen extends HTMLElement {
       gates: gates as Scene['gates'],
       night,
       evening: this.state.sleeping ? 0 : evening(this.tired),
-      weather: weatherLook(this.world.seed, this.state.day, this.state.tick),
+      weather,
       pose: this.pose,
-      mood: this.world.climate(Math.round(player.x), Math.round(player.y)),
+      mood,
+      wind: this.reduced.matches ? 0 : windAt(mood, weather),
       floats,
       particles: this.particles,
       now: t,

@@ -5,6 +5,7 @@
 // Spezifikation: docs/specs/mitwachsen.md
 
 import { hash } from '../../lib/games/rng';
+import type { Climate } from './mitwachsen-world';
 
 export type WeatherKind = 'sun' | 'clouds' | 'rain';
 export const BLOCK = 3000; // Takte je Wetter (5 Minuten)
@@ -39,4 +40,10 @@ export function weatherLook(seed: number, day: number, tick: number): WeatherLoo
       ? Math.min(1, into / FADE) * Math.min(1, Math.max(0, (RAINBOW - into) / FADE))
       : 0;
   return { cloud: c0 + (c1 - c0) * t, rain: r0 + (r1 - r0) * t, rainbow };
+}
+
+/** Wind: überall eine leichte Brise, stärker Richtung Wolken und Wald und bei Wolken und Regen (0 … 1) */
+export function windAt(mood: Climate, look: WeatherLook): number {
+  const dir = mood.id === 'wolken' ? 0.8 : mood.id === 'wald' ? 0.45 : 0;
+  return Math.min(1, 0.15 + dir * mood.strength + look.cloud * 0.15 + look.rain * 0.25);
 }

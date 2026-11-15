@@ -107,8 +107,10 @@ Die Lichtung kündigt auf dem Weg an, was hinter einem Tor wartet. `world.climat
 | Höhle | graueres Gras, Steinflecken, dämmriger | (Zeichnen) |
 | Wald | Herbstbäume in Orange und Rot, warmes Licht | „… Richtung Wald Herbst …“ |
 | Pilze | lila Moosflecken, leicht lila Licht | „… Richtung Pilze Moos“ |
-| Wolken | (Wind kommt mit Schritt 2) | |
+| Wolken | viel Wind, ziehende Wolkenschatten, weiße Federwölkchen | (Zeichnen) |
 | Am Bett und auf der Wiese neutral | | „am Bett ist es neutral“ |
+
+Leben: Herbstblätter wehen Richtung Wald, Funken glimmen Richtung Lava, Sporen schweben Richtung Pilze, Glühwürmchen leuchten Richtung Höhle auch am Tag (nicht bei reduzierter Bewegung). Wind (`windAt`, getestet): überall eine leichte Brise, stärker Richtung Wolken und Wald und bei Wolken und Regen; die Grasbüschel wiegen sich (Shader, bei reduzierter Bewegung still).
 
 Licht: Sonne und Himmelslicht nehmen Farbe und Helligkeit der Richtung an, in der die Figur steht (`MOOD_LIGHT`); in 2D eine leichte Tönung.
 
