@@ -13,6 +13,8 @@ Umgesetzt ist es in reinen, getesteten Teilen und einer Web Component:
 | Spielregeln (Zustandsmaschine) | [`src/scripts/games/mitwachsen-state.ts`](../../src/scripts/games/mitwachsen-state.ts) | `mitwachsen-state.test.ts` |
 | Spielstände | [`src/scripts/games/mitwachsen-save.ts`](../../src/scripts/games/mitwachsen-save.ts) | `mitwachsen-save.test.ts` |
 | Ruhiger Takt der Eingabe | [`src/scripts/games/input-pace.ts`](../../src/scripts/games/input-pace.ts) | `input-pace.test.ts` |
+| Nebel (erkundete Felder) | [`src/scripts/games/mitwachsen-fog.ts`](../../src/scripts/games/mitwachsen-fog.ts) | `mitwachsen-fog.test.ts` |
+| Karte | [`src/scripts/games/mitwachsen-map.ts`](../../src/scripts/games/mitwachsen-map.ts) | – (Zeichnen) |
 | Browser: Tastatur, Takt, Kamera, Töne, Menü | [`larmic-mitwachsen.ts`](../../src/scripts/games/larmic-mitwachsen.ts), [`mitwachsen-render.ts`](../../src/scripts/games/mitwachsen-render.ts) (2D und Ebene darüber), [`mitwachsen-3d.ts`](../../src/scripts/games/mitwachsen-3d.ts) (3D mit Three.js), [`sfx.ts`](../../src/scripts/games/sfx.ts) | – |
 
 Bei Änderungen am Verhalten Spec und Tests mitziehen.
@@ -66,6 +68,18 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 | Ohne Garten keine Gartenfelder; mit `{ garden: true }` genau ein Eingang | „Ohne Garten gibt es keine Gartenfelder …“ |
 | Die Landschaft ist sanft (selten mehr als eine Stufe zwischen Nachbarn) | „ist meist sanft …“ |
 
+## Nebel
+
+| Regel | Test |
+| --- | --- |
+| Am Anfang liegt alles im Nebel außer einem Kreis mit Radius 5 um das Bett | (Komponente) |
+| Bei jedem Schritt lichtet sich ein Kreis mit Radius 4 um die Figur | „lichtet sich rund um die Figur …“ |
+| Nur Stücke, in denen sich etwas geändert hat, werden neu gebaut | „meldet nur Stücke, in denen sich wirklich etwas geändert hat“ |
+| Erkundetes wird gespeichert (je Stück 32 Byte als Base64) und übersteht Laden und kaputte Daten | „übersteht das Speichern und Laden“, „ist im Spielstand klein …“ |
+| Im Nebel sind keine Tiere und keine Zeichen über Tieren zu sehen; die Karte zeigt nur Erkundetes | (Zeichnen) |
+
+Die Regeln kennen den Nebel nicht: Er betrifft nur, was gezeichnet wird.
+
 ## Invarianten
 
 Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten bei wildem Drücken“*):
@@ -81,7 +95,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Was | Regel |
 | --- | --- |
 | Schlüssel | `larmic.games.index` (Liste der Welten, aktuelle Welt), `larmic.games.world.<id>` je Welt, `larmic.games.muted` |
-| Format | `{ v: 4, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, homeAnimals, position, visits }`; `age` ist die Altersstufe der Welt (bisher nur 3) |
+| Format | `{ v: 4, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, homeAnimals, position, visits, explored }`; `explored` ist der Nebel je Stück (fehlt er, beginnt die Welt im Nebel); `age` ist die Altersstufe der Welt (bisher nur 3) |
 | Umzug | Version 1 (Arbeitstitel `game: 'threeyear'`, ohne Alter) → 2 (Alter 3) → 3 (`penAnimals` heißt jetzt `homeAnimals`) → 4 (Start auf der Lichtung: gefundene Tiere des alten Zuhauses, die es auf der Lichtung gibt, bleiben gefunden; Tore, Garten und Position beginnen neu). Ältere Indizes werden übernommen |
 | Wann | sofort bei gefunden, Garten, Tor, Schlafen, Weltwechsel und Umbenennen; sonst alle 10 s; beim Verlassen der Seite |
 | Fehler | Jeder Zugriff fängt Fehler ab. Ohne Speicher läuft das Spiel bis zum Neuladen weiter. |
@@ -96,6 +110,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | --- | --- |
 | Ansicht | **3D** mit Three.js (WebGL): Kamera schräg von oben (55°) aus Süden, folgt der Figur; echtes Sonnenlicht mit Schatten, Himmel und Nebel in der Ferne. Three.js wird erst beim Spielstart per `import()` nachgeladen (Bundle-Gate). Darüber liegt ein durchsichtiges 2D-Canvas für Zeichen über den Tieren, Herzen, Noten, Heimweg-Pfeil, Nacht, Schmetterlinge und die Leiste. Ohne WebGL bleibt die **2D-Ansicht von vorn** (Reihe für Reihe von hinten nach vorn), sie läuft auch, bis 3D geladen ist |
 | Verdeckte Figur | In 3D erscheint die Figur als heller Umriss, wo Bäume, Hecken oder Hügel sie verdecken; in 2D wird sie halb durchsichtig obenauf gezeichnet |
+| Nebel | unerkundete Felder als weiche, helle Wolkenbank (3D und 2D) |
 | Hochformat | In 3D rückt die Kamera im Hochformat weiter weg (bis 1,8-fach), der Nebel rückt mit |
 | Kamera | folgt der Figur; Figur in der Bildmitte. Etwa 18 Felder breit |
 | Feinheit | Texturen 8 × 8 wie auf der Seite, jedes Texel mit feiner Körnung in 2 × 2 Unterpixeln |

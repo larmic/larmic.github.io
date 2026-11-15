@@ -6,7 +6,7 @@
 
 import { projection, type Dir } from '../../lib/games/front';
 import type { World3D as World3DType } from './mitwachsen-3d';
-import { GAME_COLORS, LOOK, SPECIES } from '../../data/games/mitwachsen';
+import { GAME_COLORS, HOME, LOOK, SPECIES } from '../../data/games/mitwachsen';
 import { Renderer, type Body, type Float, type Particle, type Scene } from './mitwachsen-render';
 import { Sfx } from './sfx';
 import {
@@ -24,6 +24,7 @@ import {
 } from './mitwachsen-save';
 import { InputPace, STEP_MS } from './input-pace';
 import { drawMap } from './mitwachsen-map';
+import { Fog, REVEAL, START_REVEAL } from './mitwachsen-fog';
 import { initialState, progressOf, step, type Cmd, type GameEvent, type State } from './mitwachsen-state';
 import { createWorld, standHeight, type World } from './mitwachsen-world';
 
@@ -90,6 +91,8 @@ class LarmicMitwachsen extends HTMLElement {
   private dayAt = 0;
   private resize: ResizeObserver | null = null;
   private readonly reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  private fog = new Fog(); // erkundete Felder; der Rest liegt im Nebel
+  private seenAt = '';
   private map!: HTMLCanvasElement;
   private mapCtx!: CanvasRenderingContext2D;
   private lastMap = 0;
@@ -181,6 +184,10 @@ class LarmicMitwachsen extends HTMLElement {
     this.saved = { ...this.saved, visits: this.saved.visits + 1 };
     saveWorld(this.store, this.saved);
     this.world = createWorld(this.saved.seed);
+    // Nebel: Am Anfang ist nur ein kleines Stück um das Bett zu sehen
+    this.fog = Fog.from(this.saved.explored);
+    if (this.fog.size === 0) this.fog.reveal(HOME.bed[0], HOME.bed[1], START_REVEAL);
+    this.seenAt = '';
     this.state = initialState(this.world, progressFrom(this.saved), this.saved.seed ^ this.saved.visits);
     this.bodies.clear();
     this.floats = [];
@@ -194,7 +201,7 @@ class LarmicMitwachsen extends HTMLElement {
 
   private save() {
     if (!this.saved) return;
-    this.saved = withProgress(this.saved, progressOf(this.state));
+    this.saved = { ...withProgress(this.saved, progressOf(this.state)), explored: this.fog.serialize() };
     saveWorld(this.store, this.saved);
     this.lastSave = performance.now();
   }
@@ -217,8 +224,19 @@ class LarmicMitwachsen extends HTMLElement {
   private apply(cmd: Cmd) {
     const { state, events } = step(this.state, this.world, cmd);
     this.state = state;
+    this.lift();
     if (events.length) this.react(events);
     if (performance.now() - this.lastSave > SAVE_EVERY_MS) this.save();
+  }
+
+  /** Nebel um die Figur lichten; geänderte Stücke baut die 3D-Ansicht neu */
+  private lift() {
+    const { x, y } = this.state.player;
+    const at = `${x},${y}`;
+    if (at === this.seenAt) return;
+    this.seenAt = at;
+    const changed = this.fog.reveal(x, y, REVEAL);
+    if (changed.length) this.gl3d?.invalidate(changed);
   }
 
   private listen() {
@@ -530,6 +548,7 @@ class LarmicMitwachsen extends HTMLElement {
       look: LOOK,
       reduced: this.reduced.matches,
       bottomInset: this.touchUi.offsetParent ? this.touchUi.offsetHeight + 16 : 0,
+      explored: (x, y) => this.fog.has(x, y),
     };
     if (this.r3d) {
       // 3D-Welt, darüber die durchsichtige 2D-Ebene mit Zeichen, Pfeil, Nacht und Leiste
@@ -543,7 +562,17 @@ class LarmicMitwachsen extends HTMLElement {
       const m = this.map.clientWidth;
       this.mapCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
       this.mapCtx.imageSmoothingEnabled = false;
-      drawMap(this.mapCtx, this.world, this.state, player.x, player.y, m, () => true, this.reduced.matches ? 0 : t);
+      const fog = this.fog;
+      drawMap(
+        this.mapCtx,
+        this.world,
+        this.state,
+        player.x,
+        player.y,
+        m,
+        (x, y) => fog.has(x, y),
+        this.reduced.matches ? 0 : t,
+      );
     }
   }
 

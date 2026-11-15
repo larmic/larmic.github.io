@@ -58,6 +58,7 @@ export type Scene = {
   look: Look;
   reduced: boolean; // prefers-reduced-motion: nichts wippt, steigt oder funkelt
   bottomInset: number; // Platz unten für die Touch-Steuerung (die Leiste rückt darüber)
+  explored: (x: number, y: number) => boolean; // Nebel: nur Erkundetes wird gezeigt
 };
 
 const PAL_SAND: Palette = { D: [['#e3cf95', 1]], d: [['#d4bd7d', 1]], e: [['#efdeaa', 1]] };
@@ -131,7 +132,7 @@ export class Renderer {
           continue;
         }
         const a = byId.get(id);
-        if (!a) continue;
+        if (!a || !sc.explored(Math.round(b.x), Math.round(b.y))) continue; // Tiere im Nebel bleiben verborgen
         const sp = SPECIES[a.species];
         this.shadow(P, b.x + 0.5, b.y + 0.5, b.z, 0.26 * sp.scale);
         drawModel(ctx, P, sp.parts, b.x + 0.5, b.y + 0.5, b.z + b.hop, a.dir, sp.scale);
@@ -161,7 +162,7 @@ export class Renderer {
     const followers = new Set(state.followers);
     for (const a of state.animals) {
       const b = sc.bodies.get(a.id);
-      if (!b) continue;
+      if (!b || !sc.explored(Math.round(b.x), Math.round(b.y))) continue; // im Nebel nichts verraten
       const [hx, hy] = P(b.x + 0.5, b.y + 0.5, b.z + b.hop + 1.05 * SPECIES[a.species].scale * 0.75);
       if (followers.has(a.id)) sprite(ctx, HEART, GAME_COLORS.heart, hx, hy, 2.5 * z);
       else if (!state.met.includes(a.id)) {
@@ -245,6 +246,7 @@ export class Renderer {
   /** Säule eines Feldes: nur die Blöcke, deren Vorderseite nicht vom Feld davor verdeckt wird */
   private ground(P: Projection, world: World, x: number, y: number, sc: Scene) {
     const c = world.cell(x, y);
+    if (!sc.explored(x, y)) return this.cloud(P, x, y);
     if (c.ground === 'water') return this.water(P, world, x, y, sc);
     const front = world.cell(x, y + 1);
     const frontH = front.ground === 'water' ? 0 : front.h;
@@ -501,7 +503,14 @@ export class Renderer {
     }
   }
 
+  /** Nebel über unerkundeten Feldern: eine weiche, helle Wolkenbank */
+  private cloud(P: Projection, x: number, y: number) {
+    const top = 2 + (hash(5, x, y) % 4) / 10;
+    box(this.ctx, P, x, y, 0, 1, 1, top, '#e3ebf1', '#f4f8fb');
+  }
+
   private deco(P: Projection, world: World, state: State, sc: Scene, x: number, y: number) {
+    if (!sc.explored(x, y)) return;
     const c = world.cell(x, y);
     const { ctx } = this;
     const h = c.h;

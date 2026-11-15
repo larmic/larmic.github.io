@@ -29,6 +29,7 @@ export type SavedWorld = {
   homeAnimals: HomeAnimal[];
   position: [number, number];
   visits: number;
+  explored: Record<string, string>; // Nebel: erkundete Felder je Stück (Base64), siehe mitwachsen-fog.ts
 };
 export type Index = {
   v: typeof VERSION; // Index von Version 1 hat dasselbe Format und wird übernommen
@@ -75,6 +76,7 @@ export function newWorld(
     homeAnimals: [],
     position: [0, 0],
     visits: 0,
+    explored: {},
   };
 }
 
@@ -142,6 +144,9 @@ export function migrate(input: unknown): SavedWorld | null {
     homeAnimals: garden.map((p) => ({ id: p.id, species: p.species as SpeciesId })),
     position: pos ? (raw.position as [number, number]) : [0, 0],
     visits: typeof raw.visits === 'number' && raw.visits >= 0 ? Math.floor(raw.visits) : 0,
+    explored: isRecord(raw.explored)
+      ? Object.fromEntries(Object.entries(raw.explored).filter(([, v]) => typeof v === 'string') as [string, string][])
+      : {},
   };
 }
 

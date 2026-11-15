@@ -244,6 +244,9 @@ export class World3D {
   private solid: MeshLambertMaterial;
   private foliage: MeshLambertMaterial;
   private water = new MeshLambertMaterial({ color: GAME_COLORS.water, transparent: true, opacity: 0.8 });
+  private mist = new MeshLambertMaterial({ vertexColors: true }); // Nebel über Unerkundetem
+  private explored: (x: number, y: number) => boolean = () => true;
+  private dirty = new Set<string>();
   private entity = new MeshLambertMaterial({ vertexColors: true });
   // Umriss der Figur, nur wo sie verdeckt ist (hinter Bäumen, Hecken, Hügeln): Tiefentest umgekehrt
   private xray = new MeshBasicMaterial({
@@ -308,7 +311,8 @@ export class World3D {
     for (const g of this.models.values()) g.dispose();
     this.models.clear();
     this.solid.map?.dispose();
-    for (const m of [this.solid, this.foliage, this.water, this.entity, this.xray, this.hero, this.dark]) m.dispose();
+    for (const m of [this.solid, this.foliage, this.water, this.mist, this.entity, this.xray, this.hero, this.dark])
+      m.dispose();
     this.sun.shadow.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
@@ -326,6 +330,7 @@ export class World3D {
 
   render(world: World, state: State, sc: Scene) {
     if (this.world !== world) this.reset(world);
+    this.explored = sc.explored;
     const cam = sc.cam;
     const tx = cam.x + 0.5,
       tz = cam.y + 0.5;
@@ -355,6 +360,11 @@ export class World3D {
     this.renderer.render(this.scene, this.camera);
   }
 
+  /** Der Nebel hat sich in diesen Stücken gelichtet: im nächsten Bild neu bauen */
+  invalidate(keys: readonly string[]) {
+    for (const k of keys) if (this.chunks.has(k)) this.dirty.add(k);
+  }
+
   private reset(world: World) {
     this.world = world;
     for (const c of this.chunks.values())
@@ -382,6 +392,18 @@ export class World3D {
     missing.sort((a, b) => Math.hypot(a[0] - pcx, a[1] - pcy) - Math.hypot(b[0] - pcx, b[1] - pcy));
     for (const [cx, cy] of missing.slice(0, BUILD_PER_FRAME))
       this.chunks.set(`${cx},${cy}`, this.buildChunk(world, cx, cy));
+    // Gelichteter Nebel: Stück sofort ersetzen, ohne Lücke dazwischen
+    for (const k of this.dirty) {
+      const old = this.chunks.get(k);
+      if (!old) continue;
+      const [cx, cy] = k.split(',').map(Number);
+      this.chunks.set(k, this.buildChunk(world, cx, cy));
+      for (const m of old.meshes) {
+        this.scene.remove(m);
+        m.geometry.dispose();
+      }
+    }
+    this.dirty.clear();
     for (const [k, c] of this.chunks)
       if (!want.has(k)) {
         for (const m of c.meshes) {
@@ -395,9 +417,18 @@ export class World3D {
   private buildChunk(world: World, cx: number, cy: number): Chunk {
     const solid = new Geo(),
       leaves = new Geo(),
-      water = new Geo();
+      water = new Geo(),
+      mist = new Geo();
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)
       for (let x = cx * CHUNK; x < (cx + 1) * CHUNK; x++) {
+        if (!this.explored(x, y)) {
+          // Nebel: weiche, helle Wolkenbank mit leicht unruhiger Oberkante
+          const r = hash(5, x, y);
+          const top = 2.1 + (r % 5) / 10;
+          const tint = new Color('#f4f8fb').multiplyScalar(0.94 + ((r >>> 8) % 6) / 100);
+          mist.box(x, 0, y, 1, top, 1, tint, tint.clone().multiplyScalar(1.03));
+          continue;
+        }
         const c = world.cell(x, y);
         this.terrain(solid, water, world, c, x, y);
         this.decoration(solid, leaves, c, x, y);
@@ -414,6 +445,11 @@ export class World3D {
     add(solid, this.solid, true);
     add(leaves, this.foliage, false);
     add(water, this.water, false);
+    if (!mist.empty) {
+      const m = new Mesh(mist.build(), this.mist);
+      this.scene.add(m);
+      meshes.push(m);
+    }
     return { meshes };
   }
 
@@ -659,8 +695,11 @@ export class World3D {
       this.ghost.position.copy(me.position);
       this.ghost.rotation.copy(me.rotation);
     }
-    for (const a of state.animals)
+    for (const a of state.animals) {
+      const b = sc.bodies.get(a.id);
+      if (b && !this.explored(Math.round(b.x), Math.round(b.y))) continue; // Tiere im Nebel bleiben verborgen
       place(a.id, this.model(a.species, SPECIES[a.species].parts), SPECIES[a.species].scale, a.dir);
+    }
     for (const [id, m] of this.bodies)
       if (!seen.has(id)) {
         this.scene.remove(m);
