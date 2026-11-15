@@ -81,8 +81,8 @@ const ring = (r: Rect): Point[] =>
   cellsOf({ x0: r.x0 - 1, y0: r.y0 - 1, x1: r.x1 + 1, y1: r.y1 + 1 }).filter(([x, y]) => !inRect(r, x, y));
 
 const grass = (region: Cell['region']): Cell => ({ h: 1, ground: 'grass', deco: null, region, solid: false });
-// Fels kann man besteigen (eine Stufe hoch geht immer); der Felsring hält die Figur über seine Höhe auf
-const rock = (h: number): Cell => ({ h, ground: 'stone', deco: 'rock', region: 'border', solid: false });
+// Der Felsring ist eine feste Grenze: nicht zu betreten, also weder zu besteigen noch hineinzufallen
+const rock = (h: number): Cell => ({ h, ground: 'stone', deco: 'rock', region: 'border', solid: true });
 const water = (region: Cell['region']): Cell => ({ h: 0, ground: 'water', deco: null, region, solid: false });
 const flowerColor = (seed: number, x: number, y: number) =>
   GAME_COLORS.flowers[hash(seed, x, y, 7) % GAME_COLORS.flowers.length];
@@ -97,11 +97,10 @@ function edge(seed: number, x: number, y: number) {
   return d / wobble; // < 1 innen, 1 … ROCK_OUTER Felsen, darüber Landschaft
 }
 const ROCK_OUTER = 1.32;
-/**
- * Felsring in Terrassen: innen 3 (vom Hügel aus erreichbar), dann 4, außen 6. Von 4 auf 6 sind es zwei Stufen:
- * Man kann auf die Felsen klettern und schauen, aber nicht hinüber. Von außen (Landschaft höchstens 3) auch nicht.
- */
-const ringHeight = (e: number) => (e < 1.08 ? 3 : e < 1.16 ? 4 : 6);
+/** Felsring in Terrassen (nur fürs Auge, betreten kann man ihn nicht): innen 3, dann 4, außen 5 */
+const ringHeight = (e: number) => (e < 1.08 ? 3 : e < 1.16 ? 4 : 5);
+/** Bäume und Büsche stehen einzeln: im Umkreis von so vielen Feldern kein weiteres Hindernis */
+const OBSTACLE_GAP = 2;
 
 /** Die drei Felder eines großen Tores: in einer geraden Reihe, so tief wie das innerste Felsfeld der drei Spalten */
 function gateCells(seed: number, side: 'n' | 'o' | 's' | 'w'): Point[] {
@@ -115,19 +114,26 @@ function gateCells(seed: number, side: 'n' | 'o' | 's' | 'w'): Point[] {
 }
 
 /**
- * Portale: neben dem Tor (zwei Felder nach innen, drei zur Seite) und über dem Bett (HOME.portals).
- * Herauskommen jeweils auf dem Feld davor, Richtung Lichtung bzw. Bett.
+ * Portale: neben dem Tor (drei Felder zur Seite, mindestens zwei nach innen, so weit, bis es frei auf der Lichtung
+ * steht – der Felsrand wackelt) und über dem Bett (HOME.portals). Herauskommen jeweils auf dem Feld davor,
+ * Richtung Lichtung bzw. Bett.
  */
 function portalsOf(seed: number): Map<GateId, Portal> {
   const out = new Map<GateId, Portal>();
+  const inside = (x: number, y: number) => edge(seed, x, y) < 0.97;
   for (const g of GATES) {
     const [mx, my] = gateCells(seed, g.side)[1];
     const [ix, iy] = { n: [0, 1], s: [0, -1], o: [-1, 0], w: [1, 0] }[g.side]; // nach innen
     const [sx, sy] = g.side === 'n' || g.side === 's' ? [1, 0] : [0, 1]; // zur Seite
+    const at = (t: number): Point => [mx + ix * t + sx * 3, my + iy * t + sy * 3];
+    const free = (t: number) =>
+      [-1, 0, 1].every((o) => [t, t + 1, t + 2].every((u) => inside(at(u)[0] + sx * o, at(u)[1] + sy * o)));
+    let t = 2;
+    while (t < 40 && !free(t)) t++;
     const [hx, hy] = HOME.portals[g.id];
     out.set(g.id, {
-      gate: [mx + ix * 2 + sx * 3, my + iy * 2 + sy * 3],
-      gateExit: [mx + ix * 3 + sx * 3, my + iy * 3 + sy * 3],
+      gate: at(t),
+      gateExit: at(t + 1),
       home: [hx, hy],
       homeExit: [hx, hy + 1],
     });
@@ -144,6 +150,15 @@ function buildStart(
   const set = (x: number, y: number, c: Cell) => map.set(key(x, y), c);
   const { rx, ry } = lichtung.shape;
   const R = Math.ceil(Math.max(rx, ry) * 1.25) + 2;
+  // Felder werden Reihe für Reihe gesetzt; es genügt, die schon gesetzten Nachbarn anzuschauen
+  const obstacleNear = (x: number, y: number) => {
+    for (let dy = -OBSTACLE_GAP; dy <= 0; dy++)
+      for (let dx = -OBSTACLE_GAP; dx <= OBSTACLE_GAP; dx++) {
+        const d = map.get(key(x + dx, y + dy))?.deco;
+        if (d === 'tree' || d === 'bush') return true;
+      }
+    return false;
+  };
 
   for (let y = -R; y <= R; y++)
     for (let x = -R; x <= R; x++) {
@@ -171,11 +186,11 @@ function buildStart(
       }
       const hill = valueNoise(seed + 30, x, y, 10);
       c.h = near <= HOME.clear + 2 ? 1 : hill < 0.45 ? 1 : hill < 0.68 ? 2 : 3;
-      const forest = valueNoise(seed + 32, x, y, 16) > 0.62; // Wäldchen
+      const forest = valueNoise(seed + 32, x, y, 16) > 0.62; // lichte Haine: etwas mehr Bäume, aber einzeln
       const meadow = valueNoise(seed + 33, x, y, 12) > 0.6; // Blumenwiesen
-      const far = near > HOME.clear + 1;
-      if (far && roll < (forest ? 0.28 : 0.025)) Object.assign(c, { deco: 'tree', solid: true });
-      else if (far && roll < (forest ? 0.32 : 0.04)) Object.assign(c, { deco: 'bush', solid: true });
+      const far = near > HOME.clear + 1 && !obstacleNear(x, y);
+      if (far && roll < (forest ? 0.07 : 0.012)) Object.assign(c, { deco: 'tree', solid: true });
+      else if (far && roll < (forest ? 0.09 : 0.02)) Object.assign(c, { deco: 'bush', solid: true });
       else if (roll < (meadow ? 0.45 : 0.12)) Object.assign(c, { deco: 'flower', color: flowerColor(seed, x, y) });
       else if (roll < (meadow ? 0.47 : 0.145)) c.deco = forest ? 'mushroom' : 'fern';
       else if (far && roll < (meadow ? 0.475 : 0.16)) Object.assign(c, { h: c.h + 1, ground: 'stone' }); // Stein zum Klettern
@@ -209,11 +224,62 @@ function buildStart(
       deco: 'arch',
     });
   }
-  return { map, spawns: findSpawns(map) };
+  smooth(map);
+
+  // Vor jedem Tor ein freier Gang nach innen, bis er auf erreichbares Land trifft (Teiche, Bäume, Felsnischen)
+  const before = new Set(reachOf(map).map(([x, y]) => key(x, y)));
+  for (const g of GATES) {
+    const [mx, my] = gateCells(seed, g.side)[1];
+    const [ix, iy] = { n: [0, 1], s: [0, -1], o: [-1, 0], w: [1, 0] }[g.side];
+    for (let t = 1; t < 100 && (t < 4 || !before.has(key(mx + ix * t, my + iy * t))); t++)
+      for (const o of [-1, 0, 1]) {
+        const x = mx + ix * t + iy * o,
+          y = my + iy * t + ix * o;
+        const c = map.get(key(x, y));
+        if (c && (c.region === 'lichtung' || c.deco === 'rock')) set(x, y, { ...grass('lichtung'), h: c.h || 1 });
+      }
+  }
+  smooth(map);
+
+  // Was man nicht erreichen kann, wird Fels: keine Ecken, die man sieht, aber nie betreten kann
+  const reach = reachOf(map);
+  const reached = new Set(reach.map(([x, y]) => key(x, y)));
+  for (const [k, c] of map)
+    if (c.region === 'lichtung' && !c.solid && c.ground !== 'water' && !reached.has(k)) map.set(k, rock(3));
+  return { map, spawns: findSpawns(map, reach) };
 }
 
-/** Wohnorte der Tiere: Felder der Lichtung, die vom Bett aus zu Fuß erreichbar sind, je nah am Wunschort */
-function findSpawns(map: Map<string, Cell>): Map<SpeciesId, Point> {
+/**
+ * Keine Stufe höher als eins: Benachbarte Felder der Lichtung unterscheiden sich um höchstens eine Ebene.
+ * So kommt man überall hinauf, wo man heruntergefallen ist, und nirgends in eine Grube, aus der es nicht herausgeht.
+ * Felder werden nur abgesenkt; flache Stellen (am Bett, an Portalen und Toren) ziehen die Hügel ringsum herunter.
+ */
+function smooth(map: Map<string, Cell>) {
+  const land = (c: Cell | undefined) => !!c && c.ground !== 'water' && (c.region === 'lichtung' || !!c.gate);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const [k, cell] of map) {
+      let c = cell;
+      if (!land(c) || c.gate) continue;
+      const [x, y] = k.split(',').map(Number);
+      for (const [dx, dy] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
+        const n = map.get(key(x + dx, y + dy));
+        if (!land(n) || c.h <= n!.h + 1) continue;
+        map.set(k, (c = { ...c, h: n!.h + 1 }));
+        changed = true;
+      }
+    }
+  }
+}
+
+/** Felder, die vom Bett aus zu Fuß erreichbar sind */
+function reachOf(map: Map<string, Cell>): Point[] {
   const stand = (x: number, y: number) => {
     const c = map.get(key(x, y));
     return !c || c.solid || c.ground === 'water' || c.gate ? null : c.h;
@@ -239,6 +305,11 @@ function findSpawns(map: Map<string, Cell>): Map<SpeciesId, Point> {
       queue.push([x + dx, y + dy]);
     }
   }
+  return reach;
+}
+
+/** Wohnorte der Tiere: Felder der Lichtung, die vom Bett aus zu Fuß erreichbar sind, je nah am Wunschort */
+function findSpawns(map: Map<string, Cell>, reach: Point[]): Map<SpeciesId, Point> {
   const taken = new Set<string>();
   const spawns = new Map<SpeciesId, Point>();
   for (const { species, at } of lichtung.animals) {

@@ -44,18 +44,18 @@ export const REGIONS: readonly Region[] = [
   {
     id: 'lichtung',
     name: 'Lichtung',
-    shape: { rx: 54, ry: 46 }, // gut 20-mal so groß wie die erste Lichtung: Hier soll man erkunden
+    shape: { rx: 80, ry: 68 }, // groß und frei: Hier soll man erkunden, die Tore liegen weit weg
     animals: [
-      { species: 'hase', at: [-8, 6] },
-      { species: 'igel', at: [9, 8] },
-      { species: 'schaf', at: [-22, -12] },
-      { species: 'eichhoernchen', at: [24, -16] },
-      { species: 'ente', at: [-6, -24] },
-      { species: 'kuh', at: [30, 18] },
-      { species: 'fuchs', at: [-34, 20] },
-      { species: 'frosch', at: [14, 32] },
-      { species: 'biene', at: [-18, 34] },
-      { species: 'schildkroete', at: [38, -6] },
+      { species: 'hase', at: [-10, 8] },
+      { species: 'igel', at: [13, 11] },
+      { species: 'schaf', at: [-32, -18] },
+      { species: 'eichhoernchen', at: [35, -23] },
+      { species: 'ente', at: [-9, -35] },
+      { species: 'kuh', at: [44, 26] },
+      { species: 'fuchs', at: [-49, 29] },
+      { species: 'frosch', at: [20, 46] },
+      { species: 'biene', at: [-26, 49] },
+      { species: 'schildkroete', at: [55, -9] },
     ],
   },
 ];

@@ -20,7 +20,7 @@ function reachable(world: World, open: GateId[], start: readonly [number, number
 }
 const lichtung = REGIONS[0];
 const START = HOME.wake[0];
-const SEEDS = [1, 42, 2026, 7, 99, 123456];
+const SEEDS = [1, 42, 2026, 7, 99, 123456, 15838, 23757, 55433, 95028];
 
 describe('Welt aus dem Seed', () => {
   it('entsteht aus demselben Seed immer gleich, aus einem anderen anders', () => {
@@ -60,13 +60,55 @@ describe('Start auf der Lichtung', () => {
         expect(set.has(`${x},${y}`), species).toBe(true);
       }
       expect(cells.some(([x, y]) => w.cell(x, y).region === 'wild')).toBe(false);
-      expect(cells.length).toBeGreaterThan(3000); // groß genug zum Erkunden
+      expect(cells.length).toBeGreaterThan(9000); // groß genug zum Erkunden
     });
 
-    it(`Seed ${seed}: Man klettert eine Stufe hinauf und fällt beliebig tief herunter`, () => {
+    it(`Seed ${seed}: Auf der Lichtung ist keine Stufe höher als eins, man kommt überall wieder heraus`, () => {
+      const cells = reachable(w, [], START);
+      for (const [x, y] of cells)
+        for (const [dx, dy] of Object.values(DIRS)) {
+          const a = standHeight(w, [], x, y)!,
+            b = standHeight(w, [], x + dx, y + dy);
+          if (b !== null) expect(Math.abs(b - a), `${x},${y} → ${x + dx},${y + dy}`).toBeLessThanOrEqual(1);
+        }
+    });
+
+    it(`Seed ${seed}: Der Felsring ist nicht zu betreten`, () => {
+      let rocks = 0;
+      for (let y = -110; y <= 110; y += 2)
+        for (let x = -110; x <= 110; x += 2)
+          if (w.cell(x, y).deco === 'rock') {
+            rocks++;
+            expect(standHeight(w, [], x, y), `${x},${y}`).toBeNull();
+          }
+      expect(rocks).toBeGreaterThan(500);
+    });
+
+    it(`Seed ${seed}: Bäume und Büsche stehen einzeln, man kann um jeden herumgehen`, () => {
+      const solid = (x: number, y: number) => ['tree', 'bush'].includes(w.cell(x, y).deco ?? '');
+      let trees = 0;
+      for (let y = -lichtung.shape.ry; y <= lichtung.shape.ry; y++)
+        for (let x = -lichtung.shape.rx; x <= lichtung.shape.rx; x++) {
+          if (w.cell(x, y).region !== 'lichtung' || !solid(x, y)) continue;
+          trees++;
+          for (let dy = -2; dy <= 2; dy++)
+            for (let dx = -2; dx <= 2; dx++)
+              if (dx || dy) expect(solid(x + dx, y + dy), `${x},${y} und ${x + dx},${y + dy}`).toBe(false);
+        }
+      expect(trees).toBeGreaterThan(50); // es gibt sie aber noch
+    });
+
+    it(`Seed ${seed}: Die großen Tore liegen weit vom Bett`, () => {
+      for (const cells of w.gates.values()) {
+        const [x, y] = cells[1];
+        expect(Math.hypot(x - HOME.bed[0], y - HOME.bed[1])).toBeGreaterThan(60);
+      }
+    });
+
+    it(`Seed ${seed}: In der Landschaft klettert man eine Stufe hinauf und fällt beliebig tief herunter`, () => {
       let up = 0,
         down = 0;
-      for (let y = -40; y < 40; y++)
+      for (let y = 130; y < 170; y++)
         for (let x = -50; x < 50; x++) {
           const a = standHeight(w, [], x, y),
             b = standHeight(w, [], x + 1, y);
@@ -89,6 +131,15 @@ describe('Start auf der Lichtung', () => {
           expect(standHeight(w, [], x, y)).toBeNull();
         }
         expect(g.locked).toBe(true);
+      }
+    });
+
+    it(`Seed ${seed}: Vor jedem großen Tor kommt man hin`, () => {
+      const set = new Set(reachable(w, [], START).map(([x, y]) => `${x},${y}`));
+      for (const g of GATES) {
+        const [mx, my] = w.gates.get(g.id)![1];
+        const front = Object.values(DIRS).some(([dx, dy]) => set.has(`${mx + dx},${my + dy}`));
+        expect(front, g.id).toBe(true);
       }
     });
   }
@@ -122,7 +173,7 @@ describe('Landschaft', () => {
     const w = createWorld(11);
     let steep = 0,
       total = 0;
-    for (let y = 30; y < 90; y++)
+    for (let y = 130; y < 190; y++)
       for (let x = -40; x < 40; x++) {
         const a = w.cell(x, y),
           b = w.cell(x + 1, y);

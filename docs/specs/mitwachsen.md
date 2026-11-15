@@ -47,7 +47,7 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 
 1. **Start:** Die Figur schläft im Bett. Die erste Taste weckt sie an einem freien Platz neben dem Bett. *Test: „startet schlafend im Bett …“*
 2. **Laufen:** Ein Feld in Pfeilrichtung, die Figur schaut dorthin. *Test: „geht ein Feld in Pfeilrichtung …“*
-3. **Klettern:** Eine Stufe hinauf geht immer, auch auf Steine und Felsen; danach Stufe für Stufe weiter. Herunter geht jederzeit, egal wie tief. Wasser, Bäume, Büsche, Zäune, Bett und geschlossene Tore versperren das Feld; die Figur bleibt stehen (`bump`). *Tests: „klettert eine Stufe …“, „fällt beliebig tief herunter …“, „läuft nicht durch Wasser …“*
+3. **Klettern:** Eine Stufe hinauf geht immer, auch auf Klettersteine; danach Stufe für Stufe weiter. Herunter geht jederzeit, egal wie tief (auf der Lichtung gibt es aber keine Stufe höher als eins). Wasser, Bäume, Büsche, Zäune, der Felsring, Bett und geschlossene Tore versperren das Feld; die Figur bleibt stehen (`bump`). *Tests: „klettert eine Stufe …“, „fällt beliebig tief herunter …“, „läuft nicht durch Wasser …“*
 4. **Aktion neben einem Tier** (vorn, sonst das nächste der acht Nachbarfelder): Es singt. Beim ersten Mal ist es gefunden. Läuft es frei umher, folgt es danach der Figur. Folgt es schon oder ist es im Garten, singt es nur. *Tests: „singt bei der Aktion …“, „nimmt mit der Aktion auch ein Tier schräg daneben …“, „Tiere im Garten singen …“*
 5. **Hineinlaufen in ein Tier:** Es singt, folgt aber nicht. Läuft die Figur innerhalb von 15 Takten noch einmal hinein, tauschen beide den Platz (nur wenn das Tier auf dem Feld der Figur stehen darf). Steht die Figur in der Öffnung des Gartens und versperrt ein Tier im Garten den Weg, rückt es stattdessen im Garten beiseite. Kommt ein folgendes Tier durch den Tausch in den Garten, bleibt es dort (Regel 7). *Tests auch: „Randfälle aus der Prüfung“* *Tests: „Hineinlaufen lässt singen …“, „tauscht nach Ablauf der Zeit nicht mehr …“*
 6. **Gänsemarsch:** Geht die Figur einen Schritt, rückt jedes folgende Tier auf den Platz seines Vordermanns. *Test: „läuft im Gänsemarsch …“*
@@ -65,12 +65,15 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 | --- | --- |
 | Gleicher Seed ergibt gleiche Felder, anderer Seed andere Landschaft | „entsteht aus demselben Seed immer gleich …“ |
 | In der Mitte steht nur das Bett, ringsum (2 Felder) ist es flach und frei | „In der Mitte steht nur das Bett …“ |
-| Die Lichtung ist groß (Ellipse 54 × 46, über 3000 erreichbare Felder) mit Hügeln, Teichen, Wäldchen, Blumenwiesen und Klettersteinen | „Alle zehn Tiere wohnen erreichbar …“ |
+| Die Lichtung ist groß (Ellipse 80 × 68, über 9000 erreichbare Felder) mit Hügeln, Teichen, lichten Hainen, Blumenwiesen und Klettersteinen | „Alle zehn Tiere wohnen erreichbar …“ |
+| Frei zugänglich für ein kleines Kind: Benachbarte Felder unterscheiden sich um höchstens eine Ebene, so kommt man überall wieder heraus; was man nicht erreichen kann, wird Fels | „Auf der Lichtung ist keine Stufe höher als eins …“ |
+| Bäume und Büsche stehen einzeln: Im Umkreis von zwei Feldern steht kein weiteres Hindernis | „Bäume und Büsche stehen einzeln …“ |
+| Die großen Tore liegen weit vom Bett (über 60 Felder), vor jedem ist ein freier Gang nach innen | „Die großen Tore liegen weit …“, „Vor jedem großen Tor kommt man hin“ |
 | Alle zehn Tiere wohnen auf vom Bett aus erreichbaren Feldern (die Welt sucht das nächste zum Wunschort, `world.spawns`); die Landschaft hinter dem Felsring bleibt draußen | „Alle zehn Tiere wohnen erreichbar …“ |
-| Felsring in Terrassen (3, 4, außen 6): besteigbar, aber nicht zu überqueren | „Alle zehn Tiere wohnen erreichbar …“ |
-| Eine Stufe hinauf, beliebig tief herunter | „Man klettert eine Stufe hinauf …“ |
+| Felsring in Terrassen (3, 4, außen 5), nur fürs Auge: nicht zu betreten, also weder zu besteigen noch hineinzufallen | „Der Felsring ist nicht zu betreten“ |
+| Eine Stufe hinauf, beliebig tief herunter (in der Landschaft) | „In der Landschaft klettert man eine Stufe hinauf …“ |
 | Vier große Tore zu je drei Feldern, alle verschlossen; die Welt liefert ihre Felder (`world.gates`, hängen vom Seed ab) | „Vier große Tore …“ |
-| Neben jedem großen Tor ein Portal (Tormitte zwei Felder nach innen, drei zur Seite), erreichbar vom Bett; die Partner stehen in einer Reihe vier Felder über dem Bett; um jedes Portal ist es frei (`world.portals`) | „neben jedem Tor ein erreichbares Portal …“ |
+| Neben jedem großen Tor ein Portal (Tormitte drei Felder zur Seite, mindestens zwei nach innen, bis es frei auf der Lichtung steht), erreichbar vom Bett; die Partner stehen in einer Reihe vier Felder über dem Bett; um jedes Portal ist es frei (`world.portals`) | „neben jedem Tor ein erreichbares Portal …“ |
 | Ohne Garten keine Gartenfelder; mit `{ garden: true }` genau ein Eingang | „Ohne Garten gibt es keine Gartenfelder …“ |
 | Die Landschaft ist sanft (selten mehr als eine Stufe zwischen Nachbarn) | „ist meist sanft …“ |
 

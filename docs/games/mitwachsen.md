@@ -33,8 +33,9 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 ## Welt
 
 - **Endlos**, berechnet aus einem **Seed**. Derselbe Seed ergibt immer dieselbe Welt. Gespeichert werden nur Seed und Fortschritt, nie die Landschaft.
-- **Start auf der Lichtung:** Am Anfang gibt es nur das **Bett** in der Mitte einer großen Lichtung (gut 100 × 90 Felder) mit Hügeln, mehreren Teichen, Wäldchen, Blumenwiesen und Steinen zum Klettern. Keine Mauer, kein Garten: Das entwickelt sich mit der Zeit.
-- **Ringsum natürliche Felsen** mit leicht unregelmäßigem Rand, in Terrassen ansteigend (man kann hinaufklettern und schauen, aber nicht hinüber), darin vier **große Tore** (Norden, Osten, Süden, Westen). Sie sind vorerst verschlossen; dahinter liegen später Eiswelt, Sandwelt, Wasserwelt und Lavaberge. Vorerst ist nur die Lichtung spielbar.
+- **Start auf der Lichtung:** Am Anfang gibt es nur das **Bett** in der Mitte einer großen Lichtung (gut 160 × 136 Felder) mit sanften Hügeln, mehreren Teichen, einzelnen Bäumen, Blumenwiesen und Steinen zum Klettern. Keine Mauer, kein Garten: Das entwickelt sich mit der Zeit.
+- **Frei zugänglich (aus dem ersten Spieltest):** Ein Dreijähriger kommt um einen Baum herum, bei mehreren dicht beieinander wird es schwierig. Darum stehen Bäume und Büsche einzeln, mit Platz ringsum. Keine Stufe ist höher als eins, so kommt man überall hinauf und nirgends in eine Ecke, aus der es nicht herausgeht. Die Tore liegen weit weg.
+- **Ringsum natürliche Felsen** mit leicht unregelmäßigem Rand, in Terrassen ansteigend. Sie sind eine feste Grenze: Man kann sie weder besteigen noch hineinfallen, darin vier **große Tore** (Norden, Osten, Süden, Westen). Sie sind vorerst verschlossen; dahinter liegen später Eiswelt, Sandwelt, Wasserwelt und Lavaberge. Vorerst ist nur die Lichtung spielbar.
 - **Nebel:** Zu sehen ist nur, was das Kind schon erkundet hat. Dahinter verschwindet die Welt weich im Dunst, wie echter Nebel, und zeigt sich beim Herumlaufen (gespeichert).
 - Hinter den Toren: endlose, berechnete Landschaft in Stücken (16 × 16 Felder).
 - **Höhen:** Eine Stufe hinauf geht automatisch mit einem kleinen Hüpfer, auch auf Steine und Felsen; dann Stufe für Stufe weiter. Herunter geht immer, egal wie tief.
@@ -72,7 +73,7 @@ Die Lichtung ist das Zuhause mit dem Bett. Hinter jedem der vier großen Tore li
 
 ### Lichtung
 
-Große Wiese (gut 100 × 90 Felder) mit Hügeln, Teichen, Wäldchen, Blumenwiesen und Klettersteinen, ringsum Felsen in Terrassen. In der Mitte das Bett, darüber später die vier Portale in einer Reihe. Zehn Tiere: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte. Tag und Nacht, Schmetterlinge, nachts Glühwürmchen.
+Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzelnen Bäumen, Blumenwiesen und Klettersteinen, ringsum Felsen als feste Grenze. In der Mitte das Bett, darüber später die vier Portale in einer Reihe. Zehn Tiere: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte. Tag und Nacht, Schmetterlinge, nachts Glühwürmchen.
 
 ### Eiswelt (Nordtor)
 
