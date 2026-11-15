@@ -103,7 +103,7 @@ Rein in `mitwachsen-tired.ts`, die Uhr gehört zum Kind (ein Wert je Browser, `l
 | Gesperrt wird nichts. Schlafen im Bett beendet den Tag (die Zeit beginnt neu), ebenso eine Pause über 60 Minuten | „nach einer langen Pause beginnt ein neuer Tag“ |
 | Gespeichert alle 5 s und mit dem Spielstand; Kaputtes ergibt einen neuen Tag | „übersteht Speichern und Laden …“ |
 
-**Hinweis für Eltern** (`MitwachsenParentInfo.astro`): unter 3 Jahren, 3 bis 6 Jahre (Wortlaut der S2k-Leitlinie), WHO, gemeinsames Spielen, wie das Spiel hilft, Quellen als Links. Erscheint beim ersten Öffnen vor dem Spiel (gemerkt in `larmic.games.mitwachsen.info`), wieder zu öffnen im Menü („Für Eltern: Medienzeit“) und über den „i“-Knopf der Bett-Sprechblase. Steht ohne JavaScript im Text der Seite. Solange er offen ist, ruht das Spiel.
+**Hinweis für Eltern** (`MitwachsenParentInfo.astro`): unter 3 Jahren, 3 bis 6 Jahre (S2k-Leitlinie), WHO, gemeinsames Spielen (Madigan u. a.), jeweils mit Angabe, wer es empfiehlt, und ohne Vorschriften, wie das Spiel hilft, Quellen als Links. Erscheint beim ersten Öffnen vor dem Spiel (gemerkt in `larmic.games.mitwachsen.info`), wieder zu öffnen im Menü („Für Eltern: Medienzeit“) und über den „i“-Knopf der Bett-Sprechblase. Steht ohne JavaScript im Text der Seite. Solange er offen ist, ruht das Spiel.
 
 ## Invarianten
 
