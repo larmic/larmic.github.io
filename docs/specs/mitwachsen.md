@@ -77,7 +77,7 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 | Felsring in Terrassen (3, 4, außen 5), nur fürs Auge: nicht zu betreten, also weder zu besteigen noch hineinzufallen; mit festem Außenrand, so ist er überall gut zehn Felder dick | „Der Felsring ist nicht zu betreten“ |
 | Eine Stufe hinauf, beliebig tief herunter (in der Landschaft) | „In der Landschaft klettert man eine Stufe hinauf …“ |
 | Acht große Tore zu je fünf Feldern, links und rechts je zwei Felder Turm (fest), alle verschlossen; die Welt liefert Felder, Mitte, Richtung nach außen und Winkel (`world.gates`) | „Acht große Tore …“ |
-| Neben jedem großen Tor ein Portal (sieben Felder neben der Tormitte, vor dem Felsrand), erreichbar vom Bett, zur Lichtung schauend; die Partner stehen im Kreis um das Bett, jedes in Richtung seines Tors und zum Bett schauend; die Säulen sind fest, um jedes Portal ist es frei (`world.portals`) | „neben jedem Tor ein erreichbares Portal …“ |
+| Neben jedem großen Tor ein Portal (gleich neben dem Turm, sechs Felder neben der Tormitte, zwei Felder vor der Torreihe; die Bucht ist auf seiner Seite breiter), erreichbar vom Bett, zur Lichtung schauend; die Partner stehen im Kreis um das Bett, jedes in Richtung seines Tors und zum Bett schauend; die Säulen sind fest, um jedes Portal ist es frei (`world.portals`) | „neben jedem Tor ein erreichbares Portal …“ |
 | Ohne Garten keine Gartenfelder; mit `{ garden: true }` genau ein Eingang | „Ohne Garten gibt es keine Gartenfelder …“ |
 | Die Landschaft ist sanft (selten mehr als eine Stufe zwischen Nachbarn) | „ist meist sanft …“ |
 

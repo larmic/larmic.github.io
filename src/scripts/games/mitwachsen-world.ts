@@ -146,7 +146,7 @@ const OBSTACLE_GAP = 2;
 export const GATE_HALF = 2; // Tor: Mitte ± 2 Felder
 export const TOWER = 2; // Türme links und rechts, je zwei Felder breit
 const BAY_HALF = GATE_HALF + TOWER + 1; // Bucht vor dem Torhaus: so breit (Mitte ± 5), bis zur Lichtung frei
-const PORTAL_SIDE = 7; // das Portal steht so weit neben der Tormitte
+const PORTAL_SIDE = GATE_HALF + TOWER + 2; // das Portal steht gleich neben dem Turm (Mitte ± 6), auf Höhe des Tors
 
 const sign = (v: number) => (v < 0 ? -1 : 1);
 /** Achse, die einer Richtung am nächsten kommt */
@@ -156,7 +156,6 @@ const axis = (dx: number, dy: number): Point => (Math.abs(dx) >= Math.abs(dy) ? 
 type Layout = GatePlace & {
   depth: number; // t der Torreihe
   at: (u: number, t: number) => Point;
-  portalDepth: number; // t des Portals neben dem Tor: vor dem Felsrand seiner Spalten
   side: number; // Portal links (−1) oder rechts (+1) vom Tor
 };
 
@@ -189,9 +188,7 @@ function layouts(seed: number): Layout[] {
     const cells: Point[] = [];
     for (let u = -GATE_HALF; u <= GATE_HALF; u++) cells.push(at(u, depth));
     const side = hash(seed, i, 92) % 2 ? 1 : -1;
-    let portalDepth = depth;
-    for (let k = -2; k <= 2; k++) portalDepth = Math.min(portalDepth, first(side * PORTAL_SIDE + k));
-    return { id: g.id, cells, mid: at(0, depth), out, angle, depth, at, side, portalDepth: portalDepth - 3 };
+    return { id: g.id, cells, mid: at(0, depth), out, angle, depth, at, side };
   });
 }
 
@@ -207,8 +204,8 @@ function portalsOf(places: readonly Layout[]): Map<GateId, Portal> {
     ];
     const homeFacing = axis(HOME.bed[0] - home[0], HOME.bed[1] - home[1]);
     out.set(p.id, {
-      gate: p.at(u, p.portalDepth),
-      gateExit: p.at(u, p.portalDepth - 1),
+      gate: p.at(u, p.depth - 2),
+      gateExit: p.at(u, p.depth - 3),
       gateFacing: [-p.out[0], -p.out[1]],
       home,
       homeExit: [home[0] + homeFacing[0], home[1] + homeFacing[1]],
@@ -280,7 +277,9 @@ function buildStart(
   // Große Tore: Platz davor frei, Tor und Türme in der Torreihe, dahinter ein Gang durch den Fels in die Welt
   for (const p of places) {
     const span = GATE_HALF + TOWER;
-    for (let u = -BAY_HALF; u <= BAY_HALF; u++)
+    // Bucht vor dem Torhaus, auf der Seite des Portals breiter, damit es gleich neben dem Turm stehen kann
+    const [u0, u1] = p.side < 0 ? [-PORTAL_SIDE - 2, BAY_HALF] : [-BAY_HALF, PORTAL_SIDE + 2];
+    for (let u = u0; u <= u1; u++)
       for (let t = p.depth - 1; t >= p.depth - 60; t--) {
         const [x, y] = p.at(u, t);
         if (map.get(key(x, y))?.region === 'lichtung' && t < p.depth - 2) break; // weiter innen ist schon Lichtung

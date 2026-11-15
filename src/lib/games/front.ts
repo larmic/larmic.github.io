@@ -195,10 +195,16 @@ export function eyes(
   inset: number,
   color = '#1d2233',
 ): Part[] {
+  const s = Math.min(w, h) * 0.4; // Glanzpunkt oben im Auge, damit es lebendig wirkt
+  const shine = '#ffffff';
   return [
     [front - 0.02, inset, z, 0.03, w, h, color, null, 'f'],
     [front - 0.02, -inset - w, z, 0.03, w, h, color, null, 'f'],
     [front - 0.06 - w, half - 0.02, z, w, 0.03, h, color, null, 'r'],
     [front - 0.06 - w, -half - 0.01, z, w, 0.03, h, color, null, 'l'],
+    [front - 0.015, inset + w - s, z + h - s, 0.035, s, s, shine, null, 'f'],
+    [front - 0.015, -inset - w, z + h - s, 0.035, s, s, shine, null, 'f'],
+    [front - 0.06 - s, half - 0.015, z + h - s, s, 0.035, s, shine, null, 'r'],
+    [front - 0.06 - s, -half - 0.02, z + h - s, s, 0.035, s, shine, null, 'l'],
   ];
 }

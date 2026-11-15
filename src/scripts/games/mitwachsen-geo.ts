@@ -45,7 +45,8 @@ export type Tile =
   | 'cloud'
   | 'mossTop'
   | 'mossSide'
-  | 'sandstone';
+  | 'sandstone'
+  | 'fur'; // feine helle Körnung für Tiere und Figur (die Farbe kommt aus dem Modell)
 const TILES: Tile[] = [
   'grassTop',
   'grassSide',
@@ -69,6 +70,7 @@ const TILES: Tile[] = [
   'mossTop',
   'mossSide',
   'sandstone',
+  'fur',
 ];
 const TPX = 16; // Pixel je Kachel: 8 × 8-Raster mit feiner Körnung in 2 × 2 Unterpixeln
 const COLS = 4;
@@ -129,6 +131,7 @@ const SOURCES: Record<Tile, [Grid, Palette] | null> = {
   mossTop: [GRASS_TOP, PAL_MOSS],
   mossSide: [GRASS_SIDE, PAL_MOSS],
   sandstone: [PLANKS, PAL_SANDSTONE],
+  fur: [DIRT, { D: [['#ffffff', 1]], d: [['#ececec', 1]], e: [['#f6f6f6', 1]] }],
 };
 
 export function atlas(): CanvasTexture {

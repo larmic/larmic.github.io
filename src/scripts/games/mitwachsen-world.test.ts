@@ -254,6 +254,9 @@ describe('Portale', () => {
         expect(cells.has(`${p.gateExit[0]},${p.gateExit[1]}`), `${g.id} Ausgang am Tor`).toBe(true);
         expect(cells.has(`${p.homeExit[0]},${p.homeExit[1]}`), `${g.id} Ausgang am Bett`).toBe(true);
         expect(Math.hypot(p.home[0] - HOME.bed[0], p.home[1] - HOME.bed[1])).toBeLessThanOrEqual(HOME.portalRing + 1);
+        // gleich neben dem Tor (neben dem Turm, auf Höhe der Torreihe)
+        const { mid } = w.gates.get(g.id)!;
+        expect(Math.hypot(p.gate[0] - mid[0], p.gate[1] - mid[1]), `${g.id} nah am Tor`).toBeLessThanOrEqual(7);
         // Säulen links und rechts sind fest
         const [fx, fy] = p.gateFacing;
         for (const o of [-1, 1]) expect(w.cell(p.gate[0] + fy * o, p.gate[1] + fx * o).deco).toBe('portalside');

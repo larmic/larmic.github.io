@@ -73,7 +73,7 @@ const FOG_N = 128; // Nebel-Maske: 128 × 128 Felder um die Figur (8 × 8 Stück
 /** Modell aus Teilen (wie in der 2D-Ansicht), mit Blick nach Osten (+x): vorn → x, rechts → z, oben → y */
 function modelGeometry(parts: readonly Part[]): BufferGeometry {
   const g = new Geo();
-  for (const [f, r, z, fl, rw, h, color, top] of parts) g.box(f, z, r, fl, h, rw, color, top ?? null);
+  for (const [f, r, z, fl, rw, h, color, top] of parts) g.box(f, z, r, fl, h, rw, color, top ?? null, 'fur');
   return g.build();
 }
 const YAW: Record<Dir, number> = { e: 0, s: -Math.PI / 2, w: Math.PI, n: Math.PI / 2 };
