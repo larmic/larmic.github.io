@@ -22,6 +22,7 @@ function fakeWorld(cells: Record<string, Partial<Cell>> = {}): World {
     cell: (x, y) => ({ h: 1, ground: 'grass', deco: null, region: 'lichtung', solid: false, ...cells[`${x},${y}`] }),
     gates: new Map(),
     spawns: new Map(),
+    portals: new Map(),
   };
 }
 const animal = (id: string, x: number, y: number, extra: Partial<Animal> = {}): Animal => ({
@@ -417,5 +418,63 @@ describe('Durchgänge bleiben frei', () => {
         if (a.mode === 'wander' && a.home.kind === 'region')
           expect(passages, `${a.id} ${a.x},${a.y}`).not.toContain(`${a.x},${a.y}`);
     }
+  });
+});
+
+describe('Portale', () => {
+  const world = createWorld(1);
+  const west = world.portals.get('westtor')!;
+  /** Figur wach vor dem Portal am Westtor, Blick darauf */
+  function beforeGatePortal(extra: Animal[] = [], followers: string[] = []) {
+    const [ex, ey] = west.gateExit;
+    const dir = (
+      west.gate[0] - ex === 1 ? 'e' : west.gate[0] - ex === -1 ? 'w' : west.gate[1] - ey === 1 ? 's' : 'n'
+    ) as Dir;
+    const s: State = {
+      ...initialState(world),
+      sleeping: false,
+      player: { x: ex, y: ey, dir },
+      animals: extra,
+      followers,
+    };
+    return { s, dir };
+  }
+
+  it('aktiviert das Portal am Tor beim Hineinlaufen, ohne gleich zu reisen', () => {
+    const { s, dir } = beforeGatePortal();
+    const r = run(s, world, dir);
+    expect(r.events).toEqual([{ type: 'portal', id: 'westtor' }]);
+    expect(r.s.portals).toEqual(['westtor']);
+    expect([r.s.player.x, r.s.player.y]).toEqual([...west.gateExit]);
+  });
+
+  it('bringt die Figur durch das aktive Portal zum Bett und zurück; folgende Tiere reisen mit', () => {
+    const { s, dir } = beforeGatePortal(
+      [animal('lichtung:hase', west.gateExit[0], west.gateExit[1] + 1, { mode: 'follow' })],
+      ['lichtung:hase'],
+    );
+    let r = run({ ...s, portals: ['westtor'] }, world, dir);
+    expect(r.events).toEqual([{ type: 'teleport', id: 'westtor', to: 'home' }]);
+    expect([r.s.player.x, r.s.player.y]).toEqual([...west.homeExit]);
+    const hase = r.s.animals.find((a) => a.id === 'lichtung:hase')!;
+    expect(Math.max(Math.abs(hase.x - r.s.player.x), Math.abs(hase.y - r.s.player.y))).toBeLessThanOrEqual(2);
+    // zurück: vom Ausgang am Bett nach oben ins Portal
+    r = run({ ...r.s, player: { ...r.s.player, dir: 'n' } }, world, 'n');
+    expect(r.events).toEqual([{ type: 'teleport', id: 'westtor', to: 'gate' }]);
+    expect([r.s.player.x, r.s.player.y]).toEqual([...west.gateExit]);
+  });
+
+  it('ein noch nicht erschienenes Portal über dem Bett ist einfach Wiese', () => {
+    const [hx, hy] = west.home;
+    const s: State = { ...initialState(world), sleeping: false, player: { x: hx, y: hy + 1, dir: 'n' }, animals: [] };
+    const r = run(s, world, 'n');
+    expect(types(r.events)).toEqual(['step']);
+    expect([r.s.player.x, r.s.player.y]).toEqual([hx, hy]);
+  });
+
+  it('aktive Portale kommen mit dem Spielstand wieder; Unbekanntes fällt weg', () => {
+    const s = initialState(world, { portals: ['westtor', 'mondtor' as never] });
+    expect(s.portals).toEqual(['westtor']);
+    expect(progressOf(s).portals).toEqual(['westtor']);
   });
 });

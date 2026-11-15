@@ -71,6 +71,7 @@ describe('Welten speichern', () => {
       met: ['zuhause:hase'],
       garden: [{ id: 'zuhause:hase', species: 'hase' as const }],
       openGates: ['nordtor' as const],
+      portals: ['westtor' as const],
       position: [3, 4] as [number, number],
     };
     expect(progressFrom(withProgress(w, p))).toEqual(p);

@@ -47,11 +47,18 @@ export type State = {
   met: string[];
   garden: HomeAnimal[];
   openGates: GateId[];
+  portals: GateId[]; // aktivierte Portale (je Tor eines, mit Partner über dem Bett)
   lastBump: { id: string; tick: number } | null;
 };
 
 /** Was gespeichert wird */
-export type Progress = { met: string[]; garden: HomeAnimal[]; openGates: GateId[]; position: [number, number] };
+export type Progress = {
+  met: string[];
+  garden: HomeAnimal[];
+  openGates: GateId[];
+  portals: GateId[];
+  position: [number, number];
+};
 
 export type Cmd = { type: 'move'; dir: Dir } | { type: 'action' } | { type: 'tick' };
 export type GameEvent =
@@ -62,6 +69,8 @@ export type GameEvent =
   | { type: 'swap'; id: string }
   | { type: 'home'; id: string }
   | { type: 'gate'; id: GateId }
+  | { type: 'portal'; id: GateId } // Portal am Tor aktiviert
+  | { type: 'teleport'; id: GateId; to: 'gate' | 'home' }
   | { type: 'call' }
   | { type: 'sleep' }
   | { type: 'wake' };
@@ -81,7 +90,8 @@ const passageCache = new WeakMap<World, Set<string>>();
 function passages(world: World): Set<string> {
   let set = passageCache.get(world);
   if (!set) {
-    const spots = [...[...world.gates.values()].flat(), HOME.gardenGate];
+    const portalSpots = [...world.portals.values()].flatMap((p) => [p.gate, p.gateExit, p.home, p.homeExit]);
+    const spots = [...[...world.gates.values()].flat(), HOME.gardenGate, ...portalSpots];
     set = new Set(
       spots.flatMap(([x, y]) =>
         [
@@ -173,6 +183,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     met: [...(saved.met ?? [])].sort(),
     garden: [...garden],
     openGates: (saved.openGates ?? []).filter((id) => !GATES.find((g) => g.id === id)?.locked),
+    portals: (saved.portals ?? []).filter((id) => world.portals.has(id)),
     lastBump: null,
   };
   openGates(s, []); // Tore, deren Tiere schon alle getroffen sind, stehen offen
@@ -184,6 +195,7 @@ export const progressOf = (s: State): Progress => ({
   met: [...s.met],
   garden: [...s.garden],
   openGates: [...s.openGates],
+  portals: [...s.portals],
   position: [s.player.x, s.player.y],
 });
 
@@ -203,6 +215,7 @@ export function step(state: State, world: World, cmd: Cmd): { state: State; even
     met: [...state.met],
     garden: [...state.garden],
     openGates: [...state.openGates],
+    portals: [...state.portals],
   };
   const events: GameEvent[] = [];
   if (cmd.type === 'tick') tick(s, world);
@@ -259,6 +272,7 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
   const [dx, dy] = DIRS[dir];
   const tx = p.x + dx,
     ty = p.y + dy;
+  if (portal(s, world, tx, ty, events)) return;
   const animal = s.animals.find((a) => a.x === tx && a.y === ty);
   if (animal) {
     const again = s.lastBump?.id === animal.id && s.tick - s.lastBump.tick <= SWAP_WINDOW;
@@ -332,6 +346,40 @@ function bringHome(s: State, world: World, events: GameEvent[]) {
     if (spot) [a.x, a.y] = spot;
     events.push({ type: 'home', id });
   }
+}
+
+/**
+ * Portale: In ein inaktives Portal am Tor laufen aktiviert es (auch sein Partner über dem Bett erscheint).
+ * In ein aktives Portal laufen bringt die Figur zum Partner; folgende Tiere kommen mit.
+ * Ein noch nicht erschienenes Portal über dem Bett ist einfach Wiese. Liefert true, wenn ein Portal gehandelt hat.
+ */
+function portal(s: State, world: World, x: number, y: number, events: GameEvent[]): boolean {
+  const here = world.cell(x, y).portal;
+  if (!here) return false;
+  const active = s.portals.includes(here.id);
+  if (!active) {
+    if (here.side === 'home') return false;
+    s.portals.push(here.id);
+    events.push({ type: 'portal', id: here.id });
+    return true;
+  }
+  const pair = world.portals.get(here.id)!;
+  const to = here.side === 'gate' ? 'home' : 'gate';
+  const exit = to === 'home' ? pair.homeExit : pair.gateExit;
+  const spot = freeNear(s, world, exit, (fx, fy) => !world.cell(fx, fy).portal);
+  if (!spot) return false;
+  s.player.x = spot[0];
+  s.player.y = spot[1];
+  s.player.dir = 's';
+  s.lastBump = null;
+  // Folgende Tiere reisen mit und stellen sich nah hinter die Figur
+  for (const id of s.followers) {
+    const a = s.animals.find((t) => t.id === id)!;
+    const place = freeNear(s, world, spot, (fx, fy) => !world.cell(fx, fy).portal, id);
+    if (place) [a.x, a.y] = place;
+  }
+  events.push({ type: 'teleport', id: here.id, to });
+  return true;
 }
 
 function action(s: State, world: World, events: GameEvent[]) {

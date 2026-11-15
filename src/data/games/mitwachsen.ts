@@ -85,6 +85,8 @@ export const HOME = {
     [-1, 1],
   ] as readonly Point[], // freie Plätze am Bett zum Aufwachen
   clear: 2, // so weit um das Bett bleibt es flach und frei
+  /** Partner-Portale in kleinem Abstand über dem Bett: erscheinen, sobald das Portal am Tor aktiviert ist */
+  portals: { nordtor: [-3, -4], osttor: [-1, -4], suedtor: [1, -4], westtor: [3, -4] } as Record<GateId, Point>,
   /** Garten für später: Er entsteht noch nicht in der Welt (createWorld mit { garden: true } für Tests) */
   garden: { x0: 3, y0: -3, x1: 6, y1: 0 } as Rect,
   gardenGate: [4, 1] as Point, // Rosenbogen in der Hecke; das Feld dahinter bleibt frei
@@ -288,12 +290,12 @@ export const figureParts = (l: Look): Part[] => [
 // ---------- Farben der Spielwelt (Spielgrafik wie die Texturen, nicht Oberfläche) ----------
 
 /** Farben der Themen-Blöcke auf den Toren: Seite, Oberseite, Leuchten (nur Lava leuchtet) */
-export const THEME_COLORS: Record<GateTheme, { side: string; top: string; glow?: string }> = {
-  eis: { side: '#9fd6ef', top: '#e6f7ff' },
-  sand: { side: '#d9bf7f', top: '#ecd9a2' },
-  wasser: { side: '#3f8fd8', top: '#8cc6f0' },
-  lava: { side: '#e8541c', top: '#ffb347', glow: '#ff5a10' },
-  hoehle: { side: '#3c3f47', top: '#55596a' },
+export const THEME_COLORS: Record<GateTheme, { side: string; top: string; glow?: string; portal: string }> = {
+  eis: { side: '#9fd6ef', top: '#e6f7ff', portal: '#9fe3ff' },
+  sand: { side: '#d9bf7f', top: '#ecd9a2', portal: '#ffd98a' },
+  wasser: { side: '#3f8fd8', top: '#8cc6f0', portal: '#4fb3ff' },
+  lava: { side: '#e8541c', top: '#ffb347', glow: '#ff5a10', portal: '#ff7a1a' },
+  hoehle: { side: '#3c3f47', top: '#55596a', portal: '#8a6bd6' },
 };
 
 export const GAME_COLORS = {

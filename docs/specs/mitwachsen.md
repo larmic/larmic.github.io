@@ -28,6 +28,7 @@ Bei Änderungen am Verhalten Spec und Tests mitziehen.
 | **Gegend** | Von Hand entworfener Bereich. Zum Start nur die **Lichtung** mit dem Bett, ringsum Felsen mit vier großen Toren. |
 | **Landschaft** | Alles außerhalb der Gegenden, endlos aus dem Seed berechnet, in Stücken von 16 × 16 Feldern. |
 | **Tor** | Tor im Zaun oder Brücke übers Wasser. Gehört zu der Gegend, in der es steht. |
+| **Portal** | Rahmen im Thema eines großen Tors, steht neben dem Tor. Sein Partner steht wenige Felder über dem Bett. |
 | **Takt** | 100 ms. Tiere laufen im Takt, Schlafsperre und Platztausch zählen in Takten. |
 
 ## Ereignisse (Befehle an `step`)
@@ -40,7 +41,7 @@ Bei Änderungen am Verhalten Spec und Tests mitziehen.
 
 Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst tun sie nichts.
 
-`step` liefert den neuen Zustand und **Ereignisse** für Ton, Bild und Speichern: `step` (mit Kletterrichtung), `bump`, `sing` (mit `first`), `follow`, `swap`, `home`, `gate`, `call`, `sleep`, `wake`.
+`step` liefert den neuen Zustand und **Ereignisse** für Ton, Bild und Speichern: `step` (mit Kletterrichtung), `bump`, `sing` (mit `first`), `follow`, `swap`, `home`, `gate`, `portal` (aktiviert), `teleport` (gereist, mit Ziel `gate` oder `home`), `call`, `sleep`, `wake`.
 
 ## Regeln
 
@@ -53,6 +54,7 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 7. **Garten:** 4 × 4 Felder mit Hecke und einem Rosenbogen als Eingang. Ein folgendes Tier, das ein Feld im Garten betritt, löst sich aus der Kette, rückt nach hinten auf einen freien Platz und bleibt für immer dort (gespeichert). Das Feld direkt hinter der Öffnung bleibt frei: Kein Tier im Garten läuft dorthin, so kommt das nächste Tier immer hinein. *Tests: „ein folgendes Tier bleibt im Garten …“, „Eingang des Gartens“*
 8. **Tore:** Die vier großen Tore der Lichtung sind verschlossen (`locked`) und öffnen nicht, auch wenn alle Tiere gefunden sind; auch ein alter Spielstand öffnet sie nicht. Für künftige, nicht verschlossene Tore gilt: Ein Tor öffnet, wenn alle Tiere seiner Gegend gefunden sind, und bleibt offen. *Tests: „Große Tore“*
 9. **Schlafen:** Aktion mit dem Bett vorn oder daneben (wenn kein Tier näher ist). Folgende Tiere gehen heim: Tiere einer Gegend an einen freien Platz nahe ihrem Start, Tiere der Landschaft verschwinden und tauchen später an ihrem Platz auf. 30 Takte lang weckt keine Taste. *Tests: „legt sich mit der Aktion am Bett schlafen …“, „schickt folgende Tiere beim Schlafen heim“*
+9a. **Portale:** Läuft die Figur in ein noch nicht aktives Portal neben einem Tor, wird es aktiv und bleibt es (gespeichert); die Figur bleibt dabei stehen. Erst dann erscheint sein Partner über dem Bett, vorher ist dessen Feld einfach Wiese. Läuft die Figur in ein aktives Portal, steht sie danach vor dem Partner (auf dem freien Feld davor, sonst dem nächsten freien), folgende Tiere stehen in der Kette um sie herum. *Tests: „Portale“*
 10. **Rufen:** Aktion ohne Tier und Bett in der Nähe. *Test: „ruft, wenn weder Tier noch Bett …“*
 11. **Umherlaufen:** Freie Tiere ruhen 8 bis 25 Takte, dann gehen sie einen Schritt oder drehen sich. Sie bleiben in ihrem Zuhause (Gegend, Stück der Landschaft oder Garten) und nie auf einem Feld an einem Durchgang (Tore, Rosenbogen und deren Nachbarfelder); wer außerhalb steht (nach einem Platztausch), zieht heim. Steht die Figur daneben, bleiben sie stehen und schauen sie an. *Tests: „bleibt stehen und schaut …“, „läuft umher, aber nur in seinem Zuhause“, „Durchgänge bleiben frei“*
 12. **Landschaft:** Tiere der Landschaft gibt es in den Stücken um die Figur (Abstand 1). Ab Abstand 3 verschwinden frei laufende wieder. Gleiche Welt, gleiches Stück: gleiche Tiere am gleichen Platz.
@@ -68,6 +70,7 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 | Felsring in Terrassen (3, 4, außen 6): besteigbar, aber nicht zu überqueren | „Alle zehn Tiere wohnen erreichbar …“ |
 | Eine Stufe hinauf, beliebig tief herunter | „Man klettert eine Stufe hinauf …“ |
 | Vier große Tore zu je drei Feldern, alle verschlossen; die Welt liefert ihre Felder (`world.gates`, hängen vom Seed ab) | „Vier große Tore …“ |
+| Neben jedem großen Tor ein Portal (Tormitte zwei Felder nach innen, drei zur Seite), erreichbar vom Bett; die Partner stehen in einer Reihe vier Felder über dem Bett; um jedes Portal ist es frei (`world.portals`) | „neben jedem Tor ein erreichbares Portal …“ |
 | Ohne Garten keine Gartenfelder; mit `{ garden: true }` genau ein Eingang | „Ohne Garten gibt es keine Gartenfelder …“ |
 | Die Landschaft ist sanft (selten mehr als eine Stufe zwischen Nachbarn) | „ist meist sanft …“ |
 
@@ -98,9 +101,9 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Was | Regel |
 | --- | --- |
 | Schlüssel | `larmic.games.index` (Liste der Welten, aktuelle Welt), `larmic.games.world.<id>` je Welt, `larmic.games.muted` |
-| Format | `{ v: 4, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, homeAnimals, position, visits, explored }`; `explored` ist der Nebel je Stück (fehlt er, beginnt die Welt im Nebel); `age` ist die Altersstufe der Welt (bisher nur 3) |
+| Format | `{ v: 4, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, homeAnimals, portals, position, visits, explored }`; `portals` sind die aktiven Portale (Unbekanntes fällt weg); `explored` ist der Nebel je Stück (fehlt er, beginnt die Welt im Nebel); `age` ist die Altersstufe der Welt (bisher nur 3) |
 | Umzug | Version 1 (Arbeitstitel `game: 'threeyear'`, ohne Alter) → 2 (Alter 3) → 3 (`penAnimals` heißt jetzt `homeAnimals`) → 4 (Start auf der Lichtung: gefundene Tiere des alten Zuhauses, die es auf der Lichtung gibt, bleiben gefunden; Tore, Garten und Position beginnen neu). Ältere Indizes werden übernommen |
-| Wann | sofort bei gefunden, Garten, Tor, Schlafen, Weltwechsel und Umbenennen; sonst alle 10 s; beim Verlassen der Seite |
+| Wann | sofort bei gefunden, Garten, Tor, Portal, Reise, Schlafen, Weltwechsel und Umbenennen; sonst alle 10 s; beim Verlassen der Seite |
 | Fehler | Jeder Zugriff fängt Fehler ab. Ohne Speicher läuft das Spiel bis zum Neuladen weiter. |
 | `migrate()` | verwirft Fremdes (anderes Spiel, unbekannte Version) und räumt auf (unbekannte Tore und Arten, doppelte Einträge, kaputte Felder) |
 | Welt-Code | Seed in Basis 36, z. B. `0IDFDSE`; ergibt dieselbe Landschaft ohne Spielstand |
@@ -115,6 +118,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Verdeckte Figur | In 3D wird Laub halb durchsichtig, das zwischen Kamera und Figur steht (Baumkronen, Büsche, Hecken auf Körperhöhe oder darüber; Boden und Felsen bleiben fest): ein weicher Kreis um die Sichtlinie, bis zu drei von vier Pixeln weggelassen, die Figur selbst bleibt unverändert. In 2D wird die Figur halb durchsichtig obenauf gezeichnet |
 | Große Tore | Holz mit Eisenbändern, Steinsturz; obendrauf Themen-Blöcke (Eis, Sand, Wasser, Lava, später Höhle), die verraten, welche Welt dahinter liegt. Lava leuchtet auch nachts |
 | Nebel | keine Blöcke: Die Welt verblasst am Rand des Erkundeten weich in die Himmelsfarbe und verschwindet im Dunst. 3D: Nebel-Maske (128 × 128 Felder um die Figur, zweimal weich verwischt) als Textur, ein Shader-Zusatz mischt nach der Beleuchtung in die Himmelsfarbe (nachts dunkel). 2D: Unerkundetes bleibt leer, am Rand heller Dunst |
+| Portale | Rahmen aus Blöcken im Thema des Tors (Lava leuchtet), innen eine schimmernde Fläche in der Farbe der Welt, sobald aktiv (ruhig bei reduzierter Bewegung). Der Partner über dem Bett erscheint erst mit der Aktivierung. Auf der Karte: farbiges Kästchen, am Tor sobald erkundet, am Bett sobald aktiv. Aktivieren und Reisen klingen und funkeln |
 | Hochformat | In 3D rückt die Kamera im Hochformat weiter weg (bis 1,8-fach), der Nebel rückt mit |
 | Kamera | folgt der Figur; Figur in der Bildmitte. Etwa 18 Felder breit |
 | Feinheit | Texturen 8 × 8 wie auf der Seite, jedes Texel mit feiner Körnung in 2 × 2 Unterpixeln |

@@ -27,6 +27,7 @@ export type SavedWorld = {
   openGates: GateId[];
   metAnimals: string[];
   homeAnimals: HomeAnimal[];
+  portals: GateId[]; // aktivierte Portale
   position: [number, number];
   visits: number;
   explored: Record<string, string>; // Nebel: erkundete Felder je Stück (Base64), siehe mitwachsen-fog.ts
@@ -77,6 +78,7 @@ export function newWorld(
     position: [0, 0],
     visits: 0,
     explored: {},
+    portals: [],
   };
 }
 
@@ -144,6 +146,7 @@ export function migrate(input: unknown): SavedWorld | null {
     homeAnimals: garden.map((p) => ({ id: p.id, species: p.species as SpeciesId })),
     position: pos ? (raw.position as [number, number]) : [0, 0],
     visits: typeof raw.visits === 'number' && raw.visits >= 0 ? Math.floor(raw.visits) : 0,
+    portals: strings(raw.portals).filter((g): g is GateId => gates.has(g)),
     explored: isRecord(raw.explored)
       ? Object.fromEntries(Object.entries(raw.explored).filter(([, v]) => typeof v === 'string') as [string, string][])
       : {},
@@ -221,6 +224,7 @@ export const withProgress = (world: SavedWorld, p: Progress): SavedWorld => ({
   openGates: [...p.openGates],
   metAnimals: [...p.met],
   homeAnimals: [...p.garden],
+  portals: [...p.portals],
   position: [...p.position],
 });
 
@@ -229,5 +233,6 @@ export const progressFrom = (w: SavedWorld): Progress => ({
   met: [...w.metAnimals],
   garden: [...w.homeAnimals],
   openGates: [...w.openGates],
+  portals: [...w.portals],
   position: [...w.position],
 });

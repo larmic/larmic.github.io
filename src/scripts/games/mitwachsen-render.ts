@@ -590,6 +590,18 @@ export class Renderer {
         box(ctx, P, x + 0.1, y + 0.1, h + 2.85, 0.8, 0.8, 0.8, theme.side, theme.top);
         break;
       }
+      case 'portal': {
+        // Portal: Rahmen im Thema des Tors; über dem Bett erst nach der Aktivierung, innen leuchtend, wenn aktiv
+        const id = c.portal!.id;
+        const active = state.portals.includes(id);
+        if (c.portal!.side === 'home' && !active) break;
+        const theme = THEME_COLORS[GATES.find((g) => g.id === id)!.theme];
+        box(ctx, P, x + 0.02, y + 0.35, h, 0.22, 0.3, 2.2, theme.side, theme.top);
+        box(ctx, P, x + 0.76, y + 0.35, h, 0.22, 0.3, 2.2, theme.side, theme.top);
+        if (active) box(ctx, P, x + 0.24, y + 0.48, h + 0.05, 0.52, 0.04, 2.1, theme.portal);
+        box(ctx, P, x - 0.05, y + 0.3, h + 2.2, 1.1, 0.4, 0.3, theme.side, theme.top);
+        break;
+      }
       case 'gate':
         this.fence(P, world, x, y, h, 1 - (sc.gates.get(c.gate!) ?? 0));
         break;

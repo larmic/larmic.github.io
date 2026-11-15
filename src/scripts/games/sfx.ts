@@ -85,6 +85,10 @@ export class Sfx {
   gate() {
     [392, 523.25, 659.25, 783.99, 1046.5].forEach((f, i) => this.note(f, 0.22, 'triangle', 0.1, 1, 0.3 + i * 0.11));
   }
+  /** Durch ein Portal: schnell aufsteigende, glitzernde Töne */
+  portal() {
+    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => this.note(f, 0.12, 'sine', 0.08, 1.02, i * 0.05));
+  }
   wake() {
     [523.25, 659.25, 783.99].forEach((f, i) => this.note(f, 0.18, 'sine', 0.1, 1, i * 0.12));
   }

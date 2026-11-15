@@ -36,8 +36,10 @@ export type Deco =
   | 'fern'
   | 'boulder'
   | 'mushroom'
-  | 'biggate';
+  | 'biggate'
+  | 'portal';
 export type TreeKind = 'oak' | 'birch' | 'autumn' | 'blossom';
+export type Portal = { gate: Point; gateExit: Point; home: Point; homeExit: Point };
 
 export type Cell = {
   h: number; // Oberkante in Ebenen: Wasser 0, Boden 1, Hügel bis 3
@@ -52,6 +54,7 @@ export type Cell = {
   gardenGate?: true; // Rosenbogen in der Hecke
   tree?: TreeKind; // Baumart bei deco 'tree'
   tufts?: number; // Grasbüschel auf dem Feld (nur Zierde, begehbar)
+  portal?: { id: GateId; side: 'gate' | 'home' }; // Portal (Tor-Seite oder über dem Bett)
   shade?: number; // Farbfleck im Boden: −1 dunkler … +1 heller (große, weiche Flecken)
 };
 
@@ -60,6 +63,8 @@ export type World = {
   cell(x: number, y: number): Cell;
   /** Wohnort jedes Tiers der Lichtung: nächstes vom Bett aus erreichbares Feld zum Wunschort */
   readonly spawns: ReadonlyMap<SpeciesId, Point>;
+  /** Portale: je Tor eines daneben und eines über dem Bett, mit dem Feld, auf dem man herauskommt */
+  readonly portals: ReadonlyMap<GateId, Portal>;
   /** Felder der großen Tore (hängen vom Seed ab, weil der Felsrand leicht unregelmäßig ist) */
   readonly gates: ReadonlyMap<GateId, readonly Point[]>;
 };
@@ -107,6 +112,27 @@ function gateCells(seed: number, side: 'n' | 'o' | 's' | 'w'): Point[] {
   };
   const t = Math.min(first(-1), first(0), first(1));
   return [-1, 0, 1].map((off) => [dx ? dx * t : off, dy ? dy * t : off] as Point);
+}
+
+/**
+ * Portale: neben dem Tor (zwei Felder nach innen, drei zur Seite) und über dem Bett (HOME.portals).
+ * Herauskommen jeweils auf dem Feld davor, Richtung Lichtung bzw. Bett.
+ */
+function portalsOf(seed: number): Map<GateId, Portal> {
+  const out = new Map<GateId, Portal>();
+  for (const g of GATES) {
+    const [mx, my] = gateCells(seed, g.side)[1];
+    const [ix, iy] = { n: [0, 1], s: [0, -1], o: [-1, 0], w: [1, 0] }[g.side]; // nach innen
+    const [sx, sy] = g.side === 'n' || g.side === 's' ? [1, 0] : [0, 1]; // zur Seite
+    const [hx, hy] = HOME.portals[g.id];
+    out.set(g.id, {
+      gate: [mx + ix * 2 + sx * 3, my + iy * 2 + sy * 3],
+      gateExit: [mx + ix * 3 + sx * 3, my + iy * 3 + sy * 3],
+      home: [hx, hy],
+      homeExit: [hx, hy + 1],
+    });
+  }
+  return out;
 }
 
 /** Lichtung als feste Karte: Bett in der Mitte, Hügel, Teiche, Wäldchen, Blumenwiesen, Steine, Felsring, große Tore */
@@ -160,6 +186,18 @@ function buildStart(
   for (const g of GATES)
     for (const [x, y] of gateCells(seed, g.side))
       set(x, y, { ...grass('border'), ground: 'stone', deco: 'biggate', gate: g.id, solid: false });
+
+  // Portale: Platz ringsum flach und frei, damit man hin- und herauskommt
+  for (const [id, p] of portalsOf(seed))
+    for (const [[px, py], side] of [
+      [p.gate, 'gate'],
+      [p.home, 'home'],
+    ] as const) {
+      for (let dy = -1; dy <= 2; dy++)
+        for (let dx = -1; dx <= 1; dx++)
+          if (map.get(key(px + dx, py + dy))?.region === 'lichtung') set(px + dx, py + dy, grass('lichtung'));
+      set(px, py, { ...grass('lichtung'), deco: 'portal', portal: { id, side } });
+    }
 
   if (opts.garden) {
     for (const [x, y] of ring(HOME.garden)) set(x, y, { ...grass('lichtung'), deco: 'hedge', solid: true });
@@ -278,7 +316,7 @@ export function createWorld(seed: number, opts: { garden?: boolean } = {}): Worl
     return cells;
   });
   const gates = new Map(GATES.map((g) => [g.id, gateCells(seed, g.side)] as const));
-  return { seed, cell: (x, y) => cache.get(x, y), gates, spawns };
+  return { seed, cell: (x, y) => cache.get(x, y), gates, spawns, portals: portalsOf(seed) };
 }
 
 /** Höhe, auf der man auf einem Feld steht – null, wenn man dort nicht stehen kann */

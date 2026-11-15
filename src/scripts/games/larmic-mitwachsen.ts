@@ -6,7 +6,7 @@
 
 import { projection, type Dir } from '../../lib/games/front';
 import type { World3D as World3DType } from './mitwachsen-3d';
-import { GAME_COLORS, HOME, LOOK, SPECIES } from '../../data/games/mitwachsen';
+import { GAME_COLORS, GATES, HOME, LOOK, SPECIES, THEME_COLORS } from '../../data/games/mitwachsen';
 import { Renderer, type Body, type Float, type Particle, type Scene } from './mitwachsen-render';
 import { Sfx } from './sfx';
 import {
@@ -384,6 +384,16 @@ class LarmicMitwachsen extends HTMLElement {
         case 'home':
           this.sfx.home();
           this.burst(e.id, ['#ffd47e', '#ffffff', '#6cc46f'], 14);
+          persist = true;
+          break;
+        case 'portal':
+          this.sfx.gate();
+          this.burst('player', [THEME_COLORS[GATES.find((g) => g.id === e.id)!.theme].portal, '#ffffff'], 24);
+          persist = true;
+          break;
+        case 'teleport':
+          this.sfx.portal();
+          this.burst('player', [THEME_COLORS[GATES.find((g) => g.id === e.id)!.theme].portal, '#ffffff'], 18);
           persist = true;
           break;
         case 'gate':

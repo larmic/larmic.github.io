@@ -12,6 +12,8 @@ import {
   CanvasTexture,
   DataTexture,
   LinearFilter,
+  MeshBasicMaterial,
+  PlaneGeometry,
   RedFormat,
   UnsignedByteType,
   Vector2,
@@ -58,6 +60,7 @@ import {
   SPECIES,
   THEME_COLORS,
   figureParts,
+  type GateId,
   type GateTheme,
   type Look,
 } from '../../data/games/mitwachsen';
@@ -306,6 +309,11 @@ export class World3D {
   private lava!: MeshLambertMaterial; // leuchtet auch nachts
   private canopy!: MeshLambertMaterial;
   private themes = new Group(); // Blöcke oben auf den großen Toren
+  private portalGroup = new Group();
+  private portalParts = new Map<
+    GateId,
+    { gateInner: Mesh; home: Group; homeInner: Mesh; cell: readonly [number, number] }
+  >();
   private chunks = new Map<string, Chunk>();
   private models = new Map<string, BufferGeometry>();
   private bodies = new Map<string, Mesh>();
@@ -349,7 +357,7 @@ export class World3D {
     sc.near = 1;
     sc.far = 60;
     this.sun.shadow.bias = -0.0008;
-    this.scene.add(this.sun, this.sun.target, this.hemi, this.signs, this.sleeper, this.themes);
+    this.scene.add(this.sun, this.sun.target, this.hemi, this.signs, this.sleeper, this.themes, this.portalGroup);
   }
 
   /**
@@ -500,6 +508,7 @@ export class World3D {
     this.syncBodies(state, sc);
     this.syncSigns(state);
     this.syncSleeper(state);
+    this.syncPortals(state, sc);
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -512,6 +521,7 @@ export class World3D {
     this.world = world;
     this.fogDirty = true;
     this.buildThemes(world);
+    this.buildPortals(world);
     for (const c of this.chunks.values())
       for (const m of c.meshes) {
         this.scene.remove(m);
@@ -541,6 +551,60 @@ export class World3D {
       const m = new Mesh(g.build(), gate.theme === 'lava' ? this.lava : this.solid);
       m.castShadow = true;
       this.themes.add(m);
+    }
+  }
+
+  /**
+   * Portale: Rahmen im Thema des Tors, innen eine schimmernde Fläche, sobald aktiv. Das Portal am Tor ist immer da,
+   * sein Partner über dem Bett erscheint erst mit der Aktivierung.
+   */
+  private buildPortals(world: World) {
+    for (const child of [...this.portalGroup.children]) this.portalGroup.remove(child);
+    this.portalParts.clear();
+    const tile: Record<GateTheme, Tile> = { eis: 'ice', sand: 'sand', wasser: 'water', lava: 'lava', hoehle: 'cave' };
+    // Ein Portal als Gruppe um die Feldmitte; an Ost- und Westtor quer gedreht, damit es zur Lichtung schaut
+    const portal = (x: number, y: number, h: number, theme: GateTheme, turned: boolean) => {
+      const g = new Geo();
+      const white = new Color('#ffffff');
+      g.box(-0.48, 0, -0.15, 0.22, 2.2, 0.3, white, white, tile[theme]);
+      g.box(0.26, 0, -0.15, 0.22, 2.2, 0.3, white, white, tile[theme]);
+      g.box(-0.55, 2.2, -0.2, 1.1, 0.3, 0.4, white, white, tile[theme]);
+      g.box(-0.55, 0, -0.25, 1.1, 0.12, 0.5, white, white, tile[theme]);
+      const frame = new Mesh(g.build(), theme === 'lava' ? this.lava : this.solid);
+      frame.castShadow = true;
+      const material = new MeshBasicMaterial({
+        color: THEME_COLORS[theme].portal,
+        transparent: true,
+        opacity: 0.75,
+        side: DoubleSide,
+      });
+      const inner = new Mesh(new PlaneGeometry(0.52, 2.08), material);
+      inner.position.y = 1.16;
+      const group = new Group();
+      group.add(frame, inner);
+      group.position.set(x + 0.5, h, y + 0.5);
+      if (turned) group.rotation.y = Math.PI / 2;
+      return { group, inner };
+    };
+    for (const g of GATES) {
+      const p = world.portals.get(g.id);
+      if (!p) continue;
+      const [gx, gy] = p.gate,
+        [hx, hy] = p.home;
+      const atGate = portal(gx, gy, world.cell(gx, gy).h, g.theme, g.side === 'o' || g.side === 'w');
+      const home = portal(hx, hy, world.cell(hx, hy).h, g.theme, false);
+      this.portalGroup.add(atGate.group, home.group);
+      this.portalParts.set(g.id, { gateInner: atGate.inner, home: home.group, homeInner: home.inner, cell: p.gate });
+    }
+  }
+
+  private syncPortals(state: State, sc: Scene) {
+    const shimmer = sc.reduced ? 0.75 : 0.62 + 0.18 * Math.sin(sc.now / 280);
+    for (const [id, part] of this.portalParts) {
+      const active = state.portals.includes(id);
+      part.gateInner.visible = active && this.explored(part.cell[0], part.cell[1]);
+      part.home.visible = active;
+      for (const m of [part.gateInner, part.homeInner]) (m.material as MeshBasicMaterial).opacity = shimmer;
     }
   }
 

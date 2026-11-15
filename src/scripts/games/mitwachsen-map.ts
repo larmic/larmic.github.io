@@ -2,7 +2,7 @@
 // Erkundete Felder in ihren Farben, Unerkundetes als Nebel, die Figur als Punkt, das Bett als Häuschen.
 // Liegt das Bett außerhalb der Karte, zeigt ein Pfeil am Kartenrand den Weg nach Hause.
 
-import { HOME } from '../../data/games/mitwachsen';
+import { GATES, HOME, THEME_COLORS } from '../../data/games/mitwachsen';
 import type { State } from './mitwachsen-state';
 import type { Cell, World } from './mitwachsen-world';
 
@@ -63,6 +63,24 @@ export function drawMap(
       ctx.fillStyle = colorOf(world.cell(x, y));
       ctx.fillRect(Math.floor(ox + x * cell), Math.floor(oy + y * cell), Math.ceil(cell), Math.ceil(cell));
     }
+
+  // Portale: am Tor, sobald erkundet; über dem Bett, sobald aktiv
+  for (const g of GATES) {
+    const p = world.portals.get(g.id);
+    if (!p) continue;
+    const color = THEME_COLORS[g.theme].portal;
+    const spots = [explored(p.gate[0], p.gate[1]) ? p.gate : null, state.portals.includes(g.id) ? p.home : null];
+    for (const spot of spots) {
+      if (!spot) continue;
+      const px = ox + (spot[0] + 0.5) * cell,
+        py = oy + (spot[1] + 0.5) * cell;
+      const r = Math.max(3, cell * 1.1);
+      ctx.fillStyle = COLORS.ink;
+      ctx.fillRect(px - r - 1, py - r - 1, 2 * r + 2, 2 * r + 2);
+      ctx.fillStyle = color;
+      ctx.fillRect(px - r, py - r, 2 * r, 2 * r);
+    }
+  }
 
   // Bett als Häuschen, sonst ein Pfeil am Rand dorthin
   const [bx, by] = HOME.bed;

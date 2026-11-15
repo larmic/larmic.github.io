@@ -150,3 +150,20 @@ describe('Landschaft', () => {
     expect(new Set(all.map((a) => a.id)).size).toBe(all.length);
   });
 });
+
+describe('Portale', () => {
+  for (const seed of [1, 42, 2026]) {
+    it(`Seed ${seed}: neben jedem Tor ein erreichbares Portal, sein Partner über dem Bett`, () => {
+      const w = createWorld(seed);
+      const cells = new Set(reachable(w, [], START).map(([x, y]) => `${x},${y}`));
+      for (const g of GATES) {
+        const p = w.portals.get(g.id)!;
+        expect(w.cell(p.gate[0], p.gate[1]).portal).toEqual({ id: g.id, side: 'gate' });
+        expect(w.cell(p.home[0], p.home[1]).portal).toEqual({ id: g.id, side: 'home' });
+        expect(cells.has(`${p.gateExit[0]},${p.gateExit[1]}`), `${g.id} Ausgang am Tor`).toBe(true);
+        expect(cells.has(`${p.homeExit[0]},${p.homeExit[1]}`), `${g.id} Ausgang am Bett`).toBe(true);
+        expect(Math.max(Math.abs(p.home[0] - HOME.bed[0]), Math.abs(p.home[1] - HOME.bed[1]))).toBeLessThanOrEqual(4);
+      }
+    });
+  }
+});

@@ -160,7 +160,7 @@ Nur gesammelt, noch nicht ausgeplant.
 - **Lavaberge** als eigene Gegend hinter dem Westtor: glühende Lava zwischen dunklen Felsen, ganz ungefährlich (die Figur kommt nicht hinein, die Lava leuchtet nur warm).
 - **Tiere befreien:** Später sollen die Tiere nicht nur entdeckt, sondern befreit werden. Daran hängt auch, wie sich die großen Tore öffnen. Die Geschichte dazu fehlt noch: Wovon werden die Tiere befreit, und warum? (Für ein kleines Kind freundlich, ohne Bösewicht, der Angst macht.)
 - **Garten:** entsteht mit der Zeit am Bett; Regeln und Tests stehen schon (siehe Bett, Nacht, später der Garten).
-- **Portale:** In jeder Gegend gibt es ein Portal zu finden, dazu ein passendes Gegenstück im Haus. Der Heimweg-Pfeil zeigt auf das Portal, wenn der Weg darüber kürzer ist.
+- **Portale:** Umgesetzt für die großen Tore (siehe Spec). Noch offen: Der Heimweg-Pfeil zeigt auf das Portal, wenn der Weg darüber kürzer ist.
 - **Gemeinsame Welt:** Für ein höheres Alter: Man schickt anderen einen Link und spielt zu zweit in derselben Welt, z. B. Elternteil und Kind oder Kind und Freund. Braucht mehr als GitHub Pages (Verbindung zwischen zwei Browsern oder ein kleiner Dienst) und eine eigene Datenschutzprüfung.
 - **Geschichtenerzähler:** Der Vater spricht die Geschichten selbst ein, das Spiel kann sie vorspielen. Die Aufnahmen lägen als Audiodateien auf der Seite (keine externen Ressourcen). Ob das umgesetzt wird, ist offen.
 
