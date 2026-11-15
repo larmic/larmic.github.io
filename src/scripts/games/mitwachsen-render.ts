@@ -246,7 +246,7 @@ export class Renderer {
   /** Säule eines Feldes: nur die Blöcke, deren Vorderseite nicht vom Feld davor verdeckt wird */
   private ground(P: Projection, world: World, x: number, y: number, sc: Scene) {
     const c = world.cell(x, y);
-    if (!sc.explored(x, y)) return this.cloud(P, x, y);
+    if (!sc.explored(x, y)) return; // im Nebel: nichts, der Himmel scheint durch
     if (c.ground === 'water') return this.water(P, world, x, y, sc);
     const front = world.cell(x, y + 1);
     const frontH = front.ground === 'water' ? 0 : front.h;
@@ -266,6 +266,7 @@ export class Renderer {
       this.img(P, image, x, y, k + 1);
     }
     this.edges(P, world, x, y, c.h);
+    this.haze(P, x, y, c.h, sc);
     if (c.shade && c.ground !== 'stone') {
       const [ax, ay] = P(x, y, c.h);
       const [bx, by] = P(x + 1, y + 1, c.h);
@@ -503,10 +504,16 @@ export class Renderer {
     }
   }
 
-  /** Nebel über unerkundeten Feldern: eine weiche, helle Wolkenbank */
-  private cloud(P: Projection, x: number, y: number) {
-    const top = 2 + (hash(5, x, y) % 4) / 10;
-    box(this.ctx, P, x, y, 0, 1, 1, top, '#e3ebf1', '#f4f8fb');
+  /** Weicher Dunst am Rand des Erkundeten: je mehr Nebel ringsum, desto heller */
+  private haze(P: Projection, x: number, y: number, h: number, sc: Scene) {
+    let fog = 0;
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) if (!sc.explored(x + dx, y + dy)) fog++;
+    if (!fog) return;
+    const [ax, ay] = P(x, y, h);
+    const [bx, by] = P(x + 1, y + 1, h);
+    const [, cy] = P(x, y + 1, Math.max(0, h - 2));
+    this.ctx.fillStyle = `rgba(214,234,246,${Math.min(0.85, fog / 14).toFixed(2)})`;
+    this.ctx.fillRect(ax, ay, bx - ax, Math.max(by, cy) - ay);
   }
 
   private deco(P: Projection, world: World, state: State, sc: Scene, x: number, y: number) {

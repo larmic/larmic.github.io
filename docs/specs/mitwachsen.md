@@ -77,7 +77,7 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 | --- | --- |
 | Am Anfang liegt alles im Nebel außer einem Kreis mit Radius 5 um das Bett | (Komponente) |
 | Bei jedem Schritt lichtet sich ein Kreis mit Radius 4 um die Figur | „lichtet sich rund um die Figur …“ |
-| Nur Stücke, in denen sich etwas geändert hat, werden neu gebaut | „meldet nur Stücke, in denen sich wirklich etwas geändert hat“ |
+| Nur wenn sich etwas geändert hat, wird die Nebel-Maske neu berechnet | „meldet nur Stücke, in denen sich wirklich etwas geändert hat“ |
 | Erkundetes wird gespeichert (je Stück 32 Byte als Base64) und übersteht Laden und kaputte Daten | „übersteht das Speichern und Laden“, „ist im Spielstand klein …“ |
 | Im Nebel sind keine Tiere und keine Zeichen über Tieren zu sehen; die Karte zeigt nur Erkundetes | (Zeichnen) |
 
@@ -113,7 +113,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | --- | --- |
 | Ansicht | **3D** mit Three.js (WebGL): Kamera schräg von oben (55°) aus Süden, folgt der Figur; echtes Sonnenlicht mit Schatten, Himmel und Nebel in der Ferne. Three.js wird erst beim Spielstart per `import()` nachgeladen (Bundle-Gate). Darüber liegt ein durchsichtiges 2D-Canvas für Zeichen über den Tieren, Herzen, Noten, Heimweg-Pfeil, Nacht, Schmetterlinge und die Leiste. Ohne WebGL bleibt die **2D-Ansicht von vorn** (Reihe für Reihe von hinten nach vorn), sie läuft auch, bis 3D geladen ist |
 | Verdeckte Figur | In 3D erscheint die Figur als heller Umriss, wo Bäume, Hecken oder Hügel sie verdecken; in 2D wird sie halb durchsichtig obenauf gezeichnet |
-| Nebel | unerkundete Felder als weiche, helle Wolkenbank (3D und 2D) |
+| Nebel | keine Blöcke: Die Welt verblasst am Rand des Erkundeten weich in die Himmelsfarbe und verschwindet im Dunst. 3D: Nebel-Maske (128 × 128 Felder um die Figur, zweimal weich verwischt) als Textur, ein Shader-Zusatz mischt nach der Beleuchtung in die Himmelsfarbe (nachts dunkel). 2D: Unerkundetes bleibt leer, am Rand heller Dunst |
 | Hochformat | In 3D rückt die Kamera im Hochformat weiter weg (bis 1,8-fach), der Nebel rückt mit |
 | Kamera | folgt der Figur; Figur in der Bildmitte. Etwa 18 Felder breit |
 | Feinheit | Texturen 8 × 8 wie auf der Seite, jedes Texel mit feiner Körnung in 2 × 2 Unterpixeln |

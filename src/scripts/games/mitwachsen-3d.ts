@@ -10,6 +10,11 @@ import {
   BufferAttribute,
   BufferGeometry,
   CanvasTexture,
+  DataTexture,
+  LinearFilter,
+  RedFormat,
+  UnsignedByteType,
+  Vector2,
   Color,
   DirectionalLight,
   DoubleSide,
@@ -56,6 +61,7 @@ export const PITCH = (55 * Math.PI) / 180; // Neigung der Kamera: 90° wäre sen
 const DISTANCE = 18; // Abstand der Kamera zur Figur
 const RADIUS = 2; // Stücke um die Figur, die als Mesh vorliegen (5 × 5 = 80 × 80 Felder)
 const BUILD_PER_FRAME = 2; // neue Stücke je Bild, damit nichts ruckelt
+const FOG_N = 128; // Nebel-Maske: 128 × 128 Felder um die Figur (8 × 8 Stücke)
 
 // ---------- Textur-Kacheln ----------
 
@@ -244,9 +250,19 @@ export class World3D {
   private solid: MeshLambertMaterial;
   private foliage: MeshLambertMaterial;
   private water = new MeshLambertMaterial({ color: GAME_COLORS.water, transparent: true, opacity: 0.8 });
-  private mist = new MeshLambertMaterial({ vertexColors: true }); // Nebel über Unerkundetem
   private explored: (x: number, y: number) => boolean = () => true;
-  private dirty = new Set<string>();
+  // Nebel: weiche Maske der erkundeten Felder um die Figur; ein Zusatz im Shader mischt die Welt dort in die
+  // Himmelsfarbe. Keine Blöcke: Die Welt verschwindet einfach im Dunst.
+  private fogData = new Uint8Array(FOG_N * FOG_N);
+  private fogTex = new DataTexture(this.fogData, FOG_N, FOG_N, RedFormat, UnsignedByteType);
+  private fogUniforms = {
+    mwFogMap: { value: this.fogTex },
+    mwFogOrigin: { value: new Vector2(0, 0) },
+    mwFogSize: { value: FOG_N },
+    mwFogTint: { value: SKY.clone() },
+  };
+  private fogDirty = true;
+  private fogKey = '';
   private entity = new MeshLambertMaterial({ vertexColors: true });
   // Umriss der Figur, nur wo sie verdeckt ist (hinter Bäumen, Hecken, Hügeln): Tiefentest umgekehrt
   private xray = new MeshBasicMaterial({
@@ -280,6 +296,9 @@ export class World3D {
     const tex = atlas();
     this.solid = new MeshLambertMaterial({ map: tex, vertexColors: true });
     this.foliage = new MeshLambertMaterial({ vertexColors: true, side: DoubleSide });
+    this.fogTex.magFilter = LinearFilter;
+    this.fogTex.minFilter = LinearFilter;
+    for (const m of [this.solid, this.foliage, this.water]) this.withFog(m);
     this.scene.background = SKY.clone();
     this.scene.fog = new Fog(SKY.clone(), 26, 58);
     this.sun.castShadow = true;
@@ -293,6 +312,64 @@ export class World3D {
     sc.far = 60;
     this.sun.shadow.bias = -0.0008;
     this.scene.add(this.sun, this.sun.target, this.hemi, this.signs, this.sleeper);
+  }
+
+  /** Shader-Zusatz: Farbe nach der Beleuchtung je nach Nebel-Maske in die Himmelsfarbe mischen */
+  private withFog(material: MeshLambertMaterial) {
+    material.onBeforeCompile = (shader) => {
+      Object.assign(shader.uniforms, this.fogUniforms);
+      shader.vertexShader =
+        'varying vec3 vMwWorld;\n' +
+        shader.vertexShader.replace(
+          '#include <begin_vertex>',
+          '#include <begin_vertex>\n  vMwWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;',
+        );
+      shader.fragmentShader =
+        'uniform sampler2D mwFogMap;\nuniform vec2 mwFogOrigin;\nuniform float mwFogSize;\nuniform vec3 mwFogTint;\nvarying vec3 vMwWorld;\n' +
+        shader.fragmentShader.replace(
+          '#include <tonemapping_fragment>',
+          'float mwSeen = texture2D(mwFogMap, (vMwWorld.xz - mwFogOrigin) / mwFogSize).r;\n' +
+            '  gl_FragColor.rgb = mix(mwFogTint, gl_FragColor.rgb, smoothstep(0.08, 0.92, mwSeen));\n' +
+            '#include <tonemapping_fragment>',
+        );
+    };
+    material.customProgramCacheKey = () => 'mw-fog';
+  }
+
+  /** Nebel-Maske neu berechnen: erkundet = 1, dann zweimal weich verwischt (sanfter Übergang über 2–3 Felder) */
+  private updateFog(cx: number, cy: number) {
+    const [pcx, pcy] = chunkOf(Math.round(cx), Math.round(cy));
+    const ox = (pcx - FOG_N / CHUNK / 2) * CHUNK,
+      oy = (pcy - FOG_N / CHUNK / 2) * CHUNK;
+    const key = `${ox},${oy}`;
+    if (!this.fogDirty && key === this.fogKey) return;
+    this.fogDirty = false;
+    this.fogKey = key;
+    let a = new Float32Array(FOG_N * FOG_N);
+    for (let j = 0; j < FOG_N; j++)
+      for (let i = 0; i < FOG_N; i++) a[j * FOG_N + i] = this.explored(ox + i, oy + j) ? 1 : 0;
+    for (let pass = 0; pass < 2; pass++) {
+      const b = new Float32Array(FOG_N * FOG_N);
+      for (let j = 0; j < FOG_N; j++)
+        for (let i = 0; i < FOG_N; i++) {
+          let sum = 0,
+            n = 0;
+          for (let dj = -1; dj <= 1; dj++)
+            for (let di = -1; di <= 1; di++) {
+              const ii = i + di,
+                jj = j + dj;
+              if (ii < 0 || jj < 0 || ii >= FOG_N || jj >= FOG_N) continue;
+              sum += a[jj * FOG_N + ii];
+              n++;
+            }
+          b[j * FOG_N + i] = sum / n;
+        }
+      a = b;
+    }
+    for (let k = 0; k < a.length; k++) this.fogData[k] = Math.round(a[k] * 255);
+    this.fogTex.needsUpdate = true;
+    // Texel i liegt mittig auf Feld ox + i: Ursprung so, dass (x + 0,5 − ox) / N die Texelmitte trifft
+    this.fogUniforms.mwFogOrigin.value.set(ox, oy);
   }
 
   resize(w: number, h: number, dpr: number) {
@@ -311,8 +388,8 @@ export class World3D {
     for (const g of this.models.values()) g.dispose();
     this.models.clear();
     this.solid.map?.dispose();
-    for (const m of [this.solid, this.foliage, this.water, this.mist, this.entity, this.xray, this.hero, this.dark])
-      m.dispose();
+    for (const m of [this.solid, this.foliage, this.water, this.entity, this.xray, this.hero, this.dark]) m.dispose();
+    this.fogTex.dispose();
     this.sun.shadow.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
@@ -351,8 +428,10 @@ export class World3D {
     this.hemi.intensity = 1.35 * (1 - sc.night * 0.6);
     const sky = SKY.clone().lerp(NIGHT_SKY, sc.night);
     (this.scene.background as Color).copy(sky);
+    this.fogUniforms.mwFogTint.value.copy(sky);
     fog.color.copy(sky);
 
+    this.updateFog(cam.x, cam.y);
     this.syncChunks(world, cam.x, cam.y);
     this.syncBodies(state, sc);
     this.syncSigns(state);
@@ -360,13 +439,14 @@ export class World3D {
     this.renderer.render(this.scene, this.camera);
   }
 
-  /** Der Nebel hat sich in diesen Stücken gelichtet: im nächsten Bild neu bauen */
+  /** Der Nebel hat sich gelichtet: Maske im nächsten Bild neu berechnen (die Stücke selbst bleiben) */
   invalidate(keys: readonly string[]) {
-    for (const k of keys) if (this.chunks.has(k)) this.dirty.add(k);
+    if (keys.length) this.fogDirty = true;
   }
 
   private reset(world: World) {
     this.world = world;
+    this.fogDirty = true;
     for (const c of this.chunks.values())
       for (const m of c.meshes) {
         this.scene.remove(m);
@@ -392,18 +472,6 @@ export class World3D {
     missing.sort((a, b) => Math.hypot(a[0] - pcx, a[1] - pcy) - Math.hypot(b[0] - pcx, b[1] - pcy));
     for (const [cx, cy] of missing.slice(0, BUILD_PER_FRAME))
       this.chunks.set(`${cx},${cy}`, this.buildChunk(world, cx, cy));
-    // Gelichteter Nebel: Stück sofort ersetzen, ohne Lücke dazwischen
-    for (const k of this.dirty) {
-      const old = this.chunks.get(k);
-      if (!old) continue;
-      const [cx, cy] = k.split(',').map(Number);
-      this.chunks.set(k, this.buildChunk(world, cx, cy));
-      for (const m of old.meshes) {
-        this.scene.remove(m);
-        m.geometry.dispose();
-      }
-    }
-    this.dirty.clear();
     for (const [k, c] of this.chunks)
       if (!want.has(k)) {
         for (const m of c.meshes) {
@@ -417,18 +485,9 @@ export class World3D {
   private buildChunk(world: World, cx: number, cy: number): Chunk {
     const solid = new Geo(),
       leaves = new Geo(),
-      water = new Geo(),
-      mist = new Geo();
+      water = new Geo();
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)
       for (let x = cx * CHUNK; x < (cx + 1) * CHUNK; x++) {
-        if (!this.explored(x, y)) {
-          // Nebel: weiche, helle Wolkenbank mit leicht unruhiger Oberkante
-          const r = hash(5, x, y);
-          const top = 2.1 + (r % 5) / 10;
-          const tint = new Color('#f4f8fb').multiplyScalar(0.94 + ((r >>> 8) % 6) / 100);
-          mist.box(x, 0, y, 1, top, 1, tint, tint.clone().multiplyScalar(1.03));
-          continue;
-        }
         const c = world.cell(x, y);
         this.terrain(solid, water, world, c, x, y);
         this.decoration(solid, leaves, c, x, y);
@@ -445,11 +504,6 @@ export class World3D {
     add(solid, this.solid, true);
     add(leaves, this.foliage, false);
     add(water, this.water, false);
-    if (!mist.empty) {
-      const m = new Mesh(mist.build(), this.mist);
-      this.scene.add(m);
-      meshes.push(m);
-    }
     return { meshes };
   }
 

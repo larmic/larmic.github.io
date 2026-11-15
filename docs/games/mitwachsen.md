@@ -35,7 +35,7 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 - **Endlos**, berechnet aus einem **Seed**. Derselbe Seed ergibt immer dieselbe Welt. Gespeichert werden nur Seed und Fortschritt, nie die Landschaft.
 - **Start auf der Lichtung:** Am Anfang gibt es nur das **Bett** in der Mitte einer großen Lichtung (gut 100 × 90 Felder) mit Hügeln, mehreren Teichen, Wäldchen, Blumenwiesen und Steinen zum Klettern. Keine Mauer, kein Garten: Das entwickelt sich mit der Zeit.
 - **Ringsum natürliche Felsen** mit leicht unregelmäßigem Rand, in Terrassen ansteigend (man kann hinaufklettern und schauen, aber nicht hinüber), darin vier **große Tore** (Norden, Osten, Süden, Westen). Sie sind vorerst verschlossen; dahinter liegen später Wald, Blumenwiese, Teich und Lavaberge. Vorerst ist nur die Lichtung spielbar.
-- **Nebel:** Zu sehen ist nur, was das Kind schon erkundet hat. Der Rest liegt im Nebel und zeigt sich beim Herumlaufen (gespeichert).
+- **Nebel:** Zu sehen ist nur, was das Kind schon erkundet hat. Dahinter verschwindet die Welt weich im Dunst, wie echter Nebel, und zeigt sich beim Herumlaufen (gespeichert).
 - Hinter den Toren: endlose, berechnete Landschaft in Stücken (16 × 16 Felder).
 - **Höhen:** Eine Stufe hinauf geht automatisch mit einem kleinen Hüpfer, auch auf Steine und Felsen; dann Stufe für Stufe weiter. Herunter geht immer, egal wie tief.
 - **Wasser** ist nicht begehbar.
