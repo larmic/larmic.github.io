@@ -89,7 +89,8 @@ class LarmicMitwachsen extends HTMLElement {
   private dayAt = 0;
   private resize: ResizeObserver | null = null;
   private readonly reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  private r3d: World3DType | null = null; // 3D-Ansicht, sobald nachgeladen
+  private r3d: World3DType | null = null; // 3D-Ansicht, solange sie zeichnen kann
+  private gl3d: World3DType | null = null; // die geladene 3D-Ansicht, auch wenn ihr Kontext gerade fehlt
 
   connectedCallback() {
     this.canvas = this.querySelector('canvas.mw-canvas')!;
@@ -113,14 +114,36 @@ class LarmicMitwachsen extends HTMLElement {
    * scheitert, bleibt die 2D-Ansicht. Bis die 3D-Ansicht bereit ist, läuft das Spiel schon in 2D.
    */
   private async load3d() {
-    const probe = document.createElement('canvas');
-    if (!probe.getContext('webgl2') && !probe.getContext('webgl')) return;
+    // Three.js braucht WebGL2; ohne gar nicht erst laden. Den Prüf-Kontext sofort wieder freigeben.
+    const probe = document.createElement('canvas').getContext('webgl2');
+    if (!probe) return;
+    probe.getExtension('WEBGL_lose_context')?.loseContext();
     try {
       const { World3D } = await import('./mitwachsen-3d');
-      if (!this.isConnected) return;
-      this.r3d = new World3D(this.querySelector<HTMLCanvasElement>('canvas.mw-canvas3d')!, LOOK);
+      if (!this.isConnected || !this.globals) return;
+      const canvas = this.querySelector<HTMLCanvasElement>('canvas.mw-canvas3d')!;
+      this.gl3d = this.r3d = new World3D(canvas, LOOK);
       this.classList.add('three');
       this.measure();
+      // Verliert das Gerät den Kontext (App-Wechsel, Speicherdruck), springt die 2D-Ansicht ein, bis er zurück ist
+      const signal = this.globals.signal;
+      canvas.addEventListener(
+        'webglcontextlost',
+        () => {
+          this.r3d = null;
+          this.classList.remove('three');
+        },
+        { signal },
+      );
+      canvas.addEventListener(
+        'webglcontextrestored',
+        () => {
+          this.r3d = this.gl3d;
+          this.classList.add('three');
+          this.measure();
+        },
+        { signal },
+      );
     } catch {
       this.r3d = null; // 2D reicht
     }
@@ -133,8 +156,8 @@ class LarmicMitwachsen extends HTMLElement {
     this.globals = null;
     this.resize?.disconnect();
     this.sfx.close();
-    this.r3d?.dispose();
-    this.r3d = null;
+    this.gl3d?.dispose();
+    this.gl3d = this.r3d = null;
   }
 
   // ---------- Welten ----------
@@ -350,7 +373,7 @@ class LarmicMitwachsen extends HTMLElement {
     this.canvas.height = Math.round(h * dpr);
     // Etwa 18 Felder breit, auf großen Schirmen nicht riesig, auf kleinen nicht winzig
     this.size = { w, h, dpr, zoom: Math.min(1.25, Math.max(0.5, w / (18 * 64))) };
-    this.r3d?.resize(w, h, dpr);
+    this.gl3d?.resize(w, h, dpr);
   }
 
   /** Bildschirmpunkt eines Weltpunkts – aus der 3D-Kamera, sonst aus der Ansicht von vorn */

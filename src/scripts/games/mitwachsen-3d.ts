@@ -254,6 +254,7 @@ export class World3D {
     depthWrite: false,
   });
   private ghost: Mesh | null = null;
+  private dark = new MeshLambertMaterial({ color: GAME_COLORS.silhouette }); // verlorene Tiere auf den Tafeln
   // Die Figur selbst wird nach ihrem Umriss gezeichnet (beides im durchsichtigen Durchgang): Der Umriss sieht so nur
   // die Welt, nicht die eigenen Körperteile, und die Figur deckt ihn ab, wo sie sichtbar ist
   private hero = new MeshLambertMaterial({ vertexColors: true, transparent: true, opacity: 1 });
@@ -300,15 +301,27 @@ export class World3D {
     this.camera.updateProjectionMatrix();
   }
 
+  /** Alles freigeben, auch den WebGL-Kontext sofort (ältere iPads erlauben nur wenige gleichzeitig) */
   dispose() {
-    for (const c of this.chunks.values()) for (const m of c.meshes) m.geometry.dispose();
+    this.scene.traverse((o) => {
+      if (o instanceof Mesh) o.geometry.dispose(); // Stücke, Tore, Schläfer, Tafeln, Wesen; doppeltes dispose schadet nicht
+    });
     for (const g of this.models.values()) g.dispose();
+    this.models.clear();
+    this.solid.map?.dispose();
+    for (const m of [this.solid, this.foliage, this.water, this.entity, this.xray, this.hero, this.dark]) m.dispose();
+    this.sun.shadow.dispose();
     this.renderer.dispose();
+    this.renderer.forceContextLoss();
   }
 
   /** Bildschirmpunkt eines Weltpunkts (x, y in Feldern, z = Höhe) – für die 2D-Ebene darüber */
   readonly project: Projection = (x, y, z) => {
-    const v = new Vector3(x, z, y).project(this.camera);
+    const v = new Vector3(x, z, y).applyMatrix4(this.camera.matrixWorldInverse);
+    // Die Kamera schaut entlang −z: Punkte hinter ihr (Bett weit hinter der Figur) auf die Nahebene legen,
+    // sonst kippt die Projektion und der Heimweg-Pfeil zeigt in die falsche Richtung
+    if (v.z > -this.camera.near) v.z = -this.camera.near;
+    v.applyMatrix4(this.camera.projectionMatrix);
     return [((v.x + 1) / 2) * this.size.w, ((1 - v.y) / 2) * this.size.h];
   };
 
@@ -550,7 +563,7 @@ export class World3D {
     const top = leaf.clone().lerp(new Color('#ffffff'), 0.18);
     if (kind === 'birch') {
       g.box(x + 0.4, h, y + 0.4, 0.2, 1.6, 0.2, '#e8e4d8', '#f3efe6');
-      for (const z of [0.3, 0.75, 1.15]) g.box(x + 0.39, h + z, y + 0.39, 0.22, 0.06, 0.08, '#3a3a44');
+      for (const z of [0.3, 0.75, 1.15]) g.box(x + 0.39, h + z, y + 0.53, 0.22, 0.06, 0.08, '#3a3a44');
       g.box(x + 0.05, h + 1.35, y + 0.05, 0.9, 0.95, 0.9, leaf, top, 'leaves');
       g.box(x + 0.2, h + 2.3, y + 0.2, 0.6, 0.45, 0.6, leaf, top, 'leaves');
       return;
@@ -564,7 +577,7 @@ export class World3D {
     if (kind === 'blossom')
       for (let i = 0; i < 8; i++) {
         const r = hash(17, x, y, i);
-        g.box(x - 0.35 + (r % 170) / 100, h + 1.5 + ((r >>> 8) % 120) / 100, y + 1.41, 0.09, 0.09, 0.02, '#ffffff');
+        g.box(x - 0.35 + (r % 170) / 100, h + 1.5 + ((r >>> 8) % 66) / 100, y + 1.41, 0.09, 0.09, 0.02, '#ffffff');
       }
   }
 
@@ -666,14 +679,13 @@ export class World3D {
     if (key === this.signKey) return;
     this.signKey = key;
     for (const child of [...this.signs.children]) this.signs.remove(child);
-    const dark = new MeshLambertMaterial({ color: GAME_COLORS.silhouette });
     for (const g of GATES) {
       const region = REGIONS.find((r) => r.id === g.region)!;
       const n = region.animals.length;
       region.animals.forEach((a, i) => {
         const met = state.met.includes(`${region.id}:${a.species}`);
         const sp = SPECIES[a.species];
-        const m = new Mesh(this.model(a.species, sp.parts), met ? this.entity : dark);
+        const m = new Mesh(this.model(a.species, sp.parts), met ? this.entity : this.dark);
         m.scale.setScalar(sp.scale * 0.45);
         m.rotation.y = YAW.s;
         m.position.set(g.sign[0] + 0.5 + (i - (n - 1) / 2) * 0.42, 2.1, g.sign[1] + 0.5);
