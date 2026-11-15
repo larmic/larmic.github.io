@@ -19,6 +19,7 @@ import { canStep, standHeight, wildAnimals, type World } from './mitwachsen-worl
 
 export const SLEEP_LOCK = 30; // Takte nach dem Einschlafen, in denen Tasten nicht wecken (3 s)
 export const WAKE_GRACE = 15; // Takte nach dem Aufwachen, in denen das Bett nur ein Hindernis ist (1,5 s)
+export const BERRY_REGROW = 300; // Takte, bis an einem Busch neue Beeren hängen (30 s)
 export const SWAP_WINDOW = 15; // Takte, in denen zweimal Hineinlaufen den Platz tauscht (1,5 s)
 export const WILD_RADIUS = 1; // Stücke um die Figur, in denen Tiere der Landschaft unterwegs sind
 export const WILD_KEEP = 2; // ab diesem Abstand verschwinden sie wieder (und tauchen später an ihrem Platz auf)
@@ -51,6 +52,7 @@ export type State = {
   openGates: GateId[];
   portals: GateId[]; // aktivierte Portale (je Tor eines, mit Partner über dem Bett)
   lastBump: { id: string; tick: number } | null;
+  picked: Record<string, number>; // Büsche ohne Beeren: "x,y" → Takt des Pflückens (nicht gespeichert)
 };
 
 /** Was gespeichert wird */
@@ -73,6 +75,8 @@ export type GameEvent =
   | { type: 'gate'; id: GateId }
   | { type: 'portal'; id: GateId } // Portal am Tor aktiviert
   | { type: 'teleport'; id: GateId; to: 'gate' | 'home' }
+  | { type: 'pick'; x: number; y: number } // Beeren gepflückt
+  | { type: 'regrow'; x: number; y: number } // neue Beeren am Busch
   | { type: 'call' }
   | { type: 'sleep' }
   | { type: 'wake' };
@@ -188,6 +192,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     openGates: (saved.openGates ?? []).filter((id) => !GATES.find((g) => g.id === id)?.locked),
     portals: (saved.portals ?? []).filter((id) => world.portals.has(id)),
     lastBump: null,
+    picked: {},
   };
   openGates(s, []); // Tore, deren Tiere schon alle getroffen sind, stehen offen
   syncWild(s, world);
@@ -219,17 +224,25 @@ export function step(state: State, world: World, cmd: Cmd): { state: State; even
     garden: [...state.garden],
     openGates: [...state.openGates],
     portals: [...state.portals],
+    picked: { ...state.picked },
   };
   const events: GameEvent[] = [];
-  if (cmd.type === 'tick') tick(s, world);
+  if (cmd.type === 'tick') tick(s, world, events);
   else if (s.sleeping) wake(s, world, events);
   else if (cmd.type === 'move') move(s, world, cmd.dir, events);
   else action(s, world, events);
   return { state: s, events };
 }
 
-function tick(s: State, world: World) {
+function tick(s: State, world: World, events: GameEvent[]) {
   s.tick++;
+  // Beeren wachsen nach, auch nachts
+  for (const [k, at] of Object.entries(s.picked))
+    if (s.tick - at >= BERRY_REGROW) {
+      delete s.picked[k];
+      const [x, y] = k.split(',').map(Number);
+      events.push({ type: 'regrow', x, y });
+    }
   if (s.sleeping) return; // nachts ist es still
   syncWild(s, world);
   for (const a of s.animals) {
@@ -316,6 +329,12 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
       sing(s, animal, false, events);
       return;
     }
+  }
+  // In einen Busch laufen: Die Figur pflückt die Beeren (sie wachsen nach); ohne Beeren ist er nur ein Hindernis
+  if (world.cell(tx, ty).deco === 'bush' && !(`${tx},${ty}` in s.picked)) {
+    s.picked[`${tx},${ty}`] = s.tick;
+    events.push({ type: 'pick', x: tx, y: ty });
+    return;
   }
   // Ins Bett laufen: Die Figur legt sich schlafen (nicht gleich nach dem Aufwachen, sonst schläft sie aus Versehen ein)
   if (world.cell(tx, ty).deco === 'bed' && s.tick - s.wokeAt >= WAKE_GRACE) return sleep(s, world, events);

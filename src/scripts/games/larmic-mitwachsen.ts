@@ -4,6 +4,7 @@
 // Spiel nach einem Seitenwechsel (View Transitions) niemanden.
 // Konzept: docs/games/mitwachsen.md · Spec: docs/specs/mitwachsen.md
 
+import { chunkOf } from '../../lib/games/chunks';
 import { projection, type Dir } from '../../lib/games/front';
 import type { World3D as World3DType } from './mitwachsen-3d';
 import { GAME_COLORS, GATES, HOME, LOOK, SPECIES, THEME_COLORS, TIRED_TALK } from '../../data/games/mitwachsen';
@@ -400,6 +401,12 @@ class LarmicMitwachsen extends HTMLElement {
     const unlock = () => this.sfx.unlock();
     document.addEventListener('pointerup', unlock, { signal });
     document.addEventListener('touchend', unlock, { signal, passive: true });
+    // iPad/iPhone: Langes Drücken öffnet sonst Lupe, Textauswahl oder ein Menü. Pointer-Ereignisse kommen trotzdem an.
+    const quiet = (e: Event) => e.preventDefault();
+    for (const el of this.querySelectorAll<HTMLElement>('.mw-touch, .mw-canvas')) {
+      el.addEventListener('touchstart', quiet, { signal, passive: false });
+      el.addEventListener('contextmenu', quiet, { signal });
+    }
     for (const key of this.querySelectorAll<HTMLElement>('.mw-key')) {
       const dir = key.dataset.dir as Dir;
       const held = new Set<number>(); // mehrere Finger auf derselben Taste: erst der letzte lässt los
@@ -461,6 +468,17 @@ class LarmicMitwachsen extends HTMLElement {
           this.sfx.home();
           this.burst(e.id, ['#ffd47e', '#ffffff', '#6cc46f'], 14);
           persist = true;
+          break;
+        case 'pick': {
+          // Beeren gepflückt: Die Figur hüpft vor Freude, ein paar Beeren springen heraus
+          this.sfx.pick();
+          this.hops.set('player', now);
+          this.burst('player', ['#c8323a', '#ef5b5b', '#3f9a3c'], 12);
+          this.gl3d?.rebuild([chunkOf(e.x, e.y).join(',')]);
+          break;
+        }
+        case 'regrow':
+          this.gl3d?.rebuild([chunkOf(e.x, e.y).join(',')]);
           break;
         case 'portal':
           this.sfx.gate();

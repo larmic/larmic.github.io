@@ -326,6 +326,7 @@ export class World3D {
     { gateInner: Mesh; home: Group; homeInner: Mesh; cell: readonly [number, number] }
   >();
   private chunks = new Map<string, Chunk>();
+  private picked: Record<string, number> = {}; // Büsche ohne Beeren (aus den Regeln)
   private models = new Map<string, BufferGeometry>();
   private bodies = new Map<string, Mesh>();
   private signs = new Group();
@@ -489,6 +490,7 @@ export class World3D {
   render(world: World, state: State, sc: Scene) {
     if (this.world !== world) this.reset(world);
     this.explored = sc.explored;
+    this.picked = state.picked;
     const cam = sc.cam;
     const tx = cam.x + 0.5,
       tz = cam.y + 0.5;
@@ -526,6 +528,19 @@ export class World3D {
   /** Der Nebel hat sich gelichtet: Maske im nächsten Bild neu berechnen (die Stücke selbst bleiben) */
   invalidate(keys: readonly string[]) {
     if (keys.length) this.fogDirty = true;
+  }
+
+  /** Stücke neu bauen (z. B. Beeren gepflückt oder nachgewachsen); sie entstehen im nächsten Bild wieder */
+  rebuild(keys: readonly string[]) {
+    for (const k of keys) {
+      const c = this.chunks.get(k);
+      if (!c) continue;
+      for (const m of c.meshes) {
+        this.scene.remove(m);
+        m.geometry.dispose();
+      }
+      this.chunks.delete(k);
+    }
   }
 
   private reset(world: World) {
@@ -729,7 +744,8 @@ export class World3D {
         // Beerenbusch: niedrig und rund (zwei Stufen), rote Beeren oben und vorn – kein Baumwipfel
         canopy.box(x + 0.08, h, y + 0.12, 0.84, 0.5, 0.76, '#3f9a3c', '#5ab651', 'leaves');
         canopy.box(x + 0.2, h + 0.5, y + 0.22, 0.6, 0.16, 0.56, '#3f9a3c', '#5ab651', 'leaves');
-        for (const [bx, by, bz] of BERRIES) g.box(x + bx, h + by, y + bz, 0.09, 0.09, 0.09, '#c8323a', '#ef5b5b');
+        if (!(`${x},${y}` in this.picked))
+          for (const [bx, by, bz] of BERRIES) g.box(x + bx, h + by, y + bz, 0.09, 0.09, 0.09, '#c8323a', '#ef5b5b');
         break;
       case 'flower':
         g.box(x + 0.47, h, y + 0.47, 0.06, 0.18, 0.06, '#3f9a3c');

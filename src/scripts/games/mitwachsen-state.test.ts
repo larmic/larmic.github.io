@@ -3,6 +3,7 @@ import type { Dir } from '../../lib/games/front';
 import { HOME, animalId } from '../../data/games/mitwachsen';
 import {
   SLEEP_LOCK,
+  BERRY_REGROW,
   SWAP_WINDOW,
   WAKE_GRACE,
   initialState,
@@ -262,6 +263,26 @@ describe('Tiere', () => {
       const [x, y] = k.split(',').map(Number);
       expect(Math.abs(x) <= 2 && Math.abs(y) <= 2, k).toBe(true);
     }
+  });
+});
+
+describe('Beerenbüsche', () => {
+  it('in einen Busch laufen pflückt die Beeren; danach ist er nur ein Hindernis, bis sie nachwachsen', () => {
+    const w = fakeWorld({ '1,0': { deco: 'bush', solid: true } });
+    let r = run(awake(w, 0, 0), w, 'e');
+    expect(r.events).toEqual([{ type: 'pick', x: 1, y: 0 }]);
+    expect(r.s.player.x).toBe(0);
+    r = run(r.s, w, 'e');
+    expect(types(r.events)).toEqual(['bump']);
+    let s = r.s;
+    const regrown: GameEvent[] = [];
+    for (let i = 0; i < BERRY_REGROW; i++) {
+      const t = run(s, w, TICK);
+      s = t.s;
+      regrown.push(...t.events);
+    }
+    expect(regrown).toEqual([{ type: 'regrow', x: 1, y: 0 }]);
+    expect(types(run(s, w, 'e').events)).toEqual(['pick']);
   });
 });
 

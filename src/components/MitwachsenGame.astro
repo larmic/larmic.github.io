@@ -236,6 +236,8 @@ import MitwachsenParentInfo from './MitwachsenParentInfo.astro';
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
     color: var(--ink);
     border: 0;
     cursor: pointer;
@@ -253,6 +255,7 @@ import MitwachsenParentInfo from './MitwachsenParentInfo.astro';
   .mw-key svg {
     width: 100%;
     height: 100%;
+    pointer-events: none;
   }
   .mw-key:active,
   .mw-key.down {

@@ -533,15 +533,16 @@ export class Renderer {
         this.shadow(P, x + 0.5, y + 0.55, h, 0.42);
         this.leafy(P, x + 0.08, y + 0.12, h, 0.84, 0.76, 0.5, '#3f9a3c', '#5ab651', x, y);
         this.leafy(P, x + 0.2, y + 0.22, h + 0.5, 0.6, 0.56, 0.16, '#3f9a3c', '#5ab651', x, y);
-        // rote Beeren vorn und oben, damit man den Busch erkennt
-        for (const [bx, bz, bh] of [
-          [0.2, 0.86, 0.3],
-          [0.5, 0.86, 0.18],
-          [0.72, 0.86, 0.34],
-          [0.3, 0.34, 0.66],
-          [0.56, 0.5, 0.66],
-        ] as const)
-          box(ctx, P, x + bx, y + bz, h + bh, 0.09, 0.06, 0.09, '#c8323a', '#ef5b5b');
+        // rote Beeren vorn und oben, damit man den Busch erkennt (gepflückt: keine, bis sie nachwachsen)
+        if (!(`${x},${y}` in state.picked))
+          for (const [bx, bz, bh] of [
+            [0.2, 0.86, 0.3],
+            [0.5, 0.86, 0.18],
+            [0.72, 0.86, 0.34],
+            [0.3, 0.34, 0.66],
+            [0.56, 0.5, 0.66],
+          ] as const)
+            box(ctx, P, x + bx, y + bz, h + bh, 0.09, 0.06, 0.09, '#c8323a', '#ef5b5b');
         break;
       case 'fern':
         for (const [fx, fy, fh] of [

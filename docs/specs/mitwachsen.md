@@ -41,13 +41,14 @@ Bei Änderungen am Verhalten Spec und Tests mitziehen.
 
 Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst tun sie nichts.
 
-`step` liefert den neuen Zustand und **Ereignisse** für Ton, Bild und Speichern: `step` (mit Kletterrichtung), `bump`, `sing` (mit `first`), `follow`, `swap`, `home`, `gate`, `portal` (aktiviert), `teleport` (gereist, mit Ziel `gate` oder `home`), `call`, `sleep`, `wake`.
+`step` liefert den neuen Zustand und **Ereignisse** für Ton, Bild und Speichern: `step` (mit Kletterrichtung), `bump`, `sing` (mit `first`), `follow`, `swap`, `home`, `gate`, `portal` (aktiviert), `teleport` (gereist, mit Ziel `gate` oder `home`), `pick` (Beeren gepflückt), `regrow` (Beeren nachgewachsen), `call`, `sleep`, `wake`.
 
 ## Regeln
 
 1. **Start:** Die Figur schläft im Bett. Die erste Taste weckt sie an einem freien Platz neben dem Bett. *Test: „startet schlafend im Bett …“*
 2. **Laufen:** Ein Feld in Pfeilrichtung, die Figur schaut dorthin. *Test: „geht ein Feld in Pfeilrichtung …“*
 3. **Klettern:** Eine Stufe hinauf geht immer, auch auf Klettersteine; danach Stufe für Stufe weiter. Herunter geht jederzeit, egal wie tief (auf der Lichtung gibt es aber keine Stufe höher als eins). Wasser, Bäume, Büsche, Zäune, der Felsring, Bett und geschlossene Tore versperren das Feld; die Figur bleibt stehen (`bump`). *Tests: „klettert eine Stufe …“, „fällt beliebig tief herunter …“, „läuft nicht durch Wasser …“*
+3a. **Beerenbüsche:** Läuft die Figur in einen Busch mit Beeren, pflückt sie sie (sie hüpft, Beeren springen heraus, es ploppt) und bleibt stehen. Ohne Beeren ist der Busch ein Hindernis. Nach 300 Takten (30 s) wachsen neue Beeren, auch nachts. Gepflücktes wird nicht gespeichert. *Test: „in einen Busch laufen pflückt die Beeren …“*
 4. **Aktion neben einem Tier** (vorn, sonst das nächste der acht Nachbarfelder): Es singt. Beim ersten Mal ist es gefunden. Läuft es frei umher, folgt es danach der Figur. Folgt es schon oder ist es im Garten, singt es nur. *Tests: „singt bei der Aktion …“, „nimmt mit der Aktion auch ein Tier schräg daneben …“, „Tiere im Garten singen …“*
 5. **Hineinlaufen in ein Tier:** Ein frei umherlaufendes Tier singt, ist beim ersten Mal gefunden und folgt der Figur; die Figur bleibt stehen. Die Aktionstaste braucht es dafür nicht (erster Spieltest: Leertaste war zu viel). In ein folgendes Tier hineinlaufen tauscht sofort den Platz, so kann die Figur immer umdrehen. Ein Tier im Garten singt; läuft die Figur innerhalb von 15 Takten noch einmal hinein, tauschen beide den Platz (nur wenn das Tier auf dem Feld der Figur stehen darf und die Figur im Garten steht). Steht die Figur in der Öffnung des Gartens und versperrt ein Tier im Garten den Weg, rückt es stattdessen im Garten beiseite. Kommt ein folgendes Tier durch den Tausch in den Garten, bleibt es dort (Regel 7). *Tests auch: „Randfälle aus der Prüfung“* *Tests: „Hineinlaufen reicht …“, „in ein folgendes Tier hineinlaufen tauscht sofort …“, „ein Tier im Garten tauscht erst beim zweiten Mal …“*
 6. **Gänsemarsch:** Geht die Figur einen Schritt, rückt jedes folgende Tier auf den Platz seines Vordermanns. *Test: „läuft im Gänsemarsch …“*
@@ -154,7 +155,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Leiste unten | ein Platz je Tier, nach Gegenden gruppiert, dahinter Tiere der Landschaft, die im Garten wohnen: heller Platz mit Umriss und Fragezeichen = noch verloren, Holz mit Tier in Farbe = gefunden, Gras = zu Hause im Garten, Herz = folgt gerade |
 | Tafel am Tor | Tiere der Gegend auf dem Brett: gefundene in Farbe, verlorene als Umriss |
 | Karte | oben rechts, genordet wie die Kamera, etwa 41 × 41 Felder um die Figur: Felder in ihren Farben, die Figur als Punkt, das Bett als Häuschen. Liegt das Bett außerhalb, zeigt ein Pfeil am Kartenrand nach Hause |
-| Touch-Steuerung | auf Geräten ohne Maus (oder nach der ersten Berührung): Steuerkreuz unten links (kein Aktionsknopf), im selben ruhigen Takt wie die Tastatur; die Leiste rückt darüber |
+| Touch-Steuerung | auf Geräten ohne Maus (oder nach der ersten Berührung): Steuerkreuz unten links (kein Aktionsknopf); langes Drücken öffnet keine Lupe, Auswahl oder Menüs des Browsers (`touchstart`/`contextmenu` abgefangen, `-webkit-touch-callout: none`), im selben ruhigen Takt wie die Tastatur; die Leiste rückt darüber |
 | Kopf | oben links Zahnrad (Menü für Eltern, darin auch der Weg zur Homepage), Mitte Name der Figur, rechts Karte. Kein Zurück-Button: Das Spiel steht für sich |
 | Nacht | dunkler Himmel mit Sternen und Mond, die Figur liegt im Bett, Zzz steigt auf |
 | Menü | Zahnrad oben links: Welten wählen, neue Welt, Welt löschen (zweiter Klick bestätigt), Namen, Welt-Code kopieren, Ton, Vollbild, zur Homepage. Das Spiel pausiert, solange es offen ist |

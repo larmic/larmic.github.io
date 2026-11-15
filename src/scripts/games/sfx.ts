@@ -89,6 +89,11 @@ export class Sfx {
   portal() {
     [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => this.note(f, 0.12, 'sine', 0.08, 1.02, i * 0.05));
   }
+  /** Beeren pflücken: zweimal ein kleines, helles Ploppen */
+  pick() {
+    this.note(880, 0.07, 'sine', 0.09, 1.3);
+    this.note(1174.66, 0.09, 'sine', 0.08, 1.2, 0.09);
+  }
   /** Gähnen: ein langer, sinkender Ton, leise darunter ein zweiter */
   yawn() {
     this.note(330, 0.9, 'sine', 0.07, 0.55);
