@@ -94,6 +94,24 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 
 Die Regeln kennen den Nebel nicht: Er betrifft nur, was gezeichnet wird.
 
+## Stimmung der Richtungen
+
+Die Lichtung kündigt auf dem Weg an, was hinter einem Tor wartet. `world.climate(x, y)` liefert die Welt des nächsten Tors (wie hinter dem Felsring, Grenzen leicht gewellt) und die Stärke: 0 bis 30 % des Wegs zum Rand, dann weich ansteigend bis 1 am Felsring. Alles aus dem Seed; nur Boden, Baumart und Farben ändern sich, keine Höhen, nichts versperrt (die Regeln bleiben gleich).
+
+| Richtung | Stimmung | Test |
+| --- | --- | --- |
+| Eis | Schneeflecken (ohne Grasbüschel und Blumen), Bäume mit Schnee auf der Krone, kühles Licht; Regen fällt hier als Schnee | „Richtung Eis Schnee …“ |
+| Sand | gelbliches Gras, Sandflecken nahe am Rand, helles warmes Licht | „… Sand …“ |
+| Wasser | Blütenbäume | „… Richtung Wasser Blüten …“ |
+| Lava | trockenes Gras, Basaltflecken und kahle Bäume nahe am Rand, rötlich warmes Licht | (Zeichnen) |
+| Höhle | graueres Gras, Steinflecken, dämmriger | (Zeichnen) |
+| Wald | Herbstbäume in Orange und Rot, warmes Licht | „… Richtung Wald Herbst …“ |
+| Pilze | lila Moosflecken, leicht lila Licht | „… Richtung Pilze Moos“ |
+| Wolken | (Wind kommt mit Schritt 2) | |
+| Am Bett und auf der Wiese neutral | | „am Bett ist es neutral“ |
+
+Licht: Sonne und Himmelslicht nehmen Farbe und Helligkeit der Richtung an, in der die Figur steht (`MOOD_LIGHT`); in 2D eine leichte Tönung.
+
 ## Wetter und Unterstand
 
 Rein in `mitwachsen-weather.ts`: Das Wetter folgt aus Seed, Tag (`state.day`) und Spielzeit (`state.tick`), gleiche Werte ergeben gleiches Wetter.
@@ -126,7 +144,7 @@ Rein in `mitwachsen-tired.ts`, die Uhr gehört zum Kind (ein Wert je Browser, `l
 | Nach 15 und 20 Minuten setzt sich die Figur 2,5 s hin (Laufen geht so lange nicht), gähnt, und eine Sprechblase sagt es (Mond und „Zzz“ für das Kind, ein Satz zum Vorlesen) | „gähnt nach 15 und 20 Minuten …“ |
 | Nach 25 Minuten will die Figur ins Bett (Mond und Bett in der Blase, dazu ein „i“-Knopf zum Hinweis für Eltern), danach alle 3 Minuten wieder | „gähnt nach 15 und 20 Minuten …“ |
 | Verpasste Hinweise kommen nur einmal | „meldet verpasste Hinweise nur einmal“ |
-| Spielt niemand: nach 20 s ohne Eingabe setzt sich die wache Figur, schaut zum Betrachter und liest in einem Buch; nach 2 Minuten nickt sie ein (Augen zu, „Zzz“). Jede Taste weckt sie, sie läuft sofort los. Solange sie liest oder döst, läuft die Uhr fürs Müdewerden nicht. Nach Menü, Hinweis oder Tab-Wechsel beginnt die Zeit neu | „ohne Eingabe setzt sich die Figur …“ |
+| Spielt niemand: nach 20 s ohne Eingabe setzt sich die wache Figur, schaut zum Betrachter und liest in einem großen aufgeschlagenen Buch auf dem Schoß (weiße Seiten mit Zeilen nach oben, alle 5 s blättert eine Seite um); nach 2 Minuten nickt sie ein (Augen zu, „Zzz“). Jede Taste weckt sie, sie läuft sofort los. Solange sie liest oder döst, läuft die Uhr fürs Müdewerden nicht. Nach Menü, Hinweis oder Tab-Wechsel beginnt die Zeit neu | „ohne Eingabe setzt sich die Figur …“ |
 | Ab 20 Minuten wird das Licht golden (bis 25 Minuten 60 %, ab 35 Minuten ganz) | „der Himmel wird ab 20 Minuten abendlich …“ |
 | Gesperrt wird nichts. Schlafen im Bett beendet den Tag (die Zeit beginnt neu), ebenso eine Pause über 60 Minuten | „nach einer langen Pause beginnt ein neuer Tag“ |
 | Gespeichert alle 5 s und mit dem Spielstand; Kaputtes ergibt einen neuen Tag | „übersteht Speichern und Laden …“ |
@@ -161,7 +179,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 
 | Was | Regel |
 | --- | --- |
-| Ansicht | **3D** mit Three.js (WebGL): Kamera schräg von oben (55°) aus Süden, folgt der Figur; echtes Sonnenlicht mit Schatten, Himmel und Nebel in der Ferne. Three.js wird erst beim Spielstart per `import()` nachgeladen (Bundle-Gate). Darüber liegt ein durchsichtiges 2D-Canvas für Zeichen über den Tieren, Herzen, Noten, Heimweg-Pfeil, Nacht, Schmetterlinge und die Leiste. Ohne WebGL bleibt die **2D-Ansicht von vorn** (Reihe für Reihe von hinten nach vorn), sie läuft auch, bis 3D geladen ist |
+| Ansicht | **3D** mit Three.js (WebGL): Kamera schräg von oben (55°) aus Süden, folgt der Figur; echtes Sonnenlicht mit Schatten, Himmel und Nebel in der Ferne. Three.js wird erst beim Spielstart per `import()` nachgeladen (Bundle-Gate: höchstens 128 KB JavaScript beim Laden der Spielseite, kein Three.js). Darüber liegt ein durchsichtiges 2D-Canvas für Zeichen über den Tieren, Herzen, Noten, Heimweg-Pfeil, Nacht, Schmetterlinge und die Leiste. Ohne WebGL bleibt die **2D-Ansicht von vorn** (Reihe für Reihe von hinten nach vorn), sie läuft auch, bis 3D geladen ist |
 | Verdeckte Figur | In 3D wird Laub halb durchsichtig, das zwischen Kamera und Figur steht (Baumkronen, Büsche, Hecken auf Körperhöhe oder darüber; Boden und Felsen bleiben fest): ein weicher Kreis um die Sichtlinie, bis zu drei von vier Pixeln weggelassen, die Figur selbst bleibt unverändert. In 2D wird die Figur halb durchsichtig obenauf gezeichnet |
 | Nebel | keine Blöcke: Die Welt verblasst am Rand des Erkundeten weich in die Himmelsfarbe und verschwindet im Dunst. 3D: Nebel-Maske (128 × 128 Felder um die Figur, zweimal weich verwischt) als Textur, ein Shader-Zusatz mischt nach der Beleuchtung in die Himmelsfarbe (nachts dunkel). 2D: Unerkundetes bleibt leer, am Rand heller Dunst |
 | Große Tore | Mächtige Torhäuser (9 Felder breit, Türme gut 6 Ebenen hoch) mit geschlossener Doppeltür und leuchtendem Zeichen, je Welt geschmückt: Eis (Schneehauben, Eisspitzen, Eiszapfen), Sand (Stufenkronen, Bänder), Wasser (Wasserfälle, Muscheln), Lava (glühende Adern und Krone), Höhle (leuchtende Kristalle), Wald (Laubkronen, Ranken), Wolken (Wolkentürme, Regenbogen), Pilze (Pilzstiele mit Riesenhüten). Vor der Figur wird ihr Mauerwerk durchsichtig. Steht die Figur vor einem Tor, lichtet sich der Nebel im Gang dahinter (Blick in die Welt) |

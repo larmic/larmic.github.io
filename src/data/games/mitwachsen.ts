@@ -408,13 +408,26 @@ export const BASKET_PARTS: Part[] = [
   [-0.2, -0.05, 0.74, 0.05, 0.06, 0.04, '#3f9a3c', '#5ab651'], // Blatt
 ];
 
-/** Buch zum Lesen, wenn niemand spielt: Die Figur hält es vor der Brust, die Arme nach vorn */
-export const BOOK_PARTS = (l: Look): Part[] => [
-  [-0.02, -0.3, 0.46, 0.2, 0.08, 0.08, l.sleeve], // Unterarme nach vorn
-  [-0.02, 0.22, 0.46, 0.2, 0.08, 0.08, l.sleeve],
-  [0.13, -0.17, 0.44, 0.03, 0.34, 0.24, '#f6f3ec', '#ffffff'], // Seiten
-  [0.16, -0.18, 0.43, 0.04, 0.36, 0.26, '#c0453a', '#d4574a'], // Einband
-  [0.2, -0.08, 0.5, 0.005, 0.16, 0.1, '#f2d14b'], // Bild auf dem Einband
+/**
+ * Großes, aufgeschlagenes Buch auf dem Schoß, wenn niemand spielt: Die weißen Seiten mit Zeilen zeigen nach oben,
+ * so erkennt man es auch von schräg oben. `turning`: Eine Seite steht gerade hoch (umblättern).
+ */
+export const BOOK_PARTS = (l: Look, turning = false): Part[] => [
+  [-0.02, -0.31, 0.4, 0.16, 0.08, 0.08, l.sleeve], // Unterarme nach vorn
+  [-0.02, 0.23, 0.4, 0.16, 0.08, 0.08, l.sleeve],
+  [0.12, -0.33, 0.4, 0.09, 0.07, 0.07, l.skin], // Hände halten das Buch
+  [0.12, 0.26, 0.4, 0.09, 0.07, 0.07, l.skin],
+  [0.1, -0.29, 0.38, 0.34, 0.58, 0.04, '#c0453a', '#c0453a'], // roter Einband, ragt am Rand hervor
+  [0.12, -0.27, 0.42, 0.3, 0.255, 0.04, '#e9e4d8', '#ffffff'], // linke Seite
+  [0.12, 0.015, 0.42, 0.3, 0.255, 0.04, '#e9e4d8', '#ffffff'], // rechte Seite
+  [0.12, -0.015, 0.42, 0.3, 0.03, 0.03, '#8a3a30'], // Buchrücken in der Mitte
+  // Zeilen auf beiden Seiten, rechts ein kleines Bild
+  ...[0.16, 0.22, 0.28, 0.34].flatMap((f): Part[] => [
+    [f, -0.24, 0.461, 0.025, 0.2, 0.004, '#9aa0aa'],
+    ...(f < 0.27 ? [[f, 0.045, 0.461, 0.025, 0.2, 0.004, '#9aa0aa'] as Part] : []),
+  ]),
+  [0.27, 0.06, 0.461, 0.1, 0.16, 0.004, '#6dbd47'],
+  ...(turning ? [[0.14, -0.01, 0.46, 0.26, 0.02, 0.22, '#f6f3ec', '#ffffff'] as Part] : []), // Seite beim Umblättern
 ];
 
 /** Geschlossene Augen beim Einnicken: Haut über den Augen, darauf ein dunkler Strich */
@@ -437,6 +450,16 @@ export const THEME_COLORS: Record<GateTheme, { side: string; top: string; glow?:
   wald: { side: '#5d3e21', top: '#3f9a3c', portal: '#7fdc6a' },
   wolken: { side: '#e9f1fb', top: '#ffffff', portal: '#ffe27a' },
   pilze: { side: '#c8323a', top: '#f3efe6', portal: '#e08cff' },
+};
+
+/** Licht auf dem Weg zu einem Tor: Farbe der Sonne und Helligkeit (1 = wie immer) */
+export const MOOD_LIGHT: Partial<Record<GateTheme, { color: string; bright: number }>> = {
+  eis: { color: '#dcecff', bright: 1.05 },
+  sand: { color: '#fff1c4', bright: 1.12 },
+  lava: { color: '#ffcf9e', bright: 1.0 },
+  hoehle: { color: '#d6dbe6', bright: 0.78 },
+  wald: { color: '#ffe0b2', bright: 0.95 },
+  pilze: { color: '#eadbff', bright: 0.92 },
 };
 
 export const GAME_COLORS = {

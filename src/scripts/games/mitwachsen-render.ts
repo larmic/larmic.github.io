@@ -29,6 +29,7 @@ import {
   GAME_COLORS,
   GATES,
   HOME,
+  MOOD_LIGHT,
   REGIONS,
   SPECIES,
   THEME_COLORS,
@@ -44,6 +45,7 @@ import {
 import { grown } from './mitwachsen-growth';
 import type { WeatherLook } from './mitwachsen-weather';
 import type { Pose } from './mitwachsen-tired';
+import type { Climate } from './mitwachsen-world';
 import type { State } from './mitwachsen-state';
 import { hash } from '../../lib/games/rng';
 import type { Cell, TreeKind, World } from './mitwachsen-world';
@@ -64,6 +66,7 @@ export type Scene = {
   evening: number; // 0 Tag … 1 goldener Abend (die Figur wird müde)
   weather: WeatherLook; // Wolken, Regen, Regenbogen (je 0 … 1)
   pose: Pose; // was die wache Figur tut, wenn niemand spielt (lesen, einnicken)
+  mood: Climate; // Stimmung dort, wo die Figur steht (Richtung des nächsten Tors, Stärke)
   floats: Float[];
   particles: Particle[];
   now: number;
@@ -87,7 +90,7 @@ const FLAT_GROUND: Partial<Record<Cell['ground'], [string, string]>> = {
 const figure = (state: State, sc: Scene) => [
   ...figureParts(sc.look),
   ...(state.basket ? BASKET_PARTS : []),
-  ...(sc.pose === 'stand' ? [] : BOOK_PARTS(sc.look)),
+  ...(sc.pose === 'stand' ? [] : BOOK_PARTS(sc.look, sc.pose === 'read' && !sc.reduced && sc.now % 5000 < 450)),
   ...(sc.pose === 'doze' ? SLEEPY_EYES(sc.look) : []),
 ];
 /** Beim Lesen schaut die Figur zum Betrachter */
@@ -329,6 +332,15 @@ export class Renderer {
     }
     this.edges(P, world, x, y, c.h);
     this.haze(P, x, y, c.h, sc);
+    if (c.tint && c.ground === 'grass') {
+      // Stimmung der Richtung: Gras tönen (multiplizieren, damit die Körnung bleibt)
+      const [ax, ay] = P(x, y, c.h);
+      const [bx, by] = P(x + 1, y + 1, c.h);
+      this.ctx.globalCompositeOperation = 'multiply';
+      this.ctx.fillStyle = c.tint;
+      this.ctx.fillRect(ax, ay, bx - ax, by - ay);
+      this.ctx.globalCompositeOperation = 'source-over';
+    }
     if (c.shade && c.ground !== 'stone') {
       const [ax, ay] = P(x, y, c.h);
       const [bx, by] = P(x + 1, y + 1, c.h);
@@ -471,7 +483,9 @@ export class Renderer {
       oak: ['#3f9a3c', '#5ab651'],
       birch: ['#6aab3a', '#8fcf5a'],
       autumn: ['#d9732e', '#f0a04a'],
+      red: ['#b8452e', '#d9603a'],
       blossom: ['#e595bd', '#f6c3dc'],
+      winter: ['#cfdbe2', '#ffffff'],
       pine: ['#2f6f3a', '#3f8a48'],
       snowpine: ['#2f6f3a', '#ffffff'],
       palm: ['#3f9a3c', '#5ab651'],
@@ -892,10 +906,35 @@ export class Renderer {
    */
   private weather(sc: Scene) {
     const { ctx } = this;
-    const { cloud, rain, rainbow } = sc.weather;
+    const { cloud, rainbow } = sc.weather;
+    // Licht der Richtung: warm, kühl oder dämmrig, je näher am Tor, desto mehr
+    const light = MOOD_LIGHT[sc.mood.id];
+    if (light && sc.mood.strength > 0) {
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.globalAlpha = 0.35 * sc.mood.strength;
+      ctx.fillStyle = light.color;
+      ctx.fillRect(0, 0, sc.width, sc.height);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+    }
     if (cloud > 0) {
       ctx.fillStyle = `rgba(70,82,104,${(0.2 * cloud).toFixed(3)})`;
       ctx.fillRect(0, 0, sc.width, sc.height);
+    }
+    // Richtung Eistor fällt Schnee statt Regen
+    const snowy = sc.mood.id === 'eis' ? Math.min(1, sc.mood.strength * 1.4) : 0;
+    const rain = sc.weather.rain * (1 - snowy),
+      snow = sc.weather.rain * snowy;
+    if (snow > 0 && !sc.reduced) {
+      ctx.fillStyle = `rgba(255,255,255,${(0.85 * snow).toFixed(3)})`;
+      const n = Math.round(110 * snow);
+      const size = Math.max(2, Math.round(3 * sc.zoom));
+      for (let i = 0; i < n; i++) {
+        const speed = 0.05 + (hash(8, i) % 30) / 1000;
+        const y = (((hash(9, i) % 1000) / 1000) * (sc.height + 40) + sc.now * speed) % (sc.height + 40);
+        const x = ((hash(10, i) % 1000) / 1000) * sc.width + Math.sin(sc.now / 900 + i) * 14 * sc.zoom;
+        ctx.fillRect(Math.round(x), Math.round(y - 20), size, size);
+      }
     }
     if (rain > 0 && !sc.reduced) {
       ctx.fillStyle = `rgba(214,230,255,${(0.6 * rain).toFixed(3)})`;

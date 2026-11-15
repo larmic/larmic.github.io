@@ -150,6 +150,7 @@ Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzel
 
 ## Bett, Nacht und die Wiese
 
+- **Stimmung der Richtungen:** Geht man in Richtung eines Tors, nimmt die Lichtung nach und nach dessen Stimmung an: Richtung Eistor Schnee und kühles Licht (dort schneit es statt zu regnen), Richtung Wald Herbstbäume, Richtung Wasser Blütenbäume, Richtung Sand gelbes Gras und warmes Licht, Richtung Lava trockenes Gras, Richtung Höhle Steine und Dämmerlicht, Richtung Pilzwald lila Moos. Am Bett bleibt alles, wie es ist.
 - **Wetter:** Alle paar Minuten wechselt es zwischen Sonne, Wolken und sanftem Regen, nach dem Regen kommt ein Regenbogen. Kein Gewitter, nichts Unheimliches. Jeder Tag beginnt mit Sonne.
 - **Unterstand:** Auf der Wiese steht ein kleiner Unterstand mit Lattendach. Regnet es, laufen die Tiere darunter und drängen sich zusammen; scheint die Sonne wieder, gehen sie zurück an ihre Plätze.
 - **Die Wiese wächst:** Jedes Schlafen ist ein neuer Tag. Mit jedem Tag blühen mehr Blumen auf der Lichtung, und Pilze sprießen. So sieht dein Kind, dass Zeit vergeht.

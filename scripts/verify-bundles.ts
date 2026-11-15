@@ -15,7 +15,7 @@ export const RULES: Rule[] = [
   {
     name: 'Spiel lädt 3D erst bei Bedarf',
     pages: /^spiele\//,
-    budget: 96 * 1024,
+    budget: 128 * 1024, // Regeln, Welt, 2D-Ansicht und Daten des Spiels; 3D (Three.js) kommt erst per import()
     forbidden: /WebGLRenderer|three\.module/,
   },
 ];

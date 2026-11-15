@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DIRS } from '../../lib/games/front';
 import { GATES, HOME, REGIONS, type GateId } from '../../data/games/mitwachsen';
-import { canStep, createWorld, standHeight, wildAnimals, type World } from './mitwachsen-world';
+import { canStep, createWorld, standHeight, wildAnimals, type Cell, type World } from './mitwachsen-world';
 
 /** Alle Felder, die von `start` aus zu Fuß erreichbar sind (bis `limit` Felder) */
 function reachable(world: World, open: GateId[], start: readonly [number, number], limit = 30000) {
@@ -214,6 +214,41 @@ describe('Start auf der Lichtung', () => {
       expect(w.cell(...HOME.water).deco).toBe('watertrough');
       // Tiere der Lichtung wohnen nicht auf der Wiese
       for (const [x, y] of w.spawns.values()) expect(w.cell(x, y).garden).toBeUndefined();
+    });
+  }
+});
+
+describe('Stimmung der Richtungen', () => {
+  for (const seed of [4, 77]) {
+    const w = createWorld(seed);
+    const { rx, ry } = lichtung.shape;
+    // Felder der Lichtung, gruppiert nach der Welt, in deren Richtung sie liegen (nur starke Stimmung)
+    const strong = new Map<string, Cell[]>();
+    for (let y = -ry; y <= ry; y += 1)
+      for (let x = -rx; x <= rx; x += 1) {
+        const c = w.cell(x, y);
+        const cl = w.climate(x, y);
+        if (c.region !== 'lichtung' || cl.strength < 0.7) continue;
+        strong.set(cl.id, [...(strong.get(cl.id) ?? []), c]);
+      }
+    const share = (cells: Cell[], ok: (c: Cell) => boolean, of: (c: Cell) => boolean = () => true) =>
+      cells.filter((c) => of(c) && ok(c)).length / Math.max(1, cells.filter(of).length);
+
+    it(`Seed ${seed}: am Bett ist es neutral`, () => {
+      for (let y = -12; y <= 12; y++)
+        for (let x = -12; x <= 12; x++) {
+          expect(w.climate(x, y).strength, `${x},${y}`).toBe(0);
+          expect(w.cell(x, y).tint).toBeUndefined();
+        }
+    });
+
+    it(`Seed ${seed}: Richtung Eis Schnee, Richtung Wald Herbst, Richtung Wasser Blüten, Richtung Pilze Moos`, () => {
+      const isTree = (c: Cell) => c.deco === 'tree';
+      expect(share(strong.get('eis')!, (c) => c.ground === 'snow')).toBeGreaterThan(0.2);
+      expect(share(strong.get('wald')!, (c) => c.tree === 'autumn' || c.tree === 'red', isTree)).toBeGreaterThan(0.6);
+      expect(share(strong.get('wasser')!, (c) => c.tree === 'blossom', isTree)).toBeGreaterThan(0.6);
+      expect(share(strong.get('pilze')!, (c) => c.ground === 'moss')).toBeGreaterThan(0.15);
+      expect(share(strong.get('sand')!, (c) => !!c.tint)).toBeGreaterThan(0.5);
     });
   }
 });

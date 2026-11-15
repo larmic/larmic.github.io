@@ -62,7 +62,8 @@ export type Deco =
   | 'cloudpuff'
   | 'trough' // Futtertrog auf der Wiese
   | 'watertrough'; // Wassertrog
-export type TreeKind = 'oak' | 'birch' | 'autumn' | 'blossom' | 'pine' | 'snowpine' | 'palm' | 'dead';
+export type TreeKind =
+  'oak' | 'birch' | 'autumn' | 'red' | 'blossom' | 'winter' | 'pine' | 'snowpine' | 'palm' | 'dead';
 /** Portal je Tor: Feld am Tor und am Bett, je mit dem Feld davor (dort kommt man heraus) und der Blickrichtung */
 export type Portal = {
   gate: Point;
@@ -98,6 +99,7 @@ export type Cell = {
   biome?: GateId; // Welt hinter einem Tor
   part?: { id: GateId; side?: 'gate' | 'home' }; // Turm eines Tors oder Säule eines Portals: gehört zu dieser Welt
   shade?: number; // Farbfleck im Boden: −1 dunkler … +1 heller (große, weiche Flecken)
+  tint?: string; // Farbe, mit der Gras und Blätter auf der Lichtung getönt sind (Stimmung der Richtung)
 };
 
 export type World = {
@@ -111,7 +113,11 @@ export type World = {
   readonly portals: ReadonlyMap<GateId, Portal>;
   /** Die großen Tore: Lage und Reihenfolge würfelt der Seed */
   readonly gates: ReadonlyMap<GateId, GatePlace>;
+  /** Stimmung an einem Ort: Richtung des nächsten Tors und wie stark (0 am Bett … 1 am Felsring) */
+  climate(x: number, y: number): Climate;
 };
+
+export type Climate = { id: GateId; strength: number };
 
 export const inRect = (r: Rect, x: number, y: number) => x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1;
 const key = (x: number, y: number) => `${x},${y}`;
@@ -455,6 +461,81 @@ function findSpawns(seed: number, map: Map<string, Cell>, land: Point[]): Map<st
 }
 
 /** Welt eines Feldes außerhalb der Lichtung: die des Tors, in dessen Richtung es liegt (Grenzen leicht gewellt) */
+/**
+ * Stimmung der Lichtung: Je näher man in Richtung eines Tors zum Felsring kommt, desto mehr nimmt die Lichtung die
+ * Stimmung seiner Welt an. Am Bett ist es neutral, die Wiese bleibt, wie sie ist.
+ */
+function climateOf(seed: number, places: readonly GatePlace[], x: number, y: number): Climate {
+  const { rx, ry } = lichtung.shape;
+  const d = Math.sqrt((x / rx) ** 2 + (y / ry) ** 2);
+  const t = Math.max(0, Math.min(1, (d - 0.3) / 0.6));
+  return { id: biomeOf(seed, places, x, y), strength: t * t * (3 - 2 * t) };
+}
+
+/** Tönung je Welt: Gras und Blätter auf dem Weg zum Tor (trocken, warm, kühl …) */
+const CLIMATE_TINT: Partial<Record<GateId, string>> = {
+  eis: '#dfeef5',
+  sand: '#f3df84',
+  lava: '#d6b56a',
+  hoehle: '#b9c2b3',
+  wald: '#f0cf7e',
+  pilze: '#d7c6f2',
+};
+const mix = (a: string, b: string, t: number) => {
+  const pa = parseInt(a.slice(1), 16),
+    pb = parseInt(b.slice(1), 16);
+  const ch = (sh: number) => Math.round(((pa >> sh) & 255) * (1 - t) + ((pb >> sh) & 255) * t);
+  return `#${((ch(16) << 16) | (ch(8) << 8) | ch(0)).toString(16).padStart(6, '0')}`;
+};
+
+/**
+ * Stimmung auf ein Feld der Lichtung legen: Schnee Richtung Eis, Sand- und Basaltflecken, Moos Richtung Pilzwald,
+ * Steinflecken Richtung Höhle, Herbstbäume Richtung Wald, Blütenbäume Richtung Wasser, dazu die Tönung.
+ * Ändert nur Boden, Baumart und Farbe – keine Höhen, nichts, was versperrt. Die Regeln bleiben gleich.
+ */
+function withClimate(seed: number, c: Cell, cl: Climate, x: number, y: number): Cell {
+  const s = cl.strength;
+  if (s <= 0.02 || c.region !== 'lichtung' || c.garden || c.ground === 'water') return c;
+  const out: Cell = { ...c };
+  const tint = CLIMATE_TINT[cl.id];
+  if (tint) out.tint = mix('#ffffff', tint, Math.min(1, s * 1.1));
+  const roll = rand01(seed, x, y, 51);
+  const patch = valueNoise(seed + 52, x, y, 5); // Flecken statt Salz und Pfeffer
+  const grassy = c.ground === 'grass';
+  const tree = c.deco === 'tree';
+  switch (cl.id) {
+    case 'eis':
+      if (grassy && patch < (s - 0.35) * 1.6) out.ground = 'snow';
+      if (tree && roll < s * 1.2) out.tree = 'winter';
+      break;
+    case 'sand':
+      if (grassy && patch < (s - 0.6) * 1.2) out.ground = 'sand';
+      break;
+    case 'lava':
+      if (grassy && patch < (s - 0.65) * 0.8) out.ground = 'basalt';
+      if (tree && roll < (s - 0.6) * 1.5) out.tree = 'dead';
+      break;
+    case 'hoehle':
+      if (grassy && patch < (s - 0.5) * 0.8) out.ground = 'stone';
+      break;
+    case 'pilze':
+      if (grassy && patch < (s - 0.45) * 1.4) out.ground = 'moss';
+      break;
+    case 'wald':
+      if (tree && roll < s * 1.3) out.tree = roll < s * 0.6 ? 'red' : 'autumn';
+      break;
+    case 'wasser':
+      if (tree && roll < s * 1.3) out.tree = 'blossom';
+      break;
+  }
+  // Wo der Boden kein Gras mehr ist, wachsen keine Grasbüschel; auf Schnee blüht nichts
+  if (out.ground !== c.ground) {
+    out.tufts = undefined;
+    if (out.ground === 'snow' && out.deco === 'flower') out.deco = null;
+  }
+  return out;
+}
+
 function biomeOf(seed: number, places: readonly GatePlace[], x: number, y: number): GateId {
   const { rx, ry } = lichtung.shape;
   const a = Math.atan2(y / ry, x / rx) + (valueNoise(seed + 41, x, y, 24) - 0.5) * 0.3;
@@ -590,13 +671,29 @@ export function createWorld(seed: number): World {
     const cells: Cell[] = [];
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)
       for (let x = cx * CHUNK; x < (cx + 1) * CHUNK; x++)
-        cells.push(dress(seed, x, y, regions.get(key(x, y)) ?? biomeCell(seed, biomeOf(seed, places, x, y), x, y)));
+        cells.push(
+          withClimate(
+            seed,
+            dress(seed, x, y, regions.get(key(x, y)) ?? biomeCell(seed, biomeOf(seed, places, x, y), x, y)),
+            climateOf(seed, places, x, y),
+            x,
+            y,
+          ),
+        );
     return cells;
   });
   const gates = new Map<GateId, GatePlace>(
     places.map(({ id, cells, mid, out, angle }) => [id, { id, cells, mid, out, angle }]),
   );
-  return { seed, cell: (x, y) => cache.get(x, y), gates, spawns, spots, portals: portalsOf(places) };
+  return {
+    seed,
+    cell: (x, y) => cache.get(x, y),
+    gates,
+    spawns,
+    spots,
+    portals: portalsOf(places),
+    climate: (x, y) => climateOf(seed, places, x, y),
+  };
 }
 
 /** Höhe, auf der man auf einem Feld steht – null, wenn man dort nicht stehen kann */

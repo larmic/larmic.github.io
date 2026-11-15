@@ -26,6 +26,7 @@ function fakeWorld(cells: Record<string, Partial<Cell>> = {}): World {
     gates: new Map(),
     spawns: new Map(),
     spots: [],
+    climate: () => ({ id: 'eis', strength: 0 }),
     portals: new Map(),
   };
 }

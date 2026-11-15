@@ -39,6 +39,7 @@ import {
   GAME_COLORS,
   GATES,
   HOME,
+  MOOD_LIGHT,
   REGIONS,
   SPECIES,
   THEME_COLORS,
@@ -88,7 +89,9 @@ const LEAF: Record<TreeKind, string> = {
   oak: '#4fa84a',
   birch: '#7cbf48',
   autumn: '#e8823a',
+  red: '#c8452e',
   blossom: '#f0a8c8',
+  winter: '#e3ecf1', // Krone voll Schnee
   pine: '#2f6f3a',
   snowpine: '#2f6f3a',
   palm: '#4fa84a',
@@ -110,6 +113,7 @@ const GROUND_TILES: Record<Exclude<Cell['ground'], 'water' | 'lava' | 'sky'>, [T
 const SKY = new Color('#9fd6f0');
 const NIGHT_SKY = new Color('#141a3a');
 const CLOUD_SKY = new Color('#a9b4bf'); // Himmel bei Wolken und Regen
+const HEMI_SKY = '#cfe9ff'; // Himmelslicht von oben
 
 type Chunk = { meshes: Mesh[] };
 
@@ -118,7 +122,7 @@ export class World3D {
   private scene = new ThreeScene();
   private camera = new PerspectiveCamera(34, 1, 0.5, 140);
   private sun = new DirectionalLight('#fff0d4', 2.4);
-  private hemi = new HemisphereLight('#cfe9ff', '#5e7f3c', 1.35);
+  private hemi = new HemisphereLight(HEMI_SKY, '#5e7f3c', 1.35);
   private solid: MeshLambertMaterial;
   private foliage: MeshLambertMaterial;
   private water = new MeshLambertMaterial({ color: GAME_COLORS.water, transparent: true, opacity: 0.8 });
@@ -348,7 +352,13 @@ export class World3D {
     this.sun.target.position.set(tx, ty, tz);
     const day = 1 - sc.night * 0.75;
     const cloud = sc.weather.cloud;
-    this.sun.intensity = 2.4 * day * (1 - 0.5 * cloud); // Wolken dämpfen die Sonne
+    // Licht der Richtung: Farbe und Helligkeit der Sonne, je näher am Tor, desto mehr
+    const light = MOOD_LIGHT[sc.mood.id];
+    const m = light ? sc.mood.strength : 0;
+    this.sun.color.set('#ffffff').lerp(new Color(light?.color ?? '#ffffff'), m * 0.8);
+    this.hemi.color.set(HEMI_SKY).lerp(new Color(light?.color ?? HEMI_SKY), m * 0.5);
+    const bright = 1 + ((light?.bright ?? 1) - 1) * m;
+    this.sun.intensity = 2.4 * day * (1 - 0.5 * cloud) * bright; // Wolken dämpfen die Sonne
     this.hemi.intensity = 1.35 * (1 - sc.night * 0.6) * (1 - 0.15 * cloud);
     const sky = SKY.clone()
       .lerp(CLOUD_SKY, cloud * 0.75)
@@ -618,6 +628,7 @@ export class World3D {
     const [topTile, sideTop, below] = GROUND_TILES[c.ground];
     const shade = stone ? 0 : (c.shade ?? 0);
     const tint = new Color(1, 1, 1).multiplyScalar(0.93 + shade * 0.07);
+    if (c.tint && c.ground === 'grass') tint.multiply(new Color(c.tint)); // Stimmung der Richtung
     g.quad([x, h, y + 1], [x + 1, h, y + 1], [x + 1, h, y], [x, h, y], [0, 1, 0], topTile, tint);
     const sides: [number, number, V3][] = [
       [0, 1, [0, 0, 1]],
@@ -947,11 +958,12 @@ export class World3D {
       // Korb auf dem Rücken, Buch beim Lesen; beim Lesen schaut die Figur zum Betrachter
       const book = sc.pose !== 'stand';
       const doze = sc.pose === 'doze';
-      const key = `player${state.basket ? '-basket' : ''}${book ? '-book' : ''}${doze ? '-doze' : ''}`;
+      const turning = sc.pose === 'read' && !sc.reduced && sc.now % 5000 < 450; // alle paar Sekunden umblättern
+      const key = `player${state.basket ? '-basket' : ''}${book ? '-book' : ''}${turning ? '-turn' : ''}${doze ? '-doze' : ''}`;
       const parts = [
         ...figureParts(this.look),
         ...(state.basket ? BASKET_PARTS : []),
-        ...(book ? BOOK_PARTS(this.look) : []),
+        ...(book ? BOOK_PARTS(this.look, turning) : []),
         ...(doze ? SLEEPY_EYES(this.look) : []),
       ];
       place('player', this.model(key, parts), 1, book ? 's' : state.player.dir);

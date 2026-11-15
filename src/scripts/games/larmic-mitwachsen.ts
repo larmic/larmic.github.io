@@ -701,6 +701,7 @@ class LarmicMitwachsen extends HTMLElement {
       evening: this.state.sleeping ? 0 : evening(this.tired),
       weather: weatherLook(this.world.seed, this.state.day, this.state.tick),
       pose: this.pose,
+      mood: this.world.climate(Math.round(player.x), Math.round(player.y)),
       floats,
       particles: this.particles,
       now: t,
