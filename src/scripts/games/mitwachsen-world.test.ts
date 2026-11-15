@@ -89,14 +89,17 @@ describe('Start auf der Lichtung', () => {
 
     it(`Seed ${seed}: Bäume und Büsche stehen einzeln, man kann um jeden herumgehen`, () => {
       const solid = (x: number, y: number) => ['tree', 'bush'].includes(w.cell(x, y).deco ?? '');
+      /** Hindernisse im Umkreis von zwei Feldern um (x, y), ohne (x, y) selbst */
+      const neighbours = (x: number, y: number) =>
+        [-2, -1, 0, 1, 2]
+          .flatMap((dy) => [-2, -1, 0, 1, 2].map((dx) => [x + dx, y + dy]))
+          .filter(([nx, ny]) => (nx !== x || ny !== y) && solid(nx, ny));
       let trees = 0;
       for (let y = -lichtung.shape.ry; y <= lichtung.shape.ry; y++)
         for (let x = -lichtung.shape.rx; x <= lichtung.shape.rx; x++) {
           if (w.cell(x, y).region !== 'lichtung' || !solid(x, y)) continue;
           trees++;
-          for (let dy = -2; dy <= 2; dy++)
-            for (let dx = -2; dx <= 2; dx++)
-              if (dx || dy) expect(solid(x + dx, y + dy), `${x},${y} und ${x + dx},${y + dy}`).toBe(false);
+          expect(neighbours(x, y), `${x},${y}`).toEqual([]);
         }
       expect(trees).toBeGreaterThan(50); // es gibt sie aber noch
     });

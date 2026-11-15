@@ -56,7 +56,7 @@ class LarmicIsland extends HTMLElement {
       return;
     }
     this.ready = true;
-    const data: World & { rest: string } = JSON.parse(this.dataset.world || '{}');
+    const data = JSON.parse(this.dataset.world || '{}') as World & { rest: string };
     this.world = data;
     this.figpos = this.querySelector('.figpos')!;
     this.flip = this.querySelector('.figflip')!;

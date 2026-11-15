@@ -313,7 +313,7 @@ export class World3D {
   /** Alles freigeben, auch den WebGL-Kontext sofort (ältere iPads erlauben nur wenige gleichzeitig) */
   dispose() {
     this.scene.traverse((o) => {
-      if (o instanceof Mesh) o.geometry.dispose(); // Stücke, Tore, Schläfer, Tafeln, Wesen; doppeltes dispose schadet nicht
+      if (o instanceof Mesh) (o.geometry as BufferGeometry).dispose(); // Stücke, Tore, Schläfer, Tafeln, Wesen; doppeltes dispose schadet nicht
     });
     for (const g of this.models.values()) g.dispose();
     this.models.clear();
@@ -444,7 +444,7 @@ export class World3D {
 
   private clear(group: Group) {
     group.traverse((o) => {
-      if (o instanceof Mesh && o.geometry !== this.sparkGeo) o.geometry.dispose();
+      if (o instanceof Mesh && o.geometry !== this.sparkGeo) (o.geometry as BufferGeometry).dispose();
     });
     group.clear();
   }

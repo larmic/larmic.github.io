@@ -34,37 +34,38 @@ export function isForeign(url: string): boolean {
   }
 }
 
+/** Fremde Adressen in den Attributen eines Tags, das beim Laden etwas holt */
+function foreignInTag(name: string, attrs: string): string[] {
+  if (name === 'link') {
+    const rels = (attr(attrs, 'rel') ?? '').toLowerCase().split(/\s+/);
+    const href = attr(attrs, 'href');
+    const loads = !rels.every((r) => NON_LOADING_REL.has(r));
+    return href && loads && isForeign(href) ? [`<link rel="${rels.join(' ')}"> ${href}`] : [];
+  }
+  const found: string[] = [];
+  for (const a of ['src', 'poster', 'data']) {
+    const v = attr(attrs, a);
+    if (v && isForeign(v)) found.push(`<${name} ${a}> ${v}`);
+  }
+  for (const a of ['srcset', 'imagesrcset'])
+    for (const candidate of (attr(attrs, a) ?? '').split(',')) {
+      const url = candidate.trim().split(/\s+/)[0];
+      if (url && isForeign(url)) found.push(`<${name} ${a}> ${url}`);
+    }
+  for (const url of cssUrls(attr(attrs, 'style') ?? '')) if (isForeign(url)) found.push(`style url() ${url}`);
+  return found;
+}
+
+/** Adressen in CSS: url(…) und @import */
+const cssUrls = (css: string) => [...css.matchAll(/(?:url\(\s*['"]?|@import\s+['"])([^'")]+)/gi)].map((m) => m[1]);
+
 /** Externe Ressourcen, die eine Seite beim Laden von selbst holen würde */
 export function externalResources(html: string): string[] {
   const found: string[] = [];
-  for (const [, tag, attrs] of html.matchAll(/<([a-z][\w-]*)\b([^>]*)>/gi)) {
-    const name = tag.toLowerCase();
-    if (name === 'a') continue;
-    if (name === 'link') {
-      const rels = (attr(attrs, 'rel') ?? '').toLowerCase().split(/\s+/);
-      const href = attr(attrs, 'href');
-      if (href && !rels.every((r) => NON_LOADING_REL.has(r)) && isForeign(href))
-        found.push(`<link rel="${rels.join(' ')}"> ${href}`);
-      continue;
-    }
-    for (const a of ['src', 'poster', 'data']) {
-      const v = attr(attrs, a);
-      if (v && isForeign(v)) found.push(`<${name} ${a}> ${v}`);
-    }
-    for (const a of ['srcset', 'imagesrcset']) {
-      const v = attr(attrs, a);
-      for (const candidate of v ? v.split(',') : []) {
-        const url = candidate.trim().split(/\s+/)[0];
-        if (url && isForeign(url)) found.push(`<${name} ${a}> ${url}`);
-      }
-    }
-    const style = attr(attrs, 'style');
-    for (const [, url] of (style ?? '').matchAll(/url\(\s*['"]?([^'")]+)/gi))
-      if (isForeign(url)) found.push(`style url() ${url}`);
-  }
+  for (const [, tag, attrs] of html.matchAll(/<([a-z][\w-]*)\b([^>]*)>/gi))
+    if (tag.toLowerCase() !== 'a') found.push(...foreignInTag(tag.toLowerCase(), attrs));
   for (const [, css] of html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi))
-    for (const [, url] of css.matchAll(/(?:url\(\s*['"]?|@import\s+['"])([^'")]+)/gi))
-      if (isForeign(url)) found.push(`<style> ${url}`);
+    for (const url of cssUrls(css)) if (isForeign(url)) found.push(`<style> ${url}`);
   return found;
 }
 

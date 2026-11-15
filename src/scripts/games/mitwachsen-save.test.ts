@@ -222,7 +222,7 @@ describe('Umzug vom Arbeitstitel threeyear (Version 1)', () => {
       age: 3,
       homeAnimals: [],
     });
-    expect(JSON.parse(store.getItem(INDEX_KEY)!).v).toBe(4);
+    expect((JSON.parse(store.getItem(INDEX_KEY)!) as { v: number }).v).toBe(4);
   });
 
   it('setzt ein unbekanntes Alter auf 3', () => {

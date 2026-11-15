@@ -1,6 +1,6 @@
 // Statischer Server für die fertige Seite (dist/) – für den Smoke-Test im Browser, ohne Astro.
 // Ordner liefern ihre index.html, Unbekanntes die 404-Seite mit Status 404 (wie GitHub Pages).
-import { createServer } from 'node:http';
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 
@@ -19,7 +19,7 @@ const TYPES: Record<string, string> = {
   '.txt': 'text/plain',
 };
 
-createServer(async (req, res) => {
+async function serve(req: IncomingMessage, res: ServerResponse) {
   let path = normalize(decodeURIComponent(new URL(req.url ?? '/', 'http://x').pathname));
   if (path.includes('..')) path = '/';
   if (path.endsWith('/')) path += 'index.html';
@@ -31,4 +31,6 @@ createServer(async (req, res) => {
     res.writeHead(404, { 'content-type': TYPES['.html'] });
     res.end(await readFile(join(ROOT, '404.html')).catch(() => 'Nicht gefunden'));
   }
-}).listen(PORT, () => console.log(`dist/ auf http://localhost:${PORT}`));
+}
+
+createServer((req, res) => void serve(req, res)).listen(PORT, () => console.log(`dist/ auf http://localhost:${PORT}`));

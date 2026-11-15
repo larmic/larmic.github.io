@@ -145,7 +145,7 @@ export function migrate(input: unknown): SavedWorld | null {
     figureName: cleanName(typeof raw.figureName === 'string' ? raw.figureName : '', DEFAULT_FIGURE),
     openGates: strings(raw.openGates).filter((g): g is GateId => gates.has(g)),
     metAnimals: [...new Set(strings(raw.metAnimals))].sort(),
-    homeAnimals: garden.map((p) => ({ id: p.id, species: p.species as SpeciesId })),
+    homeAnimals: garden.map((p) => ({ id: p.id, species: p.species })),
     position: pos ? (raw.position as [number, number]) : [0, 0],
     visits: typeof raw.visits === 'number' && raw.visits >= 0 ? Math.floor(raw.visits) : 0,
     day: typeof raw.day === 'number' && raw.day >= 0 && Number.isFinite(raw.day) ? Math.floor(raw.day) : 0,

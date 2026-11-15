@@ -67,7 +67,7 @@ describe('Stücke der Welt', () => {
   });
 
   it('vergisst alte Stücke über dem Limit und berechnet sie bei Bedarf gleich neu', () => {
-    const cache = new ChunkCache<number>((cx) => Array(CHUNK * CHUNK).fill(cx), 2);
+    const cache = new ChunkCache<number>((cx) => new Array<number>(CHUNK * CHUNK).fill(cx), 2);
     cache.get(0, 0);
     cache.get(CHUNK, 0);
     cache.get(2 * CHUNK, 0);

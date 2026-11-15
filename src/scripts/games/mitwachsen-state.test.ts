@@ -593,9 +593,8 @@ describe('Portale', () => {
   /** Figur wach vor dem Portal am Westtor, Blick darauf */
   function beforeGatePortal(extra: Animal[] = [], followers: string[] = []) {
     const [ex, ey] = west.gateExit;
-    const dir = (
-      west.gate[0] - ex === 1 ? 'e' : west.gate[0] - ex === -1 ? 'w' : west.gate[1] - ey === 1 ? 's' : 'n'
-    ) as Dir;
+    const dir: Dir =
+      west.gate[0] - ex === 1 ? 'e' : west.gate[0] - ex === -1 ? 'w' : west.gate[1] - ey === 1 ? 's' : 'n';
     const s: State = {
       ...initialState(world),
       sleeping: false,
