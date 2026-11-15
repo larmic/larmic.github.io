@@ -408,6 +408,23 @@ export const BASKET_PARTS: Part[] = [
   [-0.2, -0.05, 0.74, 0.05, 0.06, 0.04, '#3f9a3c', '#5ab651'], // Blatt
 ];
 
+/** Buch zum Lesen, wenn niemand spielt: Die Figur hält es vor der Brust, die Arme nach vorn */
+export const BOOK_PARTS = (l: Look): Part[] => [
+  [-0.02, -0.3, 0.46, 0.2, 0.08, 0.08, l.sleeve], // Unterarme nach vorn
+  [-0.02, 0.22, 0.46, 0.2, 0.08, 0.08, l.sleeve],
+  [0.13, -0.17, 0.44, 0.03, 0.34, 0.24, '#f6f3ec', '#ffffff'], // Seiten
+  [0.16, -0.18, 0.43, 0.04, 0.36, 0.26, '#c0453a', '#d4574a'], // Einband
+  [0.2, -0.08, 0.5, 0.005, 0.16, 0.1, '#f2d14b'], // Bild auf dem Einband
+];
+
+/** Geschlossene Augen beim Einnicken: Haut über den Augen, darauf ein dunkler Strich */
+export const SLEEPY_EYES = (l: Look): Part[] => [
+  [0.222, -0.135, 0.875, 0.045, 0.08, 0.11, l.skin, null, 'f'],
+  [0.222, 0.055, 0.875, 0.045, 0.08, 0.11, l.skin, null, 'f'],
+  [0.267, -0.13, 0.9, 0.005, 0.07, 0.016, '#1d2233', null, 'f'],
+  [0.267, 0.06, 0.9, 0.005, 0.07, 0.016, '#1d2233', null, 'f'],
+];
+
 // ---------- Farben der Spielwelt (Spielgrafik wie die Texturen, nicht Oberfläche) ----------
 
 /** Farben je Welt: Seite und Oberseite der Themen-Blöcke, Leuchten (Lava), Farbe des Portals */

@@ -3,6 +3,7 @@
 // Figur, nach 25 Minuten möchte sie ins Bett und sagt das danach alle 3 Minuten wieder. Gesperrt wird nichts.
 // Schlafen im Bett beendet den Tag; nach einer langen Pause beginnt die Zeit ebenfalls neu.
 // Die Uhr gehört zum Kind, nicht zur Welt: ein Wert je Browser, nicht je Spielstand.
+// Spielt niemand (keine Eingabe), setzt sich die Figur und liest, später nickt sie ein (idlePose).
 // Spezifikation: docs/specs/mitwachsen.md
 
 import type { Store } from './mitwachsen-save';
@@ -14,6 +15,13 @@ export const BED_AGAIN = 3 * MIN; // danach sagt sie es in diesem Abstand wieder
 export const BREAK = 60 * MIN; // so lange Pause, und der Tag beginnt neu
 const MAX_STEP = 5_000; // längere Lücken (Tab im Hintergrund, Rechner schläft) zählen nicht als Spielzeit
 export const TIRED_KEY = 'larmic.games.mitwachsen.tired';
+export const READ_AFTER = 20_000; // so lange ohne Eingabe: Die Figur setzt sich und liest
+export const DOZE_AFTER = 120_000; // und so lange: Sie nickt über dem Buch ein
+
+export type Pose = 'stand' | 'read' | 'doze';
+/** Was die wache Figur tut, wenn niemand spielt (ms seit der letzten Eingabe) */
+export const idlePose = (idleMs: number): Pose =>
+  idleMs >= DOZE_AFTER ? 'doze' : idleMs >= READ_AFTER ? 'read' : 'stand';
 
 export type Tired = {
   played: number; // gespielte Zeit heute in ms

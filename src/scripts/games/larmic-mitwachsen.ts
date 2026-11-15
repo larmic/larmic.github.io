@@ -30,6 +30,7 @@ import { Fog, REVEAL, START_REVEAL } from './mitwachsen-fog';
 import { initialState, progressOf, step, type Cmd, type GameEvent, type State } from './mitwachsen-state';
 import { createWorld, standHeight, type World } from './mitwachsen-world';
 import { weatherLook } from './mitwachsen-weather';
+import { idlePose, type Pose } from './mitwachsen-tired';
 import { advance, evening, freshDay, loadTired, saveTired, type Tired, type TiredEvent } from './mitwachsen-tired';
 
 const TICK_MS = 100; // Takt der Regeln
@@ -86,6 +87,8 @@ class LarmicMitwachsen extends HTMLElement {
   private tired!: Tired;
   private lastTiredSave = 0;
   private sitUntil = 0; // bis dahin sitzt die müde Figur
+  private lastInput = 0; // letzte Eingabe: Spielt lange niemand, setzt sich die Figur und liest
+  private pose: Pose = 'stand';
   private sfx = new Sfx();
   private globals: AbortController | null = null;
   private timer: number | undefined;
@@ -233,6 +236,7 @@ class LarmicMitwachsen extends HTMLElement {
   // ---------- Takt und Eingabe ----------
 
   private start() {
+    this.lastInput = performance.now(); // nach Menü, Hinweis oder Tab-Wechsel: frisch, die Figur steht
     if (this.timer === undefined && !this.paused() && document.visibilityState === 'visible')
       this.timer = window.setInterval(() => this.apply({ type: 'tick' }), TICK_MS);
     if (!this.raf) this.raf = requestAnimationFrame((t) => this.frame(t));
@@ -246,6 +250,7 @@ class LarmicMitwachsen extends HTMLElement {
   }
 
   private apply(cmd: Cmd) {
+    if (cmd.type !== 'tick') this.lastInput = performance.now(); // jemand spielt
     if (cmd.type === 'move' && performance.now() < this.sitUntil) return; // die müde Figur sitzt kurz
     const { state, events } = step(this.state, this.world, cmd);
     this.state = state;
@@ -259,7 +264,8 @@ class LarmicMitwachsen extends HTMLElement {
 
   /** Spielzeit fortschreiben (läuft im Takt, also nur bei sichtbarer Seite und geschlossenem Menü) */
   private ageTired() {
-    const { tired, event } = advance(this.tired, Date.now(), !this.state.sleeping);
+    // Liest oder döst die Figur, spielt gerade niemand: Die Uhr fürs Müdewerden läuft dann nicht
+    const { tired, event } = advance(this.tired, Date.now(), !this.state.sleeping && this.pose === 'stand');
     this.tired = tired;
     if (event) this.getTired(event);
     if (performance.now() - this.lastTiredSave > 5000) {
@@ -603,7 +609,8 @@ class LarmicMitwachsen extends HTMLElement {
     for (const id of this.bodies.keys()) if (!targets.has(id)) this.bodies.delete(id);
     for (const [id, t] of targets) {
       const ground = standHeight(this.world, this.state.openGates, t.x, t.y) ?? this.world.cell(t.x, t.y).h;
-      const z = id === 'player' && now < this.sitUntil ? ground - 0.35 : ground; // die müde Figur sitzt im Gras
+      const sits = id === 'player' && (now < this.sitUntil || this.pose !== 'stand'); // müde oder lesend
+      const z = sits ? ground - 0.35 : ground; // sitzt im Gras
       let b = this.bodies.get(id);
       if (!b || snap || Math.abs(b.x - t.x) + Math.abs(b.y - t.y) > 2.5) b = { x: t.x, y: t.y, z, hop: 0 };
       const dx = t.x - b.x,
@@ -645,8 +652,19 @@ class LarmicMitwachsen extends HTMLElement {
     const fade = (since: number, ms: number) => (this.reduced.matches ? 1 : Math.min(1, (t - since) / ms));
     const night = this.state.sleeping ? fade(this.nightSince, 1500) : 1 - fade(this.dayAt, 900);
 
-    if (this.state.sleeping && !this.floats.some((f) => f.kind === 'zzz' && t - f.born < 1000) && !this.reduced.matches)
-      this.floats.push({ kind: 'zzz', who: 'bed', color: GAME_COLORS.star, born: t, x: 0, y: 0, z: 0, age: 0 });
+    this.pose = this.state.sleeping || this.paused() ? 'stand' : idlePose(t - this.lastInput);
+    const dozing = this.state.sleeping || this.pose === 'doze'; // im Bett oder eingenickt über dem Buch
+    if (dozing && !this.floats.some((f) => f.kind === 'zzz' && t - f.born < 1000) && !this.reduced.matches)
+      this.floats.push({
+        kind: 'zzz',
+        who: this.state.sleeping ? 'bed' : 'player',
+        color: GAME_COLORS.star,
+        born: t,
+        x: 0,
+        y: 0,
+        z: 0,
+        age: 0,
+      });
 
     // Schwebende Herzen und Noten folgen ihrem Wesen
     this.floats = this.floats.filter((f) => t - f.born < 1300);
@@ -682,6 +700,7 @@ class LarmicMitwachsen extends HTMLElement {
       night,
       evening: this.state.sleeping ? 0 : evening(this.tired),
       weather: weatherLook(this.world.seed, this.state.day, this.state.tick),
+      pose: this.pose,
       floats,
       particles: this.particles,
       now: t,

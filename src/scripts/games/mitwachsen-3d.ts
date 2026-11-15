@@ -44,6 +44,8 @@ import {
   THEME_COLORS,
   figureParts,
   BASKET_PARTS,
+  BOOK_PARTS,
+  SLEEPY_EYES,
   type GateId,
   type GateTheme,
   type Look,
@@ -942,10 +944,17 @@ export class World3D {
       m.rotation.y = YAW[dir];
     };
     if (!state.sleeping) {
-      const model = state.basket
-        ? this.model('player-basket', [...figureParts(this.look), ...BASKET_PARTS])
-        : this.model('player', figureParts(this.look));
-      place('player', model, 1, state.player.dir);
+      // Korb auf dem Rücken, Buch beim Lesen; beim Lesen schaut die Figur zum Betrachter
+      const book = sc.pose !== 'stand';
+      const doze = sc.pose === 'doze';
+      const key = `player${state.basket ? '-basket' : ''}${book ? '-book' : ''}${doze ? '-doze' : ''}`;
+      const parts = [
+        ...figureParts(this.look),
+        ...(state.basket ? BASKET_PARTS : []),
+        ...(book ? BOOK_PARTS(this.look) : []),
+        ...(doze ? SLEEPY_EYES(this.look) : []),
+      ];
+      place('player', this.model(key, parts), 1, book ? 's' : state.player.dir);
     }
     for (const a of state.animals) {
       const b = sc.bodies.get(a.id);

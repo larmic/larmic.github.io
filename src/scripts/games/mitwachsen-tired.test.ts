@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   BED_AGAIN,
   BED_AT,
+  DOZE_AFTER,
+  READ_AFTER,
+  idlePose,
   BREAK,
   TIRED_KEY,
   YAWN_AT,
@@ -94,5 +97,14 @@ describe('Müde werden', () => {
       expect(loadTired(store, 6000), bad).toEqual(freshDay(6000));
     }
     expect(loadTired(memoryStore(), 7)).toEqual(freshDay(7));
+  });
+
+  it('ohne Eingabe setzt sich die Figur nach 20 Sekunden und liest, nach 2 Minuten nickt sie ein', () => {
+    expect([READ_AFTER, DOZE_AFTER]).toEqual([20_000, 120_000]);
+    expect(idlePose(0)).toBe('stand');
+    expect(idlePose(19_999)).toBe('stand');
+    expect(idlePose(20_000)).toBe('read');
+    expect(idlePose(119_999)).toBe('read');
+    expect(idlePose(120_000)).toBe('doze');
   });
 });

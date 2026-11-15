@@ -126,6 +126,7 @@ Rein in `mitwachsen-tired.ts`, die Uhr gehört zum Kind (ein Wert je Browser, `l
 | Nach 15 und 20 Minuten setzt sich die Figur 2,5 s hin (Laufen geht so lange nicht), gähnt, und eine Sprechblase sagt es (Mond und „Zzz“ für das Kind, ein Satz zum Vorlesen) | „gähnt nach 15 und 20 Minuten …“ |
 | Nach 25 Minuten will die Figur ins Bett (Mond und Bett in der Blase, dazu ein „i“-Knopf zum Hinweis für Eltern), danach alle 3 Minuten wieder | „gähnt nach 15 und 20 Minuten …“ |
 | Verpasste Hinweise kommen nur einmal | „meldet verpasste Hinweise nur einmal“ |
+| Spielt niemand: nach 20 s ohne Eingabe setzt sich die wache Figur, schaut zum Betrachter und liest in einem Buch; nach 2 Minuten nickt sie ein (Augen zu, „Zzz“). Jede Taste weckt sie, sie läuft sofort los. Solange sie liest oder döst, läuft die Uhr fürs Müdewerden nicht. Nach Menü, Hinweis oder Tab-Wechsel beginnt die Zeit neu | „ohne Eingabe setzt sich die Figur …“ |
 | Ab 20 Minuten wird das Licht golden (bis 25 Minuten 60 %, ab 35 Minuten ganz) | „der Himmel wird ab 20 Minuten abendlich …“ |
 | Gesperrt wird nichts. Schlafen im Bett beendet den Tag (die Zeit beginnt neu), ebenso eine Pause über 60 Minuten | „nach einer langen Pause beginnt ein neuer Tag“ |
 | Gespeichert alle 5 s und mit dem Spielstand; Kaputtes ergibt einen neuen Tag | „übersteht Speichern und Laden …“ |

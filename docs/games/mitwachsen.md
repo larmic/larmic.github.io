@@ -190,6 +190,7 @@ Die S2k-Leitlinie der Kinder- und Jugendärzte rät für 3 bis 6 Jahre zu „hö
 - Ab 20 Minuten wird das Licht langsam golden wie am Abend.
 - Nach **25 Minuten** sagt die Figur: „Ich bin müde. Bringst du mich ins Bett?“, danach alle paar Minuten wieder. Das Gute-Nacht-Bild am Bett ist das Ritual zum Aufhören.
 - Gesperrt wird nichts. Wann Schluss ist, entscheiden die Eltern.
+- **Wenn niemand spielt:** Nach 20 Sekunden ohne Taste setzt sich die Figur ins Gras und liest in einem Buch, nach 2 Minuten nickt sie ein. Jede Taste weckt sie. In der Zeit zählt die Spielzeit nicht.
 - Ein **Hinweis für Eltern** mit den Empfehlungen und Quellen erscheint beim ersten Öffnen und ist im Menü und über die Bett-Sprechblase wieder zu öffnen.
 
 Später (Mitwachsen): Zeiten im Menü einstellbar, wenn das Kind älter wird.
