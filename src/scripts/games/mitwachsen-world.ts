@@ -1,12 +1,11 @@
 // Welt von Mitwachsen – rein und deterministisch: Derselbe Seed ergibt immer dieselbe Welt.
-// In der Mitte die von Hand entworfenen Gegenden (Zuhause, Blumenwiese, Teich), jede ringsum abgeschlossen und nur
-// durch ihr Tor erreichbar. Außen herum endlose Landschaft aus Rauschen, berechnet in Stücken.
+// In der Mitte die Lichtung mit dem Bett, ringsum natürliche Felsen mit vier großen Toren (vorerst zu). Außen herum
+// endlose Landschaft aus Rauschen, berechnet in Stücken. Der Garten entsteht später (für Tests: { garden: true }).
 // Spezifikation: docs/specs/mitwachsen.md
 
 import { CHUNK, ChunkCache } from '../../lib/games/chunks';
 import { hash, rand01, valueNoise } from '../../lib/games/rng';
 import {
-  BORDERS,
   GAME_COLORS,
   GATES,
   HOME,
@@ -37,7 +36,8 @@ export type Deco =
   | 'arch'
   | 'fern'
   | 'boulder'
-  | 'mushroom';
+  | 'mushroom'
+  | 'biggate';
 export type TreeKind = 'oak' | 'birch' | 'autumn' | 'blossom';
 
 export type Cell = {
@@ -56,7 +56,12 @@ export type Cell = {
   shade?: number; // Farbfleck im Boden: −1 dunkler … +1 heller (große, weiche Flecken)
 };
 
-export type World = { readonly seed: number; cell(x: number, y: number): Cell };
+export type World = {
+  readonly seed: number;
+  cell(x: number, y: number): Cell;
+  /** Felder der großen Tore (hängen vom Seed ab, weil der Felsrand leicht unregelmäßig ist) */
+  readonly gates: ReadonlyMap<GateId, readonly Point[]>;
+};
 
 export const inRect = (r: Rect, x: number, y: number) => x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1;
 const key = (x: number, y: number) => `${x},${y}`;
@@ -76,74 +81,97 @@ const water = (region: Cell['region']): Cell => ({ h: 0, ground: 'water', deco: 
 const flowerColor = (seed: number, x: number, y: number) =>
   GAME_COLORS.flowers[hash(seed, x, y, 7) % GAME_COLORS.flowers.length];
 
-/** Die von Hand entworfenen Gegenden als feste Karte; Zufall (Blumen, Seerosen) kommt aus dem Seed */
-function buildRegions(seed: number): Map<string, Cell> {
+const lichtung = REGIONS[0];
+
+/** Rand der Lichtung: Ellipse mit leichtem Wackeln aus dem Seed, damit der Felsring natürlich aussieht */
+function edge(seed: number, x: number, y: number) {
+  const { rx, ry } = lichtung.shape;
+  const d = (x / rx) ** 2 + (y / ry) ** 2;
+  const wobble = 1 + (valueNoise(seed + 21, x, y, 4) - 0.5) * 0.3;
+  return d / wobble; // < 1 innen, 1 … 1,55 Felsen, darüber Landschaft
+}
+const ROCK_OUTER = 1.55;
+
+/** Die drei Felder eines großen Tores: innerste Felsfelder in seiner Himmelsrichtung */
+function gateCells(seed: number, side: 'n' | 'o' | 's' | 'w'): Point[] {
+  const [dx, dy] = { n: [0, -1], s: [0, 1], o: [1, 0], w: [-1, 0] }[side];
+  const out: Point[] = [];
+  for (const off of [-1, 0, 1]) {
+    for (let t = 1; t < 40; t++) {
+      const x = dx ? dx * t : off,
+        y = dy ? dy * t : off;
+      if (edge(seed, x, y) >= 1) {
+        out.push([x, y]);
+        break;
+      }
+    }
+  }
+  return out;
+}
+
+/** Die Lichtung als feste Karte: Bett in der Mitte, Teich, Hügel, Bäume, Felsring, große Tore */
+function buildStart(seed: number, opts: { garden?: boolean }): Map<string, Cell> {
   const map = new Map<string, Cell>();
   const set = (x: number, y: number, c: Cell) => map.set(key(x, y), c);
+  const { rx, ry } = lichtung.shape;
+  const spawns = new Set(lichtung.animals.map((a) => key(a.at[0], a.at[1])));
+  const R = Math.ceil(Math.max(rx, ry) * 1.6);
 
-  for (const r of REGIONS) for (const [x, y] of ring(r.area)) set(x, y, rock());
-  for (const r of REGIONS)
-    for (const [x, y] of cellsOf(r.area)) {
-      const c = grass(r.id);
-      const roll = rand01(seed, x, y, 1);
-      if (r.id === 'teich') {
-        const d = ((x - POND.cx) / POND.rx) ** 2 + ((y - POND.cy) / POND.ry) ** 2;
-        if (d <= 1) {
-          set(x, y, { ...water('teich'), deco: roll < 0.25 ? 'lily' : null });
-          continue;
-        }
-        if (d <= 1.9 && roll < 0.45) c.deco = 'reed';
-      } else if (roll < (r.id === 'wiese' ? 0.3 : 0.08)) {
-        c.deco = 'flower';
-        c.color = flowerColor(seed, x, y);
+  for (let y = -R; y <= R; y++)
+    for (let x = -R; x <= R; x++) {
+      const e = edge(seed, x, y);
+      if (e >= ROCK_OUTER) continue; // Landschaft
+      if (e >= 1) {
+        set(x, y, { ...rock(), h: 2 + (hash(seed, x, y, 22) % 2) });
+        continue;
       }
+      const c = grass('lichtung');
+      const near = Math.max(Math.abs(x - HOME.bed[0]), Math.abs(y - HOME.bed[1]));
+      if (near <= HOME.clear || spawns.has(key(x, y))) {
+        set(x, y, c); // am Bett und an den Startplätzen der Tiere flach und frei
+        continue;
+      }
+      const p = ((x - POND.cx) / POND.rx) ** 2 + ((y - POND.cy) / POND.ry) ** 2;
+      const roll = rand01(seed, x, y, 1);
+      if (p <= 1) {
+        set(x, y, { ...water('lichtung'), deco: roll < 0.25 ? 'lily' : null });
+        continue;
+      }
+      if (p <= 1.8) {
+        set(x, y, { ...c, ...(roll < 0.4 ? { deco: 'reed' as const } : { ground: 'sand' as const }) });
+        continue;
+      }
+      if (valueNoise(seed + 30, x, y, 6) > 0.66 && e < 0.8) c.h = 2;
+      if (roll < 0.05 && near > HOME.clear + 1) Object.assign(c, { deco: 'tree', solid: true });
+      else if (roll < 0.065) Object.assign(c, { deco: 'bush', solid: true });
+      else if (roll < 0.2) Object.assign(c, { deco: 'flower', color: flowerColor(seed, x, y) });
+      else if (roll < 0.22) c.deco = 'fern';
+      else if (roll < 0.23) c.deco = 'mushroom';
       set(x, y, c);
     }
+  set(HOME.bed[0], HOME.bed[1], { ...grass('lichtung'), deco: 'bed', solid: true });
 
-  for (const b of BORDERS)
-    for (const [x, y] of cellsOf(b.area)) {
-      if (b.kind === 'water') set(x, y, water('border'));
-      else if (b.kind === 'path') set(x, y, { ...grass('border'), ground: 'path' });
-      else set(x, y, { ...grass('border'), deco: 'fence', solid: true });
-    }
+  for (const g of GATES)
+    for (const [x, y] of gateCells(seed, g.side))
+      set(x, y, { ...grass('border'), ground: 'stone', deco: 'biggate', gate: g.id, solid: false });
 
-  // Zuhause: Bäume, Bett, Garten mit Hecke, Rosenbogen und Blumen
-  for (const [x, y] of HOME.trees) set(x, y, { ...grass('zuhause'), deco: 'tree', solid: true });
-  set(HOME.bed[0], HOME.bed[1], { ...grass('zuhause'), deco: 'bed', solid: true });
-  for (const [x, y] of ring(HOME.garden)) set(x, y, { ...grass('zuhause'), deco: 'hedge', solid: true });
-  for (const [x, y] of cellsOf(HOME.garden)) {
-    const bloom = rand01(seed, x, y, 4) < 0.4;
-    set(x, y, {
-      ...grass('zuhause'),
-      garden: true,
-      ...(bloom ? { deco: 'flower', color: flowerColor(seed, x, y) } : {}),
+  if (opts.garden) {
+    for (const [x, y] of ring(HOME.garden)) set(x, y, { ...grass('lichtung'), deco: 'hedge', solid: true });
+    for (const [x, y] of cellsOf(HOME.garden)) set(x, y, { ...grass('lichtung'), garden: true });
+    set(HOME.gardenGate[0], HOME.gardenGate[1], {
+      ...grass('lichtung'),
+      ground: 'path',
+      gardenGate: true,
+      deco: 'arch',
     });
-  }
-  set(HOME.gardenGate[0], HOME.gardenGate[1], { ...grass('zuhause'), ground: 'path', gardenGate: true, deco: 'arch' });
-
-  for (const g of GATES) {
-    const [x, y] = g.at;
-    set(
-      x,
-      y,
-      g.kind === 'bruecke'
-        ? { ...water('border'), deco: 'bridge', gate: g.id }
-        : { ...grass('border'), deco: 'gate', gate: g.id },
-    );
-    set(g.sign[0], g.sign[1], { ...grass(g.region), deco: 'sign', solid: true, sign: g.id });
   }
   return map;
 }
 
 /** Endlose Landschaft: sanfte Hügel (Stufen meist eine Ebene), Teiche mit Sandufer, Bäume, Büsche, Blumen */
 function wildCell(seed: number, x: number, y: number): Cell {
-  // Vor dem Pfad vom Zuhause ist es flach und frei; von dort steigt das Gelände höchstens alle zwei Felder um eine
-  // Ebene. So gibt es keine Wand aus zwei Stufen, und der Weg hinaus ist bei jedem Seed offen.
-  const [ex, ey] = HOME.exit;
-  const d = Math.max(Math.abs(x - ex) - 3, ey + 1 - y, y - (ey + 5), 0);
   const n = valueNoise(seed, x, y, 11);
-  const h = Math.min(n < 0.4 ? 1 : n < 0.66 ? 2 : 3, 1 + Math.floor(d / 2));
-  if (d < 2) return { ...grass('wild'), h };
+  const h = n < 0.4 ? 1 : n < 0.66 ? 2 : 3;
   const wet = valueNoise(seed + 1, x, y, 7);
   if (h === 1 && wet < 0.17) return water('wild');
   const c = grass('wild');
@@ -171,10 +199,8 @@ function dress(seed: number, x: number, y: number, c: Cell): Cell {
   if (c.deco === 'tree' && !c.tree) {
     const patch = valueNoise(seed + 5, x, y, 14);
     out.tree =
-      c.region === 'zuhause'
-        ? rand01(seed, x, y, 12) < 0.5
-          ? 'blossom'
-          : 'oak'
+      c.region === 'lichtung'
+        ? (['oak', 'blossom', 'birch', 'oak', 'autumn'] as const)[hash(seed, x, y, 12) % 5] // bunt gemischt
         : patch > 0.66
           ? 'autumn'
           : patch < 0.27
@@ -190,8 +216,8 @@ function dress(seed: number, x: number, y: number, c: Cell): Cell {
   return out;
 }
 
-export function createWorld(seed: number): World {
-  const regions = buildRegions(seed);
+export function createWorld(seed: number, opts: { garden?: boolean } = {}): World {
+  const regions = buildStart(seed, opts);
   const cache = new ChunkCache<Cell>((cx, cy) => {
     const cells: Cell[] = [];
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)
@@ -199,7 +225,8 @@ export function createWorld(seed: number): World {
         cells.push(dress(seed, x, y, regions.get(key(x, y)) ?? wildCell(seed, x, y)));
     return cells;
   });
-  return { seed, cell: (x, y) => cache.get(x, y) };
+  const gates = new Map(GATES.map((g) => [g.id, gateCells(seed, g.side)] as const));
+  return { seed, cell: (x, y) => cache.get(x, y), gates };
 }
 
 /** Höhe, auf der man auf einem Feld steht – null, wenn man dort nicht stehen kann */

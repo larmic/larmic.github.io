@@ -261,7 +261,6 @@ export class World3D {
   private chunks = new Map<string, Chunk>();
   private models = new Map<string, BufferGeometry>();
   private bodies = new Map<string, Mesh>();
-  private gates = new Map<string, Mesh>();
   private signs = new Group();
   private signKey = '';
   private sleeper = new Group();
@@ -351,7 +350,6 @@ export class World3D {
 
     this.syncChunks(world, cam.x, cam.y);
     this.syncBodies(state, sc);
-    this.syncGates(sc);
     this.syncSigns(state);
     this.syncSleeper(state);
     this.renderer.render(this.scene, this.camera);
@@ -504,6 +502,9 @@ export class World3D {
       case 'fence':
         this.fence(g, x, y, h);
         break;
+      case 'biggate':
+        this.bigGate(g, x, y, h);
+        break;
       case 'hedge':
         g.box(x + 0.08, h, y + 0.08, 0.84, 0.75, 0.84, '#3a8a35', '#4fa84a', 'leaves');
         break;
@@ -581,6 +582,26 @@ export class World3D {
       }
   }
 
+  /** Großes Tor im Felsen: Holzflügel mit Eisenbändern, oben ein Steinsturz; in der Mitte das Schloss */
+  private bigGate(g: Geo, x: number, y: number, h: number) {
+    const w = this.world!;
+    const isGate = (dx: number, dy: number) => w.cell(x + dx, y + dy).deco === 'biggate';
+    const across = isGate(1, 0) || isGate(-1, 0); // Tor liegt quer (Norden, Süden)
+    const middle = across ? isGate(1, 0) && isGate(-1, 0) : isGate(0, 1) && isGate(0, -1);
+    const iron = '#3a3a44';
+    if (across) {
+      g.box(x, h, y + 0.35, 1, 2.4, 0.3, '#8a5a30', '#a0703f', 'planks');
+      for (const z of [0.5, 1.7]) g.box(x, h + z, y + 0.3, 1, 0.12, 0.4, iron);
+      g.box(x - 0.02, h + 2.4, y + 0.2, 1.04, 0.45, 0.6, '#8f949b', '#a8adb3', 'stone');
+      if (middle) g.box(x + 0.38, h + 1.0, y + 0.25, 0.24, 0.3, 0.12, iron);
+    } else {
+      g.box(x + 0.35, h, y, 0.3, 2.4, 1, '#8a5a30', '#a0703f', 'planks');
+      for (const z of [0.5, 1.7]) g.box(x + 0.3, h + z, y, 0.4, 0.12, 1, iron);
+      g.box(x + 0.2, h + 2.4, y - 0.02, 0.6, 0.45, 1.04, '#8f949b', '#a8adb3', 'stone');
+      if (middle) g.box(x + 0.25, h + 1.0, y + 0.38, 0.12, 0.3, 0.24, iron);
+    }
+  }
+
   private fence(g: Geo, x: number, y: number, h: number) {
     const w = this.world!;
     const joins = (dx: number, dy: number) => {
@@ -647,32 +668,6 @@ export class World3D {
       }
   }
 
-  private syncGates(sc: Scene) {
-    for (const g of GATES) {
-      let m = this.gates.get(g.id);
-      const h = 1;
-      if (!m) {
-        const geo = new Geo();
-        if (g.kind === 'bruecke') geo.box(-0.5, 0, -0.5, 1, 0.18, 1, '#a0703f', '#c0915b', 'planks');
-        else geo.box(-0.08, 0, -0.5, 0.16, 0.85, 1, GAME_COLORS.fence, GAME_COLORS.fenceDark, 'planks');
-        m = new Mesh(geo.build(), this.solid);
-        m.castShadow = true;
-        m.receiveShadow = true;
-        m.position.set(g.at[0] + 0.5, g.kind === 'bruecke' ? 0.82 : h, g.at[1] + 0.5);
-        this.scene.add(m);
-        this.gates.set(g.id, m);
-      }
-      const open = sc.gates.get(g.id) ?? 0;
-      if (g.kind === 'bruecke') {
-        m.visible = open > 0;
-        m.scale.set(1, 1, Math.max(0.001, open));
-      } else {
-        m.visible = open < 1;
-        m.scale.set(1, 1, Math.max(0.001, 1 - open));
-      }
-    }
-  }
-
   /** Tiere auf den Tafeln: gefundene in Farbe, verlorene als dunkle Umrisse (neu gebaut, wenn sich etwas ändert) */
   private syncSigns(state: State) {
     const key = state.met.join(',');
@@ -680,6 +675,8 @@ export class World3D {
     this.signKey = key;
     for (const child of [...this.signs.children]) this.signs.remove(child);
     for (const g of GATES) {
+      if (!g.sign) continue;
+      const sign = g.sign;
       const region = REGIONS.find((r) => r.id === g.region)!;
       const n = region.animals.length;
       region.animals.forEach((a, i) => {
@@ -688,7 +685,7 @@ export class World3D {
         const m = new Mesh(this.model(a.species, sp.parts), met ? this.entity : this.dark);
         m.scale.setScalar(sp.scale * 0.45);
         m.rotation.y = YAW.s;
-        m.position.set(g.sign[0] + 0.5 + (i - (n - 1) / 2) * 0.42, 2.1, g.sign[1] + 0.5);
+        m.position.set(sign[0] + 0.5 + (i - (n - 1) / 2) * 0.42, 2.1, sign[1] + 0.5);
         this.signs.add(m);
       });
     }

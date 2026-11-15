@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DIRS } from '../../lib/games/front';
 import { GATES, HOME, REGIONS, type GateId } from '../../data/games/mitwachsen';
-import { canStep, createWorld, inRect, standHeight, wildAnimals, type World } from './mitwachsen-world';
+import { canStep, createWorld, standHeight, wildAnimals, type World } from './mitwachsen-world';
 
 /** Alle Felder, die von `start` aus zu Fuß erreichbar sind (bis `limit` Felder) */
 function reachable(world: World, open: GateId[], start: readonly [number, number], limit = 6000) {
@@ -18,8 +18,9 @@ function reachable(world: World, open: GateId[], start: readonly [number, number
   }
   return [...seen].map((k) => k.split(',').map(Number) as [number, number]);
 }
-const region = (id: string) => REGIONS.find((r) => r.id === id)!;
+const lichtung = REGIONS[0];
 const START = HOME.wake[0];
+const SEEDS = [1, 42, 2026, 7, 99, 123456];
 
 describe('Welt aus dem Seed', () => {
   it('entsteht aus demselben Seed immer gleich, aus einem anderen anders', () => {
@@ -34,75 +35,65 @@ describe('Welt aus dem Seed', () => {
       }
     expect(differs).toBeGreaterThan(100);
   });
-
-  it('hat die Gegenden bei jedem Seed an derselben Stelle', () => {
-    for (const seed of [1, 2, 3]) {
-      const w = createWorld(seed);
-      for (const r of REGIONS) expect(w.cell(r.area.x0, r.area.y0).region).toBe(r.id);
-      expect(w.cell(HOME.bed[0], HOME.bed[1]).deco).toBe('bed');
-    }
-  });
-
-  it('Bett, Aufwachplätze und Startplätze der Tiere sind frei', () => {
-    const w = createWorld(7);
-    for (const [x, y] of HOME.wake) expect(standHeight(w, [], x, y), `${x},${y}`).not.toBeNull();
-    for (const r of REGIONS)
-      for (const a of r.animals) {
-        expect(standHeight(w, [], a.at[0], a.at[1]), a.species).not.toBeNull();
-        expect(w.cell(a.at[0], a.at[1]).region).toBe(r.id);
-      }
-  });
 });
 
-describe('Gegenden und Tore', () => {
-  for (const seed of [1, 42, 2026, 7, 99, 123456]) {
+describe('Start auf der Lichtung', () => {
+  for (const seed of SEEDS) {
     const w = createWorld(seed);
 
-    it(`Seed ${seed}: Ohne offene Tore erreicht man nur das Zuhause und die Landschaft`, () => {
+    it(`Seed ${seed}: In der Mitte steht nur das Bett, ringsum ist es frei`, () => {
+      expect(w.cell(HOME.bed[0], HOME.bed[1]).deco).toBe('bed');
+      for (let y = -HOME.clear; y <= HOME.clear; y++)
+        for (let x = -HOME.clear; x <= HOME.clear; x++) {
+          if (x === HOME.bed[0] && y === HOME.bed[1]) continue;
+          expect(standHeight(w, [], x, y), `${x},${y}`).toBe(1);
+        }
+      for (const [x, y] of HOME.wake) expect(standHeight(w, [], x, y)).not.toBeNull();
+    });
+
+    it(`Seed ${seed}: Alle Tiere der Lichtung sind vom Bett aus erreichbar, die Landschaft nicht`, () => {
       const cells = reachable(w, [], START);
-      expect(cells.some(([x, y]) => inRect(region('wiese').area, x, y))).toBe(false);
-      expect(cells.some(([x, y]) => inRect(region('teich').area, x, y))).toBe(false);
-      // Der Pfad hinaus ist offen: weit draußen liegt erreichbare Landschaft
-      expect(cells.some(([x, y]) => w.cell(x, y).region === 'wild' && Math.abs(y) > 20)).toBe(true);
+      const set = new Set(cells.map(([x, y]) => `${x},${y}`));
+      for (const a of lichtung.animals) {
+        expect(w.cell(a.at[0], a.at[1]).region, a.species).toBe('lichtung');
+        const around = [
+          [0, 0],
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ].some(([dx, dy]) => set.has(`${a.at[0] + dx},${a.at[1] + dy}`));
+        expect(around, a.species).toBe(true);
+      }
+      expect(cells.some(([x, y]) => w.cell(x, y).region === 'wild')).toBe(false);
+      expect(cells.length).toBeLessThan(600); // die Lichtung ist überschaubar
     });
 
-    it(`Seed ${seed}: Jedes Tor öffnet genau seine nächste Gegend`, () => {
-      const one = reachable(w, ['gartentor'], START);
-      expect(one.some(([x, y]) => inRect(region('wiese').area, x, y))).toBe(true);
-      expect(one.some(([x, y]) => inRect(region('teich').area, x, y))).toBe(false);
-      const both = reachable(w, ['gartentor', 'bruecke'], START);
-      expect(both.some(([x, y]) => inRect(region('teich').area, x, y))).toBe(true);
-    });
-
-    it(`Seed ${seed}: Aus der Landschaft kommt man nicht seitlich in eine Gegend`, () => {
-      // Start weit draußen, alle Tore zu: kein Feld einer Gegend außer dem Zuhause (über den Pfad) erreichbar
-      const outside = reachable(w, [], [0, 12]);
-      expect(outside.some(([x, y]) => inRect(region('wiese').area, x, y) || inRect(region('teich').area, x, y))).toBe(
-        false,
-      );
+    it(`Seed ${seed}: Vier große Tore zu je drei Feldern, alle verschlossen`, () => {
+      expect([...w.gates.keys()].sort()).toEqual(GATES.map((g) => g.id).sort());
+      for (const g of GATES) {
+        const cells = w.gates.get(g.id)!;
+        expect(cells).toHaveLength(3);
+        for (const [x, y] of cells) {
+          expect(w.cell(x, y).deco).toBe('biggate');
+          expect(w.cell(x, y).gate).toBe(g.id);
+          expect(standHeight(w, [], x, y)).toBeNull();
+        }
+        expect(g.locked).toBe(true);
+      }
     });
   }
 
-  it('Tore sind zu, bis sie offen sind; Brücken liegen über Wasser', () => {
-    const w = createWorld(5);
-    for (const g of GATES) {
-      expect(standHeight(w, [], g.at[0], g.at[1])).toBeNull();
-      expect(standHeight(w, [g.id], g.at[0], g.at[1])).toBe(1);
-      expect(w.cell(g.sign[0], g.sign[1]).sign).toBe(g.id);
-    }
-    const bridge = GATES.find((g) => g.kind === 'bruecke')!;
-    expect(w.cell(bridge.at[0], bridge.at[1]).ground).toBe('water');
-  });
-
-  it('der Garten hat genau einen Eingang', () => {
-    const w = createWorld(3);
-    const inside = reachable(w, [], [HOME.garden.x0, HOME.garden.y0]).filter(([x, y]) => !w.cell(x, y).garden);
-    // Von innen führt jeder Weg hinaus über den Rosenbogen
-    expect(inside.some(([x, y]) => x === HOME.gardenGate[0] && y === HOME.gardenGate[1])).toBe(true);
+  it('Ohne Garten gibt es keine Gartenfelder; mit Garten genau einen Eingang', () => {
+    const plain = createWorld(3);
+    for (let y = -15; y <= 15; y++) for (let x = -15; x <= 15; x++) expect(plain.cell(x, y).garden).toBeUndefined();
+    const w = createWorld(3, { garden: true });
     let openings = 0;
     for (let y = HOME.garden.y0 - 1; y <= HOME.garden.y1 + 1; y++)
       for (let x = HOME.garden.x0 - 1; x <= HOME.garden.x1 + 1; x++) if (w.cell(x, y).gardenGate) openings++;
     expect(openings).toBe(1);
+    const inside = reachable(w, [], [HOME.garden.x0, HOME.garden.y0]).filter(([x, y]) => !w.cell(x, y).garden);
+    expect(inside.some(([x, y]) => x === HOME.gardenGate[0] && y === HOME.gardenGate[1])).toBe(true);
   });
 });
 

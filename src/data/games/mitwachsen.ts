@@ -4,10 +4,10 @@
 
 import { eyes, type Part } from '../../lib/games/front';
 
-export type RegionId = 'zuhause' | 'wiese' | 'teich';
+export type RegionId = 'lichtung';
 export type SpeciesId =
   'hase' | 'igel' | 'schaf' | 'kuh' | 'biene' | 'ente' | 'frosch' | 'schildkroete' | 'fuchs' | 'eichhoernchen';
-export type GateId = 'gartentor' | 'bruecke';
+export type GateId = 'nordtor' | 'osttor' | 'suedtor' | 'westtor';
 
 export type Rect = { x0: number; y0: number; x1: number; y1: number }; // Grenzen eingeschlossen
 export type Point = readonly [number, number];
@@ -15,88 +15,67 @@ export type Point = readonly [number, number];
 export type Region = {
   id: RegionId;
   name: string;
-  area: Rect; // begehbares Innere; der Ring darum ist Fels, außer wo BORDERS etwas anderes sagt
+  /** Ellipse um die Mitte (0, 0), deren Rand leicht unregelmäßig ist; darum liegen Felsen */
+  shape: { rx: number; ry: number };
   animals: readonly { species: SpeciesId; at: Point }[];
 };
 
 export type Gate = {
   id: GateId;
-  kind: 'tor' | 'bruecke'; // Tor im Zaun oder Brücke übers Wasser
-  at: Point;
-  region: RegionId; // Gegend, in der das Tor steht: Es öffnet, wenn alle ihre Tiere getroffen sind
-  leadsTo: RegionId;
-  sign: Point; // Tafel mit den Tieren der Gegend
+  kind: 'grosstor'; // großes Tor im Felsen, drei Felder breit
+  side: 'n' | 'o' | 's' | 'w'; // Himmelsrichtung von der Mitte aus
+  region: RegionId; // Gegend, in der das Tor steht
+  leadsTo: string; // was dahinter liegt (kommt später)
+  locked: boolean; // vorerst verschlossen; öffnet nicht, auch wenn alle Tiere gefunden sind
+  sign?: Point; // Tafel mit den Tieren der Gegend (noch keine)
 };
 
 /** Tiere einer Gegend haben die Kennung `<gegend>:<art>` */
 export const animalId = (region: RegionId, species: SpeciesId) => `${region}:${species}`;
 
+/**
+ * Am Anfang gibt es nur die Lichtung mit dem Bett. Ringsum Felsen mit vier großen Toren, die vorerst zu sind.
+ * Dahinter liegt die endlose Landschaft (später Wald, Blumenwiese, Teich, Lavaberge).
+ */
 export const REGIONS: readonly Region[] = [
   {
-    id: 'zuhause',
-    name: 'Zuhause',
-    area: { x0: -6, y0: -4, x1: 6, y1: 5 },
+    id: 'lichtung',
+    name: 'Lichtung',
+    shape: { rx: 12, ry: 10 },
     animals: [
-      { species: 'hase', at: [-4, 2] },
-      { species: 'igel', at: [3, 3] },
+      { species: 'hase', at: [-6, 4] },
+      { species: 'igel', at: [5, 5] },
+      { species: 'eichhoernchen', at: [8, -2] },
+      { species: 'schaf', at: [-7, -3] },
+      { species: 'ente', at: [-1, -5] },
     ],
   },
-  {
-    id: 'wiese',
-    name: 'Blumenwiese',
-    area: { x0: 8, y0: -4, x1: 19, y1: 5 },
-    animals: [
-      { species: 'schaf', at: [12, 2] },
-      { species: 'kuh', at: [16, -1] },
-      { species: 'biene', at: [10, -2] },
-    ],
-  },
-  {
-    id: 'teich',
-    name: 'Teich',
-    area: { x0: 8, y0: -16, x1: 19, y1: -6 },
-    animals: [
-      { species: 'ente', at: [11, -8] },
-      { species: 'frosch', at: [16, -14] },
-      { species: 'schildkroete', at: [10, -14] },
-    ],
-  },
-];
-
-/** Grenzen zwischen Gegenden, die kein Fels sind (überschreiben den Felsring) */
-export const BORDERS: readonly { area: Rect; kind: 'fence' | 'water' | 'path' }[] = [
-  { area: { x0: 7, y0: -4, x1: 7, y1: 5 }, kind: 'fence' }, // Zuhause | Blumenwiese
-  { area: { x0: 8, y0: -5, x1: 19, y1: -5 }, kind: 'water' }, // Blumenwiese | Teich
-  { area: { x0: 0, y0: 6, x1: 0, y1: 6 }, kind: 'path' }, // Pfad vom Zuhause in die endlose Landschaft
 ];
 
 export const GATES: readonly Gate[] = [
-  { id: 'gartentor', kind: 'tor', at: [7, 0], region: 'zuhause', leadsTo: 'wiese', sign: [6, -1] },
-  { id: 'bruecke', kind: 'bruecke', at: [13, -5], region: 'wiese', leadsTo: 'teich', sign: [12, -4] },
+  { id: 'nordtor', kind: 'grosstor', side: 'n', region: 'lichtung', leadsTo: 'Wald', locked: true },
+  { id: 'osttor', kind: 'grosstor', side: 'o', region: 'lichtung', leadsTo: 'Blumenwiese', locked: true },
+  { id: 'suedtor', kind: 'grosstor', side: 's', region: 'lichtung', leadsTo: 'Teich', locked: true },
+  { id: 'westtor', kind: 'grosstor', side: 'w', region: 'lichtung', leadsTo: 'Lavaberge', locked: true },
 ];
 
 export const HOME = {
-  bed: [-3, -3] as Point,
+  bed: [0, 0] as Point,
   wake: [
-    [-2, -3],
-    [-3, -2],
-    [-2, -2],
-    [-4, -3],
-    [-4, -2],
+    [1, 0],
+    [0, 1],
+    [1, 1],
+    [-1, 0],
+    [-1, 1],
   ] as readonly Point[], // freie Plätze am Bett zum Aufwachen
-  garden: { x0: 1, y0: -3, x1: 4, y1: 0 } as Rect, // Inneres des Gartens (4 × 4), Hecke ringsum
-  gardenGate: [2, 1] as Point, // Rosenbogen in der Hecke; das Feld dahinter bleibt frei
-  exit: [0, 6] as Point, // Pfad in die endlose Landschaft
-  trees: [
-    [-6, -4],
-    [-6, 5],
-    [5, 5],
-    [-1, -4],
-  ] as readonly Point[],
+  clear: 2, // so weit um das Bett bleibt es flach und frei
+  /** Garten für später: Er entsteht noch nicht in der Welt (createWorld mit { garden: true } für Tests) */
+  garden: { x0: 3, y0: -3, x1: 6, y1: 0 } as Rect,
+  gardenGate: [4, 1] as Point, // Rosenbogen in der Hecke; das Feld dahinter bleibt frei
 };
 
-/** Teich: Wasser in einer Ellipse */
-export const POND = { cx: 13.5, cy: -11, rx: 3.2, ry: 2.3 };
+/** Kleiner Teich auf der Lichtung */
+export const POND = { cx: -3, cy: -6, rx: 2.4, ry: 1.6 };
 
 // ---------- Tiere ----------
 

@@ -23,7 +23,7 @@ Bei Änderungen am Verhalten Spec und Tests mitziehen.
 | --- | --- |
 | **Welt** | Seed, Weltname, Figurenname und Fortschritt. Mehrere Welten nebeneinander. |
 | **Feld** | Ganzzahlige Koordinate (x nach rechts, y nach unten/vorn). Jedes Feld hat eine Höhe (Wasser 0, Boden 1, Hügel bis 3). |
-| **Gegend** | Von Hand entworfener Bereich (Zuhause, Blumenwiese, Teich), ringsum durch Fels, Zaun oder Wasser abgeschlossen. |
+| **Gegend** | Von Hand entworfener Bereich. Zum Start nur die **Lichtung** mit dem Bett, ringsum Felsen mit vier großen Toren. |
 | **Landschaft** | Alles außerhalb der Gegenden, endlos aus dem Seed berechnet, in Stücken von 16 × 16 Feldern. |
 | **Tor** | Tor im Zaun oder Brücke übers Wasser. Gehört zu der Gegend, in der es steht. |
 | **Takt** | 100 ms. Tiere laufen im Takt, Schlafsperre und Platztausch zählen in Takten. |
@@ -49,10 +49,10 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 5. **Hineinlaufen in ein Tier:** Es singt, folgt aber nicht. Läuft die Figur innerhalb von 15 Takten noch einmal hinein, tauschen beide den Platz (nur wenn das Tier auf dem Feld der Figur stehen darf). Steht die Figur in der Öffnung des Gartens und versperrt ein Tier im Garten den Weg, rückt es stattdessen im Garten beiseite. Kommt ein folgendes Tier durch den Tausch in den Garten, bleibt es dort (Regel 7). *Tests auch: „Randfälle aus der Prüfung“* *Tests: „Hineinlaufen lässt singen …“, „tauscht nach Ablauf der Zeit nicht mehr …“*
 6. **Gänsemarsch:** Geht die Figur einen Schritt, rückt jedes folgende Tier auf den Platz seines Vordermanns. *Test: „läuft im Gänsemarsch …“*
 7. **Garten:** 4 × 4 Felder mit Hecke und einem Rosenbogen als Eingang. Ein folgendes Tier, das ein Feld im Garten betritt, löst sich aus der Kette, rückt nach hinten auf einen freien Platz und bleibt für immer dort (gespeichert). Das Feld direkt hinter der Öffnung bleibt frei: Kein Tier im Garten läuft dorthin, so kommt das nächste Tier immer hinein. *Tests: „ein folgendes Tier bleibt im Garten …“, „Eingang des Gartens“*
-8. **Tore:** Ein Tor öffnet genau dann, wenn alle Tiere seiner Gegend gefunden sind, und bleibt offen. *Tests: „öffnen genau dann …“, „das letzte gefundene Tier öffnet das Tor sofort …“*
+8. **Tore:** Die vier großen Tore der Lichtung sind verschlossen (`locked`) und öffnen nicht, auch wenn alle Tiere gefunden sind; auch ein alter Spielstand öffnet sie nicht. Für künftige, nicht verschlossene Tore gilt: Ein Tor öffnet, wenn alle Tiere seiner Gegend gefunden sind, und bleibt offen. *Tests: „Große Tore“*
 9. **Schlafen:** Aktion mit dem Bett vorn oder daneben (wenn kein Tier näher ist). Folgende Tiere gehen heim: Tiere einer Gegend an einen freien Platz nahe ihrem Start, Tiere der Landschaft verschwinden und tauchen später an ihrem Platz auf. 30 Takte lang weckt keine Taste. *Tests: „legt sich mit der Aktion am Bett schlafen …“, „schickt folgende Tiere beim Schlafen heim“*
 10. **Rufen:** Aktion ohne Tier und Bett in der Nähe. *Test: „ruft, wenn weder Tier noch Bett …“*
-11. **Umherlaufen:** Freie Tiere ruhen 8 bis 25 Takte, dann gehen sie einen Schritt oder drehen sich. Sie bleiben in ihrem Zuhause (Gegend, Stück der Landschaft oder Garten) und nie auf einem Feld an einem Durchgang (Tor, Brücke, Garten-Öffnung, Pfad und deren Nachbarfelder); wer außerhalb steht (nach einem Platztausch), zieht heim. Steht die Figur daneben, bleiben sie stehen und schauen sie an. *Tests: „bleibt stehen und schaut …“, „läuft umher, aber nur in seinem Zuhause“, „Durchgänge bleiben frei“*
+11. **Umherlaufen:** Freie Tiere ruhen 8 bis 25 Takte, dann gehen sie einen Schritt oder drehen sich. Sie bleiben in ihrem Zuhause (Gegend, Stück der Landschaft oder Garten) und nie auf einem Feld an einem Durchgang (Tore, Rosenbogen und deren Nachbarfelder); wer außerhalb steht (nach einem Platztausch), zieht heim. Steht die Figur daneben, bleiben sie stehen und schauen sie an. *Tests: „bleibt stehen und schaut …“, „läuft umher, aber nur in seinem Zuhause“, „Durchgänge bleiben frei“*
 12. **Landschaft:** Tiere der Landschaft gibt es in den Stücken um die Figur (Abstand 1). Ab Abstand 3 verschwinden frei laufende wieder. Gleiche Welt, gleiches Stück: gleiche Tiere am gleichen Platz.
 
 ## Welt
@@ -60,12 +60,11 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 | Regel | Test |
 | --- | --- |
 | Gleicher Seed ergibt gleiche Felder, anderer Seed andere Landschaft | „entsteht aus demselben Seed immer gleich …“ |
-| Gegenden, Bett und Garten liegen bei jedem Seed an derselben Stelle | „hat die Gegenden bei jedem Seed …“ |
-| Ohne offene Tore erreicht man nur Zuhause und Landschaft; der Pfad hinaus ist offen | „Ohne offene Tore erreicht man nur …“ |
-| Jedes Tor öffnet genau seine nächste Gegend | „Jedes Tor öffnet genau …“ |
-| Aus der Landschaft kommt man nicht seitlich in eine Gegend | „Aus der Landschaft kommt man nicht seitlich …“ |
-| Der Garten hat genau einen Eingang (Rosenbogen) | „der Garten hat genau einen Eingang“ |
-| Die Landschaft ist sanft (selten mehr als eine Stufe zwischen Nachbarn); vor dem Pfad steigt sie höchstens alle zwei Felder | „ist meist sanft …“ |
+| In der Mitte steht nur das Bett, ringsum (2 Felder) ist es flach und frei | „In der Mitte steht nur das Bett …“ |
+| Alle Tiere der Lichtung sind vom Bett aus erreichbar, die Landschaft dahinter nicht; die Lichtung ist überschaubar (unter 600 Felder) | „Alle Tiere der Lichtung sind vom Bett aus erreichbar …“ |
+| Vier große Tore zu je drei Feldern, alle verschlossen; die Welt liefert ihre Felder (`world.gates`, hängen vom Seed ab) | „Vier große Tore …“ |
+| Ohne Garten keine Gartenfelder; mit `{ garden: true }` genau ein Eingang | „Ohne Garten gibt es keine Gartenfelder …“ |
+| Die Landschaft ist sanft (selten mehr als eine Stufe zwischen Nachbarn) | „ist meist sanft …“ |
 
 ## Invarianten
 
@@ -82,8 +81,8 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Was | Regel |
 | --- | --- |
 | Schlüssel | `larmic.games.index` (Liste der Welten, aktuelle Welt), `larmic.games.world.<id>` je Welt, `larmic.games.muted` |
-| Format | `{ v: 3, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, homeAnimals, position, visits }`; `age` ist die Altersstufe der Welt (bisher nur 3) |
-| Umzug | Version 1 (Arbeitstitel `game: 'threeyear'`, ohne Alter) → 2 (Alter 3) → 3 (`penAnimals` heißt jetzt `homeAnimals`). Ältere Indizes werden übernommen. Nichts geht verloren |
+| Format | `{ v: 4, game: 'mitwachsen', age, id, seed, worldName, figureName, openGates, metAnimals, homeAnimals, position, visits }`; `age` ist die Altersstufe der Welt (bisher nur 3) |
+| Umzug | Version 1 (Arbeitstitel `game: 'threeyear'`, ohne Alter) → 2 (Alter 3) → 3 (`penAnimals` heißt jetzt `homeAnimals`) → 4 (Start auf der Lichtung: gefundene Tiere des alten Zuhauses, die es auf der Lichtung gibt, bleiben gefunden; Tore, Garten und Position beginnen neu). Ältere Indizes werden übernommen |
 | Wann | sofort bei gefunden, Garten, Tor, Schlafen, Weltwechsel und Umbenennen; sonst alle 10 s; beim Verlassen der Seite |
 | Fehler | Jeder Zugriff fängt Fehler ab. Ohne Speicher läuft das Spiel bis zum Neuladen weiter. |
 | `migrate()` | verwirft Fremdes (anderes Spiel, unbekannte Version) und räumt auf (unbekannte Tore und Arten, doppelte Einträge, kaputte Felder) |

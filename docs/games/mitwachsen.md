@@ -33,32 +33,21 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 ## Welt
 
 - **Endlos**, berechnet aus einem **Seed**. Derselbe Seed ergibt immer dieselbe Welt. Gespeichert werden nur Seed und Fortschritt, nie die Landschaft.
-- Die Welt wird in Stücken (z. B. 16 × 16 Felder) berechnet, sobald die Kamera in ihre Nähe kommt.
-- **Gegenden rund ums Zuhause:** Das Zuhause liegt in der Mitte. Die Geschichten-Gegenden öffnen sich nacheinander (Kette über Tore), liegen räumlich aber um das Zuhause herum, damit der Heimweg mit Tieren kurz bleibt.
-- **Ränder:** Jede Geschichten-Gegend ist ringsum durch Wasser, Felsen (zwei Stufen hoch) oder Zaun abgeschlossen, hinein kommt man nur durch ihr Tor. Die berechnete Landschaft (Wiesen, Hügel, Bäume, Berge zum Klettern) beginnt außerhalb des Rings der Gegenden und ist vom Zuhause aus über einen offenen Pfad erreichbar. So ist die Welt von Anfang an endlos, und die Tore lassen sich trotzdem nicht umgehen.
+- **Start auf der Lichtung:** Am Anfang gibt es nur das **Bett** in der Mitte einer Lichtung mit sanften Hügeln, Bäumen, Blumen und einem kleinen Teich. Keine Mauer, kein Garten: Das entwickelt sich mit der Zeit.
+- **Ringsum natürliche Felsen** mit leicht unregelmäßigem Rand, darin vier **große Tore** (Norden, Osten, Süden, Westen). Sie sind vorerst verschlossen; dahinter liegen später Wald, Blumenwiese, Teich und Lavaberge. Vorerst ist nur die Lichtung spielbar.
+- **Nebel:** Zu sehen ist nur, was das Kind schon erkundet hat. Der Rest liegt im Nebel und zeigt sich beim Herumlaufen (gespeichert).
+- Hinter den Toren: endlose, berechnete Landschaft in Stücken (16 × 16 Felder).
 - **Höhen:** Eine Stufe hoch oder runter geht automatisch mit einem kleinen Hüpfer. Zwei Stufen sind eine Wand. Herunterfallen gibt es nicht.
-- **Wasser** ist nicht begehbar; Brücken führen darüber.
+- **Wasser** ist nicht begehbar.
 
-## Gegenden
+## Die Lichtung
 
-Von Hand entworfen. Jede hat Landschaft, Tiere, ein Tor und eine Geschichte. Tiere, Reihenfolge und Tore sind festgelegt; die genaue Lage ergibt der Entwurf.
+| | |
+| --- | --- |
+| Tiere zum Entdecken | Hase, Igel, Eichhörnchen, Schaf, Ente |
+| Tore | Nordtor (Wald), Osttor (Blumenwiese), Südtor (Teich), Westtor (Lavaberge), alle vorerst zu |
 
-| Gegend | Tiere | Tor in die nächste Gegend |
-| --- | --- | --- |
-| Zuhause (Start, mit Bett und Garten) | Hase, Igel | Gartentor zur Blumenwiese |
-| Blumenwiese | Schaf, Kuh, Biene | Brücke zum Teich |
-| Teich | Ente, Frosch, Schildkröte | Waldtor zum Wald |
-| Wald | Eichhörnchen, Fuchs, Eule, Reh | Weg zum Strand |
-| Strand | Krabbe, Robbe | – |
-
-Neue Gegenden kommen nach und nach hinzu; so wächst die Welt mit. Berge gibt es zunächst in der berechneten Landschaft zum Klettern.
-
-## Tore
-
-1. Ein Tor ist zu, bis das Kind **alle Tiere der Gegend gefunden hat, in der das Tor steht**. Gefunden reicht; in den Garten bringen muss es sie dafür nicht.
-2. Am Tor steht eine **Tafel mit Bildern**: gefundene Tiere in Farbe, fehlende als dunkle Umrisse. So sieht das Kind selbst, wer noch fehlt.
-3. Dazu ein **Text zum Vorlesen** („Der Fuchs wartet noch im hohen Gras …“). Kommt erst mit den Geschichten (Stufe 3).
-4. Sind alle gefunden, öffnet sich das Tor sichtbar und hörbar (Brücke baut sich Block für Block, Tor schwingt auf). Offene Tore bleiben offen.
+Die Leiste unten zeigt, welche Tiere schon entdeckt sind. Wie sich die Tore später öffnen, hängt an der Geschichte (siehe Ideen: Tiere befreien).
 
 ## Tiere
 
@@ -75,9 +64,9 @@ Neue Gegenden kommen nach und nach hinzu; so wächst die Welt mit. Berge gibt es
 8. **Tiere der berechneten Landschaft:** Sie zählen für kein Tor, singen aber, folgen und dürfen in den Garten. Ihre Kennung ergibt sich aus Seed, Stück und Nummer und bleibt dadurch stabil.
 9. Positionen werden nicht gespeichert, nur „gefunden“ und „im Garten“. Ein Tier im Garten erscheint nicht mehr in seiner Heimat-Gegend.
 
-## Zuhause, Garten, Nacht
+## Bett, Nacht, später der Garten
 
-- **Garten:** Hecke mit einem Rosenbogen als Eingang am Zuhause, 4 × 4 Felder mit Blumen. Hier wohnen die gefundenen Tiere gern; ab und zu steigt über ihnen ein Herz auf. Niemand ist eingesperrt, die Tiere bleiben, weil sie zu Hause sind. Das Feld hinter dem Rosenbogen bleibt frei, neue Tiere rücken nach hinten. Figur und folgende Tiere können hindurch. Jedes folgende Tier, das ein Feld im Garten betritt, löst sich aus der Kette und bleibt. Für Tiere im Garten ist die Öffnung eine Wand. Gespeichert.
+- **Garten (später):** Hecke mit einem Rosenbogen am Zuhause, in dem gefundene Tiere wohnen. Er gehört noch nicht zum Start; Regeln und Tests dafür stehen schon (das Feld hinter dem Rosenbogen bleibt frei, Tiere im Garten bleiben dort).
 - **Bett:** Aktion am Bett → die Figur legt sich hin, der Himmel wird dunkel, Sterne gehen auf, eine leise Melodie spielt, es wird gespeichert.
 - **Aufwachen:** Nach dem Einschlafen reagiert das Spiel einige Sekunden nicht auf Tasten, damit wildes Drücken die Runde nicht sofort weiterführt. Danach bringt ein Tastendruck den Morgen.
 - **Start einer Runde:** Die Figur schläft im Bett, ein Tastendruck weckt sie. Dieser erste Druck schaltet auch den Ton frei (Autoplay-Regeln).

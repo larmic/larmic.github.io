@@ -3,13 +3,13 @@
 // nicht mit. Jeder Zugriff fängt Fehler ab (privates Fenster, voller Speicher); das Spiel läuft dann ohne Speichern.
 // Spezifikation: docs/specs/mitwachsen.md
 
-import { GATES, SPECIES, type GateId, type SpeciesId } from '../../data/games/mitwachsen';
+import { GATES, REGIONS, SPECIES, animalId, type GateId, type SpeciesId } from '../../data/games/mitwachsen';
 import type { HomeAnimal, Progress } from './mitwachsen-state';
 
 export const PREFIX = 'larmic.games.';
 export const INDEX_KEY = `${PREFIX}index`;
 export const worldKey = (id: string) => `${PREFIX}world.${id}`;
-export const VERSION = 3; // 1: Arbeitstitel „threeyear“ ohne Alter · 2: „mitwachsen“ mit Alter · 3: Garten statt Gehege
+export const VERSION = 4; // 1: „threeyear“ · 2: mit Alter · 3: Garten statt Gehege · 4: Start auf der Lichtung
 export const AGES = [3] as const; // Altersstufen, die es schon gibt
 export type Age = (typeof AGES)[number];
 
@@ -95,6 +95,20 @@ function fromV2(raw: Record<string, unknown>): Record<string, unknown> {
 }
 
 /**
+ * Version 3 → 4: Die Welt beginnt jetzt auf der Lichtung (nur das Bett, keine Gegenden, kein Garten).
+ * Gefundene Tiere des alten Zuhauses bleiben gefunden, wenn es sie auf der Lichtung gibt; der Rest beginnt neu.
+ */
+function fromV3(raw: Record<string, unknown>): Record<string, unknown> {
+  const lichtung = new Set(REGIONS[0].animals.map((a) => a.species));
+  const met = (Array.isArray(raw.metAnimals) ? raw.metAnimals : [])
+    .filter((id): id is string => typeof id === 'string' && id.startsWith('zuhause:'))
+    .map((id) => id.slice('zuhause:'.length))
+    .filter((sp): sp is SpeciesId => lichtung.has(sp as SpeciesId))
+    .map((sp) => animalId('lichtung', sp));
+  return { ...raw, v: 4, metAnimals: met, openGates: [], homeAnimals: [], position: [0, 0] };
+}
+
+/**
  * Gespeicherte Daten in das aktuelle Format bringen: ältere Versionen Schritt für Schritt umziehen, dann aufräumen.
  * Unbekanntes wird verworfen statt das Spiel zu stören: fremde Tore, Tierarten, Alter oder kaputte Felder.
  * Neuere Versionen als diese und fremde Spiele → null.
@@ -104,6 +118,7 @@ export function migrate(input: unknown): SavedWorld | null {
   let raw = input;
   if (raw.v === 1 && raw.game === 'threeyear') raw = fromV1(raw);
   if (raw.v === 2 && raw.game === 'mitwachsen') raw = fromV2(raw);
+  if (raw.v === 3 && raw.game === 'mitwachsen') raw = fromV3(raw);
   if (raw.v !== VERSION || raw.game !== 'mitwachsen') return null;
   if (typeof raw.id !== 'string' || typeof raw.seed !== 'number' || !Number.isFinite(raw.seed)) return null;
   const gates = new Set<string>(GATES.map((g) => g.id));
@@ -149,7 +164,7 @@ function write(store: Store, key: string, value: unknown): boolean {
 
 export function loadIndex(store: Store): Index {
   const raw = read(store, INDEX_KEY);
-  if (!isRecord(raw) || ![1, 2, VERSION].includes(raw.v as number) || !Array.isArray(raw.worlds))
+  if (!isRecord(raw) || ![1, 2, 3, VERSION].includes(raw.v as number) || !Array.isArray(raw.worlds))
     return { v: VERSION, worlds: [], current: null };
   const worlds = raw.worlds
     .filter((w): w is Record<string, unknown> => isRecord(w) && typeof w.id === 'string')

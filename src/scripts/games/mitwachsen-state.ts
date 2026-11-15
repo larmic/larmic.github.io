@@ -76,23 +76,32 @@ const cheb = (ax: number, ay: number, bx: number, by: number) => Math.max(Math.a
 const GARDEN_ENTRY = [HOME.gardenGate[0], HOME.gardenGate[1] - 1] as const;
 const isGardenEntry = (x: number, y: number) => x === GARDEN_ENTRY[0] && y === GARDEN_ENTRY[1];
 
-/** Felder an Durchgängen (Tore, Brücke, Rosenbogen, Pfad): Dort bleibt kein Tier stehen, sonst versperrt es den Weg */
-const PASSAGES = new Set(
-  [...GATES.map((g) => g.at), HOME.gardenGate, HOME.exit].flatMap(([x, y]) =>
-    [
-      [x, y],
-      [x + 1, y],
-      [x - 1, y],
-      [x, y + 1],
-      [x, y - 1],
-    ].map(([a, b]) => `${a},${b}`),
-  ),
-);
+/** Felder an Durchgängen (Tore, Rosenbogen): Dort bleibt kein Tier stehen, sonst versperrt es den Weg */
+const passageCache = new WeakMap<World, Set<string>>();
+function passages(world: World): Set<string> {
+  let set = passageCache.get(world);
+  if (!set) {
+    const spots = [...[...world.gates.values()].flat(), HOME.gardenGate];
+    set = new Set(
+      spots.flatMap(([x, y]) =>
+        [
+          [x, y],
+          [x + 1, y],
+          [x - 1, y],
+          [x, y + 1],
+          [x, y - 1],
+        ].map(([a, b]) => `${a},${b}`),
+      ),
+    );
+    passageCache.set(world, set);
+  }
+  return set;
+}
 
 function atHome(world: World, home: Home, x: number, y: number): boolean {
   const c = world.cell(x, y);
   if (home.kind === 'garden') return c.garden === true && !isGardenEntry(x, y);
-  if (c.garden || c.gardenGate || PASSAGES.has(`${x},${y}`)) return false;
+  if (c.garden || c.gardenGate || passages(world).has(`${x},${y}`)) return false;
   if (home.kind === 'region') return c.region === home.region;
   const [cx, cy] = chunkOf(x, y);
   return c.region === 'wild' && cx === home.cx && cy === home.cy;
@@ -162,7 +171,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     followers: [],
     met: [...(saved.met ?? [])].sort(),
     garden: [...garden],
-    openGates: [...(saved.openGates ?? [])],
+    openGates: (saved.openGates ?? []).filter((id) => !GATES.find((g) => g.id === id)?.locked),
     lastBump: null,
   };
   openGates(s, []); // Tore, deren Tiere schon alle getroffen sind, stehen offen
@@ -364,7 +373,7 @@ function sing(s: State, a: Animal, follow: boolean, events: GameEvent[]) {
 /** Tore öffnen, sobald alle Tiere ihrer Gegend getroffen sind; offen bleibt offen */
 function openGates(s: State, events: GameEvent[]) {
   for (const g of GATES) {
-    if (s.openGates.includes(g.id)) continue;
+    if (g.locked || s.openGates.includes(g.id)) continue; // verschlossene Tore öffnen (noch) nicht
     if (regionAnimals(g.region).every((id) => s.met.includes(id))) {
       s.openGates.push(g.id);
       events.push({ type: 'gate', id: g.id });
@@ -398,7 +407,7 @@ function wake(s: State, world: World, events: GameEvent[]) {
   if (s.tick - s.sleptAt < SLEEP_LOCK) return; // wildes Drücken direkt nach dem Einschlafen weckt nicht
   const spot =
     HOME.wake.find(([x, y]) => standHeight(world, s.openGates, x, y) !== null && !occupied(s, x, y)) ??
-    freeNear(s, world, HOME.bed, (x, y) => world.cell(x, y).region === 'zuhause' && !world.cell(x, y).garden);
+    freeNear(s, world, HOME.bed, (x, y) => world.cell(x, y).region === 'lichtung' && !world.cell(x, y).garden);
   if (!spot) return;
   s.sleeping = false;
   s.player.x = spot[0];
