@@ -94,6 +94,12 @@ export class Sfx {
     this.note(880, 0.07, 'sine', 0.09, 1.3);
     this.note(1174.66, 0.09, 'sine', 0.08, 1.2, 0.09);
   }
+  /** Futter im Trog: fröhliche, hüpfende Töne */
+  feed() {
+    [523.25, 659.25, 587.33, 783.99, 659.25, 1046.5].forEach((f, i) =>
+      this.note(f, 0.14, 'triangle', 0.09, 1, i * 0.09),
+    );
+  }
   /** Gähnen: ein langer, sinkender Ton, leise darunter ein zweiter */
   yawn() {
     this.note(330, 0.9, 'sine', 0.07, 0.55);

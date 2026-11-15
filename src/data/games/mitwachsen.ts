@@ -394,6 +394,19 @@ export const figureParts = (l: Look): Part[] => [
   ...eyes(0.24, 0.23, 0.88, 0.07, 0.1, 0.06),
 ];
 
+/** Korb mit Beeren auf dem Rücken der Figur (nach dem Pflücken, bis zum Futtertrog) */
+export const BASKET_PARTS: Part[] = [
+  [-0.33, -0.17, 0.38, 0.21, 0.34, 0.3, '#b0803c', '#c9984e'], // Korb aus Weide
+  [-0.335, -0.175, 0.47, 0.22, 0.35, 0.03, '#8a5f2a'], // Flechtband
+  [-0.335, -0.175, 0.6, 0.22, 0.35, 0.03, '#8a5f2a'],
+  [-0.12, -0.15, 0.7, 0.25, 0.04, 0.03, '#8a5f2a'], // Riemen über den Schultern
+  [-0.12, 0.11, 0.7, 0.25, 0.04, 0.03, '#8a5f2a'],
+  [-0.3, -0.13, 0.68, 0.16, 0.26, 0.06, '#c8323a', '#ef5b5b'], // Beeren obenauf
+  [-0.27, -0.1, 0.74, 0.07, 0.07, 0.05, '#c8323a', '#ef5b5b'],
+  [-0.23, 0.02, 0.74, 0.07, 0.07, 0.05, '#c8323a', '#ef5b5b'],
+  [-0.2, -0.05, 0.74, 0.05, 0.06, 0.04, '#3f9a3c', '#5ab651'], // Blatt
+];
+
 // ---------- Farben der Spielwelt (Spielgrafik wie die Texturen, nicht Oberfläche) ----------
 
 /** Farben je Welt: Seite und Oberseite der Themen-Blöcke, Leuchten (Lava), Farbe des Portals */

@@ -283,6 +283,27 @@ const meadowWorld = () => {
   return fakeWorld(cells);
 };
 
+describe('Korb mit Beeren', () => {
+  it('Pflücken füllt den Korb; am Futtertrog kommen die Beeren hinein und alle Tiere der Wiese freuen sich', () => {
+    const w = fakeWorld({
+      '1,0': { deco: 'bush', solid: true },
+      '-1,0': { deco: 'trough', solid: true, garden: true },
+      '0,2': { garden: true },
+    });
+    let s = awake(w, 0, 0, [
+      animal('lichtung:hase', 0, 2, { mode: 'home', home: { kind: 'garden' } }),
+      animal('lichtung:igel', 5, 5),
+    ]);
+    expect(types(run(s, w, 'w').events)).toEqual(['bump']); // ohne Korb ist der Trog nur ein Hindernis
+    s = run(s, w, 'e').s;
+    expect(s.basket).toBe(true);
+    const r = run(s, w, 'w');
+    expect(r.events).toEqual([{ type: 'feed', ids: ['lichtung:hase'] }]);
+    expect(r.s.basket).toBe(false);
+    expect([r.s.player.x, r.s.player.y]).toEqual([0, 0]);
+  });
+});
+
 describe('Wiese ums Bett', () => {
   it('ein folgendes Tier, das die Wiese betritt, ist zu Hause: es singt, läuft zu seinem Platz und bleibt dort', () => {
     const w = meadowWorld();

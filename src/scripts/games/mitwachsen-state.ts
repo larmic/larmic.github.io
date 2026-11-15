@@ -53,6 +53,7 @@ export type State = {
   portals: GateId[]; // aktivierte Portale (je Tor eines, mit Partner über dem Bett)
   lastBump: { id: string; tick: number } | null;
   picked: Record<string, number>; // Büsche ohne Beeren: "x,y" → Takt des Pflückens (nicht gespeichert)
+  basket: boolean; // Korb mit Beeren auf dem Rücken (nach dem Pflücken, bis zum Futtertrog)
 };
 
 /** Was gespeichert wird */
@@ -77,6 +78,7 @@ export type GameEvent =
   | { type: 'teleport'; id: GateId; to: 'gate' | 'home' }
   | { type: 'pick'; x: number; y: number } // Beeren gepflückt
   | { type: 'regrow'; x: number; y: number } // neue Beeren am Busch
+  | { type: 'feed'; ids: string[] } // Beeren in den Futtertrog: diese Tiere der Wiese freuen sich
   | { type: 'call' }
   | { type: 'sleep' }
   | { type: 'wake' };
@@ -198,6 +200,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     portals: (saved.portals ?? []).filter((id) => world.portals.has(id)),
     lastBump: null,
     picked: {},
+    basket: false,
   };
   openGates(s, []); // Tore, deren Tiere schon alle getroffen sind, stehen offen
   syncWild(s, world);
@@ -326,7 +329,14 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
   // In einen Busch laufen: Die Figur pflückt die Beeren (sie wachsen nach); ohne Beeren ist er nur ein Hindernis
   if (world.cell(tx, ty).deco === 'bush' && !(`${tx},${ty}` in s.picked)) {
     s.picked[`${tx},${ty}`] = s.tick;
+    s.basket = true;
     events.push({ type: 'pick', x: tx, y: ty });
+    return;
+  }
+  // Mit vollem Korb in den Futtertrog laufen: Die Beeren kommen hinein, alle Tiere der Wiese freuen sich
+  if (s.basket && world.cell(tx, ty).deco === 'trough') {
+    s.basket = false;
+    events.push({ type: 'feed', ids: s.animals.filter((a) => a.mode === 'home').map((a) => a.id) });
     return;
   }
   // Ins Bett laufen: Die Figur legt sich schlafen (nicht gleich nach dem Aufwachen, sonst schläft sie aus Versehen ein)

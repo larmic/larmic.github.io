@@ -487,6 +487,15 @@ class LarmicMitwachsen extends HTMLElement {
           this.gl3d?.rebuild([chunkOf(e.x, e.y).join(',')]);
           break;
         }
+        case 'feed':
+          // Beeren im Futtertrog: Alle Tiere der Wiese hüpfen und bekommen ein Herz
+          this.sfx.feed();
+          this.burst('player', ['#c8323a', '#ef5b5b', '#ffd47e'], 16);
+          e.ids.forEach((id, i) => {
+            this.hops.set(id, now);
+            this.float('heart', id, GAME_COLORS.heart, now + 100 + i * 60);
+          });
+          break;
         case 'regrow':
           this.gl3d?.rebuild([chunkOf(e.x, e.y).join(',')]);
           break;

@@ -43,6 +43,7 @@ import {
   SPECIES,
   THEME_COLORS,
   figureParts,
+  BASKET_PARTS,
   type GateId,
   type GateTheme,
   type Look,
@@ -895,7 +896,12 @@ export class World3D {
       m.position.set(b.x + 0.5, b.z + b.hop, b.y + 0.5);
       m.rotation.y = YAW[dir];
     };
-    if (!state.sleeping) place('player', this.model('player', figureParts(this.look)), 1, state.player.dir);
+    if (!state.sleeping) {
+      const model = state.basket
+        ? this.model('player-basket', [...figureParts(this.look), ...BASKET_PARTS])
+        : this.model('player', figureParts(this.look));
+      place('player', model, 1, state.player.dir);
+    }
     for (const a of state.animals) {
       const b = sc.bodies.get(a.id);
       if (b && !this.explored(Math.round(b.x), Math.round(b.y))) continue; // Tiere im Nebel bleiben verborgen

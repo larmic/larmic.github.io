@@ -32,6 +32,7 @@ import {
   SPECIES,
   THEME_COLORS,
   figureParts,
+  BASKET_PARTS,
   speciesOf,
   type GateId,
   type Look,
@@ -73,6 +74,10 @@ const FLAT_GROUND: Partial<Record<Cell['ground'], [string, string]>> = {
   cloud: ['#e6eef7', '#ffffff'],
   moss: ['#6a4a3a', '#8a76cc'],
 };
+
+/** Die Figur, mit Korb auf dem Rücken, solange sie Beeren trägt */
+const figure = (state: State, sc: Scene) =>
+  state.basket ? [...figureParts(sc.look), ...BASKET_PARTS] : figureParts(sc.look);
 
 const PAL_SAND: Palette = { D: [['#e3cf95', 1]], d: [['#d4bd7d', 1]], e: [['#efdeaa', 1]] };
 const PAL_PATH: Palette = { D: [['#c9a46e', 1]], d: [['#b48d58', 1]], e: [['#d8b783', 1]] };
@@ -141,7 +146,7 @@ export class Renderer {
         const b = sc.bodies.get(id)!;
         if (id === 'player') {
           this.shadow(P, b.x + 0.5, b.y + 0.5, b.z, 0.32);
-          drawModel(ctx, P, figureParts(sc.look), b.x + 0.5, b.y + 0.5, b.z + b.hop, state.player.dir, 1);
+          drawModel(ctx, P, figure(state, sc), b.x + 0.5, b.y + 0.5, b.z + b.hop, state.player.dir, 1);
           continue;
         }
         const a = byId.get(id);
@@ -156,7 +161,7 @@ export class Renderer {
     const me = sc.bodies.get('player');
     if (me && !state.sleeping) {
       ctx.globalAlpha = 0.35;
-      drawModel(ctx, P, figureParts(sc.look), me.x + 0.5, me.y + 0.5, me.z + me.hop, state.player.dir, 1);
+      drawModel(ctx, P, figure(state, sc), me.x + 0.5, me.y + 0.5, me.z + me.hop, state.player.dir, 1);
       ctx.globalAlpha = 1;
     }
 
