@@ -693,7 +693,7 @@ class LarmicMitwachsen extends HTMLElement {
 
     const { dpr, w, h, zoom } = this.size;
     const mood = this.world.climate(Math.round(player.x), Math.round(player.y));
-    const weather = weatherLook(this.world.seed, this.state.day, this.state.tick);
+    const weather = weatherLook(this.world.seed, this.state.day, this.state.tick - this.state.dayStart);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.ctx.imageSmoothingEnabled = false;
     const scene: Scene = {
@@ -810,10 +810,19 @@ class LarmicMitwachsen extends HTMLElement {
     if (button.dataset.armed !== '1') {
       button.dataset.armed = '1';
       button.textContent = 'Wirklich löschen?';
+      // auch für Screenreader: Das Etikett sagt, dass der nächste Druck löscht
+      button.setAttribute(
+        'aria-label',
+        `${button.getAttribute('aria-label')?.replace(/ löschen$/, '') ?? 'Welt'} wirklich löschen?`,
+      );
       setTimeout(() => {
         if (!button.isConnected) return;
         button.dataset.armed = '';
         button.textContent = 'Löschen';
+        button.setAttribute(
+          'aria-label',
+          button.getAttribute('aria-label')!.replace(/ wirklich löschen\?$/, ' löschen'),
+        );
       }, 4000);
       return;
     }

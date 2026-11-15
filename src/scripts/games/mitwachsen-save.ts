@@ -131,7 +131,7 @@ export function migrate(input: unknown): SavedWorld | null {
   const garden = Array.isArray(raw.homeAnimals)
     ? raw.homeAnimals.filter(
         (p): p is HomeAnimal =>
-          isRecord(p) && typeof p.id === 'string' && typeof p.species === 'string' && p.species in SPECIES,
+          isRecord(p) && typeof p.id === 'string' && typeof p.species === 'string' && Object.hasOwn(SPECIES, p.species),
       )
     : [];
   const pos = Array.isArray(raw.position) && raw.position.length === 2 && raw.position.every(Number.isInteger);

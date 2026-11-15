@@ -367,7 +367,7 @@ function buildStart(
   for (const [k, c] of map)
     if (c.region === 'lichtung' && !c.solid && c.ground !== 'water' && !reached.has(k)) map.set(k, rock(3));
   const spots = reach.filter(([x, y]) => map.get(key(x, y))!.region === 'lichtung' && !map.get(key(x, y))!.garden);
-  return { map, spawns: findSpawns(seed, map, spots), spots };
+  return { map, spawns: findSpawns(seed, spots), spots };
 }
 
 /**
@@ -433,7 +433,7 @@ function reachOf(map: Map<string, Cell>): Point[] {
  * Wohnorte der Tiere: Felder der Lichtung, die vom Bett aus zu Fuß erreichbar sind. Das erste Tier jeder Art wohnt
  * nah an seinem Wunschort, die weiteren verteilt der Seed über die ganze Lichtung (mit Abstand zueinander und zum Bett).
  */
-function findSpawns(seed: number, map: Map<string, Cell>, land: Point[]): Map<string, Point> {
+function findSpawns(seed: number, land: Point[]): Map<string, Point> {
   const spawns = new Map<string, Point>();
   const taken: Point[] = [];
   const free = (p: Point, gap: number) => taken.every(([x, y]) => (x - p[0]) ** 2 + (y - p[1]) ** 2 >= gap * gap);

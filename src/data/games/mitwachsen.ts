@@ -41,7 +41,7 @@ export const animalId = (region: RegionId, species: SpeciesId, n = 1) =>
 /** Art eines Tiers der Gegenden aus seiner Kennung (Tiere der Landschaft: null) */
 export function speciesOf(id: string): SpeciesId | null {
   const [region, species] = id.split(':');
-  return REGIONS.some((r) => r.id === region) && species in SPECIES ? (species as SpeciesId) : null;
+  return REGIONS.some((r) => r.id === region) && Object.hasOwn(SPECIES, species) ? (species as SpeciesId) : null;
 }
 
 /** Alle Tiere einer Gegend: je Art `herd` Stück, in fester Reihenfolge */

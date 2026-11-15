@@ -55,6 +55,7 @@ export type State = {
   lastBump: { id: string; tick: number } | null;
   picked: Record<string, number>; // Büsche ohne Beeren: "x,y" → Takt des Pflückens (nicht gespeichert)
   day: number; // Tage, die die Welt schon erlebt hat (jedes Schlafen zählt einen); Blumen wachsen damit
+  dayStart: number; // Takt, an dem der heutige Tag begann (Aufwachen): Das Wetter zählt ab hier, jeder Tag beginnt mit Sonne
   basket: boolean; // Korb mit Beeren auf dem Rücken (nach dem Pflücken, bis zum Futtertrog)
 };
 
@@ -223,6 +224,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     picked: {},
     basket: false,
     day: saved.day ?? 0,
+    dayStart: 0,
   };
   openGates(s, []); // Tore, deren Tiere schon alle getroffen sind, stehen offen
   scatter(s, world); // jeder Besuch: Die Tiere wohnen woanders
@@ -300,7 +302,7 @@ function tick(s: State, world: World, events: GameEvent[]) {
   if (s.sleeping) return; // nachts ist es still
   syncWild(s, world);
   // Regnet es, gehen die Tiere der Wiese unter den Unterstand: jedes an einen eigenen Platz darunter oder dicht daneben
-  const wet = raining(world.seed, s.day, s.tick);
+  const wet = raining(world.seed, s.day, s.tick - s.dayStart);
   const dry = wet ? shelterSpots(world) : [];
   const homes = s.animals.filter((a) => a.mode === 'home');
   for (const a of s.animals) {
@@ -566,6 +568,7 @@ function wake(s: State, world: World, events: GameEvent[]) {
   if (!spot) return;
   s.sleeping = false;
   s.wokeAt = s.tick;
+  s.dayStart = s.tick; // ein neuer Morgen: Das Wetter des Tages beginnt von vorn (mit Sonne)
   s.player.x = spot[0];
   s.player.y = spot[1];
   s.player.dir = 's';

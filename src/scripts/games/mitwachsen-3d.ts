@@ -159,6 +159,7 @@ export class World3D {
     { gateInner: Mesh; home: Group; homeInner: Mesh; stubs: Group; sparks: Mesh[]; cell: readonly [number, number] }
   >();
   private chunks = new Map<string, Chunk>();
+  private stale = new Set<string>(); // Stücke, die neu gebaut werden müssen; bis dahin bleibt das alte stehen
   private picked: Record<string, number> = {}; // Büsche ohne Beeren (aus den Regeln)
   private day = 0; // Tag der Welt: bestimmt, was nachgewachsen ist
   private models = new Map<string, BufferGeometry>();
@@ -170,7 +171,7 @@ export class World3D {
   private world: World | null = null;
 
   constructor(
-    private readonly canvas: HTMLCanvasElement,
+    canvas: HTMLCanvasElement,
     private readonly look: Look,
   ) {
     this.renderer = new WebGLRenderer({ canvas, antialias: false, alpha: false });
@@ -341,7 +342,7 @@ export class World3D {
     if (state.day !== this.day) {
       // ein neuer Tag: Stücke neu bauen, denn es sind Blumen und Pilze nachgewachsen
       this.day = state.day;
-      this.rebuild([...this.chunks.keys()]);
+      for (const k of this.chunks.keys()) this.stale.add(k);
     }
     const cam = sc.cam;
     const tx = cam.x + 0.5,
@@ -393,17 +394,12 @@ export class World3D {
     if (keys.length) this.fogDirty = true;
   }
 
-  /** Stücke neu bauen (z. B. Beeren gepflückt oder nachgewachsen); sie entstehen im nächsten Bild wieder */
+  /**
+   * Stücke neu bauen (z. B. Beeren gepflückt oder nachgewachsen, ein neuer Tag). Das alte Stück bleibt sichtbar, bis
+   * das neue fertig ist, so flackert nichts; gebaut wird im Takt von syncChunks.
+   */
   rebuild(keys: readonly string[]) {
-    for (const k of keys) {
-      const c = this.chunks.get(k);
-      if (!c) continue;
-      for (const m of c.meshes) {
-        this.scene.remove(m);
-        m.geometry.dispose();
-      }
-      this.chunks.delete(k);
-    }
+    for (const k of keys) if (this.chunks.has(k)) this.stale.add(k);
   }
 
   private reset(world: World) {
@@ -417,6 +413,7 @@ export class World3D {
         m.geometry.dispose();
       }
     this.chunks.clear();
+    this.stale.clear();
     this.signKey = '';
   }
 
@@ -560,6 +557,26 @@ export class World3D {
     missing.sort((a, b) => Math.hypot(a[0] - pcx, a[1] - pcy) - Math.hypot(b[0] - pcx, b[1] - pcy));
     for (const [cx, cy] of missing.slice(0, BUILD_PER_FRAME))
       this.chunks.set(`${cx},${cy}`, this.buildChunk(world, cx, cy));
+    // veraltete Stücke ersetzen: erst das neue bauen, dann das alte wegräumen (nahe zuerst, eins mehr je Bild)
+    const stale = [...this.stale]
+      .filter((k) => want.has(k))
+      .sort((a, b) => {
+        const d = (k: string) => {
+          const [cx, cy] = k.split(',').map(Number);
+          return Math.hypot(cx - pcx, cy - pcy);
+        };
+        return d(a) - d(b);
+      });
+    for (const k of stale.slice(0, BUILD_PER_FRAME + 1)) {
+      const [cx, cy] = k.split(',').map(Number);
+      const fresh = this.buildChunk(world, cx, cy);
+      for (const m of this.chunks.get(k)?.meshes ?? []) {
+        this.scene.remove(m);
+        m.geometry.dispose();
+      }
+      this.chunks.set(k, fresh);
+      this.stale.delete(k);
+    }
     for (const [k, c] of this.chunks)
       if (!want.has(k)) {
         for (const m of c.meshes) {
@@ -567,6 +584,7 @@ export class World3D {
           m.geometry.dispose();
         }
         this.chunks.delete(k);
+        this.stale.delete(k);
       }
   }
 

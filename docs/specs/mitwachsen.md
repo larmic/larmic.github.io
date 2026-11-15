@@ -116,7 +116,7 @@ Licht: Sonne und Himmelslicht nehmen leicht Farbe und Helligkeit der Richtung an
 
 ## Wetter und Unterstand
 
-Rein in `mitwachsen-weather.ts`: Das Wetter folgt aus Seed, Tag (`state.day`) und Spielzeit (`state.tick`), gleiche Werte ergeben gleiches Wetter.
+Rein in `mitwachsen-weather.ts`: Das Wetter folgt aus Seed, Tag (`state.day`) und Spielzeit seit dem Aufwachen (`state.tick - state.dayStart`), gleiche Werte ergeben gleiches Wetter. *Test: „nach dem Schlafen beginnt das Wetter von vorn …“*
 
 | Regel | Test |
 | --- | --- |

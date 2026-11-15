@@ -363,6 +363,27 @@ describe('Unterstand bei Regen', () => {
   });
 });
 
+describe('Jeder Tag beginnt mit Sonne', () => {
+  it('nach dem Schlafen beginnt das Wetter von vorn, auch wenn es am Abend geregnet hat', () => {
+    const world = createWorld(1);
+    let s: State = {
+      ...initialState(world),
+      sleeping: false,
+      player: { x: HOME.bed[0] + 1, y: HOME.bed[1], dir: 'w' },
+    };
+    let rain = 1;
+    while (!raining(world.seed, s.day, rain * BLOCK)) rain++;
+    s = { ...s, tick: rain * BLOCK + 10, wokeAt: -1e9 }; // es regnet gerade
+    expect(raining(world.seed, s.day, s.tick - s.dayStart)).toBe(true);
+    s = run(s, world, ACT).s; // schlafen
+    for (let i = 0; i < SLEEP_LOCK; i++) s = run(s, world, TICK).s;
+    s = run(s, world, 'e').s; // neuer Morgen
+    expect(s.sleeping).toBe(false);
+    expect(s.dayStart).toBe(s.tick);
+    expect(raining(world.seed, s.day, s.tick - s.dayStart)).toBe(false);
+  });
+});
+
 describe('Korb mit Beeren', () => {
   it('Pflücken füllt den Korb; am Futtertrog kommen die Beeren hinein und alle Tiere der Wiese freuen sich', () => {
     const w = fakeWorld({

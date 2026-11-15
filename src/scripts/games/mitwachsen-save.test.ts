@@ -139,12 +139,23 @@ describe('Format und Umzug (migrate)', () => {
       ...newWorld('a', 1, 'X'),
       openGates: ['eis', 'nordtor', 3],
       metAnimals: ['b', 'a', 'a', 7],
-      homeAnimals: [{ id: 'p', species: 'hase' }, { id: 'q', species: 'drache' }, 'kaputt'],
+      homeAnimals: [
+        { id: 'p', species: 'hase' },
+        { id: 'q', species: 'drache' },
+        { id: 'r', species: 'constructor' }, // Eigenschaft jedes Objekts, aber keine Tierart
+        'kaputt',
+      ],
       position: [1.5, 2],
       visits: -3,
+      day: -2.5,
+      portals: ['lava', 'westtor', 3],
+      explored: { '0,0': 42, '1,1': 'AAAA' },
       worldName: '<script>Welt',
     };
     const w = migrate(raw)!;
+    expect(w.day).toBe(0);
+    expect(w.portals).toEqual(['lava']);
+    expect(w.explored).toEqual({ '1,1': 'AAAA' });
     expect(w.openGates).toEqual(['eis']);
     expect(w.metAnimals).toEqual(['a', 'b']);
     expect(w.homeAnimals).toEqual([{ id: 'p', species: 'hase' }]);
