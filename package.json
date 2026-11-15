@@ -10,7 +10,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run --coverage",
-    "lint": "eslint .",
+    "lint": "astro sync && eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "arch": "depcruise src --config .dependency-cruiser.cjs",
