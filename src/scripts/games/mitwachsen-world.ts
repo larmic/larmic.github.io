@@ -1,6 +1,6 @@
 // Welt von Mitwachsen – rein und deterministisch: Derselbe Seed ergibt immer dieselbe Welt.
 // In der Mitte die Lichtung mit dem Bett, ringsum natürliche Felsen mit vier großen Toren (vorerst zu). Außen herum
-// endlose Landschaft aus Rauschen, berechnet in Stücken. Der Garten entsteht später (für Tests: { garden: true }).
+// endlose Landschaft aus Rauschen, berechnet in Stücken. Ums Bett die Wiese, auf der gefundene Tiere zu Hause sind.
 // Spezifikation: docs/specs/mitwachsen.md
 
 import { CHUNK, ChunkCache } from '../../lib/games/chunks';
@@ -59,7 +59,9 @@ export type Deco =
   | 'crystal'
   | 'stalagmite'
   | 'bigshroom'
-  | 'cloudpuff';
+  | 'cloudpuff'
+  | 'trough' // Futtertrog auf der Wiese
+  | 'watertrough'; // Wassertrog
 export type TreeKind = 'oak' | 'birch' | 'autumn' | 'blossom' | 'pine' | 'snowpine' | 'palm' | 'dead';
 /** Portal je Tor: Feld am Tor und am Bett, je mit dem Feld davor (dort kommt man heraus) und der Blickrichtung */
 export type Portal = {
@@ -88,8 +90,7 @@ export type Cell = {
   solid: boolean; // Deko versperrt das Feld (Baum, Busch, Fels, Zaun, Bett, Tafel)
   gate?: GateId; // Tor oder Brücke: begehbar, sobald offen
   sign?: GateId; // Tafel zu diesem Tor
-  garden?: true; // Inneres des Gartens, in dem gefundene Tiere zu Hause sind
-  gardenGate?: true; // Rosenbogen in der Hecke
+  garden?: true; // Wiese ums Bett: Hier sind gefundene Tiere zu Hause
   tree?: TreeKind; // Baumart bei deco 'tree'
   tufts?: number; // Grasbüschel auf dem Feld (nur Zierde, begehbar)
   portal?: { id: GateId; side: 'gate' | 'home' }; // Portal (am Tor oder am Bett)
@@ -111,14 +112,6 @@ export type World = {
 
 export const inRect = (r: Rect, x: number, y: number) => x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1;
 const key = (x: number, y: number) => `${x},${y}`;
-
-function cellsOf(r: Rect): Point[] {
-  const out: Point[] = [];
-  for (let y = r.y0; y <= r.y1; y++) for (let x = r.x0; x <= r.x1; x++) out.push([x, y]);
-  return out;
-}
-const ring = (r: Rect): Point[] =>
-  cellsOf({ x0: r.x0 - 1, y0: r.y0 - 1, x1: r.x1 + 1, y1: r.y1 + 1 }).filter(([x, y]) => !inRect(r, x, y));
 
 const grass = (region: Cell['region']): Cell => ({ h: 1, ground: 'grass', deco: null, region, solid: false });
 // Der Felsring ist eine feste Grenze: nicht zu betreten, also weder zu besteigen noch hineinzufallen
@@ -216,11 +209,7 @@ function portalsOf(places: readonly Layout[]): Map<GateId, Portal> {
 }
 
 /** Lichtung als feste Karte: Bett in der Mitte, Hügel, Teiche, Wäldchen, Blumenwiesen, Steine, Felsring, große Tore */
-function buildStart(
-  seed: number,
-  places: readonly Layout[],
-  opts: { garden?: boolean },
-): { map: Map<string, Cell>; spawns: Map<string, Point> } {
+function buildStart(seed: number, places: readonly Layout[]): { map: Map<string, Cell>; spawns: Map<string, Point> } {
   const map = new Map<string, Cell>();
   const set = (x: number, y: number, c: Cell) => map.set(key(x, y), c);
   const { rx, ry } = lichtung.shape;
@@ -316,16 +305,27 @@ function buildStart(
         set(px + fy * o, py + fx * o, { ...grass('lichtung'), deco: 'portalside', solid: true, part: { id, side } });
     }
 
-  if (opts.garden) {
-    for (const [x, y] of ring(HOME.garden)) set(x, y, { ...grass('lichtung'), deco: 'hedge', solid: true });
-    for (const [x, y] of cellsOf(HOME.garden)) set(x, y, { ...grass('lichtung'), garden: true });
-    set(HOME.gardenGate[0], HOME.gardenGate[1], {
-      ...grass('lichtung'),
-      ground: 'path',
-      gardenGate: true,
-      deco: 'arch',
-    });
-  }
+  // Wiese ums Bett: eben und frei, mit Futter und Wasser; am Rand ein paar Blumen
+  const r = HOME.meadow;
+  for (let dy = -r - 1; dy <= r + 1; dy++)
+    for (let dx = -r - 1; dx <= r + 1; dx++) {
+      const d = Math.hypot(dx, dy);
+      if (d > r + 0.5) continue;
+      const [x, y] = [HOME.bed[0] + dx, HOME.bed[1] + dy];
+      const c = map.get(key(x, y));
+      if (!c || c.deco === 'bed' || c.deco === 'portal' || c.deco === 'portalside') continue;
+      const edgeFlower = d > r - 0.5 && hash(seed, x, y, 15) % 3 === 0;
+      set(x, y, {
+        ...grass('lichtung'),
+        garden: true,
+        ...(edgeFlower ? { deco: 'flower' as const, color: flowerColor(seed, x, y) } : {}),
+      });
+    }
+  for (const [[x, y], deco] of [
+    [HOME.food, 'trough'],
+    [HOME.water, 'watertrough'],
+  ] as const)
+    set(x, y, { ...grass('lichtung'), garden: true, deco, solid: true });
   smooth(map);
 
   // Vom Torplatz ein freier Gang nach innen, bis er auf erreichbares Land trifft (Teiche, Bäume)
@@ -414,7 +414,7 @@ function findSpawns(seed: number, map: Map<string, Cell>, reach: Point[]): Map<s
   const spawns = new Map<string, Point>();
   const taken: Point[] = [];
   const free = (p: Point, gap: number) => taken.every(([x, y]) => (x - p[0]) ** 2 + (y - p[1]) ** 2 >= gap * gap);
-  const land = reach.filter(([x, y]) => map.get(key(x, y))!.region === 'lichtung');
+  const land = reach.filter(([x, y]) => map.get(key(x, y))!.region === 'lichtung' && !map.get(key(x, y))!.garden);
   const all = regionAnimalList(lichtung);
   for (const { id, species, n } of all) {
     if (n !== 1) continue;
@@ -574,9 +574,9 @@ function dress(seed: number, x: number, y: number, c: Cell): Cell {
   return out;
 }
 
-export function createWorld(seed: number, opts: { garden?: boolean } = {}): World {
+export function createWorld(seed: number): World {
   const places = layouts(seed);
-  const { map: regions, spawns } = buildStart(seed, places, opts);
+  const { map: regions, spawns } = buildStart(seed, places);
   const cache = new ChunkCache<Cell>((cx, cy) => {
     const cells: Cell[] = [];
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)

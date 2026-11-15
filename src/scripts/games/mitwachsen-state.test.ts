@@ -65,7 +65,7 @@ const types = (e: GameEvent[]) => e.map((x) => x.type);
 
 describe('Aufwachen und Schlafen', () => {
   it('startet schlafend im Bett; die erste Taste weckt die Figur an einem freien Platz daneben', () => {
-    const world = createWorld(1, { garden: true });
+    const world = createWorld(1);
     const s0 = initialState(world);
     expect(s0.sleeping).toBe(true);
     expect([s0.player.x, s0.player.y]).toEqual([...HOME.bed]);
@@ -76,7 +76,7 @@ describe('Aufwachen und Schlafen', () => {
   });
 
   it('legt sich mit der Aktion am Bett schlafen; Tasten wecken erst nach der Sperrzeit', () => {
-    const world = createWorld(1, { garden: true });
+    const world = createWorld(1);
     let { s } = run(initialState(world), world, 'e'); // aufwachen neben dem Bett
     const r = run(s, world, ACT);
     expect(r.s.sleeping).toBe(true);
@@ -110,23 +110,13 @@ describe('Aufwachen und Schlafen', () => {
   });
 
   it('schickt folgende Tiere beim Schlafen heim', () => {
-    const world = createWorld(1, { garden: true });
-    let { s } = run(initialState(world), world, 'e');
-    const hase = animalId('lichtung', 'hase');
-    // Hase direkt vor die Figur setzen und mitnehmen
-    s = {
-      ...s,
-      animals: s.animals.map((a) => (a.id === hase ? { ...a, x: s.player.x + 1, y: s.player.y } : a)),
-      player: { ...s.player, dir: 'e' },
-    };
-    s = run(s, world, ACT).s;
-    expect(s.followers).toEqual([hase]);
-    s = run(s, world, 'w', 'w').s; // zurück ans Bett
-    s = { ...s, player: { ...s.player, x: HOME.bed[0] + 1, y: HOME.bed[1], dir: 'w' } };
-    s = run(s, world, ACT).s;
+    const w = fakeWorld({ '0,0': { deco: 'bed', solid: true } });
+    let s = awake(w, 1, 0, [animal('lichtung:hase', 2, 0, { mode: 'follow', spawn: [9, 9] })]);
+    s = { ...s, followers: ['lichtung:hase'], player: { ...s.player, dir: 'w' } };
+    s = run(s, w, ACT).s;
     expect(s.sleeping).toBe(true);
     expect(s.followers).toEqual([]);
-    expect(s.animals.find((a) => a.id === hase)!.mode).toBe('wander');
+    expect(s.animals[0].mode).toBe('wander');
   });
 });
 
@@ -286,32 +276,73 @@ describe('Beerenbüsche', () => {
   });
 });
 
-describe('Garten', () => {
-  it('ein folgendes Tier bleibt im Garten und verlässt es nie wieder', () => {
-    const world = createWorld(1, { garden: true });
-    const [gx, gy] = HOME.gardenGate;
-    // Figur steht unter dem Rosenbogen, der Hase folgt; dann hindurch in den Garten
-    let s = awake(world, gx, gy + 1, [animal('lichtung:hase', gx, gy + 2)]);
-    s = { ...s, player: { ...s.player, dir: 's' } };
-    s = run(s, world, ACT).s;
-    const r = run(s, world, 'n', 'n', 'n');
-    s = r.s;
-    expect(r.events).toContainEqual({ type: 'home', id: 'lichtung:hase' });
-    expect(s.followers).toEqual([]);
-    expect(s.garden).toEqual([{ id: 'lichtung:hase', species: 'hase' }]);
-    s = run(s, world, 's', 's', 's', 's').s; // Figur geht hinaus und weg
-    for (let i = 0; i < 3000; i++) {
-      s = run(s, world, TICK).s;
-      const a = s.animals.find((x) => x.id === 'lichtung:hase')!;
-      expect(world.cell(a.x, a.y).garden, `${a.x},${a.y}`).toBe(true);
+/** Testwelt: links vom Bett (x ≤ 0) die Wiese, rechts davon gewöhnliche Lichtung */
+const meadowWorld = () => {
+  const cells: Record<string, Partial<Cell>> = {};
+  for (let y = -3; y <= 3; y++) for (let x = -6; x <= 0; x++) cells[`${x},${y}`] = { garden: true };
+  return fakeWorld(cells);
+};
+
+describe('Wiese ums Bett', () => {
+  it('ein folgendes Tier, das die Wiese betritt, ist zu Hause: es singt, läuft zu seinem Platz und bleibt dort', () => {
+    const w = meadowWorld();
+    let s = awake(w, 2, 0, [animal('lichtung:hase', 3, 0, { mode: 'follow' })]);
+    s = { ...s, followers: ['lichtung:hase'], player: { ...s.player, dir: 'w' } };
+    const r = run(s, w, 'w', 'w', 'w');
+    expect(r.events).toContainEqual({ type: 'home', id: 'lichtung:hase', species: 'hase' });
+    expect(r.s.followers).toEqual([]);
+    expect(r.s.garden).toEqual([{ id: 'lichtung:hase', species: 'hase' }]);
+    const hase = () => s.animals.find((a) => a.id === 'lichtung:hase')!;
+    s = { ...r.s, player: { ...r.s.player, x: 12, y: 0 } }; // Figur geht weg
+    expect(w.cell(hase().spawn[0], hase().spawn[1]).garden).toBe(true);
+    for (let i = 0; i < 300; i++) s = run(s, w, TICK).s;
+    expect(Math.abs(hase().x - hase().spawn[0]) + Math.abs(hase().y - hase().spawn[1])).toBeLessThanOrEqual(2);
+    for (let i = 0; i < 2000; i++) {
+      s = run(s, w, TICK).s;
+      expect(w.cell(hase().x, hase().y).garden, `${hase().x},${hase().y}`).toBe(true);
     }
   });
 
-  it('Tiere im Garten singen bei der Aktion, folgen aber nicht', () => {
+  it('jedes Tier bekommt einen eigenen Platz auf der Wiese', () => {
+    const w = meadowWorld();
+    const ids = ['lichtung:hase', 'lichtung:igel', 'lichtung:fuchs'];
+    let s = awake(
+      w,
+      2,
+      0,
+      ids.map((id, i) => animal(id, 3 + i, 0, { mode: 'follow' })),
+    );
+    s = { ...s, followers: ids, player: { ...s.player, dir: 'w' } };
+    s = run(s, w, 'w', 'w', 'w', 'w', 'w').s;
+    expect(s.garden.map((p) => p.id).sort()).toEqual([...ids].sort());
+    const spots = s.animals.map((a) => a.spawn.join(','));
+    expect(new Set(spots).size).toBe(3);
+  });
+
+  it('ein folgendes Tier, das per Platztausch auf die Wiese kommt, bleibt dort', () => {
+    const w = meadowWorld();
+    let s = awake(w, 0, 0, [animal('lichtung:hase', 1, 0, { mode: 'follow' })]);
+    s = { ...s, followers: ['lichtung:hase'] };
+    const r = run(s, w, 'e'); // tauscht sofort: Hase steht jetzt auf der Wiese
+    expect(r.events).toContainEqual({ type: 'home', id: 'lichtung:hase', species: 'hase' });
+    expect(r.s.followers).toEqual([]);
+  });
+
+  it('Tiere auf der Wiese singen beim Hineinlaufen, folgen aber nicht', () => {
     const w = fakeWorld({ '1,0': { garden: true }, '0,0': { garden: true } });
-    const r = run(awake(w, 0, 0, [animal('a', 1, 0, { mode: 'home', home: { kind: 'garden' } })]), w, ACT);
+    const r = run(awake(w, 0, 0, [animal('a', 1, 0, { mode: 'home', home: { kind: 'garden' } })]), w, 'e');
     expect(types(r.events)).toEqual(['sing']);
     expect(r.s.followers).toEqual([]);
+  });
+
+  it('Tiere auf der Wiese kommen mit dem Spielstand wieder, verteilt auf der Wiese', () => {
+    const world = createWorld(2);
+    const garden = Array.from({ length: 8 }, (_, i) => ({ id: `wild:9:9:${i}`, species: 'hase' as const }));
+    const s = initialState(world, { garden });
+    const home = s.animals.filter((a) => a.mode === 'home');
+    expect(home).toHaveLength(8);
+    for (const a of home) expect(world.cell(a.x, a.y).garden).toBe(true);
+    expect(new Set(home.map((a) => `${a.x},${a.y}`)).size).toBe(8);
   });
 });
 
@@ -352,7 +383,7 @@ describe('Rufen', () => {
 
 describe('Spielstand', () => {
   it('stellt Gefundene und Tiere im Garten wieder her', () => {
-    const world = createWorld(4, { garden: true });
+    const world = createWorld(4);
     const met = regionAnimals('lichtung');
     const s = initialState(world, { met, garden: [{ id: 'wild:0:2:0', species: 'fuchs' }] });
     expect(s.met).toEqual([...met].sort());
@@ -365,7 +396,7 @@ describe('Spielstand', () => {
   });
 
   it('ein Tier im Garten taucht nicht zusätzlich in seiner Gegend auf', () => {
-    const world = createWorld(4, { garden: true });
+    const world = createWorld(4);
     const s = initialState(world, { garden: [{ id: animalId('lichtung', 'hase'), species: 'hase' }] });
     expect(s.animals.filter((a) => a.id === animalId('lichtung', 'hase'))).toHaveLength(1);
   });
@@ -374,7 +405,7 @@ describe('Spielstand', () => {
 describe('Invarianten bei wildem Drücken', () => {
   const DIRS: Dir[] = ['n', 's', 'e', 'w'];
   for (const seed of [1, 2, 3]) {
-    it(`Seed ${seed}: Figur steht immer begehbar, nie zwei auf einem Feld, Garten-Tiere bleiben drin, alles wiederholbar`, () => {
+    it(`Seed ${seed}: Figur steht immer begehbar, nie zwei auf einem Feld, Tiere der Wiese bleiben drauf, alles wiederholbar`, () => {
       const world = createWorld(seed);
       const play = () => {
         let s = initialState(world, {}, seed);
@@ -400,75 +431,21 @@ describe('Invarianten bei wildem Drücken', () => {
 
 describe('Randfälle aus der Prüfung', () => {
   it('schläft am Bett, auch wenn ein folgendes Tier direkt hinter der Figur steht', () => {
-    const world = createWorld(1, { garden: true });
+    const world = createWorld(1);
     const [bx, by] = HOME.bed;
     let s = awake(world, bx + 1, by, [animal('lichtung:hase', bx + 1, by + 1, { mode: 'follow' })]);
     s = { ...s, followers: ['lichtung:hase'], player: { ...s.player, dir: 'n' } };
     const r = run(s, world, ACT);
     expect(r.s.sleeping).toBe(true);
   });
-
-  it('ein Tier im Garten rückt beiseite, statt den Eingang zu versperren', () => {
-    const world = createWorld(1, { garden: true });
-    const [gx, gy] = HOME.gardenGate;
-    let s = awake(world, gx, gy, [animal('lichtung:igel', gx, gy - 1, { mode: 'home', home: { kind: 'garden' } })]);
-    s = run(s, world, 'n').s; // singt
-    const r = run(s, world, 'n'); // zweites Mal: Tier rückt im Garten beiseite, Figur geht hinein
-    expect([r.s.player.x, r.s.player.y]).toEqual([gx, gy - 1]);
-    const igel = r.s.animals[0];
-    expect(world.cell(igel.x, igel.y).garden).toBe(true);
-    expect([igel.x, igel.y]).not.toEqual([gx, gy - 1]);
-  });
-
-  it('ein folgendes Tier, das per Platztausch in den Garten kommt, bleibt dort', () => {
-    const world = createWorld(1, { garden: true });
-    const [gx, gy] = HOME.gardenGate;
-    let s = awake(world, gx, gy - 1, [animal('lichtung:hase', gx, gy, { mode: 'follow' })]);
-    s = { ...s, followers: ['lichtung:hase'] };
-    const r = run(s, world, 's'); // tauscht sofort: Hase steht jetzt im Garten
-    expect(r.events).toContainEqual({ type: 'home', id: 'lichtung:hase' });
-    expect(r.s.followers).toEqual([]);
-    expect(r.s.garden.map((p) => p.id)).toEqual(['lichtung:hase']);
-  });
-});
-
-describe('Eingang des Gartens', () => {
-  it('neue Tiere rücken nach hinten, das Feld hinter dem Rosenbogen bleibt frei für das nächste', () => {
-    const world = createWorld(1, { garden: true });
-    const [gx, gy] = HOME.gardenGate;
-    let s = awake(world, gx, gy + 1, [
-      animal('lichtung:hase', gx, gy + 2, { mode: 'follow' }),
-      animal('lichtung:igel', gx, gy + 3, { mode: 'follow', species: 'igel' }),
-    ]);
-    s = { ...s, followers: ['lichtung:hase', 'lichtung:igel'] };
-    const r = run(s, world, 'n', 'n', 'n', 'n');
-    expect(r.s.garden.map((p) => p.id).sort()).toEqual(['lichtung:hase', 'lichtung:igel']);
-    expect(r.s.followers).toEqual([]);
-    expect(r.s.animals.some((a) => a.x === gx && a.y === gy - 1)).toBe(false);
-  });
-
-  it('Tiere im Garten laufen nie auf das Feld hinter dem Rosenbogen', () => {
-    const world = createWorld(2, { garden: true });
-    const [gx, gy] = HOME.gardenGate;
-    const garden = Array.from({ length: 6 }, (_, i) => ({ id: `wild:9:9:${i}`, species: 'hase' as const }));
-    let s: State = { ...initialState(world, { garden }), sleeping: false, player: { x: 0, y: 4, dir: 's' } };
-    for (let i = 0; i < 3000; i++) {
-      s = step(s, world, TICK).state;
-      expect(s.animals.some((a) => a.mode === 'home' && a.x === gx && a.y === gy - 1)).toBe(false);
-    }
-  });
 });
 
 describe('Durchgänge bleiben frei', () => {
   it('umherlaufende Tiere bleiben nie an Toren oder am Rosenbogen stehen', () => {
-    const world = createWorld(5, { garden: true });
-    const passages = [...[...world.gates.values()].flatMap((g) => g.cells), HOME.gardenGate].flatMap(([x, y]) => [
-      `${x},${y}`,
-      `${x + 1},${y}`,
-      `${x - 1},${y}`,
-      `${x},${y + 1}`,
-      `${x},${y - 1}`,
-    ]);
+    const world = createWorld(5);
+    const passages = [...world.gates.values()]
+      .flatMap((g) => g.cells)
+      .flatMap(([x, y]) => [`${x},${y}`, `${x + 1},${y}`, `${x - 1},${y}`, `${x},${y + 1}`, `${x},${y - 1}`]);
     // Alle Tore offen, Figur weit weg: Die Tiere laufen lange frei umher
     let s: State = {
       ...initialState(world),

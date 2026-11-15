@@ -5,7 +5,7 @@
 
 import { chunkOf } from '../../lib/games/chunks';
 import { DIRS, type Dir } from '../../lib/games/front';
-import { nextRandom } from '../../lib/games/rng';
+import { hash, nextRandom } from '../../lib/games/rng';
 import {
   GATES,
   HOME,
@@ -71,7 +71,7 @@ export type GameEvent =
   | { type: 'sing'; id: string; species: SpeciesId; first: boolean }
   | { type: 'follow'; id: string }
   | { type: 'swap'; id: string }
-  | { type: 'home'; id: string }
+  | { type: 'home'; id: string; species: SpeciesId } // auf der Wiese angekommen
   | { type: 'gate'; id: GateId }
   | { type: 'portal'; id: GateId } // Portal am Tor aktiviert
   | { type: 'teleport'; id: GateId; to: 'gate' | 'home' }
@@ -87,9 +87,6 @@ const dirTo = (dx: number, dy: number): Dir =>
 const cheb = (ax: number, ay: number, bx: number, by: number) => Math.max(Math.abs(ax - bx), Math.abs(ay - by));
 
 /** Darf ein Tier auf diesem Feld umherlaufen? (Folgende Tiere gehen überall hin, wo die Figur war) */
-/** Feld direkt hinter dem Rosenbogen: bleibt frei, damit neue Tiere hineinkommen */
-const GARDEN_ENTRY = [HOME.gardenGate[0], HOME.gardenGate[1] - 1] as const;
-const isGardenEntry = (x: number, y: number) => x === GARDEN_ENTRY[0] && y === GARDEN_ENTRY[1];
 
 /** Felder an Durchgängen (Tore, Rosenbogen): Dort bleibt kein Tier stehen, sonst versperrt es den Weg */
 const passageCache = new WeakMap<World, Set<string>>();
@@ -97,7 +94,7 @@ function passages(world: World): Set<string> {
   let set = passageCache.get(world);
   if (!set) {
     const portalSpots = [...world.portals.values()].flatMap((p) => [p.gate, p.gateExit, p.home, p.homeExit]);
-    const spots = [...[...world.gates.values()].flatMap((g) => g.cells), HOME.gardenGate, ...portalSpots];
+    const spots = [...[...world.gates.values()].flatMap((g) => g.cells), ...portalSpots];
     set = new Set(
       spots.flatMap(([x, y]) =>
         [
@@ -116,8 +113,8 @@ function passages(world: World): Set<string> {
 
 function atHome(world: World, home: Home, x: number, y: number): boolean {
   const c = world.cell(x, y);
-  if (home.kind === 'garden') return c.garden === true && !isGardenEntry(x, y);
-  if (c.garden || c.gardenGate || passages(world).has(`${x},${y}`)) return false;
+  if (home.kind === 'garden') return c.garden === true && !passages(world).has(`${x},${y}`);
+  if (c.garden || passages(world).has(`${x},${y}`)) return false;
   if (home.kind === 'region') return c.region === home.region;
   const [cx, cy] = chunkOf(x, y);
   return c.region === 'wild' && cx === home.cx && cy === home.cy;
@@ -135,12 +132,21 @@ function random(s: State): number {
 
 // ---------- Aufbau ----------
 
-const gardenCells = () => {
-  const out: [number, number][] = [];
-  for (let y = HOME.garden.y0; y <= HOME.garden.y1; y++)
-    for (let x = HOME.garden.x0; x <= HOME.garden.x1; x++) if (!isGardenEntry(x, y)) out.push([x, y]);
+/** Freie Plätze auf der Wiese ums Bett, gut verteilt (benachbarte Plätze stehen in der Liste weit auseinander) */
+const meadowCache = new WeakMap<World, [number, number][]>();
+function meadowSpots(world: World): [number, number][] {
+  let out = meadowCache.get(world);
+  if (!out) {
+    out = [];
+    const r = HOME.meadow + 1;
+    for (let y = HOME.bed[1] - r; y <= HOME.bed[1] + r; y++)
+      for (let x = HOME.bed[0] - r; x <= HOME.bed[0] + r; x++)
+        if (atHome(world, { kind: 'garden' }, x, y) && standHeight(world, [], x, y) !== null) out.push([x, y]);
+    out.sort((a, b) => hash(7, a[0], a[1]) - hash(7, b[0], b[1]));
+    meadowCache.set(world, out);
+  }
   return out;
-};
+}
 
 export function initialState(world: World, saved: Partial<Progress> = {}, rngSeed = 1): State {
   const garden = saved.garden ?? [];
@@ -162,7 +168,7 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
           rest: 5,
         });
     }
-  const cells = gardenCells();
+  const cells = meadowSpots(world);
   garden.forEach((p, i) => {
     const [x, y] = cells[i % cells.length];
     animals.push({
@@ -246,20 +252,22 @@ function tick(s: State, world: World, events: GameEvent[]) {
   syncWild(s, world);
   for (const a of s.animals) {
     if (a.mode === 'follow') continue;
+    // Gerade heimgekommen: Es läuft zu seinem Platz auf der Wiese
+    const arriving = a.mode === 'home' && Math.abs(a.x - a.spawn[0]) + Math.abs(a.y - a.spawn[1]) > 2;
     // Steht die Figur daneben, bleibt das Tier stehen und schaut sie an
-    if (cheb(a.x, a.y, s.player.x, s.player.y) <= 1) {
+    if (!arriving && cheb(a.x, a.y, s.player.x, s.player.y) <= 1) {
       a.dir = dirTo(s.player.x - a.x, s.player.y - a.y);
       a.rest = Math.max(a.rest, 5);
       continue;
     }
     if (--a.rest > 0) continue;
-    a.rest = 8 + Math.floor(random(s) * 18);
-    if (random(s) < 0.3) {
+    a.rest = arriving ? 3 : 8 + Math.floor(random(s) * 18);
+    if (!arriving && random(s) < 0.3) {
       a.dir = ALL_DIRS[Math.floor(random(s) * 4)];
       continue;
     }
     // Außerhalb des Zuhauses (nach einem Platztausch) zieht es heim, sonst läuft es zufällig
-    const away = !atHome(world, a.home, a.x, a.y);
+    const away = !atHome(world, a.home, a.x, a.y) || arriving;
     const order = away ? [...ALL_DIRS].sort((p, q) => dist(a, p) - dist(a, q)) : [ALL_DIRS[Math.floor(random(s) * 4)]];
     for (const d of order) {
       const [dx, dy] = DIRS[d];
@@ -297,22 +305,8 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
   if (animal) {
     const again = s.lastBump?.id === animal.id && s.tick - s.lastBump.tick <= SWAP_WINDOW;
     const climbable = canStep(world, s.openGates, p.x, p.y, tx, ty);
-    const atGardenGate = p.x === HOME.gardenGate[0] && p.y === HOME.gardenGate[1];
-    if (again && climbable && animal.mode === 'home' && atGardenGate) {
-      // Ein Tier im Garten versperrt den Eingang: Es rückt im Garten beiseite, die Figur geht hinein
-      const spot = freeNear(
-        s,
-        world,
-        [tx, ty],
-        (x, y) => world.cell(x, y).garden === true && (x !== tx || y !== ty),
-        animal.id,
-      );
-      if (spot) {
-        [animal.x, animal.y] = spot;
-        s.lastBump = null;
-      }
-    } else if (climbable && (animal.mode === 'follow' || (again && world.cell(p.x, p.y).garden === true))) {
-      // Ein folgendes Tier tauscht sofort den Platz (umdrehen geht immer), eines im Garten erst beim zweiten Mal
+    if (climbable && (animal.mode === 'follow' || (again && world.cell(p.x, p.y).garden === true))) {
+      // Ein folgendes Tier tauscht sofort den Platz (umdrehen geht immer), eines auf der Wiese erst beim zweiten Mal
       animal.x = p.x;
       animal.y = p.y;
       animal.dir = dirTo(-dx, -dy);
@@ -359,20 +353,32 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
   bringHome(s, world, events);
 }
 
-/** Wer als folgendes Tier im Garten ankommt, löst sich aus der Kette und bleibt dort */
+/**
+ * Wer als folgendes Tier die Wiese ums Bett betritt, ist zu Hause: Es löst sich aus der Kette, singt, bekommt einen
+ * eigenen Platz auf der Wiese (dorthin läuft es von selbst) und bleibt für immer dort.
+ */
 function bringHome(s: State, world: World, events: GameEvent[]) {
   for (const id of [...s.followers]) {
     const a = s.animals.find((x) => x.id === id)!;
     if (!world.cell(a.x, a.y).garden) continue;
     a.mode = 'home';
     a.home = { kind: 'garden' };
-    a.rest = 10;
+    a.rest = 2;
     s.followers = s.followers.filter((f) => f !== id);
     if (!s.garden.some((x) => x.id === id)) s.garden.push({ id, species: a.species });
-    // Nach hinten rücken, damit der Eingang für das nächste Tier frei ist
-    const spot = freeNear(s, world, [GARDEN_ENTRY[0], HOME.garden.y0], (x, y) => atHome(world, a.home, x, y), id);
-    if (spot) [a.x, a.y] = spot;
-    events.push({ type: 'home', id });
+    // Eigener Platz: ein Platz der Wiese, den noch kein anderes Tier als Platz hat
+    const spots = meadowSpots(world);
+    const taken = new Set(
+      s.animals.filter((o) => o.mode === 'home' && o !== a).map((o) => `${o.spawn[0]},${o.spawn[1]}`),
+    );
+    const start = Math.floor(random(s) * spots.length);
+    for (let k = 0; k < spots.length; k++) {
+      const spot = spots[(start + k) % spots.length];
+      if (taken.has(`${spot[0]},${spot[1]}`)) continue;
+      a.spawn = spot;
+      break;
+    }
+    events.push({ type: 'home', id, species: a.species });
   }
 }
 
@@ -484,7 +490,7 @@ function wake(s: State, world: World, events: GameEvent[]) {
   if (s.tick - s.sleptAt < SLEEP_LOCK) return; // wildes Drücken direkt nach dem Einschlafen weckt nicht
   const spot =
     HOME.wake.find(([x, y]) => standHeight(world, s.openGates, x, y) !== null && !occupied(s, x, y)) ??
-    freeNear(s, world, HOME.bed, (x, y) => world.cell(x, y).region === 'lichtung' && !world.cell(x, y).garden);
+    freeNear(s, world, HOME.bed, (x, y) => world.cell(x, y).region === 'lichtung');
   if (!spot) return;
   s.sleeping = false;
   s.wokeAt = s.tick;

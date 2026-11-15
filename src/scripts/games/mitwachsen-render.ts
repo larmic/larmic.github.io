@@ -703,6 +703,22 @@ export class Renderer {
         box(ctx, P, x + 0.36, y + 0.42, h, 0.28, 0.24, 1.4, '#efe4d2', '#f7efe2');
         box(ctx, P, x - 0.25, y - 0.1, h + 1.4, 1.5, 1.2, 0.45, c.color ?? '#d9473a');
         break;
+      case 'trough':
+      case 'watertrough':
+        box(ctx, P, x + 0.05, y + 0.15, h, 0.9, 0.72, 0.48, '#8a5a30', '#a0703f');
+        box(
+          ctx,
+          P,
+          x + 0.13,
+          y + 0.23,
+          h + 0.4,
+          0.74,
+          0.56,
+          0.08,
+          c.deco === 'trough' ? '#d9b85a' : '#3f8fd8',
+          c.deco === 'trough' ? '#ecd27a' : '#7fc0f0',
+        );
+        break;
       case 'cloudpuff':
         box(ctx, P, x + 0.15, y + 0.3, h, 0.6, 0.4, 0.3, '#e6eef7', '#ffffff');
         break;

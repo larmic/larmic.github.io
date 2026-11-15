@@ -471,7 +471,11 @@ class LarmicMitwachsen extends HTMLElement {
           this.sfx.step();
           break;
         case 'home':
+          // Zu Hause angekommen: Das Tier ruft seinen eigenen Ton, dazu ein heller Klang und ein Herz
+          this.sfx.play(SPECIES[e.species].tone);
           this.sfx.home();
+          this.hops.set(e.id, now);
+          this.float('heart', e.id, GAME_COLORS.heart, now + 150);
           this.burst(e.id, ['#ffd47e', '#ffffff', '#6cc46f'], 14);
           persist = true;
           break;

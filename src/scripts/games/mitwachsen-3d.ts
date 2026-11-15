@@ -702,6 +702,33 @@ export class World3D {
           canopy.box(x + dx - 0.15, h + 1.86, y + dz - 0.15, 0.2, 0.05, 0.2, '#ffffff');
         break;
       }
+      case 'trough':
+      case 'watertrough': {
+        // Trog aus Holz auf vier Füßchen: Futter (Heu und Möhren) oder Wasser
+        for (const [fx, fz] of [
+          [0.1, 0.2],
+          [0.8, 0.2],
+          [0.1, 0.72],
+          [0.8, 0.72],
+        ])
+          g.box(x + fx, h, y + fz, 0.1, 0.12, 0.1, '#7a5432');
+        g.box(x + 0.05, h + 0.12, y + 0.15, 0.9, 0.08, 0.72, '#8a5a30', '#a0703f', 'planks');
+        g.box(x + 0.05, h + 0.2, y + 0.15, 0.9, 0.28, 0.08, '#8a5a30', '#a0703f', 'planks');
+        g.box(x + 0.05, h + 0.2, y + 0.79, 0.9, 0.28, 0.08, '#8a5a30', '#a0703f', 'planks');
+        g.box(x + 0.05, h + 0.2, y + 0.23, 0.08, 0.28, 0.56, '#8a5a30', '#a0703f', 'planks');
+        g.box(x + 0.87, h + 0.2, y + 0.23, 0.08, 0.28, 0.56, '#8a5a30', '#a0703f', 'planks');
+        if (c.deco === 'watertrough') g.box(x + 0.13, h + 0.2, y + 0.23, 0.74, 0.22, 0.56, '#3f8fd8', '#7fc0f0');
+        else {
+          g.box(x + 0.13, h + 0.2, y + 0.23, 0.74, 0.26, 0.56, '#d9b85a', '#ecd27a'); // Heu
+          for (const [fx, fz] of [
+            [0.25, 0.35],
+            [0.55, 0.5],
+            [0.7, 0.3],
+          ])
+            g.box(x + fx, h + 0.46, y + fz, 0.14, 0.06, 0.06, '#f08a3c'); // Möhren
+        }
+        break;
+      }
       case 'cloudpuff':
         g.box(x + 0.15, h, y + 0.3, 0.5, 0.25, 0.4, '#ffffff', null, 'cloud');
         g.box(x + 0.4, h, y + 0.15, 0.4, 0.35, 0.45, '#ffffff', null, 'cloud');

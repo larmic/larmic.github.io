@@ -1,6 +1,6 @@
 # Konzept: Mitwachsen ab 3
 
-Das Kind läuft mit einer eigenen Figur durch eine endlose Voxel-Welt, findet verlorene Tiere, die singen, wenn man sie findet, bringt sie nach Hause in den Garten und öffnet so nach und nach neue Gegenden. Zu jeder Gegend gibt es eine Geschichte, die der Elternteil vorliest. Zum Aufhören legt sich die Figur ins Bett, und es wird Nacht.
+Das Kind läuft mit einer eigenen Figur durch eine endlose Voxel-Welt, findet verlorene Tiere, die singen, wenn man sie findet, bringt sie nach Hause auf die Wiese ums Bett und öffnet so nach und nach neue Gegenden. Zu jeder Gegend gibt es eine Geschichte, die der Elternteil vorliest. Zum Aufhören legt sich die Figur ins Bett, und es wird Nacht.
 
 Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dokument beschreibt die erste Stufe (ab 3). Ein früher Prototyp (feste kleine Insel, Tiere treffen) liegt als Artefakt vor und hat gezeigt: Die Pfeiltasten beherrscht das Kind, die schräge Ansicht der Homepage passt aber nicht dazu (→ läuft dort nach rechts unten).
 
@@ -33,7 +33,7 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 ## Welt
 
 - **Endlos**, berechnet aus einem **Seed**. Derselbe Seed ergibt immer dieselbe Welt. Gespeichert werden nur Seed und Fortschritt, nie die Landschaft.
-- **Start auf der Lichtung:** Am Anfang gibt es nur das **Bett** in der Mitte einer großen Lichtung (gut 160 × 136 Felder) mit sanften Hügeln, mehreren Teichen, einzelnen Bäumen, Blumenwiesen und Steinen zum Klettern. Keine Mauer, kein Garten: Das entwickelt sich mit der Zeit.
+- **Start auf der Lichtung:** Am Anfang gibt es nur das **Bett** in der Mitte einer großen Lichtung (gut 160 × 136 Felder) mit sanften Hügeln, mehreren Teichen, einzelnen Bäumen, Blumenwiesen und Steinen zum Klettern. Keine Mauer, kein Zaun. Ums Bett liegt eine offene Wiese mit Futter- und Wassertrog: das Zuhause der gefundenen Tiere.
 - **Frei zugänglich (aus dem ersten Spieltest):** Ein Dreijähriger kommt um einen Baum herum, bei mehreren dicht beieinander wird es schwierig. Darum stehen Bäume und Büsche einzeln, mit Platz ringsum. Büsche tragen rote Beeren, damit man sie nicht für Baumspitzen hält. Läuft man hinein, pflückt die Figur die Beeren und freut sich; nach kurzer Zeit wachsen neue. Keine Stufe ist höher als eins, so kommt man überall hinauf und nirgends in eine Ecke, aus der es nicht herausgeht. Die Tore liegen weit weg.
 - **Ringsum natürliche Felsen** mit leicht unregelmäßigem Rand, in Terrassen ansteigend. Sie sind eine feste Grenze: Man kann sie weder besteigen noch hineinfallen. Darin stehen acht **große Tore**, eines je Welt. Wo sie stehen und in welcher Reihenfolge, würfelt jede Welt neu. Sie sind vorerst verschlossen; vorerst ist nur die Lichtung spielbar.
 - **Nebel:** Zu sehen ist nur, was das Kind schon erkundet hat. Dahinter verschwindet die Welt weich im Dunst, wie echter Nebel, und zeigt sich beim Herumlaufen (gespeichert).
@@ -48,7 +48,7 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 | Tiere zum Entdecken | zehn Arten: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte, je vier Tiere (aus dem ersten Spieltest: die Lichtung war zu leer). Die Leiste zeigt jede Art einmal. |
 | Tore | acht, eines je Welt (Eis, Sand, Wasser, Lava, Höhle, Wald, Wolken, Pilze), Lage und Reihenfolge je Welt gewürfelt, alle vorerst zu. Jedes Torhaus ist im Stil seiner Welt geschmückt |
 
-Die Leiste unten ist die **Liste der entdeckten Tiere**: Umriss mit Fragezeichen = noch nicht entdeckt, in Farbe = entdeckt, Herz = folgt gerade. Einen Garten, in den sie ziehen, gibt es am Anfang nicht. Wie sich die Tore später öffnen, hängt an der Geschichte (siehe Ideen: Tiere befreien).
+Die Leiste unten ist die **Liste der entdeckten Tiere**: Umriss mit Fragezeichen = noch nicht entdeckt, in Farbe = entdeckt, Herz = folgt gerade. Grün hinterlegt = zu Hause auf der Wiese. Wie sich die Tore später öffnen, hängt an der Geschichte (siehe Ideen: Tiere befreien).
 
 ## Die Welten
 
@@ -134,22 +134,22 @@ Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzel
 
 ## Tiere
 
-**Die Geschichte:** Die Tiere haben sich verlaufen und finden nicht mehr nach Hause. Verlorene Tiere tragen ein kleines Fragezeichen über dem Kopf. Das Kind findet sie, sie freuen sich (Ton, Hüpfer, Herz) und laufen mit ihm nach Hause in den Garten. Dort wohnen sie und sind glücklich. Es geht ums Helfen, nicht ums Sammeln oder Einsperren.
+**Die Geschichte:** Die Tiere haben sich verlaufen und finden nicht mehr nach Hause. Verlorene Tiere tragen ein kleines Fragezeichen über dem Kopf. Das Kind findet sie, sie freuen sich (Ton, Hüpfer, Herz) und laufen mit ihm nach Hause auf die Wiese ums Bett. Dort fressen und trinken sie, wohnen und sind glücklich. Es geht ums Helfen, nicht ums Sammeln oder Einsperren.
 
 
 1. Jedes Tier hat eine **Heimat-Gegend** und wandert dort langsam umher.
 2. Steht die Figur direkt neben einem Tier, **bleibt es stehen** und schaut sie an.
-3. **Aktion neben einem Tier:** Es hüpft und **singt seinen eigenen Ton** (alle aus derselben Pentatonik, klingt immer zusammen). Beim ersten Mal gilt es als **gefunden** und bekommt ein Herz. Danach **folgt** es der Figur im Gänsemarsch, bis es im Garten ist oder die Figur schläft. Über folgenden Tieren schwebt ein kleines Herz.
+3. **Aktion neben einem Tier:** Es hüpft und **singt seinen eigenen Ton** (alle aus derselben Pentatonik, klingt immer zusammen). Beim ersten Mal gilt es als **gefunden** und bekommt ein Herz. Danach **folgt** es der Figur im Gänsemarsch, bis es auf der Wiese ums Bett ankommt oder die Figur schläft. Über folgenden Tieren schwebt ein kleines Herz.
 4. **Hineinlaufen in ein Tier** genügt (aus dem ersten Spieltest: die Leertaste war zu viel): Es singt, bekommt beim ersten Mal ein Herz und folgt. Läuft die Figur in ein Tier, das schon folgt, tauschen beide sofort den Platz. So kann die Figur immer umdrehen und bleibt nie eingeklemmt. Ins Bett geht es genauso: hineinlaufen.
 5. **Aktion neben einem folgenden Tier:** Es singt noch einmal, sonst ändert sich nichts.
-6. **Aktion neben einem Tier im Garten:** Es singt und hüpft, folgt aber nicht. Es ist zu Hause und bleibt gern im Garten.
+6. **Zu Hause ankommen:** Betritt ein folgendes Tier die Wiese ums Bett, ruft es seinen Ton, freut sich und läuft zu seinem eigenen Platz auf der Wiese. Dort bleibt es, auch nach dem Schlafen, und folgt nicht mehr (erster Spieltest: nach dem Schlafen waren alle Tiere weg). Läuft man hinein, singt es.
 7. **Schläft die Figur**, laufen folgende Tiere in ihre Heimat-Gegend zurück.
-8. **Tiere der berechneten Landschaft:** Sie zählen für kein Tor, singen aber, folgen und dürfen in den Garten. Ihre Kennung ergibt sich aus Seed, Stück und Nummer und bleibt dadurch stabil.
-9. Positionen werden nicht gespeichert, nur „gefunden“ und „im Garten“. Ein Tier im Garten erscheint nicht mehr in seiner Heimat-Gegend.
+8. **Tiere der berechneten Landschaft:** Sie zählen für kein Tor, singen aber, folgen und dürfen mit auf die Wiese. Ihre Kennung ergibt sich aus Seed, Stück und Nummer und bleibt dadurch stabil.
+9. Positionen werden nicht gespeichert, nur „gefunden“ und „zu Hause“. Ein Tier auf der Wiese erscheint nicht mehr in seiner Heimat-Gegend.
 
-## Bett, Nacht, später der Garten
+## Bett, Nacht und die Wiese
 
-- **Garten (später):** Hecke mit einem Rosenbogen am Zuhause, in dem gefundene Tiere wohnen. Er gehört noch nicht zum Start; Regeln und Tests dafür stehen schon (das Feld hinter dem Rosenbogen bleibt frei, Tiere im Garten bleiben dort).
+- **Wiese ums Bett:** offen, ohne Zaun, mit Futtertrog (Heu und Möhren) und Wassertrog. Hier wohnen die gefundenen Tiere.
 - **Bett:** Ins Bett laufen → die Figur legt sich hin (direkt nach dem Aufwachen noch nicht, damit sie nicht aus Versehen wieder einschläft), der Himmel wird dunkel, Sterne gehen auf, eine leise Melodie spielt, es wird gespeichert.
 - **Aufwachen:** Nach dem Einschlafen reagiert das Spiel einige Sekunden nicht auf Tasten, damit wildes Drücken die Runde nicht sofort weiterführt. Danach bringt ein Tastendruck den Morgen.
 - **Start einer Runde:** Die Figur schläft im Bett, ein Tastendruck weckt sie. Dieser erste Druck schaltet auch den Ton frei (Autoplay-Regeln).
@@ -253,7 +253,6 @@ Nur gesammelt, noch nicht ausgeplant.
 
 - **Welten hinter den Toren:** Alle acht sind oben unter „Die Welten“ beschrieben. Weitere Ideen: Blumenland, Herbstwald, Strand mit Gezeiten.
 - **Tiere befreien:** Später sollen die Tiere nicht nur entdeckt, sondern befreit werden. Daran hängt auch, wie sich die großen Tore öffnen. Die Geschichte dazu fehlt noch: Wovon werden die Tiere befreit, und warum? (Für ein kleines Kind freundlich, ohne Bösewicht, der Angst macht.)
-- **Garten:** entsteht mit der Zeit am Bett; Regeln und Tests stehen schon (siehe Bett, Nacht, später der Garten).
 - **Portale:** Umgesetzt für die großen Tore (siehe Spec). Noch offen: Der Heimweg-Pfeil zeigt auf das Portal, wenn der Weg darüber kürzer ist.
 - **Gemeinsame Welt:** Für ein höheres Alter: Man schickt anderen einen Link und spielt zu zweit in derselben Welt, z. B. Elternteil und Kind oder Kind und Freund. Braucht mehr als GitHub Pages (Verbindung zwischen zwei Browsern oder ein kleiner Dienst) und eine eigene Datenschutzprüfung.
 - **Geschichtenerzähler:** Der Vater spricht die Geschichten selbst ein, das Spiel kann sie vorspielen. Die Aufnahmen lägen als Audiodateien auf der Seite (keine externen Ressourcen). Ob das umgesetzt wird, ist offen.

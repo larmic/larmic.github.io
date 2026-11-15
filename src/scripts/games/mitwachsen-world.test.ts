@@ -193,17 +193,29 @@ describe('Start auf der Lichtung', () => {
     }
   });
 
-  it('Ohne Garten gibt es keine Gartenfelder; mit Garten genau einen Eingang', () => {
-    const plain = createWorld(3);
-    for (let y = -15; y <= 15; y++) for (let x = -15; x <= 15; x++) expect(plain.cell(x, y).garden).toBeUndefined();
-    const w = createWorld(3, { garden: true });
-    let openings = 0;
-    for (let y = HOME.garden.y0 - 1; y <= HOME.garden.y1 + 1; y++)
-      for (let x = HOME.garden.x0 - 1; x <= HOME.garden.x1 + 1; x++) if (w.cell(x, y).gardenGate) openings++;
-    expect(openings).toBe(1);
-    const inside = reachable(w, [], [HOME.garden.x0, HOME.garden.y0]).filter(([x, y]) => !w.cell(x, y).garden);
-    expect(inside.some(([x, y]) => x === HOME.gardenGate[0] && y === HOME.gardenGate[1])).toBe(true);
-  });
+  for (const seed of [3, 42]) {
+    it(`Seed ${seed}: Ums Bett liegt die Wiese, eben und frei, mit Futter- und Wassertrog`, () => {
+      const w = createWorld(seed);
+      const reach = new Set(reachable(w, [], START).map(([x, y]) => `${x},${y}`));
+      let meadow = 0;
+      for (let y = -HOME.meadow; y <= HOME.meadow; y++)
+        for (let x = -HOME.meadow; x <= HOME.meadow; x++) {
+          if (Math.hypot(x, y) > HOME.meadow) continue;
+          const c = w.cell(HOME.bed[0] + x, HOME.bed[1] + y);
+          if (c.deco === 'bed' || c.deco === 'portal' || c.deco === 'portalside') continue;
+          expect(c.garden, `${x},${y}`).toBe(true);
+          if (c.solid) continue; // Tröge
+          meadow++;
+          expect(standHeight(w, [], HOME.bed[0] + x, HOME.bed[1] + y)).toBe(1);
+          expect(reach.has(`${HOME.bed[0] + x},${HOME.bed[1] + y}`)).toBe(true);
+        }
+      expect(meadow).toBeGreaterThan(90);
+      expect(w.cell(...HOME.food).deco).toBe('trough');
+      expect(w.cell(...HOME.water).deco).toBe('watertrough');
+      // Tiere der Lichtung wohnen nicht auf der Wiese
+      for (const [x, y] of w.spawns.values()) expect(w.cell(x, y).garden).toBeUndefined();
+    });
+  }
 });
 
 describe('Landschaft', () => {

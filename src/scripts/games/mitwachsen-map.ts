@@ -39,7 +39,7 @@ const WORLD_GROUND: Partial<Record<Cell['ground'], string>> = {
 function colorOf(c: Cell): string {
   if (c.gate) return THEME_COLORS[c.gate].side;
   if (c.deco === 'gatetower' || c.deco === 'portalside') return THEME_COLORS[c.part!.id].side;
-  if (c.deco === 'gate') return COLORS.gate;
+  if (c.deco === 'gate' || c.deco === 'trough' || c.deco === 'watertrough') return COLORS.gate;
   if (WORLD_GROUND[c.ground]) return WORLD_GROUND[c.ground]!;
   if (c.ground === 'water') return COLORS.water;
   if (c.deco === 'tree') return COLORS.tree;

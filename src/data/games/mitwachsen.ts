@@ -104,9 +104,13 @@ export const HOME = {
   clear: 2, // so weit um das Bett bleibt es flach und frei
   /** Partner-Portale stehen im Kreis um das Bett, jedes in Richtung seines Tors; erscheinen mit der Aktivierung */
   portalRing: 8,
-  /** Garten für später: Er entsteht noch nicht in der Welt (createWorld mit { garden: true } für Tests) */
-  garden: { x0: 3, y0: -3, x1: 6, y1: 0 } as Rect,
-  gardenGate: [4, 1] as Point, // Rosenbogen in der Hecke; das Feld dahinter bleibt frei
+  /**
+   * Zuhause der gefundenen Tiere: eine offene Wiese rund um das Bett (ohne Zaun), mit Futter und Wasser.
+   * Folgende Tiere, die sie betreten, bleiben dort und verteilen sich.
+   */
+  meadow: 6, // Radius der Wiese um das Bett
+  food: [-4, 3] as Point, // Futtertrog
+  water: [4, 3] as Point, // Wassertrog
 };
 
 // ---------- Tiere ----------
