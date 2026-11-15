@@ -129,5 +129,5 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Touch-Steuerung | auf Geräten ohne Maus (oder nach der ersten Berührung): Steuerkreuz unten links, Aktionsknopf mit Herz unten rechts, im selben ruhigen Takt wie die Tastatur; die Leiste rückt darüber |
 | Kopf | oben links Zahnrad (Menü für Eltern, darin auch der Weg zur Homepage), Mitte Name der Figur, rechts Karte. Kein Zurück-Button: Das Spiel steht für sich |
 | Nacht | dunkler Himmel mit Sternen und Mond, die Figur liegt im Bett, Zzz steigt auf |
-| Menü | Zahnrad oben rechts: Welten wählen, neue Welt, Namen, Welt-Code kopieren, Ton, Vollbild. Das Spiel pausiert, solange es offen ist |
+| Menü | Zahnrad oben links: Welten wählen, neue Welt, Welt löschen (zweiter Klick bestätigt), Namen, Welt-Code kopieren, Ton, Vollbild, zur Homepage. Das Spiel pausiert, solange es offen ist |
 | Reduzierte Bewegung | keine Partikel, Noten und Zzz, kein Gleiten und Hüpfen, Tore und Nacht ohne Überblendung; Töne bleiben |

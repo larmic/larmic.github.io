@@ -198,6 +198,23 @@ export function saveWorld(store: Store, world: SavedWorld, makeCurrent = true): 
   return saveIndex(store, index);
 }
 
+/**
+ * Welt löschen: Spielstand und Eintrag im Index. War sie die aktuelle Welt, wird die erste übrige aktuell (oder keine).
+ * Liefert den neuen Index.
+ */
+export function deleteWorld(store: Store, id: string): Index {
+  try {
+    store.removeItem(worldKey(id));
+  } catch {
+    /* dann bleibt der Spielstand liegen, der Index vergisst ihn trotzdem */
+  }
+  const index = loadIndex(store);
+  index.worlds = index.worlds.filter((w) => w.id !== id);
+  if (index.current === id) index.current = index.worlds[0]?.id ?? null;
+  saveIndex(store, index);
+  return index;
+}
+
 /** Fortschritt aus dem Spiel in die gespeicherte Welt übernehmen */
 export const withProgress = (world: SavedWorld, p: Progress): SavedWorld => ({
   ...world,

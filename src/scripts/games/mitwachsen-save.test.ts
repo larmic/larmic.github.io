@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   INDEX_KEY,
   cleanName,
+  deleteWorld,
   loadIndex,
   loadWorld,
   migrate,
@@ -91,6 +92,31 @@ describe('Welten speichern', () => {
       worlds: [{ id: 'a', worldName: 'Meine Welt', figureName: 'Bobo' }],
       current: 'a',
     });
+  });
+});
+
+describe('Welten löschen', () => {
+  it('entfernt Spielstand und Eintrag; die nächste Welt wird aktuell', () => {
+    const store = memoryStore();
+    saveWorld(store, newWorld('a', 1, 'Erste'));
+    saveWorld(store, newWorld('b', 2, 'Zweite')); // aktuell
+    const index = deleteWorld(store, 'b');
+    expect(index.worlds.map((w) => w.id)).toEqual(['a']);
+    expect(index.current).toBe('a');
+    expect(loadWorld(store, 'b')).toBeNull();
+    expect(loadIndex(store)).toEqual(index);
+  });
+
+  it('lässt die aktuelle Welt, wenn eine andere gelöscht wird; die letzte hinterlässt keine aktuelle', () => {
+    const store = memoryStore();
+    saveWorld(store, newWorld('a', 1, 'Erste'));
+    saveWorld(store, newWorld('b', 2, 'Zweite'));
+    expect(deleteWorld(store, 'a').current).toBe('b');
+    expect(deleteWorld(store, 'b')).toEqual({ v: 4, worlds: [], current: null });
+  });
+
+  it('übersteht einen Speicher, der nichts zulässt', () => {
+    expect(deleteWorld(brokenStore, 'a')).toEqual({ v: 4, worlds: [], current: null });
   });
 });
 

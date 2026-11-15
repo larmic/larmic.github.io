@@ -329,6 +329,18 @@
     padding: 0;
     list-style: none;
   }
+  .mw-worlds :global(li) {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .mw-worlds :global(.mw-delete) {
+    flex: none;
+    font-size: 0.9rem;
+  }
+  .mw-worlds :global(.mw-delete[data-armed='1']) {
+    color: var(--error);
+  }
   .mw-worlds :global(.mw-world) {
     display: flex;
     justify-content: space-between;

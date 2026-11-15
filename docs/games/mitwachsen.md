@@ -92,7 +92,7 @@ Eine **Welt** besteht aus Seed, Weltname, Figurenname und Fortschritt. Es kann m
 | Ton, Vollbild | an/aus | ja |
 | Welt aus Code anlegen | Seed eingeben | später |
 | Spielstand sichern / laden | Fortschritt als Datei (JSON), Schutz gegen gelöschte Browserdaten | später |
-| Löschen | mit Rückfrage im Menü | später |
+| Löschen | mit Rückfrage im Menü (zweiter Klick) | ja |
 | Mini-Vorschau der Welt | auf der Kachel | später |
 
 ## Speichern

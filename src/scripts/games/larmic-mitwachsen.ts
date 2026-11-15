@@ -12,6 +12,7 @@ import { Sfx } from './sfx';
 import {
   DEFAULT_FIGURE,
   cleanName,
+  deleteWorld,
   loadIndex,
   loadWorld,
   newWorld,
@@ -627,7 +628,13 @@ class LarmicMitwachsen extends HTMLElement {
         const fig = document.createElement('span');
         fig.textContent = w.figureName;
         b.append(name, fig);
-        li.append(b);
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'mw-link mw-delete';
+        del.dataset.delete = w.id;
+        del.textContent = 'Löschen';
+        del.setAttribute('aria-label', `Welt „${w.worldName}“ löschen`);
+        li.append(b, del);
         return li;
       }),
     );
@@ -639,9 +646,31 @@ class LarmicMitwachsen extends HTMLElement {
     sound.textContent = this.sfx.muted ? 'Ton ist aus' : 'Ton ist an';
   }
 
+  /** Welt löschen mit Rückfrage im Menü: erster Klick fragt, zweiter löscht (innerhalb von 4 Sekunden) */
+  private removeWorld(button: HTMLElement, id: string) {
+    if (button.dataset.armed !== '1') {
+      button.dataset.armed = '1';
+      button.textContent = 'Wirklich löschen?';
+      setTimeout(() => {
+        if (!button.isConnected) return;
+        button.dataset.armed = '';
+        button.textContent = 'Löschen';
+      }, 4000);
+      return;
+    }
+    const index = deleteWorld(this.store, id);
+    // Die gespielte Welt ist weg: zur nächsten wechseln oder eine neue anlegen
+    if (id === this.saved.id) this.openWorld(index.current);
+    else this.renderMenu();
+  }
+
   private menuClick(e: Event) {
-    const t = (e.target as HTMLElement).closest<HTMLElement>('[data-world], [data-act]');
+    const t = (e.target as HTMLElement).closest<HTMLElement>('[data-world], [data-act], [data-delete]');
     if (!t) return;
+    if (t.dataset.delete) {
+      this.removeWorld(t, t.dataset.delete);
+      return;
+    }
     if (t.dataset.world && t.dataset.world !== this.saved.id) {
       this.save();
       this.openWorld(t.dataset.world);
