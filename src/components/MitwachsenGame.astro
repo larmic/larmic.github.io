@@ -131,6 +131,23 @@
   .mw-canvas3d {
     visibility: hidden;
   }
+  /* Kein Zoomen, Verschieben oder Markieren durch Kinderhände; das Menü bleibt normal bedienbar */
+  .mw-canvas,
+  .mw-canvas3d,
+  .mw-map,
+  .mw-top,
+  .mw-touch {
+    touch-action: none;
+  }
+  .mw {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .mw-menu {
+    -webkit-user-select: text;
+    user-select: text;
+  }
   .mw.three .mw-canvas3d {
     visibility: visible;
   }
@@ -363,6 +380,33 @@
   }
   .mw-menu > .pxbtn {
     margin-top: 8px;
+  }
+  @media (pointer: coarse) {
+    .mw {
+      min-height: 0;
+    }
+  }
+  /* Handy quer: alles etwas kleiner, damit die Steuerung ganz zu sehen ist */
+  @media (max-height: 500px) {
+    .mw-map {
+      width: 112px;
+      height: 112px;
+    }
+    .mw-pad {
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(3, 44px);
+    }
+    .mw-key {
+      padding: 9px;
+    }
+    .mw-act {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 0;
+    }
+    .mw-touch {
+      inset: auto 12px 12px;
+    }
   }
   @media (max-width: 560px) {
     .mw-map {

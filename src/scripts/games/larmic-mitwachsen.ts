@@ -310,9 +310,16 @@ class LarmicMitwachsen extends HTMLElement {
    */
   private listenTouch(signal: AbortSignal) {
     document.addEventListener('touchstart', () => this.classList.add('touch'), { signal, passive: true, once: true });
+    // iPad/iPhone erlauben Ton erst bei einer aktivierenden Geste (Loslassen), nicht schon beim Antippen
+    const unlock = () => this.sfx.unlock();
+    document.addEventListener('pointerup', unlock, { signal });
+    document.addEventListener('touchend', unlock, { signal, passive: true });
     for (const key of this.querySelectorAll<HTMLElement>('.mw-key')) {
       const dir = key.dataset.dir as Dir;
-      const up = () => {
+      const held = new Set<number>(); // mehrere Finger auf derselben Taste: erst der letzte lässt los
+      const up = (e: Event) => {
+        held.delete((e as PointerEvent).pointerId);
+        if (held.size) return;
         key.classList.remove('down');
         this.pace.release(dir);
       };
@@ -321,6 +328,7 @@ class LarmicMitwachsen extends HTMLElement {
         (e) => {
           e.preventDefault();
           key.setPointerCapture(e.pointerId);
+          held.add(e.pointerId);
           key.classList.add('down');
           this.sfx.unlock();
           const go = this.pace.press(dir, performance.now());
@@ -515,7 +523,7 @@ class LarmicMitwachsen extends HTMLElement {
     const floats: Float[] = [];
     for (const f of this.floats) {
       if (t < f.born) continue;
-      const b = f.who === 'bed' ? { x: -3, y: -3, z: 1.3, hop: 0 } : this.bodies.get(f.who!);
+      const b = f.who === 'bed' ? { x: HOME.bed[0], y: HOME.bed[1], z: 1.3, hop: 0 } : this.bodies.get(f.who!);
       if (!b) continue;
       floats.push({ ...f, x: b.x, y: b.y, z: b.z + (f.who === 'player' ? 1.5 : 0.9), age: t - f.born });
     }

@@ -566,10 +566,17 @@ export class Renderer {
         this.fence(P, world, x, y, h, 1);
         break;
       case 'biggate': {
-        // Großes Tor im Felsen (vorerst zu): Holz mit Eisenbändern, oben Stein
-        box(ctx, P, x, y + 0.35, h, 1, 0.3, 2.4, '#8a5a30', '#a0703f');
-        for (const z of [0.5, 1.7]) box(ctx, P, x, y + 0.3, h + z, 1, 0.4, 0.12, '#3a3a44');
-        box(ctx, P, x - 0.02, y + 0.2, h + 2.4, 1.04, 0.6, 0.45, '#8f949b', '#a8adb3');
+        // Großes Tor im Felsen (vorerst zu): Holz mit Eisenbändern, oben Stein; Ost- und Westtor laufen nach vorn
+        const along = world.cell(x, y - 1).deco === 'biggate' || world.cell(x, y + 1).deco === 'biggate';
+        if (along) {
+          box(ctx, P, x + 0.35, y, h, 0.3, 1, 2.4, '#8a5a30', '#a0703f');
+          for (const z of [0.5, 1.7]) box(ctx, P, x + 0.3, y, h + z, 0.4, 1, 0.12, '#3a3a44');
+          box(ctx, P, x + 0.2, y - 0.02, h + 2.4, 0.6, 1.04, 0.45, '#8f949b', '#a8adb3');
+        } else {
+          box(ctx, P, x, y + 0.35, h, 1, 0.3, 2.4, '#8a5a30', '#a0703f');
+          for (const z of [0.5, 1.7]) box(ctx, P, x, y + 0.3, h + z, 1, 0.4, 0.12, '#3a3a44');
+          box(ctx, P, x - 0.02, y + 0.2, h + 2.4, 1.04, 0.6, 0.45, '#8f949b', '#a8adb3');
+        }
         break;
       }
       case 'gate':

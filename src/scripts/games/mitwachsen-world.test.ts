@@ -84,6 +84,17 @@ describe('Start auf der Lichtung', () => {
     });
   }
 
+  it('Die drei Felder jedes großen Tores liegen in einer geraden Reihe (viele Seeds)', () => {
+    for (let seed = 1; seed < 400; seed += 7) {
+      const w = createWorld(seed * 4513);
+      for (const cells of w.gates.values()) {
+        const xs = new Set(cells.map(([x]) => x)),
+          ys = new Set(cells.map(([, y]) => y));
+        expect(xs.size === 1 || ys.size === 1, `Seed ${seed * 4513}`).toBe(true);
+      }
+    }
+  });
+
   it('Ohne Garten gibt es keine Gartenfelder; mit Garten genau einen Eingang', () => {
     const plain = createWorld(3);
     for (let y = -15; y <= 15; y++) for (let x = -15; x <= 15; x++) expect(plain.cell(x, y).garden).toBeUndefined();

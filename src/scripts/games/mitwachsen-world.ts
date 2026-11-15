@@ -92,21 +92,15 @@ function edge(seed: number, x: number, y: number) {
 }
 const ROCK_OUTER = 1.55;
 
-/** Die drei Felder eines großen Tores: innerste Felsfelder in seiner Himmelsrichtung */
+/** Die drei Felder eines großen Tores: in einer geraden Reihe, so tief wie das innerste Felsfeld der drei Spalten */
 function gateCells(seed: number, side: 'n' | 'o' | 's' | 'w'): Point[] {
   const [dx, dy] = { n: [0, -1], s: [0, 1], o: [1, 0], w: [-1, 0] }[side];
-  const out: Point[] = [];
-  for (const off of [-1, 0, 1]) {
-    for (let t = 1; t < 40; t++) {
-      const x = dx ? dx * t : off,
-        y = dy ? dy * t : off;
-      if (edge(seed, x, y) >= 1) {
-        out.push([x, y]);
-        break;
-      }
-    }
-  }
-  return out;
+  const first = (off: number) => {
+    for (let t = 1; t < 40; t++) if (edge(seed, dx ? dx * t : off, dy ? dy * t : off) >= 1) return t;
+    return 40;
+  };
+  const t = Math.min(first(-1), first(0), first(1));
+  return [-1, 0, 1].map((off) => [dx ? dx * t : off, dy ? dy * t : off] as Point);
 }
 
 /** Die Lichtung als feste Karte: Bett in der Mitte, Teich, Hügel, Bäume, Felsring, große Tore */
