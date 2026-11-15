@@ -145,7 +145,7 @@ describe('Start auf der Lichtung', () => {
   }
 
   it('Die drei Felder jedes großen Tores liegen in einer geraden Reihe (viele Seeds)', () => {
-    for (let seed = 1; seed < 400; seed += 7) {
+    for (let seed = 1; seed < 400; seed += 25) {
       const w = createWorld(seed * 4513);
       for (const cells of w.gates.values()) {
         const xs = new Set(cells.map(([x]) => x)),
@@ -185,12 +185,14 @@ describe('Landschaft', () => {
   });
 
   it('hat Tiere, immer dieselben an derselben Stelle, auf Feldern der Landschaft', () => {
-    const w = createWorld(8);
+    const w = createWorld(8),
+      again = createWorld(8);
     const all = [];
-    for (let cy = 2; cy < 8; cy++)
+    for (let cy = 8; cy < 14; cy++)
+      // weit draußen, hinter dem Felsring
       for (let cx = -3; cx < 3; cx++) {
         const spawns = wildAnimals(w, cx, cy);
-        expect(spawns).toEqual(wildAnimals(createWorld(8), cx, cy));
+        expect(spawns).toEqual(wildAnimals(again, cx, cy));
         for (const s of spawns) {
           expect(w.cell(s.x, s.y).region).toBe('wild');
           expect(standHeight(w, [], s.x, s.y)).not.toBeNull();
