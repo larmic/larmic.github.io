@@ -156,6 +156,18 @@ Eine **Welt** besteht aus Seed, Weltname, Figurenname und Fortschritt. Es kann m
 | Löschen | mit Rückfrage im Menü (zweiter Klick) | ja |
 | Mini-Vorschau der Welt | auf der Kachel | später |
 
+## Müde werden (Medienzeit)
+
+Die S2k-Leitlinie der Kinder- und Jugendärzte rät für 3 bis 6 Jahre zu „höchstens 30 Minuten an einzelnen Tagen, und nicht ohne Anwesenheit der Eltern“ (unter 3 Jahren gar keine Bildschirmmedien). Das Spiel hilft beim Aufhören, ohne etwas wegzunehmen:
+
+- Nach **15 und 20 Minuten** setzt sich die Figur kurz hin, gähnt, und eine Sprechblase sagt „Uaah … ich werde langsam müde.“ Bilder (Mond, Zzz) versteht das Kind selbst, den Satz lesen die Eltern vor.
+- Ab 20 Minuten wird das Licht langsam golden wie am Abend.
+- Nach **25 Minuten** sagt die Figur: „Ich bin müde. Bringst du mich ins Bett?“, danach alle paar Minuten wieder. Das Gute-Nacht-Bild am Bett ist das Ritual zum Aufhören.
+- Gesperrt wird nichts. Wann Schluss ist, entscheiden die Eltern.
+- Ein **Hinweis für Eltern** mit den Empfehlungen und Quellen erscheint beim ersten Öffnen und ist im Menü und über die Bett-Sprechblase wieder zu öffnen.
+
+Später (Mitwachsen): Zeiten im Menü einstellbar, wenn das Kind älter wird.
+
 ## Speichern
 
 - **localStorage**, alle Schlüssel mit Präfix `larmic.games.`: ein Index der Welten und je Welt ein eigener Schlüssel, damit eine kaputte Welt nicht alle anderen mitreißt.

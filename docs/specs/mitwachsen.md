@@ -89,6 +89,22 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 
 Die Regeln kennen den Nebel nicht: Er betrifft nur, was gezeichnet wird.
 
+## Müde werden (Medienzeit)
+
+Rein in `mitwachsen-tired.ts`, die Uhr gehört zum Kind (ein Wert je Browser, `larmic.games.mitwachsen.tired`), nicht zur Welt.
+
+| Regel | Test |
+| --- | --- |
+| Gezählt wird nur echte Spielzeit: Takt läuft (Seite sichtbar, Menü und Hinweis zu) und die Figur ist wach; Lücken über 5 s zählen nicht | „zählt nur echte Spielzeit …“ |
+| Nach 15 und 20 Minuten setzt sich die Figur 2,5 s hin (Laufen geht so lange nicht), gähnt, und eine Sprechblase sagt es (Mond und „Zzz“ für das Kind, ein Satz zum Vorlesen) | „gähnt nach 15 und 20 Minuten …“ |
+| Nach 25 Minuten will die Figur ins Bett (Mond und Bett in der Blase, dazu ein „i“-Knopf zum Hinweis für Eltern), danach alle 3 Minuten wieder | „gähnt nach 15 und 20 Minuten …“ |
+| Verpasste Hinweise kommen nur einmal | „meldet verpasste Hinweise nur einmal“ |
+| Ab 20 Minuten wird das Licht golden (bis 25 Minuten 60 %, ab 35 Minuten ganz) | „der Himmel wird ab 20 Minuten abendlich …“ |
+| Gesperrt wird nichts. Schlafen im Bett beendet den Tag (die Zeit beginnt neu), ebenso eine Pause über 60 Minuten | „nach einer langen Pause beginnt ein neuer Tag“ |
+| Gespeichert alle 5 s und mit dem Spielstand; Kaputtes ergibt einen neuen Tag | „übersteht Speichern und Laden …“ |
+
+**Hinweis für Eltern** (`MitwachsenParentInfo.astro`): unter 3 Jahren, 3 bis 6 Jahre (Wortlaut der S2k-Leitlinie), WHO, gemeinsames Spielen, wie das Spiel hilft, Quellen als Links. Erscheint beim ersten Öffnen vor dem Spiel (gemerkt in `larmic.games.mitwachsen.info`), wieder zu öffnen im Menü („Für Eltern: Medienzeit“) und über den „i“-Knopf der Bett-Sprechblase. Steht ohne JavaScript im Text der Seite. Solange er offen ist, ruht das Spiel.
+
 ## Invarianten
 
 Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten bei wildem Drücken“*):

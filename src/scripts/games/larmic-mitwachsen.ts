@@ -6,7 +6,7 @@
 
 import { projection, type Dir } from '../../lib/games/front';
 import type { World3D as World3DType } from './mitwachsen-3d';
-import { GAME_COLORS, GATES, HOME, LOOK, SPECIES, THEME_COLORS } from '../../data/games/mitwachsen';
+import { GAME_COLORS, GATES, HOME, LOOK, SPECIES, THEME_COLORS, TIRED_TALK } from '../../data/games/mitwachsen';
 import { Renderer, type Body, type Float, type Particle, type Scene } from './mitwachsen-render';
 import { Sfx } from './sfx';
 import {
@@ -28,9 +28,12 @@ import { drawMap } from './mitwachsen-map';
 import { Fog, REVEAL, START_REVEAL } from './mitwachsen-fog';
 import { initialState, progressOf, step, type Cmd, type GameEvent, type State } from './mitwachsen-state';
 import { createWorld, standHeight, type World } from './mitwachsen-world';
+import { advance, evening, freshDay, loadTired, saveTired, type Tired, type TiredEvent } from './mitwachsen-tired';
 
 const TICK_MS = 100; // Takt der Regeln
 const SAVE_EVERY_MS = 10_000; // Position regelmäßig sichern
+const SIT_MS = 2500; // so lange setzt sich die müde Figur hin (Laufen geht in der Zeit nicht)
+const INFO_KEY = 'larmic.games.mitwachsen.info'; // Hinweis für Eltern schon gesehen
 const SPEED = (1000 / STEP_MS) * 1.1; // Felder pro Sekunde beim Gleiten: etwas schneller als der Takt, also weich
 const KEYS: Record<string, Dir> = { ArrowUp: 'n', ArrowDown: 's', ArrowLeft: 'w', ArrowRight: 'e' };
 const FREE_KEYS = new Set([
@@ -75,6 +78,12 @@ class LarmicMitwachsen extends HTMLElement {
   private canvas!: HTMLCanvasElement;
   private ctx!: CanvasRenderingContext2D;
   private menu!: HTMLDialogElement;
+  private info!: HTMLDialogElement; // Hinweis für Eltern zur Bildschirmzeit
+  private bubble!: HTMLElement; // Sprechblase der müden Figur
+  private bubbleTimer: number | undefined;
+  private tired!: Tired;
+  private lastTiredSave = 0;
+  private sitUntil = 0; // bis dahin sitzt die müde Figur
   private sfx = new Sfx();
   private globals: AbortController | null = null;
   private timer: number | undefined;
@@ -104,13 +113,16 @@ class LarmicMitwachsen extends HTMLElement {
   connectedCallback() {
     this.canvas = this.querySelector('canvas.mw-canvas')!;
     this.ctx = this.canvas.getContext('2d')!;
-    this.menu = this.querySelector('dialog')!;
+    this.menu = this.querySelector('dialog.mw-settings')!;
+    this.info = this.querySelector('dialog.mw-info')!;
+    this.bubble = this.querySelector('.mw-bubble')!;
     this.map = this.querySelector('canvas.mw-map')!;
     this.mapCtx = this.map.getContext('2d')!;
     this.touchUi = this.querySelector('.mw-touch')!;
     this.renderer = new Renderer(this.ctx);
     this.store = browserStore();
     this.sfx.muted = this.store.getItem('larmic.games.muted') === '1';
+    this.tired = loadTired(this.store, Date.now());
     this.openWorld(loadIndex(this.store).current);
     this.listen();
     this.resize = new ResizeObserver(() => this.measure());
@@ -119,6 +131,8 @@ class LarmicMitwachsen extends HTMLElement {
     this.classList.add('ready');
     this.start();
     void this.load3d();
+    // Beim ersten Öffnen: erst der Hinweis für Eltern, dann geht es los
+    if (this.store.getItem(INFO_KEY) !== '1') this.openInfo();
   }
 
   /**
@@ -168,6 +182,7 @@ class LarmicMitwachsen extends HTMLElement {
     this.globals = null;
     this.resize?.disconnect();
     this.sfx.close();
+    clearTimeout(this.bubbleTimer);
     this.gl3d?.dispose();
     this.gl3d = this.r3d = null;
   }
@@ -204,13 +219,19 @@ class LarmicMitwachsen extends HTMLElement {
     if (!this.saved) return;
     this.saved = { ...withProgress(this.saved, progressOf(this.state)), explored: this.fog.serialize() };
     saveWorld(this.store, this.saved);
+    saveTired(this.store, this.tired);
     this.lastSave = performance.now();
+  }
+
+  /** Menü oder Hinweis offen: Das Spiel ruht */
+  private paused() {
+    return this.menu.open || this.info.open;
   }
 
   // ---------- Takt und Eingabe ----------
 
   private start() {
-    if (this.timer === undefined && !this.menu.open && document.visibilityState === 'visible')
+    if (this.timer === undefined && !this.paused() && document.visibilityState === 'visible')
       this.timer = window.setInterval(() => this.apply({ type: 'tick' }), TICK_MS);
     if (!this.raf) this.raf = requestAnimationFrame((t) => this.frame(t));
   }
@@ -223,11 +244,46 @@ class LarmicMitwachsen extends HTMLElement {
   }
 
   private apply(cmd: Cmd) {
+    if (cmd.type === 'move' && performance.now() < this.sitUntil) return; // die müde Figur sitzt kurz
     const { state, events } = step(this.state, this.world, cmd);
     this.state = state;
     this.lift();
     if (events.length) this.react(events);
+    if (cmd.type === 'tick') this.ageTired();
     if (performance.now() - this.lastSave > SAVE_EVERY_MS) this.save();
+  }
+
+  // ---------- Müde werden ----------
+
+  /** Spielzeit fortschreiben (läuft im Takt, also nur bei sichtbarer Seite und geschlossenem Menü) */
+  private ageTired() {
+    const { tired, event } = advance(this.tired, Date.now(), !this.state.sleeping);
+    this.tired = tired;
+    if (event) this.getTired(event);
+    if (performance.now() - this.lastTiredSave > 5000) {
+      saveTired(this.store, this.tired);
+      this.lastTiredSave = performance.now();
+    }
+  }
+
+  /** Die Figur setzt sich kurz hin, gähnt und sagt es in einer Sprechblase */
+  private getTired(kind: TiredEvent) {
+    this.sitUntil = performance.now() + SIT_MS;
+    this.pace.clear();
+    this.sfx.yawn();
+    this.bubble.dataset.kind = kind;
+    this.bubble.querySelector('.mw-bubble-text')!.textContent = TIRED_TALK[kind];
+    this.bubble.hidden = false;
+    clearTimeout(this.bubbleTimer);
+    this.bubbleTimer = window.setTimeout(() => (this.bubble.hidden = true), kind === 'bed' ? 12_000 : 7_000);
+  }
+
+  private openInfo() {
+    this.pace.clear();
+    if (this.timer !== undefined) clearInterval(this.timer);
+    this.timer = undefined;
+    (document.activeElement as HTMLElement | null)?.blur();
+    this.info.showModal();
   }
 
   /** Nebel um die Figur lichten; geänderte Stücke baut die 3D-Ansicht neu */
@@ -246,8 +302,7 @@ class LarmicMitwachsen extends HTMLElement {
     document.addEventListener(
       'keydown',
       (e) => {
-        if (this.menu.open || e.metaKey || e.ctrlKey || e.altKey || FREE_KEYS.has(e.key) || /^F\d+$/.test(e.key))
-          return;
+        if (this.paused() || e.metaKey || e.ctrlKey || e.altKey || FREE_KEYS.has(e.key) || /^F\d+$/.test(e.key)) return;
         const t = e.target as HTMLElement | null;
         if (t?.closest('input, textarea, select')) return;
         // Buttons bleiben bedienbar (Enter, im Menü auch die Leertaste). Zurück und Zahnrad oben: Die Leertaste gehört
@@ -302,6 +357,33 @@ class LarmicMitwachsen extends HTMLElement {
       { signal },
     );
     this.menu.addEventListener('click', (e) => this.menuClick(e), { signal });
+    this.info.addEventListener(
+      'close',
+      () => {
+        try {
+          this.store.setItem(INFO_KEY, '1');
+        } catch {
+          /* dann kommt der Hinweis beim nächsten Mal wieder */
+        }
+        (document.activeElement as HTMLElement | null)?.blur();
+        this.start();
+      },
+      { signal },
+    );
+    this.info.addEventListener(
+      'click',
+      (e) => {
+        if ((e.target as HTMLElement).closest('[data-act="info-close"]')) this.info.close();
+      },
+      { signal },
+    );
+    this.bubble.addEventListener(
+      'click',
+      (e) => {
+        if ((e.target as HTMLElement).closest('[data-act="info"]')) this.openInfo();
+      },
+      { signal },
+    );
     this.menu.addEventListener('change', (e) => this.menuChange(e), { signal });
   }
 
@@ -409,6 +491,10 @@ class LarmicMitwachsen extends HTMLElement {
         case 'sleep':
           this.sfx.lullaby();
           this.nightSince = now;
+          // Ins Bett gebracht: Der Tag ist zu Ende, morgen ist die Figur wieder ausgeschlafen
+          this.tired = freshDay(Date.now());
+          this.sitUntil = 0;
+          this.bubble.hidden = true;
           persist = true;
           break;
         case 'wake':
@@ -484,7 +570,8 @@ class LarmicMitwachsen extends HTMLElement {
     for (const a of this.state.animals) targets.set(a.id, a);
     for (const id of this.bodies.keys()) if (!targets.has(id)) this.bodies.delete(id);
     for (const [id, t] of targets) {
-      const z = standHeight(this.world, this.state.openGates, t.x, t.y) ?? this.world.cell(t.x, t.y).h;
+      const ground = standHeight(this.world, this.state.openGates, t.x, t.y) ?? this.world.cell(t.x, t.y).h;
+      const z = id === 'player' && now < this.sitUntil ? ground - 0.35 : ground; // die müde Figur sitzt im Gras
       let b = this.bodies.get(id);
       if (!b || snap || Math.abs(b.x - t.x) + Math.abs(b.y - t.y) > 2.5) b = { x: t.x, y: t.y, z, hop: 0 };
       const dx = t.x - b.x,
@@ -513,7 +600,7 @@ class LarmicMitwachsen extends HTMLElement {
     if (!this.size.w) this.measure();
     if (!this.size.w) return;
     // Gehaltener Pfeil oder gemerkter Tipp: im ruhigen Takt weiterlaufen
-    const next = this.menu.open ? null : this.pace.poll(t);
+    const next = this.paused() ? null : this.pace.poll(t);
     if (next) this.apply({ type: 'move', dir: next });
     this.glide(dt, t);
 
@@ -561,6 +648,7 @@ class LarmicMitwachsen extends HTMLElement {
       bodies: this.bodies,
       gates: gates as Scene['gates'],
       night,
+      evening: this.state.sleeping ? 0 : evening(this.tired),
       floats,
       particles: this.particles,
       now: t,
@@ -718,6 +806,10 @@ class LarmicMitwachsen extends HTMLElement {
         break;
       case 'close':
         this.menu.close();
+        break;
+      case 'info':
+        this.menu.close();
+        this.openInfo();
         break;
     }
   }

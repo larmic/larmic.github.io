@@ -53,6 +53,7 @@ export type Scene = {
   bodies: Map<string, Body>; // Tiere nach Kennung, die Figur unter 'player'
   gates: Map<GateId, number>; // Öffnung 0…1 je Tor
   night: number; // 0 Tag … 1 Nacht
+  evening: number; // 0 Tag … 1 goldener Abend (die Figur wird müde)
   floats: Float[];
   particles: Particle[];
   now: number;
@@ -161,6 +162,7 @@ export class Renderer {
     const { ctx } = this;
     const z = sc.zoom;
     const followers = new Set(state.followers);
+    if (sc.evening > 0) this.eveningGlow(sc);
     for (const a of state.animals) {
       const b = sc.bodies.get(a.id);
       if (!b || !sc.explored(Math.round(b.x), Math.round(b.y))) continue; // im Nebel nichts verraten
@@ -726,6 +728,17 @@ export class Renderer {
       ctx.fillStyle = p.color;
       ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
     }
+  }
+
+  /** Goldener Abend: warmes Licht von oben, unten schwächer; Zeichen und Leiste liegen darüber und bleiben hell */
+  private eveningGlow(sc: Scene) {
+    const { ctx } = this;
+    const [r, g, b] = GAME_COLORS.evening;
+    const glow = ctx.createLinearGradient(0, 0, 0, sc.height);
+    glow.addColorStop(0, `rgba(${r},${g},${b},${(0.46 * sc.evening).toFixed(3)})`);
+    glow.addColorStop(1, `rgba(${r},${g},${b},${(0.2 * sc.evening).toFixed(3)})`);
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, sc.width, sc.height);
   }
 
   private nightSky(sc: Scene) {

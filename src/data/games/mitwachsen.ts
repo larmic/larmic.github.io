@@ -304,6 +304,7 @@ export const GAME_COLORS = {
   water: '#5aa6e8',
   waterLight: '#8cc6f0',
   night: 'rgba(14, 18, 44, 0.62)',
+  evening: [255, 140, 60] as const, // goldener Abend, wenn die Figur müde wird (RGB)
   star: '#fff7d6',
   fence: '#a0703f',
   fenceDark: '#7a5432',
@@ -320,4 +321,10 @@ export const GAME_COLORS = {
   ledge: 'rgba(29, 40, 56, 0.45)', // Kante, wo es eine Stufe hinuntergeht
   shade: 'rgba(0, 0, 0, 0.16)', // Schatten am Fuß einer höheren Stufe
   highlight: 'rgba(255, 255, 255, 0.35)', // Licht auf der Vorderkante
+} as const;
+
+/** Was die Figur sagt, wenn sie müde wird (Eltern lesen vor; die Bilder in der Sprechblase versteht das Kind selbst) */
+export const TIRED_TALK = {
+  yawn: 'Uaah … ich werde langsam müde.',
+  bed: 'Ich bin müde. Bringst du mich ins Bett?',
 } as const;

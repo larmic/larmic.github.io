@@ -1,0 +1,90 @@
+---
+// Hinweis für Eltern zur Bildschirmzeit: steht im Dialog des Spiels (beim ersten Öffnen und über Menü und Sprechblase)
+// und ohne JavaScript im Text der Seite. Quellen sind normale Links, geladen wird erst beim Klick.
+// Stand der Quellen: November 2026. Konzept: docs/games/mitwachsen.md
+interface Props {
+  headingId: string;
+}
+const { headingId } = Astro.props;
+---
+
+<h2 id={headingId}>Für Eltern: Wie viel Bildschirm?</h2>
+<dl class="mw-facts">
+  <dt>Unter 3 Jahren</dt>
+  <dd>Die Leitlinie der Kinder- und Jugendärzte rät, Kinder ganz von Bildschirmmedien fernzuhalten.</dd>
+  <dt>3 bis 6 Jahre</dt>
+  <dd>
+    Wer sein Kind an Bildschirmmedien heranführen möchte, gestattet das „höchstens 30 Minuten an einzelnen Tagen, und
+    nicht ohne Anwesenheit der Eltern“. Die WHO ist großzügiger: höchstens eine Stunde am Tag, weniger ist besser.
+  </dd>
+  <dt>Gemeinsam ist besser</dt>
+  <dd>
+    Studien finden bei gemeinsamem Schauen und Spielen eine bessere Sprachentwicklung als allein. Die Zusammenhänge sind
+    klein, und eine genaue Grenze lässt sich daraus nicht ablesen: Die 30 Minuten sind eine Empfehlung von Fachleuten.
+  </dd>
+</dl>
+<p>
+  <strong>So hilft Mitwachsen:</strong> Das Spiel ist ruhig, belohnt kein schnelles Drücken und ist zum gemeinsamen
+  Spielen gedacht. Nach 15 und 20 Minuten wird die Figur müde, nach 25 Minuten möchte sie ins Bett. Gesperrt wird
+  nichts. Wann Schluss ist, entscheiden die Eltern.
+</p>
+<p class="mw-sources">Quellen:</p>
+<ul class="mw-sources">
+  <li>
+    <a
+      href="https://register.awmf.org/assets/guidelines/027-075l_S2k_Praevention-dysregulierten-Bildschirmmediengebrauchs-Kinder-Jugendliche_2023-09-verlaengert.pdf"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      S2k-Leitlinie (AWMF 027-075)
+    </a>
+  </li>
+  <li>
+    <a
+      href="https://register.awmf.org/assets/guidelines/027_D_Ges_fuer_Kinderheilkunde_und_Jugendmedizin/027-075eltern_S2k_Praevention-dysregulierten-Bildschirmmediengebrauchs-Kinder-Jugendliche_2024-11.pdf"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Elternversion der Leitlinie
+    </a>
+  </li>
+  <li>
+    <a href="https://www.who.int/publications/i/item/9789241550536" target="_blank" rel="noopener noreferrer">
+      WHO-Empfehlung für Kinder unter 5
+    </a>
+  </li>
+  <li>
+    <a href="https://pubmed.ncbi.nlm.nih.gov/32202633/" target="_blank" rel="noopener noreferrer">
+      Madigan u. a. 2020 (Sprache und Bildschirm)
+    </a>
+  </li>
+</ul>
+
+<style>
+  h2 {
+    margin: 0 0 12px;
+    font-family: var(--font-pixel);
+  }
+  .mw-facts {
+    margin: 0;
+  }
+  dt {
+    margin-top: 12px;
+    font-weight: 800;
+  }
+  dd {
+    margin: 4px 0 0;
+  }
+  .mw-sources {
+    margin: 12px 0 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  ul.mw-sources {
+    margin-top: 4px;
+    padding-left: 20px;
+  }
+  .mw-sources a {
+    color: var(--ink);
+  }
+</style>

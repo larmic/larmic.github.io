@@ -89,6 +89,11 @@ export class Sfx {
   portal() {
     [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => this.note(f, 0.12, 'sine', 0.08, 1.02, i * 0.05));
   }
+  /** Gähnen: ein langer, sinkender Ton, leise darunter ein zweiter */
+  yawn() {
+    this.note(330, 0.9, 'sine', 0.07, 0.55);
+    this.note(247, 0.7, 'triangle', 0.04, 0.7, 0.35);
+  }
   wake() {
     [523.25, 659.25, 783.99].forEach((f, i) => this.note(f, 0.18, 'sine', 0.1, 1, i * 0.12));
   }
