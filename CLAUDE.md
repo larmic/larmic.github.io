@@ -7,7 +7,7 @@ Persönliche Website von Lars Michaelis (larmic.de) im Voxel-Stil „Inselwelt�
 ```bash
 npm run dev      # Entwicklungsserver auf http://localhost:4321
 npm run check    # Guard-Gate: Typen und Inhalts-Schemas prüfen – muss grün sein
-npm test         # Guard-Gate: Unit-Tests (Vitest) – muss grün sein
+npm test         # Guard-Gate: Unit-Tests (Vitest) mit Mindest-Abdeckung der reinen Module (vitest.config.ts) – muss grün sein
 npm run lint     # Guard-Gate: ESLint – muss grün sein
 npm run format   # Prettier; `npm run format:check` ist das Guard-Gate
 npm run arch     # Guard-Gate: Architekturregeln (dependency-cruiser) – muss grün sein

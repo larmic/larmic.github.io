@@ -20,7 +20,7 @@ Die Seite läuft dann unter http://localhost:4321 und lädt Änderungen sofort n
 | --- | --- |
 | `npm run dev` | Entwicklungsserver mit Live-Reload |
 | `npm run check` | Prüft Typen und Inhalts-Schemas. Läuft auch in der Pipeline als Guard-Gate |
-| `npm test` | Unit-Tests (Vitest) für Voxel-Generator und Logik. Ebenfalls Guard-Gate |
+| `npm test` | Unit-Tests (Vitest) für Voxel-Generator und Logik, mit Mindest-Abdeckung der reinen Module (Schwellen in `vitest.config.ts`). Ebenfalls Guard-Gate |
 | `npm run lint` | ESLint für TypeScript und Astro. Guard-Gate |
 | `npm run format` / `format:check` | Prettier formatiert bzw. prüft den Code. `format:check` ist Guard-Gate |
 | `npm run arch` | Architekturregeln (dependency-cruiser, `.dependency-cruiser.cjs`): Schichten `lib` → `data` → Oberfläche, Browser-Code ohne Build-Code. Guard-Gate |
@@ -103,7 +103,7 @@ Auf der Seite steht „KI mit Leitplanken“ – hier sind sie. Jeder Commit lä
 | Lint | typische Fehler in TypeScript und Astro | ESLint |
 | Architektur | Schichten: `lib` ist generisch, `data` kennt keine Oberfläche, Browser-Code bekommt keinen Build-Code, keine Zyklen | dependency-cruiser |
 | Typen und Inhalte | TypeScript strikt, Markdown-Inhalte gegen ihr Schema | astro check |
-| Unit-Tests | Zustandsmaschine der Figur (Spec: [docs/specs/insel.md](docs/specs/insel.md)), Geometrie der Insel, Kopf, Pixel-Raster, Regeln und Welt des Kinderspiels (Spec: [docs/specs/mitwachsen.md](docs/specs/mitwachsen.md)) | Vitest |
+| Unit-Tests | Zustandsmaschine der Figur (Spec: [docs/specs/insel.md](docs/specs/insel.md)), Geometrie der Insel, Kopf, Pixel-Raster, Regeln und Welt des Kinderspiels (Spec: [docs/specs/mitwachsen.md](docs/specs/mitwachsen.md)); die Abdeckung der reinen Module darf nicht sinken | Vitest, v8-Coverage |
 | Fertige Seite | gültiges HTML, keine toten internen Links und Sprungmarken, Homepage ohne Spiel und im JavaScript-Budget, keine externen Ressourcen ohne Klick, alte Adressen leiten weiter | html-validate, linkinator, Bundle-Gate, Seiten-Gate |
 | Im Browser | Insel und Seitenwechsel, Detailseiten, das Kinderspiel startet, alte Adressen führen weiter, keine Fehler in der Konsole | Playwright |
 
