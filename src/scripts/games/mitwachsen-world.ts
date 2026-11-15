@@ -160,6 +160,7 @@ const OBSTACLE_GAP = 2;
 
 export const GATE_HALF = 2; // Tor: Mitte ± 2 Felder
 export const TOWER = 2; // Türme links und rechts, je zwei Felder breit
+export const HOUSE_DEPTH = 2; // so viele Reihen hinter der Torreihe umschließt das Torhaus ganz
 const BAY_HALF = GATE_HALF + TOWER + 1; // Bucht vor dem Torhaus: so breit (Mitte ± 5), bis zur Lichtung frei
 const PORTAL_SIDE = GATE_HALF + TOWER + 2; // das Portal steht gleich neben dem Turm (Mitte ± 6), auf Höhe des Tors
 
@@ -316,7 +317,9 @@ function buildStart(
       let beyond = true;
       for (let u = -span; u <= span; u++) {
         const [x, y] = p.at(u, t);
-        if (Math.abs(u) > GATE_HALF) set(x, y, rock(ringHeight(1.1)));
+        // Hinter den Türmen steckt das Torhaus im Fels (3D: 2,5 Felder tief). Dort bleibt der Fels flach wie das Turmfeld,
+        // sonst stünden seine Wände genau in den Turmwänden und flackerten mit ihnen (Z-Fighting)
+        if (Math.abs(u) > GATE_HALF) set(x, y, rock(t <= p.depth + HOUSE_DEPTH ? 1 : ringHeight(1.1)));
         else set(x, y, passage(seed, p.id, x, y));
         if (!outside(x, y)) beyond = false;
       }

@@ -177,6 +177,8 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 
 In der 3D-Ansicht liegen in Torhäusern, Portalen und ihren Sockeln nie zwei Flächen deckungsgleich in einer Ebene; sonst flackern sie beim Bewegen (Z-Fighting, Rückmeldung: Grafikfehler am Regenbogen). *Test: „Torhäuser und Portale flackern nicht“ (`mitwachsen-gatehouse.test.ts`)*
 
+Auch zwischen Torhaus und Gelände nicht: Die zwei Reihen hinter den Türmen, die das Torhaus ganz umschließt, sind im Felsring so flach wie das Turmfeld; hohe Felsblöcke dort stellten ihre Wände genau in die inneren Turmwände (Rückmeldung: Torseiten flackern). *Test: „Torhaus und Felsring“ (`mitwachsen-world.test.ts`)*
+
 Schatten flimmern nicht beim Laufen: Die Schattenkamera folgt der Figur nur in ganzen Pixeln ihrer Schattenkarte (quer zum Licht eingerastet), und ein kleiner Versatz entlang der Flächen (`normalBias`) verhindert Streifen auf Wänden, die die Sonne schräg trifft (Rückmeldung: Flackern an den Seiten der Baumstämme). *Test: „Schatten rasten ein“ (`mitwachsen-geo.test.ts`)*
 
 ## Speichern

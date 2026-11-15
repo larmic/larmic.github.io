@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { DIRS } from '../../lib/games/front';
 import { GATES, HOME, REGIONS, type GateId } from '../../data/games/mitwachsen';
-import { canStep, createWorld, standHeight, wildAnimals, type Cell, type World } from './mitwachsen-world';
+import {
+  GATE_HALF,
+  HOUSE_DEPTH,
+  TOWER,
+  canStep,
+  createWorld,
+  standHeight,
+  wildAnimals,
+  type Cell,
+  type World,
+} from './mitwachsen-world';
 
 /** Alle Felder, die von `start` aus zu Fuß erreichbar sind (bis `limit` Felder) */
 function reachable(world: World, open: GateId[], start: readonly [number, number], limit = 30000) {
@@ -350,4 +360,24 @@ describe('Klangsteine', () => {
       }
     });
   }
+});
+
+describe('Torhaus und Felsring', () => {
+  /** Felder hinter den Türmen, die das Torhaus ganz umschließt: [quer zum Tor, Reihe hinter der Torreihe] */
+  const inside = Array.from({ length: HOUSE_DEPTH }, (_, i) => i + 1).flatMap((t) =>
+    Array.from({ length: TOWER }, (_, i) => GATE_HALF + 1 + i).flatMap((u) => [
+      [u, t],
+      [-u, t],
+    ]),
+  );
+
+  it('hinter den Türmen ragt kein Fels ins Torhaus (seine Wände lägen in den Turmwänden und flackerten)', () => {
+    for (const w of [1, 42, 2026].map(createWorld))
+      for (const g of w.gates.values()) {
+        const along = [g.out[1], -g.out[0]] as const; // quer zum Tor
+        const at = (u: number, t: number) =>
+          w.cell(g.mid[0] + along[0] * u + g.out[0] * t, g.mid[1] + along[1] * u + g.out[1] * t);
+        for (const [u, t] of inside) expect(at(u!, t!).h, `${w.seed} ${g.id} u=${u} t=${t}`).toBe(at(u!, 0).h);
+      }
+  });
 });
