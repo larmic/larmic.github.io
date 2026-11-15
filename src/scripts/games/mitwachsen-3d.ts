@@ -107,6 +107,7 @@ const GROUND_TILES: Record<Exclude<Cell['ground'], 'water' | 'lava' | 'sky'>, [T
 };
 const SKY = new Color('#9fd6f0');
 const NIGHT_SKY = new Color('#141a3a');
+const CLOUD_SKY = new Color('#a9b4bf'); // Himmel bei Wolken und Regen
 
 type Chunk = { meshes: Mesh[] };
 
@@ -344,9 +345,12 @@ export class World3D {
     this.sun.position.set(tx - 9, ty + 22, tz + 7);
     this.sun.target.position.set(tx, ty, tz);
     const day = 1 - sc.night * 0.75;
-    this.sun.intensity = 2.4 * day;
-    this.hemi.intensity = 1.35 * (1 - sc.night * 0.6);
-    const sky = SKY.clone().lerp(NIGHT_SKY, sc.night);
+    const cloud = sc.weather.cloud;
+    this.sun.intensity = 2.4 * day * (1 - 0.5 * cloud); // Wolken dämpfen die Sonne
+    this.hemi.intensity = 1.35 * (1 - sc.night * 0.6) * (1 - 0.15 * cloud);
+    const sky = SKY.clone()
+      .lerp(CLOUD_SKY, cloud * 0.75)
+      .lerp(NIGHT_SKY, sc.night);
     (this.scene.background as Color).copy(sky);
     this.fogUniforms.mwFogTint.value.copy(sky);
     fog.color.copy(sky);
@@ -636,6 +640,7 @@ export class World3D {
   private decoration(g: Geo, blades: Geo, canopy: Geo, bright: Geo, c: Cell, x: number, y: number) {
     const h = c.h;
     if (c.tufts) this.tufts(blades, x, y, h, c.tufts);
+    if (c.roof) this.shelter(g, x, y, h);
     switch (c.deco) {
       case 'tree':
         this.tree(g, canopy, x, y, h, c.tree ?? 'oak');
@@ -860,6 +865,39 @@ export class World3D {
   }
 
   /** Großes Tor im Felsen: Holzflügel mit Eisenbändern, oben ein Steinsturz; in der Mitte das Schloss */
+  /**
+   * Unterstand auf der Wiese, Feld für Feld: Pfosten an den Ecken, Balken vorn und hinten, ein leicht schräges
+   * Lattendach mit Lücken (hinten höher). Durch die Lücken sieht man die Tiere darunter auch von schräg oben.
+   */
+  private shelter(g: Geo, x: number, y: number, h: number) {
+    const { x0, y0, x1, y1 } = HOME.shelter;
+    const wood = '#8a5a30',
+      woodTop = '#a0703f',
+      straw = '#d9b85a',
+      strawTop = '#ecd27a';
+    const top = (yy: number) => h + 2.25 - (yy - y0) * 0.16; // Dachhöhe an der Stelle yy
+    for (const [cx, cy] of [
+      [x0, y0],
+      [x1, y0],
+      [x0, y1],
+      [x1, y1],
+    ])
+      if (x === cx && y === cy) {
+        const px = x === x0 ? x + 0.05 : x + 0.77,
+          pz = y === y0 ? y + 0.05 : y + 0.77;
+        g.box(px, h, pz, 0.18, top(pz) - h, 0.18, wood, woodTop, 'planks');
+      }
+    if (y === y0) g.box(x, top(y + 0.1) - 0.18, y + 0.05, 1, 0.16, 0.16, wood, woodTop, 'planks');
+    if (y === y1) g.box(x, top(y + 0.85) - 0.18, y + 0.79, 1, 0.16, 0.16, wood, woodTop, 'planks');
+    for (let k = 0; k < 2; k++) {
+      const sx = x + 0.1 + k * 0.5; // breite Lücken: Man sieht die Tiere darunter
+      for (let j = 0; j < 4; j++) {
+        const sz = y + j * 0.25;
+        g.box(sx, top(sz + 0.12), sz, 0.22, 0.07, 0.25, straw, strawTop);
+      }
+    }
+  }
+
   private fence(g: Geo, x: number, y: number, h: number) {
     const w = this.world!;
     const joins = (dx: number, dy: number) => {

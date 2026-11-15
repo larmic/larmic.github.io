@@ -111,6 +111,7 @@ export const HOME = {
   meadow: 6, // Radius der Wiese um das Bett
   food: [-4, 3] as Point, // Futtertrog
   water: [4, 3] as Point, // Wassertrog
+  shelter: { x0: -3, y0: -5, x1: 3, y1: -3 } as Rect, // Unterstand: Bei Regen gehen die Tiere der Wiese darunter
 };
 
 // ---------- Tiere ----------

@@ -91,6 +91,7 @@ export type Cell = {
   gate?: GateId; // Tor oder Brücke: begehbar, sobald offen
   sign?: GateId; // Tafel zu diesem Tor
   garden?: true; // Wiese ums Bett: Hier sind gefundene Tiere zu Hause
+  roof?: true; // unter dem Unterstand auf der Wiese
   tree?: TreeKind; // Baumart bei deco 'tree'
   tufts?: number; // Grasbüschel auf dem Feld (nur Zierde, begehbar)
   portal?: { id: GateId; side: 'gate' | 'home' }; // Portal (am Tor oder am Bett)
@@ -331,6 +332,9 @@ function buildStart(
     [HOME.water, 'watertrough'],
   ] as const)
     set(x, y, { ...grass('lichtung'), garden: true, deco, solid: true });
+  for (let y = HOME.shelter.y0; y <= HOME.shelter.y1; y++)
+    for (let x = HOME.shelter.x0; x <= HOME.shelter.x1; x++)
+      set(x, y, { ...grass('lichtung'), garden: true, roof: true });
   smooth(map);
 
   // Vom Torplatz ein freier Gang nach innen, bis er auf erreichbares Land trifft (Teiche, Bäume)

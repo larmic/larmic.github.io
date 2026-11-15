@@ -16,6 +16,7 @@ import {
   type SpeciesId,
 } from '../../data/games/mitwachsen';
 import { canStep, standHeight, wildAnimals, type World } from './mitwachsen-world';
+import { raining } from './mitwachsen-weather';
 
 export const SLEEP_LOCK = 30; // Takte nach dem Einschlafen, in denen Tasten nicht wecken (3 s)
 export const WAKE_GRACE = 15; // Takte nach dem Aufwachen, in denen das Bett nur ein Hindernis ist (1,5 s)
@@ -132,6 +133,20 @@ function random(s: State): number {
   const [v, next] = nextRandom(s.rng);
   s.rng = next;
   return v;
+}
+
+/** Plätze bei Regen: erst die Felder unter dem Unterstand, dann die nächsten Felder der Wiese, von der Mitte aus */
+const shelterCache = new WeakMap<World, [number, number][]>();
+function shelterSpots(world: World): [number, number][] {
+  let out = shelterCache.get(world);
+  if (!out) {
+    const { x0, y0, x1, y1 } = HOME.shelter;
+    const [cx, cy] = [(x0 + x1) / 2, (y0 + y1) / 2];
+    const near = (p: [number, number]) => (world.cell(p[0], p[1]).roof ? 0 : 1000) + Math.hypot(p[0] - cx, p[1] - cy);
+    out = [...meadowSpots(world)].sort((a, b) => near(a) - near(b));
+    shelterCache.set(world, out);
+  }
+  return out;
 }
 
 // ---------- Aufbau ----------
@@ -280,10 +295,20 @@ function tick(s: State, world: World, events: GameEvent[]) {
     }
   if (s.sleeping) return; // nachts ist es still
   syncWild(s, world);
+  // Regnet es, gehen die Tiere der Wiese unter den Unterstand: jedes an einen eigenen Platz darunter oder dicht daneben
+  const wet = raining(world.seed, s.day, s.tick);
+  const dry = wet ? shelterSpots(world) : [];
+  const homes = s.animals.filter((a) => a.mode === 'home');
   for (const a of s.animals) {
     if (a.mode === 'follow') continue;
-    // Gerade heimgekommen: Es läuft zu seinem Platz auf der Wiese
-    const arriving = a.mode === 'home' && Math.abs(a.x - a.spawn[0]) + Math.abs(a.y - a.spawn[1]) > 2;
+    const goal = wet && a.mode === 'home' ? dry[homes.indexOf(a) % dry.length] : a.spawn;
+    const gap = Math.abs(a.x - goal[0]) + Math.abs(a.y - goal[1]);
+    // Gerade heimgekommen oder Regen: Es läuft zu seinem Platz auf der Wiese bzw. unter dem Dach
+    const arriving = a.mode === 'home' && gap > (wet ? 0 : 2);
+    if (wet && a.mode === 'home' && !arriving) {
+      a.rest = Math.max(a.rest, 5); // bleibt im Trockenen
+      continue;
+    }
     // Steht die Figur daneben, bleibt das Tier stehen und schaut sie an
     if (!arriving && cheb(a.x, a.y, s.player.x, s.player.y) <= 1) {
       a.dir = dirTo(s.player.x - a.x, s.player.y - a.y);
@@ -300,7 +325,9 @@ function tick(s: State, world: World, events: GameEvent[]) {
     const away = !atHome(world, a.home, a.x, a.y);
     // zielstrebig heim (außerhalb des Zuhauses) oder zum eigenen Platz auf der Wiese, sonst zufällig
     const order =
-      away || arriving ? [...ALL_DIRS].sort((p, q) => dist(a, p) - dist(a, q)) : [ALL_DIRS[Math.floor(random(s) * 4)]];
+      away || arriving
+        ? [...ALL_DIRS].sort((p, q) => dist(a, p, goal) - dist(a, q, goal))
+        : [ALL_DIRS[Math.floor(random(s) * 4)]];
     for (const d of order) {
       const [dx, dy] = DIRS[d];
       const tx = a.x + dx,
@@ -319,7 +346,8 @@ function tick(s: State, world: World, events: GameEvent[]) {
   }
 }
 
-const dist = (a: Animal, d: Dir) => Math.abs(a.x + DIRS[d][0] - a.spawn[0]) + Math.abs(a.y + DIRS[d][1] - a.spawn[1]);
+const dist = (a: Animal, d: Dir, goal: readonly [number, number]) =>
+  Math.abs(a.x + DIRS[d][0] - goal[0]) + Math.abs(a.y + DIRS[d][1] - goal[1]);
 
 function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
   const p = s.player;

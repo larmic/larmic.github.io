@@ -29,6 +29,7 @@ import { drawMap } from './mitwachsen-map';
 import { Fog, REVEAL, START_REVEAL } from './mitwachsen-fog';
 import { initialState, progressOf, step, type Cmd, type GameEvent, type State } from './mitwachsen-state';
 import { createWorld, standHeight, type World } from './mitwachsen-world';
+import { weatherLook } from './mitwachsen-weather';
 import { advance, evening, freshDay, loadTired, saveTired, type Tired, type TiredEvent } from './mitwachsen-tired';
 
 const TICK_MS = 100; // Takt der Regeln
@@ -680,6 +681,7 @@ class LarmicMitwachsen extends HTMLElement {
       gates: gates as Scene['gates'],
       night,
       evening: this.state.sleeping ? 0 : evening(this.tired),
+      weather: weatherLook(this.world.seed, this.state.day, this.state.tick),
       floats,
       particles: this.particles,
       now: t,

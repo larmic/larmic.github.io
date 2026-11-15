@@ -28,6 +28,7 @@ import {
 import {
   GAME_COLORS,
   GATES,
+  HOME,
   REGIONS,
   SPECIES,
   THEME_COLORS,
@@ -39,6 +40,7 @@ import {
   type SpeciesId,
 } from '../../data/games/mitwachsen';
 import { grown } from './mitwachsen-growth';
+import type { WeatherLook } from './mitwachsen-weather';
 import type { State } from './mitwachsen-state';
 import { hash } from '../../lib/games/rng';
 import type { Cell, TreeKind, World } from './mitwachsen-world';
@@ -57,6 +59,7 @@ export type Scene = {
   gates: Map<GateId, number>; // Öffnung 0…1 je Tor
   night: number; // 0 Tag … 1 Nacht
   evening: number; // 0 Tag … 1 goldener Abend (die Figur wird müde)
+  weather: WeatherLook; // Wolken, Regen, Regenbogen (je 0 … 1)
   floats: Float[];
   particles: Particle[];
   now: number;
@@ -180,6 +183,7 @@ export class Renderer {
     const z = sc.zoom;
     const followers = new Set(state.followers);
     if (sc.evening > 0) this.eveningGlow(sc);
+    this.weather(sc);
     for (const a of state.animals) {
       const b = sc.bodies.get(a.id);
       if (!b || !sc.explored(Math.round(b.x), Math.round(b.y))) continue; // im Nebel nichts verraten
@@ -591,6 +595,24 @@ export class Renderer {
     const c = grown(world.seed, state.day, x, y, world.cell(x, y)); // mit allem, was schon nachgewachsen ist
     const { ctx } = this;
     const h = c.h;
+    if (c.roof) {
+      // Unterstand: Pfosten an den Ecken, darüber ein Lattendach mit Lücken
+      const { x0, y0, x1, y1 } = HOME.shelter;
+      if ((x === x0 || x === x1) && (y === y0 || y === y1))
+        box(
+          ctx,
+          P,
+          x === x0 ? x + 0.05 : x + 0.77,
+          y === y0 ? y + 0.05 : y + 0.77,
+          h,
+          0.18,
+          0.18,
+          2.1,
+          '#8a5a30',
+          '#a0703f',
+        );
+      for (let k = 0; k < 2; k++) box(ctx, P, x + 0.1 + k * 0.5, y, h + 2.1, 0.22, 1, 0.07, '#d9b85a', '#ecd27a');
+    }
     if (c.tufts) this.tufts(P, x, y, h, c.tufts);
     switch (c.deco) {
       case 'tree':
@@ -851,6 +873,51 @@ export class Renderer {
     for (const p of sc.particles) {
       ctx.fillStyle = p.color;
       ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
+    }
+  }
+
+  /**
+   * Wetter über der Welt: Wolken dämpfen das Licht grau, Regen fällt in feinen, schrägen Strichen (bei reduzierter
+   * Bewegung bleibt nur das graue Licht), nach dem Regen ein Regenbogen am Himmel.
+   */
+  private weather(sc: Scene) {
+    const { ctx } = this;
+    const { cloud, rain, rainbow } = sc.weather;
+    if (cloud > 0) {
+      ctx.fillStyle = `rgba(70,82,104,${(0.2 * cloud).toFixed(3)})`;
+      ctx.fillRect(0, 0, sc.width, sc.height);
+    }
+    if (rain > 0 && !sc.reduced) {
+      ctx.fillStyle = `rgba(214,230,255,${(0.6 * rain).toFixed(3)})`;
+      const n = Math.round(140 * rain);
+      const len = 14 * sc.zoom,
+        w = Math.max(1.5, 1.6 * sc.zoom);
+      for (let i = 0; i < n; i++) {
+        const speed = 0.7 + (hash(5, i) % 40) / 100;
+        const y = ((hash(6, i) % 1000) / 1000) * (sc.height + 60) + sc.now * speed;
+        const yy = (y % (sc.height + 60)) - 30;
+        const x = ((hash(7, i) % 1000) / 1000) * (sc.width + 80) - yy * 0.2;
+        for (let k = 0; k < len; k += w) ctx.fillRect(Math.round(x + k * 0.2), Math.round(yy + k), w, w);
+      }
+    }
+    if (rainbow > 0) {
+      // Regenbogen aus Pixelbögen oben rechts, halb durchsichtig
+      const bands = ['#e8504a', '#f39a3d', '#f2d14b', '#6dbd47', '#5aa6e8', '#8a6bd6'];
+      const cx = sc.width * 0.8,
+        cy = sc.height * 0.38,
+        r0 = Math.min(sc.width, sc.height) * 0.3;
+      const step = 6 * sc.zoom;
+      ctx.globalAlpha = 0.36 * rainbow;
+      bands.forEach((c, i) => {
+        ctx.fillStyle = c;
+        const r = r0 - i * step;
+        for (let a = Math.PI; a <= Math.PI * 2; a += 0.012) {
+          const px = Math.round((cx + Math.cos(a) * r) / step) * step,
+            py = Math.round((cy + Math.sin(a) * r) / step) * step;
+          ctx.fillRect(px, py, step, step);
+        }
+      });
+      ctx.globalAlpha = 1;
     }
   }
 

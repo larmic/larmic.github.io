@@ -150,6 +150,8 @@ Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzel
 
 ## Bett, Nacht und die Wiese
 
+- **Wetter:** Alle paar Minuten wechselt es zwischen Sonne, Wolken und sanftem Regen, nach dem Regen kommt ein Regenbogen. Kein Gewitter, nichts Unheimliches. Jeder Tag beginnt mit Sonne.
+- **Unterstand:** Auf der Wiese steht ein kleiner Unterstand mit Lattendach. Regnet es, laufen die Tiere darunter und drängen sich zusammen; scheint die Sonne wieder, gehen sie zurück an ihre Plätze.
 - **Die Wiese wächst:** Jedes Schlafen ist ein neuer Tag. Mit jedem Tag blühen mehr Blumen auf der Lichtung, und Pilze sprießen. So sieht dein Kind, dass Zeit vergeht.
 - **Wiese ums Bett:** offen, ohne Zaun, mit Futtertrog (Heu und Möhren) und Wassertrog. Hier wohnen die gefundenen Tiere.
 - **Bett:** Ins Bett laufen → die Figur legt sich hin (direkt nach dem Aufwachen noch nicht, damit sie nicht aus Versehen wieder einschläft), der Himmel wird dunkel, Sterne gehen auf, eine leise Melodie spielt, es wird gespeichert.

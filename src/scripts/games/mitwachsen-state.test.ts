@@ -16,6 +16,7 @@ import {
   type State,
 } from './mitwachsen-state';
 import { createWorld, standHeight, type Cell, type World } from './mitwachsen-world';
+import { BLOCK, raining } from './mitwachsen-weather';
 
 /** Kleine Testwelt: überall flaches Gras des Zuhauses, einzelne Felder überschreibbar */
 function fakeWorld(cells: Record<string, Partial<Cell>> = {}): World {
@@ -337,6 +338,27 @@ describe('Tiere an wechselnden Stellen', () => {
     const later = s.animals.find((a) => a.id === 'lichtung:hase')!;
     expect(later.mode).toBe('home');
     expect(world.cell(later.x, later.y).garden).toBe(hase.mode === 'home' ? true : undefined);
+  });
+});
+
+describe('Unterstand bei Regen', () => {
+  it('regnet es, gehen die Tiere der Wiese unter den Unterstand; danach zurück an ihre Plätze', () => {
+    const world = createWorld(1);
+    const garden = Array.from({ length: 6 }, (_, i) => ({ id: `wild:7:7:${i}`, species: 'hase' as const }));
+    let s: State = { ...initialState(world, { garden }), sleeping: false, player: { x: 0, y: 3, dir: 's' } };
+    let rain = 1;
+    while (!raining(world.seed, s.day, rain * BLOCK)) rain++;
+    s = { ...s, tick: rain * BLOCK };
+    for (let i = 0; i < 400; i++) s = run(s, world, TICK).s;
+    const home = () => s.animals.filter((a) => a.mode === 'home');
+    for (const a of home()) expect(world.cell(a.x, a.y).roof, `${a.id} ${a.x},${a.y}`).toBe(true);
+    let sun = rain + 1;
+    while (raining(world.seed, s.day, sun * BLOCK)) sun++;
+    s = { ...s, tick: sun * BLOCK };
+    for (let i = 0; i < 600; i++) s = run(s, world, TICK).s;
+    for (const a of home())
+      expect(Math.abs(a.x - a.spawn[0]) + Math.abs(a.y - a.spawn[1]), a.id).toBeLessThanOrEqual(4);
+    for (const a of home()) expect(world.cell(a.x, a.y).garden).toBe(true);
   });
 });
 

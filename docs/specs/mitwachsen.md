@@ -94,6 +94,17 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 
 Die Regeln kennen den Nebel nicht: Er betrifft nur, was gezeichnet wird.
 
+## Wetter und Unterstand
+
+Rein in `mitwachsen-weather.ts`: Das Wetter folgt aus Seed, Tag (`state.day`) und Spielzeit (`state.tick`), gleiche Werte ergeben gleiches Wetter.
+
+| Regel | Test |
+| --- | --- |
+| Alle 5 Minuten Spielzeit (3000 Takte) ein neues Wetter: Sonne 50 %, Wolken 25 %, Regen 25 %; jeder Tag beginnt mit Sonne | „jeder Tag beginnt mit Sonne …“ |
+| Weicher Übergang über 20 s; nach dem Regen 1,5 Minuten Regenbogen | „wechselt weich …“, „nach dem Regen steht eine Weile ein Regenbogen …“ |
+| Regnet es, gehen die Tiere der Wiese unter den Unterstand (7 × 3 Felder oben auf der Wiese, `HOME.shelter`, `cell.roof`): jedes an einen eigenen Platz darunter oder, wenn er voll ist, dicht daneben, und bleibt dort; danach zurück an ihre Plätze. Sie verlassen die Wiese dabei nie | „Unterstand bei Regen“ |
+| Bild: Wolken dämpfen Sonne und Himmel, Regen fällt in feinen schrägen Strichen (nicht bei reduzierter Bewegung), der Regenbogen steht als Pixelbogen oben rechts. Der Unterstand hat Pfosten und ein Lattendach mit Lücken, damit man die Tiere darunter sieht | (Zeichnen) |
+
 ## Nachwachsen
 
 Rein in `mitwachsen-growth.ts`. Jedes Schlafen zählt einen Tag (`state.day`, gespeichert als `day`). Nur Zierde, die Regeln ändern sich nicht.
