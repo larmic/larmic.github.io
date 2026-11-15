@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Dir } from '../../lib/games/front';
-import { ACTION_MS, InputPace, STEP_MS } from './input-pace';
+import { ACTION_MS, HOLD_MS, InputPace, STEP_MS } from './input-pace';
 
 /** Simuliert `ms` Millisekunden mit einem Bild alle 16 ms und zählt die Schritte */
 function steps(pace: InputPace, from: number, ms: number, taps: number[] = [], dir: Dir = 'e') {
@@ -20,13 +20,21 @@ describe('Ruhiger Takt der Eingabe', () => {
     expect(new InputPace().press('e', 0)).toBe('e');
   });
 
-  it('Halten läuft gleichmäßig im Takt, ohne Stocken nach dem ersten Schritt', () => {
+  it('ein Druck ist genau ein Schritt, auch wenn der Finger etwas länger liegt', () => {
+    const pace = new InputPace();
+    expect(pace.press('e', 0)).toBe('e');
+    expect(steps(pace, 0, HOLD_MS - 20)).toEqual([]);
+    pace.release('e');
+    expect(steps(pace, HOLD_MS - 20, 2000)).toEqual([]);
+  });
+
+  it('wer hält, läuft nach der Wartezeit gleichmäßig im Takt weiter', () => {
     const pace = new InputPace();
     pace.press('e', 0);
     const times = steps(pace, 0, 2000);
-    expect(times[0]).toBeLessThanOrEqual(STEP_MS + 16);
+    expect(times[0]).toBeGreaterThanOrEqual(HOLD_MS);
+    expect(times[0]).toBeLessThanOrEqual(HOLD_MS + 16);
     for (let i = 1; i < times.length; i++) expect(times[i] - times[i - 1]).toBeLessThan(STEP_MS + 17);
-    expect(times.length + 1).toBe(Math.floor(2000 / STEP_MS) + 1);
   });
 
   it('wildes Tippen ist nicht schneller als Halten', () => {
@@ -36,7 +44,7 @@ describe('Ruhiger Takt der Eingabe', () => {
     const tapper = new InputPace();
     const taps = Array.from({ length: 60 }, (_, i) => i * 50); // 20 Tipps pro Sekunde
     const tapping = steps(tapper, 0, 3000, taps).length;
-    expect(tapping).toBeLessThanOrEqual(holding);
+    expect(tapping).toBeLessThanOrEqual(holding + 1); // höchstens der eine Schritt der Wartezeit
   });
 
   it('merkt sich einen Tipp während eines Schritts, aber nur einen', () => {
@@ -56,9 +64,9 @@ describe('Ruhiger Takt der Eingabe', () => {
     const pace = new InputPace();
     pace.press('e', 0);
     pace.press('n', 10);
-    expect(pace.poll(STEP_MS)).toBe('n');
+    expect(pace.poll(10 + HOLD_MS)).toBe('n');
     pace.release('n');
-    expect(pace.poll(2 * STEP_MS)).toBe('e');
+    expect(pace.poll(10 + HOLD_MS + STEP_MS)).toBe('e');
   });
 
   it('nach clear läuft nichts weiter', () => {

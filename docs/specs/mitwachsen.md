@@ -36,7 +36,7 @@ Bei Änderungen am Verhalten Spec und Tests mitziehen.
 
 | Befehl | Auslöser | Wirkung |
 | --- | --- | --- |
-| `move(dir)` | Pfeiltaste im ruhigen Takt: höchstens ein Schritt alle 260 ms, ob getippt oder gehalten. Halten läuft ab dem ersten Schritt gleichmäßig; ein Tipp während eines Schritts wird gemerkt (höchstens einer). *Tests: `input-pace.test.ts`* | Schritt, Hineinlaufen oder Wand, siehe Regeln |
+| `move(dir)` | Pfeiltaste im ruhigen Takt: höchstens ein Schritt alle 260 ms, ob getippt oder gehalten. Ein Druck ist genau ein Schritt, auch wenn der Finger etwas länger liegt; erst wer 450 ms hält, läuft gleichmäßig weiter (Spieltest am Tablet). Ein Tipp während eines Schritts wird gemerkt (höchstens einer). Bei einer Begegnung (Tier gefunden oder angestoßen, Beeren, Füttern, Portal) bleibt die Figur stehen, bis der Pfeil neu gedrückt wird; sonst tauschte sie mit gehaltenem Pfeil gleich den Platz mit dem neuen Tier. *Tests: `input-pace.test.ts`* | Schritt, Hineinlaufen oder Wand, siehe Regeln |
 | `action` | Ab 3 an keine Taste gebunden (erster Spieltest: Leertaste war zu viel; die Leertaste tut nichts, auch kein Touch-Knopf). Der Befehl bleibt in den Regeln für spätere Altersstufen | Singen und Folgen, Schlafen oder Rufen |
 | `tick` | Takt, solange Seite sichtbar und Menü zu | Tiere laufen umher, Tiere der Landschaft tauchen auf und verschwinden |
 

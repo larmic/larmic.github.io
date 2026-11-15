@@ -451,6 +451,10 @@ class LarmicMitwachsen extends HTMLElement {
   private react(events: GameEvent[]) {
     const now = performance.now();
     let persist = false;
+    // Begegnung (Tier gefunden oder getroffen, Beeren, Füttern, Portal): Die Figur bleibt stehen, bis der Pfeil neu
+    // gedrückt wird. Sonst liefe sie mit gehaltenem Pfeil gleich weiter und tauschte den Platz mit dem neuen Tier.
+    if (events.some((e) => ['sing', 'follow', 'pick', 'feed', 'portal', 'teleport'].includes(e.type)))
+      this.pace.clear();
     for (const e of events) {
       switch (e.type) {
         case 'step':
