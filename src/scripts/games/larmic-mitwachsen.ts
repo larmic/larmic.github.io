@@ -458,7 +458,8 @@ class LarmicMitwachsen extends HTMLElement {
     for (const e of events) {
       switch (e.type) {
         case 'step':
-          this.sfx.step(e.climb);
+        case 'swap':
+          this.sfx.step(e.type === 'step' ? e.climb : 0);
           break;
         case 'bump':
           this.sfx.bump();
@@ -478,8 +479,10 @@ class LarmicMitwachsen extends HTMLElement {
         case 'follow':
           this.float('heart', e.id, GAME_COLORS.heart, now + 150);
           break;
-        case 'swap':
-          this.sfx.step();
+        case 'aside':
+          // Ein Tier der Wiese hüpft zur Seite und ruft kurz – die Figur geht weiter, ohne anzuhalten
+          this.sfx.play(SPECIES[e.species].tone);
+          this.hops.set(e.id, now);
           break;
         case 'home':
           // Zu Hause angekommen: Das Tier ruft seinen eigenen Ton, dazu ein heller Klang und ein Herz

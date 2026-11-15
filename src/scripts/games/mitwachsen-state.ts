@@ -21,7 +21,6 @@ import { raining } from './mitwachsen-weather';
 export const SLEEP_LOCK = 30; // Takte nach dem Einschlafen, in denen Tasten nicht wecken (3 s)
 export const WAKE_GRACE = 15; // Takte nach dem Aufwachen, in denen das Bett nur ein Hindernis ist (1,5 s)
 export const BERRY_REGROW = 300; // Takte, bis an einem Busch neue Beeren hängen (30 s)
-export const SWAP_WINDOW = 15; // Takte, in denen zweimal Hineinlaufen den Platz tauscht (1,5 s)
 export const WILD_RADIUS = 1; // Stücke um die Figur, in denen Tiere der Landschaft unterwegs sind
 export const WILD_KEEP = 2; // ab diesem Abstand verschwinden sie wieder (und tauchen später an ihrem Platz auf)
 
@@ -52,7 +51,6 @@ export type State = {
   garden: HomeAnimal[];
   openGates: GateId[];
   portals: GateId[]; // aktivierte Portale (je Tor eines, mit Partner über dem Bett)
-  lastBump: { id: string; tick: number } | null;
   picked: Record<string, number>; // Büsche ohne Beeren: "x,y" → Takt des Pflückens (nicht gespeichert)
   day: number; // Tage, die die Welt schon erlebt hat (jedes Schlafen zählt einen); Blumen wachsen damit
   dayStart: number; // Takt, an dem der heutige Tag begann (Aufwachen): Das Wetter zählt ab hier, jeder Tag beginnt mit Sonne
@@ -76,6 +74,7 @@ export type GameEvent =
   | { type: 'sing'; id: string; species: SpeciesId; first: boolean }
   | { type: 'follow'; id: string }
   | { type: 'swap'; id: string }
+  | { type: 'aside'; id: string; species: SpeciesId } // ein Tier der Wiese macht der Figur Platz
   | { type: 'home'; id: string; species: SpeciesId } // auf der Wiese angekommen
   | { type: 'gate'; id: GateId }
   | { type: 'portal'; id: GateId } // Portal am Tor aktiviert
@@ -129,6 +128,15 @@ function atHome(world: World, home: Home, x: number, y: number): boolean {
 const occupied = (s: State, x: number, y: number, except?: string) =>
   (!s.sleeping && s.player.x === x && s.player.y === y) ||
   s.animals.some((a) => a.id !== except && a.x === x && a.y === y);
+
+/**
+ * Darf ein Tier einen Schritt nach (tx, ty) gehen? Es bleibt in seinem Zuhause; wer draußen steht (`away`), zieht heim,
+ * ein Tier der Wiese dabei nur über die Wiese.
+ */
+function mayWalk(s: State, world: World, a: Animal, away: boolean, tx: number, ty: number): boolean {
+  const allowed = away ? a.home.kind !== 'garden' || world.cell(tx, ty).garden === true : atHome(world, a.home, tx, ty);
+  return allowed && canStep(world, s.openGates, a.x, a.y, tx, ty) && !occupied(s, tx, ty);
+}
 
 function random(s: State): number {
   const [v, next] = nextRandom(s.rng);
@@ -220,7 +228,6 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     garden: [...garden],
     openGates: (saved.openGates ?? []).filter((id) => !GATES.find((g) => g.id === id)?.locked),
     portals: (saved.portals ?? []).filter((id) => world.portals.has(id)),
-    lastBump: null,
     picked: {},
     basket: false,
     day: saved.day ?? 0,
@@ -339,17 +346,52 @@ function tick(s: State, world: World, events: GameEvent[]) {
       const tx = a.x + dx,
         ty = a.y + dy;
       a.dir = d;
-      if (
-        (away || atHome(world, a.home, tx, ty)) &&
-        canStep(world, s.openGates, a.x, a.y, tx, ty) &&
-        !occupied(s, tx, ty)
-      ) {
-        a.x = tx;
-        a.y = ty;
+      if (mayWalk(s, world, a, away, tx, ty)) {
+        [a.x, a.y] = [tx, ty];
         break;
       }
     }
   }
+}
+
+/**
+ * Die Figur läuft in ein Tier, das ihr folgt oder auf der Wiese wohnt. Ein folgendes Tier tauscht den Platz (umdrehen
+ * geht immer). Eines auf der Wiese macht Platz: Es hüpft zur Seite und die Figur geht weiter – so kommt sie auch durch
+ * eine volle Wiese. Ist seitlich nichts frei, tauschen beide. Liefert true, wenn der Zug damit erledigt ist.
+ */
+function meetAnimal(s: State, world: World, animal: Animal, dir: Dir, events: GameEvent[]): boolean {
+  const p = s.player;
+  const climbable = canStep(world, s.openGates, p.x, p.y, animal.x, animal.y);
+  const aside = climbable && animal.mode === 'home' ? asideCell(s, world, animal, dir) : null;
+  if (aside) {
+    [animal.x, animal.y] = aside;
+    animal.dir = dirTo(p.x + DIRS[dir][0] - aside[0], p.y + DIRS[dir][1] - aside[1]); // schaut zur Figur
+    animal.rest = Math.max(animal.rest, 8); // bleibt kurz, wo es ist, statt gleich zurückzulaufen
+    events.push({ type: 'aside', id: animal.id, species: animal.species });
+    return false; // die Figur geht auf das frei gewordene Feld
+  }
+  if (climbable && (animal.mode === 'follow' || atHome(world, animal.home, p.x, p.y))) {
+    const [dx, dy] = DIRS[dir];
+    [animal.x, animal.y] = [p.x, p.y];
+    animal.dir = dirTo(-dx, -dy);
+    [p.x, p.y] = [p.x + dx, p.y + dy];
+    events.push({ type: 'swap', id: animal.id });
+    bringHome(s, world, events);
+    return true;
+  }
+  sing(s, animal, false, events);
+  return true;
+}
+
+/** Freies Feld neben einem Tier der Wiese, auf das es ausweichen kann: lieber seitlich als weiter geradeaus */
+function asideCell(s: State, world: World, a: Animal, dir: Dir): [number, number] | null {
+  const sides: Dir[] = dir === 'e' || dir === 'w' ? ['n', 's'] : ['e', 'w'];
+  if (random(s) < 0.5) sides.reverse();
+  for (const d of [...sides, dir]) {
+    const [tx, ty] = [a.x + DIRS[d][0], a.y + DIRS[d][1]];
+    if (mayWalk(s, world, a, false, tx, ty)) return [tx, ty];
+  }
+  return null;
 }
 
 const dist = (a: Animal, d: Dir, goal: readonly [number, number]) =>
@@ -365,30 +407,9 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
   const animal = s.animals.find((a) => a.x === tx && a.y === ty);
   if (animal?.mode === 'wander') {
     // Hineinlaufen reicht: Das Tier singt, freut sich und folgt (die Aktionstaste braucht es dafür nicht)
-    s.lastBump = null;
     return sing(s, animal, true, events);
   }
-  if (animal) {
-    const again = s.lastBump?.id === animal.id && s.tick - s.lastBump.tick <= SWAP_WINDOW;
-    const climbable = canStep(world, s.openGates, p.x, p.y, tx, ty);
-    if (climbable && (animal.mode === 'follow' || (again && world.cell(p.x, p.y).garden === true))) {
-      // Ein folgendes Tier tauscht sofort den Platz (umdrehen geht immer), eines auf der Wiese erst beim zweiten Mal
-      animal.x = p.x;
-      animal.y = p.y;
-      animal.dir = dirTo(-dx, -dy);
-      p.x = tx;
-      p.y = ty;
-      s.lastBump = null;
-      events.push({ type: 'swap', id: animal.id });
-      bringHome(s, world, events);
-      return;
-    }
-    if (s.animals.some((a) => a.x === tx && a.y === ty)) {
-      s.lastBump = { id: animal.id, tick: s.tick };
-      sing(s, animal, false, events);
-      return;
-    }
-  }
+  if (animal && meetAnimal(s, world, animal, dir, events)) return;
   // In einen Busch laufen: Die Figur pflückt die Beeren (sie wachsen nach); ohne Beeren ist er nur ein Hindernis
   if (world.cell(tx, ty).deco === 'bush' && !(`${tx},${ty}` in s.picked)) {
     s.picked[`${tx},${ty}`] = s.tick;
@@ -478,7 +499,6 @@ function portal(s: State, world: World, x: number, y: number, events: GameEvent[
   s.player.x = spot[0];
   s.player.y = spot[1];
   s.player.dir = 's';
-  s.lastBump = null;
   // Folgende Tiere reisen mit und stellen sich nah hinter die Figur
   for (const id of s.followers) {
     const a = s.animals.find((t) => t.id === id)!;
@@ -541,7 +561,6 @@ function sleep(s: State, world: World, events: GameEvent[]) {
   s.sleeping = true;
   s.day++; // über Nacht wächst die Wiese
   s.sleptAt = s.tick;
-  s.lastBump = null;
   // Folgende Tiere gehen heim: Tiere der Gegenden an ihren Platz, Tiere der Landschaft tauchen dort später wieder auf
   for (const id of s.followers) {
     const a = s.animals.find((x) => x.id === id)!;

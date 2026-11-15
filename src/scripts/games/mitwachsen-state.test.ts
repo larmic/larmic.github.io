@@ -4,7 +4,6 @@ import { HOME, animalId } from '../../data/games/mitwachsen';
 import {
   SLEEP_LOCK,
   BERRY_REGROW,
-  SWAP_WINDOW,
   WAKE_GRACE,
   initialState,
   progressOf,
@@ -207,17 +206,58 @@ describe('Tiere', () => {
     expect(r.s.followers).toEqual(['a']);
   });
 
-  it('ein Tier im Garten tauscht erst beim zweiten Mal kurz hintereinander, nach Ablauf der Zeit singt es wieder', () => {
-    const w = fakeWorld({ '0,0': { garden: true }, '1,0': { garden: true } });
-    const inGarden = () => [animal('a', 1, 0, { mode: 'home', home: { kind: 'garden' } })];
-    let r = run(awake(w, 0, 0, inGarden()), w, 'e');
-    expect(types(r.events)).toEqual(['sing']);
-    expect(r.s.followers).toEqual([]);
-    r = run(r.s, w, 'e');
+  /** Wiese (Garten) auf allen Feldern des Rechtecks */
+  const meadow = (x0: number, y0: number, x1: number, y1: number) => {
+    const cells: Record<string, Partial<Cell>> = {};
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) cells[`${x},${y}`] = { garden: true };
+    return fakeWorld(cells);
+  };
+  const resident = (id: string, x: number, y: number) => animal(id, x, y, { mode: 'home', home: { kind: 'garden' } });
+
+  it('ein Tier auf der Wiese macht Platz: Es hüpft zur Seite und schaut, die Figur geht im selben Zug weiter', () => {
+    const w = meadow(-2, -2, 2, 2);
+    const r = run(awake(w, 0, 0, [resident('a', 1, 0)]), w, 'e');
+    expect(types(r.events)).toEqual(['aside', 'step']);
+    expect([r.s.player.x, r.s.player.y]).toEqual([1, 0]);
+    const a = r.s.animals[0]!;
+    expect(a.x === 1 && Math.abs(a.y) === 1, `seitlich: ${a.x},${a.y}`).toBe(true);
+    expect(a.dir).toBe(a.y > 0 ? 'n' : 's'); // schaut zur Figur
+  });
+
+  it('ist seitlich nichts frei, weicht es geradeaus aus; geht gar nichts, tauschen beide den Platz', () => {
+    let w = meadow(0, 0, 2, 0); // eine Reihe
+    let r = run(awake(w, 0, 0, [resident('a', 1, 0)]), w, 'e');
+    expect(types(r.events)).toEqual(['aside', 'step']);
+    expect(r.s.animals[0]!.x).toBe(2);
+    w = meadow(0, 0, 1, 0);
+    r = run(awake(w, 0, 0, [resident('a', 1, 0)]), w, 'e');
     expect(types(r.events)).toEqual(['swap']);
-    let s = run(awake(w, 0, 0, inGarden()), w, 'e').s;
-    for (let i = 0; i <= SWAP_WINDOW; i++) s = run(s, w, TICK).s;
-    expect(types(run(s, w, 'e').events)).toEqual(['sing']);
+    expect([r.s.player.x, r.s.animals[0]!.x]).toEqual([1, 0]);
+  });
+
+  it('kommt durch eine volle Wiese, ohne anzuhalten; kein Tier steht auf einem anderen oder auf der Figur', () => {
+    const w = meadow(0, -2, 7, 2);
+    const herd: Animal[] = [];
+    for (let x = 1; x <= 6; x++) {
+      herd.push(resident(`m${x}`, x, 0));
+      if (x % 2 === 0) herd.push(resident(`n${x}`, x, -1), resident(`s${x}`, x, 1));
+    }
+    let s = awake(w, 0, 0, herd);
+    for (let i = 0; i < 7; i++) {
+      const r = run(s, w, 'e');
+      expect(types(r.events), `Schritt ${i + 1}`).not.toContain('sing');
+      s = r.s;
+    }
+    expect(s.player.x).toBe(7);
+    const cells = [...s.animals.map((a) => `${a.x},${a.y}`), `${s.player.x},${s.player.y}`];
+    expect(new Set(cells).size).toBe(cells.length);
+  });
+
+  it('ein Tier auf der Wiese, das nicht ausweichen kann und nicht tauschen darf, singt nur', () => {
+    const w = fakeWorld({ '1,0': { garden: true } }); // die Figur steht nicht auf der Wiese
+    const r = run(awake(w, 0, 0, [resident('a', 1, 0)]), w, 'e');
+    expect(types(r.events)).toEqual(['sing']);
+    expect(r.s.player.x).toBe(0);
   });
 
   it('läuft im Gänsemarsch: Jedes Tier rückt auf den Platz seines Vordermanns', () => {
@@ -450,10 +490,10 @@ describe('Wiese ums Bett', () => {
     expect(r.s.followers).toEqual([]);
   });
 
-  it('Tiere auf der Wiese singen beim Hineinlaufen, folgen aber nicht', () => {
+  it('Tiere auf der Wiese folgen nicht, wenn die Figur hineinläuft', () => {
     const w = fakeWorld({ '1,0': { garden: true }, '0,0': { garden: true } });
     const r = run(awake(w, 0, 0, [animal('a', 1, 0, { mode: 'home', home: { kind: 'garden' } })]), w, 'e');
-    expect(types(r.events)).toEqual(['sing']);
+    expect(types(r.events)).toEqual(['swap']); // kein Platz zum Ausweichen: Sie tauschen
     expect(r.s.followers).toEqual([]);
   });
 
