@@ -165,23 +165,38 @@ describe('Tiere', () => {
     expect(types(r.events)).toEqual(['sing', 'follow']);
   });
 
-  it('Hineinlaufen lässt singen ohne Folgen; zweimal kurz hintereinander tauscht den Platz', () => {
+  it('Hineinlaufen reicht: Das Tier singt, ist gefunden und folgt; die Figur bleibt stehen', () => {
     const w = fakeWorld();
-    let r = run(awake(w, 0, 0, [animal('a', 1, 0)]), w, 'e');
-    expect(types(r.events)).toEqual(['sing']);
-    expect(r.s.followers).toEqual([]);
+    const r = run(awake(w, 0, 0, [animal('a', 1, 0)]), w, 'e');
+    expect(r.events).toEqual([
+      { type: 'sing', id: 'a', species: 'hase', first: true },
+      { type: 'follow', id: 'a' },
+    ]);
+    expect(r.s.met).toEqual(['a']);
+    expect(r.s.followers).toEqual(['a']);
     expect(r.s.player.x).toBe(0);
-    r = run(r.s, w, 'e');
-    expect(types(r.events)).toEqual(['swap']);
-    expect([r.s.player.x, r.s.animals[0].x]).toEqual([1, 0]);
   });
 
-  it('tauscht nach Ablauf der Zeit nicht mehr, sondern singt wieder', () => {
+  it('in ein folgendes Tier hineinlaufen tauscht sofort den Platz', () => {
     const w = fakeWorld();
-    let s = run(awake(w, 0, 0, [animal('a', 1, 0)]), w, 'e').s;
-    for (let i = 0; i <= SWAP_WINDOW; i++) s = run(s, w, TICK).s;
+    const s = run(awake(w, 0, 0, [animal('a', 1, 0)]), w, 'e').s; // folgt jetzt
     const r = run(s, w, 'e');
+    expect(types(r.events)).toEqual(['swap']);
+    expect([r.s.player.x, r.s.animals[0].x]).toEqual([1, 0]);
+    expect(r.s.followers).toEqual(['a']);
+  });
+
+  it('ein Tier im Garten tauscht erst beim zweiten Mal kurz hintereinander, nach Ablauf der Zeit singt es wieder', () => {
+    const w = fakeWorld({ '0,0': { garden: true }, '1,0': { garden: true } });
+    const inGarden = () => [animal('a', 1, 0, { mode: 'home', home: { kind: 'garden' } })];
+    let r = run(awake(w, 0, 0, inGarden()), w, 'e');
     expect(types(r.events)).toEqual(['sing']);
+    expect(r.s.followers).toEqual([]);
+    r = run(r.s, w, 'e');
+    expect(types(r.events)).toEqual(['swap']);
+    let s = run(awake(w, 0, 0, inGarden()), w, 'e').s;
+    for (let i = 0; i <= SWAP_WINDOW; i++) s = run(s, w, TICK).s;
+    expect(types(run(s, w, 'e').events)).toEqual(['sing']);
   });
 
   it('läuft im Gänsemarsch: Jedes Tier rückt auf den Platz seines Vordermanns', () => {
@@ -361,8 +376,7 @@ describe('Randfälle aus der Prüfung', () => {
     const [gx, gy] = HOME.gardenGate;
     let s = awake(world, gx, gy - 1, [animal('lichtung:hase', gx, gy, { mode: 'follow' })]);
     s = { ...s, followers: ['lichtung:hase'] };
-    s = run(s, world, 's').s; // singt
-    const r = run(s, world, 's'); // tauscht: Hase steht jetzt im Garten
+    const r = run(s, world, 's'); // tauscht sofort: Hase steht jetzt im Garten
     expect(r.events).toContainEqual({ type: 'home', id: 'lichtung:hase' });
     expect(r.s.followers).toEqual([]);
     expect(r.s.garden.map((p) => p.id)).toEqual(['lichtung:hase']);

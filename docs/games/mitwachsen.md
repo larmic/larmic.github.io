@@ -118,7 +118,7 @@ Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzel
 1. Jedes Tier hat eine **Heimat-Gegend** und wandert dort langsam umher.
 2. Steht die Figur direkt neben einem Tier, **bleibt es stehen** und schaut sie an.
 3. **Aktion neben einem Tier:** Es hüpft und **singt seinen eigenen Ton** (alle aus derselben Pentatonik, klingt immer zusammen). Beim ersten Mal gilt es als **gefunden** und bekommt ein Herz. Danach **folgt** es der Figur im Gänsemarsch, bis es im Garten ist oder die Figur schläft. Über folgenden Tieren schwebt ein kleines Herz.
-4. **Hineinlaufen in ein Tier:** Es singt, folgt aber nicht. Läuft die Figur innerhalb kurzer Zeit ein zweites Mal hinein, tauschen beide den Platz. So bleibt die Figur nie eingeklemmt.
+4. **Hineinlaufen in ein Tier** genügt (aus dem ersten Spieltest: die Leertaste war zu viel): Es singt, bekommt beim ersten Mal ein Herz und folgt. Läuft die Figur in ein Tier, das schon folgt, tauschen beide sofort den Platz. So kann die Figur immer umdrehen und bleibt nie eingeklemmt. Die Aktionstaste bleibt für das Bett und zum Singen-Lassen.
 5. **Aktion neben einem folgenden Tier:** Es singt noch einmal, sonst ändert sich nichts.
 6. **Aktion neben einem Tier im Garten:** Es singt und hüpft, folgt aber nicht. Es ist zu Hause und bleibt gern im Garten.
 7. **Schläft die Figur**, laufen folgende Tiere in ihre Heimat-Gegend zurück.

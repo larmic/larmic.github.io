@@ -274,6 +274,11 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
     ty = p.y + dy;
   if (portal(s, world, tx, ty, events)) return;
   const animal = s.animals.find((a) => a.x === tx && a.y === ty);
+  if (animal?.mode === 'wander') {
+    // Hineinlaufen reicht: Das Tier singt, freut sich und folgt (die Aktionstaste braucht es dafür nicht)
+    s.lastBump = null;
+    return sing(s, animal, true, events);
+  }
   if (animal) {
     const again = s.lastBump?.id === animal.id && s.tick - s.lastBump.tick <= SWAP_WINDOW;
     const climbable = canStep(world, s.openGates, p.x, p.y, tx, ty);
@@ -291,8 +296,8 @@ function move(s: State, world: World, dir: Dir, events: GameEvent[]) {
         [animal.x, animal.y] = spot;
         s.lastBump = null;
       }
-    } else if (again && climbable && (animal.mode !== 'home' || world.cell(p.x, p.y).garden === true)) {
-      // Zweimal hineingelaufen: Platz tauschen, so bleibt die Figur nie stecken
+    } else if (climbable && (animal.mode === 'follow' || (again && world.cell(p.x, p.y).garden === true))) {
+      // Ein folgendes Tier tauscht sofort den Platz (umdrehen geht immer), eines im Garten erst beim zweiten Mal
       animal.x = p.x;
       animal.y = p.y;
       animal.dir = dirTo(-dx, -dy);
@@ -403,7 +408,7 @@ function action(s: State, world: World, events: GameEvent[]) {
   events.push({ type: 'call' });
 }
 
-/** Tier singt. Beim ersten Mal ist es getroffen; mit der Aktion folgt es der Figur. */
+/** Tier singt. Beim ersten Mal ist es getroffen; mit `follow` folgt es der Figur, wenn es frei umherläuft. */
 function sing(s: State, a: Animal, follow: boolean, events: GameEvent[]) {
   const first = !s.met.includes(a.id);
   a.dir = dirTo(s.player.x - a.x, s.player.y - a.y);
