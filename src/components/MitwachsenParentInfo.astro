@@ -96,6 +96,12 @@ const { headingId } = Astro.props;
     margin-top: 4px;
     padding-left: 20px;
   }
+  /* Mindestens 24 px hoch, damit auch der Finger auf dem Tablet den richtigen Link trifft (WCAG 2.5.8) */
+  ul.mw-sources a {
+    display: inline-block;
+    min-height: 24px;
+    padding-block: 2px;
+  }
   .mw-store {
     font-size: 0.9rem;
   }

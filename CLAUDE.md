@@ -13,7 +13,7 @@ npm run format   # Prettier; `npm run format:check` ist das Guard-Gate
 npm run arch     # Guard-Gate: Architekturregeln (dependency-cruiser) – muss grün sein
 npm run build    # statische Seite nach dist/
 npm run verify   # Guard-Gate nach dem Build: gültiges HTML, keine toten internen Links und Sprungmarken, Bundle-Gate (Homepage ohne Spiel, JS-Budget), Seiten-Gate (keine externen Ressourcen, alte Adressen leiten weiter)
-npm run test:e2e # Guard-Gate nach dem Build: Smoke-Test im Browser (Playwright, e2e/): Insel, Detailseiten, Spiel, alte Adressen, ohne Konsolenfehler; einmalig: npx playwright install chromium
+npm run test:e2e # Guard-Gate nach dem Build: Smoke-Test im Browser (Playwright, e2e/): Insel, Detailseiten, Spiel, alte Adressen, ohne Konsolenfehler; Barrierefreiheit nach WCAG 2.2 AA (axe-core, e2e/a11y.spec.ts); einmalig: npx playwright install chromium
 npm run gates    # alle Gates in der Reihenfolge der Pipeline
 # Git-Hook .githooks/pre-commit (aktiviert durch npm install) prüft vor jedem Commit Formatierung, Lint, Architektur, Tests
 ```

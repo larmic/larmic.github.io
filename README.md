@@ -26,7 +26,7 @@ Die Seite läuft dann unter http://localhost:4321 und lädt Änderungen sofort n
 | `npm run arch` | Architekturregeln (dependency-cruiser, `.dependency-cruiser.cjs`): Schichten `lib` → `data` → Oberfläche, Browser-Code ohne Build-Code. Guard-Gate |
 | `npm run build` | Erzeugt die fertige Seite in `dist/` |
 | `npm run verify` | Prüft die fertige Seite in `dist/`: gültiges HTML (html-validate), keine toten internen Links und Sprungmarken (linkinator), das Bundle-Gate (Homepage ohne Spiel, JavaScript-Budget) und das Seiten-Gate (keine externen Ressourcen ohne Klick, alte Adressen leiten weiter). Guard-Gate nach dem Build |
-| `npm run test:e2e` | Smoke-Test im Browser (Playwright, `e2e/`): Startseite und Insel, Detailseiten, das Kinderspiel, alte Adressen, ohne Fehler in der Konsole. Guard-Gate nach dem Build; einmalig `npx playwright install chromium` |
+| `npm run test:e2e` | Smoke-Test im Browser (Playwright, `e2e/`): Startseite und Insel, Detailseiten, das Kinderspiel, alte Adressen, ohne Fehler in der Konsole, dazu Barrierefreiheit jeder Seite nach WCAG 2.2 AA (axe-core). Guard-Gate nach dem Build; einmalig `npx playwright install chromium` |
 | `npm run preview` | Zeigt den gebauten Stand aus `dist/` lokal an |
 | `npm run gates` | Alle Guard-Gates in der Reihenfolge der Pipeline, inklusive Build |
 
@@ -105,7 +105,7 @@ Auf der Seite steht „KI mit Leitplanken“ – hier sind sie. Jeder Commit lä
 | Typen und Inhalte | TypeScript strikt, Markdown-Inhalte gegen ihr Schema | astro check |
 | Unit-Tests | Zustandsmaschine der Figur (Spec: [docs/specs/insel.md](docs/specs/insel.md)), Geometrie der Insel, Kopf, Pixel-Raster, Regeln und Welt des Kinderspiels (Spec: [docs/specs/mitwachsen.md](docs/specs/mitwachsen.md)); die Abdeckung der reinen Module darf nicht sinken | Vitest, v8-Coverage |
 | Fertige Seite | gültiges HTML, keine toten internen Links und Sprungmarken, Homepage ohne Spiel und im JavaScript-Budget, keine externen Ressourcen ohne Klick, alte Adressen leiten weiter | html-validate, linkinator, Bundle-Gate, Seiten-Gate |
-| Im Browser | Insel und Seitenwechsel, Detailseiten, das Kinderspiel startet, alte Adressen führen weiter, keine Fehler in der Konsole | Playwright |
+| Im Browser | Insel und Seitenwechsel, Detailseiten, das Kinderspiel startet, alte Adressen führen weiter, keine Fehler in der Konsole; Barrierefreiheit jeder Seite nach WCAG 2.2 AA | Playwright, axe-core |
 
 Lokal laufen alle zusammen mit `npm run gates`. Zusätzlich prüft ein Git-Hook (`.githooks/pre-commit`) vor jedem Commit die schnellen Gates – Formatierung, Lint, Architektur, Unit-Tests – in wenigen Sekunden. `npm install` aktiviert ihn automatisch; im Notfall überspringt `git commit --no-verify` ihn. Dass die Gates wirklich etwas fangen, ist geprüft: absichtlich eingebaute Fehler (überlappende Kisten, übersprungene Felder, verbotene Imports, tote Links, kaputtes HTML) lassen sie scheitern.
 
