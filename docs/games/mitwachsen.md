@@ -145,7 +145,8 @@ Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzel
 6. **Zu Hause ankommen:** Betritt ein folgendes Tier die Wiese ums Bett, ruft es seinen Ton, freut sich und läuft zu seinem eigenen Platz auf der Wiese. Dort bleibt es, auch nach dem Schlafen, und folgt nicht mehr (erster Spieltest: nach dem Schlafen waren alle Tiere weg). Läuft man hinein, singt es.
 7. **Schläft die Figur**, laufen folgende Tiere in ihre Heimat-Gegend zurück.
 8. **Tiere der berechneten Landschaft:** Sie zählen für kein Tor, singen aber, folgen und dürfen mit auf die Wiese. Ihre Kennung ergibt sich aus Seed, Stück und Nummer und bleibt dadurch stabil.
-9. Positionen werden nicht gespeichert, nur „gefunden“ und „zu Hause“. Ein Tier auf der Wiese erscheint nicht mehr in seiner Heimat-Gegend.
+9. **Wechselnde Plätze:** Bei jedem Besuch und an jedem neuen Morgen sind die noch verlorenen Tiere woanders auf der Lichtung unterwegs. So gibt es jeden Tag etwas zu suchen.
+10. Positionen werden nicht gespeichert, nur „gefunden“ und „zu Hause“. Ein Tier auf der Wiese erscheint nicht mehr in seiner Heimat-Gegend.
 
 ## Bett, Nacht und die Wiese
 

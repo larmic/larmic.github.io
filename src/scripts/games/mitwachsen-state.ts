@@ -203,8 +203,31 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
     basket: false,
   };
   openGates(s, []); // Tore, deren Tiere schon alle getroffen sind, stehen offen
+  scatter(s, world); // jeder Besuch: Die Tiere wohnen woanders
   syncWild(s, world);
   return s;
+}
+
+/**
+ * Tiere der Gegenden, die frei umherlaufen, an neue Plätze verteilen (beim Öffnen und an jedem neuen Morgen):
+ * zufällige erreichbare Felder der Lichtung, mit Abstand zum Bett und zueinander. Gleicher Zustand, gleiche Plätze.
+ */
+function scatter(s: State, world: World) {
+  const spots = world.spots;
+  if (!spots.length) return;
+  const placed: [number, number][] = [];
+  for (const a of s.animals) {
+    if (a.mode !== 'wander' || a.home.kind !== 'region') continue;
+    for (let tries = 0; tries < 80; tries++) {
+      const [x, y] = spots[Math.floor(random(s) * spots.length)];
+      if (cheb(x, y, HOME.bed[0], HOME.bed[1]) < 8 || !atHome(world, a.home, x, y)) continue; // nicht an Toren
+      if (placed.some(([px, py]) => cheb(x, y, px, py) < 5) || occupied(s, x, y, a.id)) continue;
+      [a.x, a.y] = [x, y];
+      a.spawn = [x, y];
+      placed.push([x, y]);
+      break;
+    }
+  }
 }
 
 export const progressOf = (s: State): Progress => ({
@@ -270,8 +293,10 @@ function tick(s: State, world: World, events: GameEvent[]) {
       continue;
     }
     // Außerhalb des Zuhauses (nach einem Platztausch) zieht es heim, sonst läuft es zufällig
-    const away = !atHome(world, a.home, a.x, a.y) || arriving;
-    const order = away ? [...ALL_DIRS].sort((p, q) => dist(a, p) - dist(a, q)) : [ALL_DIRS[Math.floor(random(s) * 4)]];
+    const away = !atHome(world, a.home, a.x, a.y);
+    // zielstrebig heim (außerhalb des Zuhauses) oder zum eigenen Platz auf der Wiese, sonst zufällig
+    const order =
+      away || arriving ? [...ALL_DIRS].sort((p, q) => dist(a, p) - dist(a, q)) : [ALL_DIRS[Math.floor(random(s) * 4)]];
     for (const d of order) {
       const [dx, dy] = DIRS[d];
       const tx = a.x + dx,
@@ -507,6 +532,7 @@ function wake(s: State, world: World, events: GameEvent[]) {
   s.player.x = spot[0];
   s.player.y = spot[1];
   s.player.dir = 's';
+  scatter(s, world); // ein neuer Morgen: Die verlorenen Tiere sind woanders unterwegs
   events.push({ type: 'wake' });
 }
 

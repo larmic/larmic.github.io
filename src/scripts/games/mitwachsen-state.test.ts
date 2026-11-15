@@ -24,6 +24,7 @@ function fakeWorld(cells: Record<string, Partial<Cell>> = {}): World {
     cell: (x, y) => ({ h: 1, ground: 'grass', deco: null, region: 'lichtung', solid: false, ...cells[`${x},${y}`] }),
     gates: new Map(),
     spawns: new Map(),
+    spots: [],
     portals: new Map(),
   };
 }
@@ -282,6 +283,49 @@ const meadowWorld = () => {
   for (let y = -3; y <= 3; y++) for (let x = -6; x <= 0; x++) cells[`${x},${y}`] = { garden: true };
   return fakeWorld(cells);
 };
+
+describe('Tiere an wechselnden Stellen', () => {
+  const world = createWorld(3);
+  const where = (s: State) =>
+    s.animals
+      .filter((a) => a.home.kind === 'region')
+      .map((a) => `${a.id}@${a.x},${a.y}`)
+      .sort();
+
+  it('bei jedem Besuch wohnen die Tiere woanders, beim gleichen Besuch gleich', () => {
+    expect(where(initialState(world, {}, 11))).toEqual(where(initialState(world, {}, 11)));
+    expect(where(initialState(world, {}, 11))).not.toEqual(where(initialState(world, {}, 12)));
+  });
+
+  it('immer auf erreichbaren Feldern der Lichtung, mit Abstand zum Bett und zueinander', () => {
+    const spots = new Set(world.spots.map(([x, y]) => `${x},${y}`));
+    for (const seed of [1, 2, 3]) {
+      const s = initialState(world, {}, seed);
+      const region = s.animals.filter((a) => a.home.kind === 'region');
+      expect(region).toHaveLength(40);
+      for (const a of region) {
+        expect(spots.has(`${a.x},${a.y}`), a.id).toBe(true);
+        expect(Math.max(Math.abs(a.x - HOME.bed[0]), Math.abs(a.y - HOME.bed[1]))).toBeGreaterThanOrEqual(8);
+      }
+    }
+  });
+
+  it('an einem neuen Morgen sind die verlorenen Tiere woanders unterwegs, Tiere der Wiese bleiben', () => {
+    const garden = [{ id: 'lichtung:hase', species: 'hase' as const }];
+    let s = initialState(world, { garden }, 5);
+    s = run(s, world, 'e').s; // aufwachen
+    const hase = s.animals.find((a) => a.id === 'lichtung:hase')!;
+    const before = where(s);
+    s = { ...s, player: { ...s.player, x: HOME.bed[0] + 1, y: HOME.bed[1] } };
+    s = run(s, world, ACT).s; // schlafen
+    for (let i = 0; i < SLEEP_LOCK; i++) s = run(s, world, TICK).s;
+    s = run(s, world, 'e').s; // neuer Morgen
+    expect(where(s)).not.toEqual(before);
+    const later = s.animals.find((a) => a.id === 'lichtung:hase')!;
+    expect(later.mode).toBe('home');
+    expect(world.cell(later.x, later.y).garden).toBe(hase.mode === 'home' ? true : undefined);
+  });
+});
 
 describe('Korb mit Beeren', () => {
   it('Pflücken füllt den Korb; am Futtertrog kommen die Beeren hinein und alle Tiere der Wiese freuen sich', () => {

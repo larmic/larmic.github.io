@@ -104,6 +104,8 @@ export type World = {
   cell(x: number, y: number): Cell;
   /** Wohnort jedes Tiers der Lichtung: nächstes vom Bett aus erreichbares Feld zum Wunschort */
   readonly spawns: ReadonlyMap<string, Point>; // je Tier-Kennung
+  /** Alle vom Bett aus erreichbaren Felder der Lichtung außerhalb der Wiese: hier dürfen Tiere wohnen */
+  readonly spots: readonly Point[];
   /** Portale: je Tor eines daneben und eines im Kreis um das Bett, mit dem Feld, auf dem man herauskommt */
   readonly portals: ReadonlyMap<GateId, Portal>;
   /** Die großen Tore: Lage und Reihenfolge würfelt der Seed */
@@ -209,7 +211,10 @@ function portalsOf(places: readonly Layout[]): Map<GateId, Portal> {
 }
 
 /** Lichtung als feste Karte: Bett in der Mitte, Hügel, Teiche, Wäldchen, Blumenwiesen, Steine, Felsring, große Tore */
-function buildStart(seed: number, places: readonly Layout[]): { map: Map<string, Cell>; spawns: Map<string, Point> } {
+function buildStart(
+  seed: number,
+  places: readonly Layout[],
+): { map: Map<string, Cell>; spawns: Map<string, Point>; spots: Point[] } {
   const map = new Map<string, Cell>();
   const set = (x: number, y: number, c: Cell) => map.set(key(x, y), c);
   const { rx, ry } = lichtung.shape;
@@ -344,7 +349,8 @@ function buildStart(seed: number, places: readonly Layout[]): { map: Map<string,
   const reached = new Set(reach.map(([x, y]) => key(x, y)));
   for (const [k, c] of map)
     if (c.region === 'lichtung' && !c.solid && c.ground !== 'water' && !reached.has(k)) map.set(k, rock(3));
-  return { map, spawns: findSpawns(seed, map, reach) };
+  const spots = reach.filter(([x, y]) => map.get(key(x, y))!.region === 'lichtung' && !map.get(key(x, y))!.garden);
+  return { map, spawns: findSpawns(seed, map, spots), spots };
 }
 
 /**
@@ -410,11 +416,10 @@ function reachOf(map: Map<string, Cell>): Point[] {
  * Wohnorte der Tiere: Felder der Lichtung, die vom Bett aus zu Fuß erreichbar sind. Das erste Tier jeder Art wohnt
  * nah an seinem Wunschort, die weiteren verteilt der Seed über die ganze Lichtung (mit Abstand zueinander und zum Bett).
  */
-function findSpawns(seed: number, map: Map<string, Cell>, reach: Point[]): Map<string, Point> {
+function findSpawns(seed: number, map: Map<string, Cell>, land: Point[]): Map<string, Point> {
   const spawns = new Map<string, Point>();
   const taken: Point[] = [];
   const free = (p: Point, gap: number) => taken.every(([x, y]) => (x - p[0]) ** 2 + (y - p[1]) ** 2 >= gap * gap);
-  const land = reach.filter(([x, y]) => map.get(key(x, y))!.region === 'lichtung' && !map.get(key(x, y))!.garden);
   const all = regionAnimalList(lichtung);
   for (const { id, species, n } of all) {
     if (n !== 1) continue;
@@ -576,7 +581,7 @@ function dress(seed: number, x: number, y: number, c: Cell): Cell {
 
 export function createWorld(seed: number): World {
   const places = layouts(seed);
-  const { map: regions, spawns } = buildStart(seed, places);
+  const { map: regions, spawns, spots } = buildStart(seed, places);
   const cache = new ChunkCache<Cell>((cx, cy) => {
     const cells: Cell[] = [];
     for (let y = cy * CHUNK; y < (cy + 1) * CHUNK; y++)
@@ -587,7 +592,7 @@ export function createWorld(seed: number): World {
   const gates = new Map<GateId, GatePlace>(
     places.map(({ id, cells, mid, out, angle }) => [id, { id, cells, mid, out, angle }]),
   );
-  return { seed, cell: (x, y) => cache.get(x, y), gates, spawns, portals: portalsOf(places) };
+  return { seed, cell: (x, y) => cache.get(x, y), gates, spawns, spots, portals: portalsOf(places) };
 }
 
 /** Höhe, auf der man auf einem Feld steht – null, wenn man dort nicht stehen kann */
