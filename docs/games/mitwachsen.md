@@ -49,6 +49,66 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 
 Die Leiste unten ist die **Liste der entdeckten Tiere**: Umriss mit Fragezeichen = noch nicht entdeckt, in Farbe = entdeckt, Herz = folgt gerade. Einen Garten, in den sie ziehen, gibt es am Anfang nicht. Wie sich die Tore später öffnen, hängt an der Geschichte (siehe Ideen: Tiere befreien).
 
+## Die Welten
+
+Die Lichtung ist das Zuhause mit dem Bett. Hinter jedem der vier großen Tore liegt eine eigene Welt mit eigenem Thema, eigenen Tieren und später einer eigenen Geschichte. Vorerst ist nur die Lichtung spielbar; die anderen Welten sind entworfen, aber noch nicht gebaut. Für alle gilt: freundlich und ungefährlich, nichts kann der Figur passieren, nichts geht verloren.
+
+| Welt | Wo | Stand | Thema (`GateTheme`) |
+| --- | --- | --- | --- |
+| **Lichtung** | Mitte, mit dem Bett | spielbar | – |
+| **Eiswelt** | hinter dem Nordtor | geplant | `eis` |
+| **Sandwelt** | hinter dem Osttor | geplant | `sand` |
+| **Wasserwelt** | hinter dem Südtor | geplant | `wasser` |
+| **Lavaberge** | hinter dem Westtor | geplant | `lava` |
+| **Höhlenwelt** | noch ohne Tor, vielleicht ein Höhleneingang im Felsring | Idee | `hoehle` |
+
+**Was alle Welten verbindet:**
+
+- **Tor mit Themen-Blöcken:** Oben auf dem Steinsturz des Tors liegen Blöcke der Welt dahinter (Eis, Sand, Wasser, leuchtende Lava). So sieht das Kind schon vorher, was wartet.
+- **Portal neben dem Tor:** Daneben steht ein Portal im Thema der Welt, zuerst leer. Läuft das Kind hinein, leuchtet es auf und bleibt an. Gleichzeitig erscheint sein Gegenstück wenige Schritte über dem Bett. Von da an kann das Kind zwischen Bett und Tor hin- und herreisen, folgende Tiere reisen mit. Die Portale sind schon umgesetzt, auch solange die Tore zu sind.
+- **Eigene Tiere:** Jede Welt hat ihre eigenen verlorenen Tiere. Die Vorschläge unten sind Ideen, gemeinsam mit dem Kind auszusuchen.
+- **Gleiche Regeln:** Klettern, Nebel, Singen, Folgen und Schlafen bleiben überall gleich. Neu ist nur, wie die Welt aussieht und klingt.
+- **Öffnen der Tore:** Wie die Tore aufgehen, hängt an der Geschichte (siehe Ideen: Tiere befreien). Bis dahin bleiben sie zu.
+
+### Lichtung
+
+Große Wiese (gut 100 × 90 Felder) mit Hügeln, Teichen, Wäldchen, Blumenwiesen und Klettersteinen, ringsum Felsen in Terrassen. In der Mitte das Bett, darüber später die vier Portale in einer Reihe. Zehn Tiere: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte. Tag und Nacht, Schmetterlinge, nachts Glühwürmchen.
+
+### Eiswelt (Nordtor)
+
+- **Aussehen:** Schneefelder, glitzernde Eisblöcke zum Klettern, zugefrorene Seen, verschneite Tannen, Iglus. Kühles, helles Licht, sanfter Schneefall (nicht bei reduzierter Bewegung).
+- **Besonderes:** Auf Eis rutscht die Figur nicht (das wäre für ein kleines Kind frustrierend), es knirscht nur beim Laufen.
+- **Tiere (Ideen):** Pinguin, Eisbär, Robbe, Schneehase, Schneeeule.
+- **Portal:** hellblau, Rahmen aus Eis.
+
+### Sandwelt (Osttor)
+
+- **Aussehen:** Dünen in sanften Stufen, Kakteen, Palmen an einer kleinen Oase, Sandsteinfelsen, warmes Licht.
+- **Besonderes:** Fußspuren im Sand, die langsam verwehen (reine Zierde).
+- **Tiere (Ideen):** Kamel, Erdmännchen, Eidechse, Wüstenfuchs, Schildkröte aus der Oase.
+- **Portal:** goldgelb, Rahmen aus Sandstein.
+
+### Wasserwelt (Südtor)
+
+- **Aussehen:** Viele kleine Inseln und Strände, verbunden durch Stege, Brücken und Trittsteine; Seerosen, Boote am Ufer, ein Leuchtturm.
+- **Besonderes:** Wasser bleibt nicht begehbar, die Wege führen darüber. Wellen und Glitzern, leises Plätschern.
+- **Tiere (Ideen):** Fisch (springt aus dem Wasser), Krebs, Seestern, Möwe, Otter.
+- **Portal:** blau, Rahmen aus Wasserblöcken.
+
+### Lavaberge (Westtor)
+
+- **Aussehen:** Dunkle Felsen und Berge, dazwischen glühende Lavaflüsse, die warm leuchten, auch nachts. Höher als die anderen Welten, mit viel zum Klettern.
+- **Besonderes:** Ganz ungefährlich: Die Figur kommt nicht in die Lava, die Lava leuchtet nur. Kein Feuer, kein Rauch, der Angst macht.
+- **Tiere (Ideen):** Bergziege, Salamander, Murmeltier, Adler, Steinbock.
+- **Portal:** orange, Rahmen aus leuchtender Lava.
+
+### Höhlenwelt (Idee)
+
+- **Aussehen:** Dunkle Steinblöcke, leuchtende Kristalle und Pilze als Lichtquellen, unterirdische Seen. Nie ganz dunkel: Es bleibt immer genug Licht, damit nichts unheimlich wirkt.
+- **Wo:** Noch offen, vielleicht ein Höhleneingang im Felsring der Lichtung statt eines fünften Tors.
+- **Tiere (Ideen):** Fledermaus, Maulwurf, Glühwürmchen, Höhlenmolch.
+- **Portal:** lila, Rahmen aus dunklem Stein (das Thema `hoehle` gibt es schon).
+
 ## Tiere
 
 **Die Geschichte:** Die Tiere haben sich verlaufen und finden nicht mehr nach Hause. Verlorene Tiere tragen ein kleines Fragezeichen über dem Kopf. Das Kind findet sie, sie freuen sich (Ton, Hüpfer, Herz) und laufen mit ihm nach Hause in den Garten. Dort wohnen sie und sind glücklich. Es geht ums Helfen, nicht ums Sammeln oder Einsperren.
@@ -156,8 +216,7 @@ Gespielt wird direkt auf der Homepage: Sobald eine Stufe spielbar ist, spielt de
 
 Nur gesammelt, noch nicht ausgeplant.
 
-- **Höhlenwelt** mit dunklen Blöcken, z. B. hinter einem Höhleneingang in den Felsen der Lichtung (das Thema `hoehle` gibt es schon).
-- **Lavaberge** als eigene Gegend hinter dem Westtor: glühende Lava zwischen dunklen Felsen, ganz ungefährlich (die Figur kommt nicht hinein, die Lava leuchtet nur warm).
+- **Welten hinter den Toren:** Eiswelt, Sandwelt, Wasserwelt, Lavaberge und die Höhlenwelt sind oben unter „Die Welten“ beschrieben.
 - **Tiere befreien:** Später sollen die Tiere nicht nur entdeckt, sondern befreit werden. Daran hängt auch, wie sich die großen Tore öffnen. Die Geschichte dazu fehlt noch: Wovon werden die Tiere befreit, und warum? (Für ein kleines Kind freundlich, ohne Bösewicht, der Angst macht.)
 - **Garten:** entsteht mit der Zeit am Bett; Regeln und Tests stehen schon (siehe Bett, Nacht, später der Garten).
 - **Portale:** Umgesetzt für die großen Tore (siehe Spec). Noch offen: Der Heimweg-Pfeil zeigt auf das Portal, wenn der Weg darüber kürzer ist.
