@@ -66,11 +66,11 @@ Schläft die Figur, wecken `move` und `action` sie (nach der Sperrzeit), sonst t
 | --- | --- |
 | Gleicher Seed ergibt gleiche Felder, anderer Seed andere Landschaft | „entsteht aus demselben Seed immer gleich …“ |
 | In der Mitte steht nur das Bett, ringsum (2 Felder) ist es flach und frei | „In der Mitte steht nur das Bett …“ |
-| Die Lichtung ist groß (Ellipse 80 × 68, über 9000 erreichbare Felder) mit Hügeln, Teichen, lichten Hainen, Blumenwiesen und Klettersteinen | „Alle zehn Tiere wohnen erreichbar …“ |
+| Die Lichtung ist groß (Ellipse 80 × 68, über 9000 erreichbare Felder) mit Hügeln, Teichen, lichten Hainen, Blumenwiesen und Klettersteinen | „Alle Tiere wohnen erreichbar …“ |
 | Frei zugänglich für ein kleines Kind: Benachbarte Felder unterscheiden sich um höchstens eine Ebene, so kommt man überall wieder heraus; was man nicht erreichen kann, wird Fels | „Auf der Lichtung ist keine Stufe höher als eins …“ |
 | Bäume und Büsche stehen einzeln: Im Umkreis von zwei Feldern steht kein weiteres Hindernis | „Bäume und Büsche stehen einzeln …“ |
 | Die großen Tore liegen weit vom Bett (über 60 Felder), vor jedem ist ein freier Gang nach innen | „Die großen Tore liegen weit …“, „Vor jedem großen Tor kommt man hin“ |
-| Alle zehn Tiere wohnen auf vom Bett aus erreichbaren Feldern (die Welt sucht das nächste zum Wunschort, `world.spawns`); die Landschaft hinter dem Felsring bleibt draußen | „Alle zehn Tiere wohnen erreichbar …“ |
+| Vier Tiere je Art (`herd`, zusammen 40) wohnen auf vom Bett aus erreichbaren Feldern, jedes auf eigenem Platz: das erste nah am Wunschort, die weiteren aus dem Seed verteilt, mit Abstand zueinander und zum Bett (`world.spawns`, je Kennung `lichtung:<art>` bzw. `lichtung:<art>:<n>`); die Landschaft hinter dem Felsring bleibt draußen | „Alle Tiere wohnen erreichbar …“ |
 | Felsring in Terrassen (3, 4, außen 5), nur fürs Auge: nicht zu betreten, also weder zu besteigen noch hineinzufallen | „Der Felsring ist nicht zu betreten“ |
 | Eine Stufe hinauf, beliebig tief herunter (in der Landschaft) | „In der Landschaft klettert man eine Stufe hinauf …“ |
 | Vier große Tore zu je drei Feldern, alle verschlossen; die Welt liefert ihre Felder (`world.gates`, hängen vom Seed ab) | „Vier große Tore …“ |
@@ -152,7 +152,7 @@ Geprüft mit je 4000 zufälligen Befehlen auf drei Welten (*Test: „Invarianten
 | Beerenbüsche | niedrig und rund in zwei Stufen, mit roten Beeren oben und vorn, damit man sie nicht für Baumwipfel hält (erster Spieltest) |
 | Natur | Grasbüschel, Farne, Pilze, bemooste Findlinge (blockieren, nur auf Hügeln); Bäume als Eiche, Birke, Herbst- oder Blütenbaum, in Gruppen; Farbflecken im Boden. Reine Zierde aus dem Seed, die Regeln ändern sich nicht |
 | Licht und Leben | weiche Schatten unter Bäumen, Büschen, Tieren und Figur; warmes Licht von oben links, leichter Dunst oben, dunklere Ränder; glitzerndes Wasser mit hellem Ufer; tagsüber Schmetterlinge und Pollen, nachts Glühwürmchen (Bewegtes nicht bei reduzierter Bewegung) |
-| Leiste unten | ein Platz je Tier, nach Gegenden gruppiert, dahinter Tiere der Landschaft, die im Garten wohnen: heller Platz mit Umriss und Fragezeichen = noch verloren, Holz mit Tier in Farbe = gefunden, Gras = zu Hause im Garten, Herz = folgt gerade |
+| Leiste unten | ein Platz je Art, nach Gegenden gruppiert (eine Art gilt als gefunden, sobald eines ihrer Tiere gefunden ist), dahinter Tiere der Landschaft, die im Garten wohnen: heller Platz mit Umriss und Fragezeichen = noch verloren, Holz mit Tier in Farbe = gefunden, Gras = zu Hause im Garten, Herz = folgt gerade |
 | Tafel am Tor | Tiere der Gegend auf dem Brett: gefundene in Farbe, verlorene als Umriss |
 | Karte | oben rechts, genordet wie die Kamera, etwa 41 × 41 Felder um die Figur: Felder in ihren Farben, die Figur als Punkt, das Bett als Häuschen. Liegt das Bett außerhalb, zeigt ein Pfeil am Kartenrand nach Hause |
 | Touch-Steuerung | auf Geräten ohne Maus (oder nach der ersten Berührung): Steuerkreuz unten links (kein Aktionsknopf); langes Drücken öffnet keine Lupe, Auswahl oder Menüs des Browsers (`touchstart`/`contextmenu` abgefangen, `-webkit-touch-callout: none`), im selben ruhigen Takt wie die Tastatur; die Leiste rückt darüber |

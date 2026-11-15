@@ -31,10 +31,11 @@ import {
   REGIONS,
   SPECIES,
   THEME_COLORS,
-  animalId,
   figureParts,
+  speciesOf,
   type GateId,
   type Look,
+  type SpeciesId,
 } from '../../data/games/mitwachsen';
 import type { State } from './mitwachsen-state';
 import { hash } from '../../lib/games/rng';
@@ -194,9 +195,25 @@ export class Renderer {
    */
   private album(state: State, sc: Scene) {
     const { ctx } = this;
-    const groups = REGIONS.map((r) => r.animals.map((a) => ({ id: animalId(r.id, a.species), species: a.species })));
+    // Je Gegend ein Platz pro Art (es gibt mehrere Tiere je Art: eines gefunden heißt die Art gefunden),
+    // dahinter Tiere der Landschaft im Garten einzeln
+    const of = (ids: readonly string[], region: string, species: string) =>
+      ids.some((id) => id.startsWith(`${region}:`) && speciesOf(id) === species);
+    const garden = state.garden.map((p) => p.id);
+    type Slot = { species: SpeciesId; met: boolean; home: boolean; follows: boolean };
+    const groups: Slot[][] = REGIONS.map((r) =>
+      r.animals.map(({ species }) => ({
+        species,
+        met: of(state.met, r.id, species) || of(garden, r.id, species),
+        home: of(garden, r.id, species),
+        follows: of(state.followers, r.id, species),
+      })),
+    );
     const wild = state.garden.filter((p) => p.id.startsWith('wild:')).slice(0, 10);
-    if (wild.length) groups.push(wild);
+    if (wild.length)
+      groups.push(
+        wild.map((p) => ({ species: p.species, met: true, home: true, follows: state.followers.includes(p.id) })),
+      );
     const count = groups.reduce((n, g) => n + g.length, 0);
     const gap = 6,
       groupGap = 18;
@@ -205,12 +222,10 @@ export class Renderer {
     const total = count * size + (count - 1) * gap + (groups.length - 1) * (groupGap - gap);
     let x = Math.round((sc.width - total) / 2);
     const y = Math.round(sc.height - size - 14 - sc.bottomInset);
-    const atHomeIds = new Set(state.garden.map((p) => p.id));
-    const following = new Set(state.followers);
     for (const group of groups) {
       for (const a of group) {
-        const met = state.met.includes(a.id) || atHomeIds.has(a.id);
-        ctx.fillStyle = atHomeIds.has(a.id) ? GAME_COLORS.slotHome : met ? GAME_COLORS.slotMet : GAME_COLORS.slotEmpty;
+        const met = a.met;
+        ctx.fillStyle = a.home ? GAME_COLORS.slotHome : met ? GAME_COLORS.slotMet : GAME_COLORS.slotEmpty;
         ctx.fillRect(x, y, size, size);
         // Pixel-Rahmen ohne Eckpixel wie auf der Seite
         ctx.fillStyle = GAME_COLORS.ink;
@@ -223,7 +238,7 @@ export class Renderer {
         const P = projection(0.5, 0.5, x + size / 2, y + size * 0.86, s);
         drawModel(ctx, P, sp.parts, 0.5, 0.5, 0, 'e', sp.scale, met ? undefined : GAME_COLORS.silhouette);
         if (!met) sprite(ctx, ASK, GAME_COLORS.lost, x + size - 7, y + 13, Math.max(1.5, size / 26));
-        if (following.has(a.id)) sprite(ctx, HEART, GAME_COLORS.heart, x + size - 6, y + 12, Math.max(1.5, size / 22));
+        if (a.follows) sprite(ctx, HEART, GAME_COLORS.heart, x + size - 6, y + 12, Math.max(1.5, size / 22));
         x += size + gap;
       }
       x += groupGap - gap;

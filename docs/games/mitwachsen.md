@@ -45,7 +45,7 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 
 | | |
 | --- | --- |
-| Tiere zum Entdecken | alle zehn: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte |
+| Tiere zum Entdecken | zehn Arten: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte, je vier Tiere (aus dem ersten Spieltest: die Lichtung war zu leer). Die Leiste zeigt jede Art einmal. |
 | Tore | Nordtor (Eiswelt), Osttor (Sandwelt), Südtor (Wasserwelt), Westtor (Lavaberge), alle vorerst zu. Oben auf dem Steinsturz jedes Tors liegen Blöcke, die verraten, was dahinter wartet: Eis, Sand, Wasser, leuchtende Lava |
 
 Die Leiste unten ist die **Liste der entdeckten Tiere**: Umriss mit Fragezeichen = noch nicht entdeckt, in Farbe = entdeckt, Herz = folgt gerade. Einen Garten, in den sie ziehen, gibt es am Anfang nicht. Wie sich die Tore später öffnen, hängt an der Geschichte (siehe Ideen: Tiere befreien).

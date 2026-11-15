@@ -11,6 +11,7 @@ import {
   HOME,
   REGIONS,
   WILD_SPECIES,
+  regionAnimalList,
   type GateId,
   type Point,
   type Rect,
@@ -62,7 +63,7 @@ export type World = {
   readonly seed: number;
   cell(x: number, y: number): Cell;
   /** Wohnort jedes Tiers der Lichtung: nächstes vom Bett aus erreichbares Feld zum Wunschort */
-  readonly spawns: ReadonlyMap<SpeciesId, Point>;
+  readonly spawns: ReadonlyMap<string, Point>; // je Tier-Kennung
   /** Portale: je Tor eines daneben und eines über dem Bett, mit dem Feld, auf dem man herauskommt */
   readonly portals: ReadonlyMap<GateId, Portal>;
   /** Felder der großen Tore (hängen vom Seed ab, weil der Felsrand leicht unregelmäßig ist) */
@@ -142,10 +143,7 @@ function portalsOf(seed: number): Map<GateId, Portal> {
 }
 
 /** Lichtung als feste Karte: Bett in der Mitte, Hügel, Teiche, Wäldchen, Blumenwiesen, Steine, Felsring, große Tore */
-function buildStart(
-  seed: number,
-  opts: { garden?: boolean },
-): { map: Map<string, Cell>; spawns: Map<SpeciesId, Point> } {
+function buildStart(seed: number, opts: { garden?: boolean }): { map: Map<string, Cell>; spawns: Map<string, Point> } {
   const map = new Map<string, Cell>();
   const set = (x: number, y: number, c: Cell) => map.set(key(x, y), c);
   const { rx, ry } = lichtung.shape;
@@ -247,7 +245,7 @@ function buildStart(
   const reached = new Set(reach.map(([x, y]) => key(x, y)));
   for (const [k, c] of map)
     if (c.region === 'lichtung' && !c.solid && c.ground !== 'water' && !reached.has(k)) map.set(k, rock(3));
-  return { map, spawns: findSpawns(map, reach) };
+  return { map, spawns: findSpawns(seed, map, reach) };
 }
 
 /**
@@ -309,22 +307,41 @@ function reachOf(map: Map<string, Cell>): Point[] {
   return reach;
 }
 
-/** Wohnorte der Tiere: Felder der Lichtung, die vom Bett aus zu Fuß erreichbar sind, je nah am Wunschort */
-function findSpawns(map: Map<string, Cell>, reach: Point[]): Map<SpeciesId, Point> {
-  const taken = new Set<string>();
-  const spawns = new Map<SpeciesId, Point>();
-  for (const { species, at } of lichtung.animals) {
+/**
+ * Wohnorte der Tiere: Felder der Lichtung, die vom Bett aus zu Fuß erreichbar sind. Das erste Tier jeder Art wohnt
+ * nah an seinem Wunschort, die weiteren verteilt der Seed über die ganze Lichtung (mit Abstand zueinander und zum Bett).
+ */
+function findSpawns(seed: number, map: Map<string, Cell>, reach: Point[]): Map<string, Point> {
+  const spawns = new Map<string, Point>();
+  const taken: Point[] = [];
+  const free = (p: Point, gap: number) => taken.every(([x, y]) => (x - p[0]) ** 2 + (y - p[1]) ** 2 >= gap * gap);
+  const land = reach.filter(([x, y]) => map.get(key(x, y))!.region === 'lichtung');
+  const all = regionAnimalList(lichtung);
+  for (const { id, species, n } of all) {
+    if (n !== 1) continue;
+    const at = lichtung.animals.find((a) => a.species === species)!.at;
     let best: Point | null = null,
       bestD = Infinity;
-    for (const p of reach) {
-      const c = map.get(key(p[0], p[1]))!;
-      if (c.region !== 'lichtung' || taken.has(key(p[0], p[1]))) continue;
+    for (const p of land) {
       const d = (p[0] - at[0]) ** 2 + (p[1] - at[1]) ** 2;
-      if (d < bestD) [best, bestD] = [p, d];
+      if (d < bestD && free(p, 1)) [best, bestD] = [p, d];
     }
     if (!best) continue;
-    taken.add(key(best[0], best[1]));
-    spawns.set(species, best);
+    taken.push(best);
+    spawns.set(id, best);
+  }
+  // Die weiteren: Felder in einer Reihenfolge aus dem Seed, jedes mit Abstand zu allen anderen
+  const shuffled = [...land].sort((a, b) => hash(seed, a[0], a[1], 77) - hash(seed, b[0], b[1], 77));
+  const rest = all.filter((a) => a.n !== 1);
+  for (const gap of [9, 5, 1]) {
+    for (const p of shuffled) {
+      if (!rest.length) break;
+      const [x, y] = p;
+      if (Math.max(Math.abs(x - HOME.bed[0]), Math.abs(y - HOME.bed[1])) < 6 || !free(p, gap)) continue;
+      const { id } = rest.shift()!;
+      taken.push(p);
+      spawns.set(id, p);
+    }
   }
   return spawns;
 }

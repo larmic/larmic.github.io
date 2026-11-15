@@ -51,14 +51,17 @@ describe('Start auf der Lichtung', () => {
       for (const [x, y] of HOME.wake) expect(standHeight(w, [], x, y)).not.toBeNull();
     });
 
-    it(`Seed ${seed}: Alle zehn Tiere wohnen erreichbar auf der Lichtung, die Landschaft bleibt draußen`, () => {
+    it(`Seed ${seed}: Alle Tiere wohnen erreichbar auf der Lichtung (vier je Art), die Landschaft bleibt draußen`, () => {
       const cells = reachable(w, [], START);
       const set = new Set(cells.map(([x, y]) => `${x},${y}`));
-      expect(w.spawns.size).toBe(lichtung.animals.length);
-      for (const [species, [x, y]] of w.spawns) {
-        expect(w.cell(x, y).region, species).toBe('lichtung');
-        expect(set.has(`${x},${y}`), species).toBe(true);
+      expect(w.spawns.size).toBe(lichtung.animals.length * lichtung.herd); // 40 Tiere, vier je Art
+      const spots = new Set<string>();
+      for (const [id, [x, y]] of w.spawns) {
+        expect(w.cell(x, y).region, id).toBe('lichtung');
+        expect(set.has(`${x},${y}`), id).toBe(true);
+        spots.add(`${x},${y}`);
       }
+      expect(spots.size).toBe(w.spawns.size); // jedes Tier hat seinen eigenen Platz
       expect(cells.some(([x, y]) => w.cell(x, y).region === 'wild')).toBe(false);
       expect(cells.length).toBeGreaterThan(9000); // groß genug zum Erkunden
     });

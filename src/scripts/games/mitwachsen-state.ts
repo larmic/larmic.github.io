@@ -10,7 +10,7 @@ import {
   GATES,
   HOME,
   REGIONS,
-  animalId,
+  regionAnimalList,
   type GateId,
   type RegionId,
   type SpeciesId,
@@ -147,9 +147,8 @@ export function initialState(world: World, saved: Partial<Progress> = {}, rngSee
   const atHomeIds = new Set(garden.map((p) => p.id));
   const animals: Animal[] = [];
   for (const r of REGIONS)
-    for (const { species } of r.animals) {
-      const id = animalId(r.id, species);
-      const at = world.spawns.get(species); // die Welt kennt den erreichbaren Wohnort
+    for (const { id, species } of regionAnimalList(r)) {
+      const at = world.spawns.get(id); // die Welt kennt den erreichbaren Wohnort
       if (at && !atHomeIds.has(id))
         animals.push({
           id,
@@ -209,7 +208,7 @@ export const progressOf = (s: State): Progress => ({
 
 /** Tiere einer Gegend (Kennungen) – ein Tor öffnet, wenn alle davon getroffen sind */
 export const regionAnimals = (region: RegionId): string[] =>
-  REGIONS.find((r) => r.id === region)!.animals.map((a) => animalId(region, a.species));
+  regionAnimalList(REGIONS.find((r) => r.id === region)!).map((a) => a.id);
 
 // ---------- Ein Schritt ----------
 

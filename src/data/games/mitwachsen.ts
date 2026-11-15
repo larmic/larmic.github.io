@@ -20,6 +20,8 @@ export type Region = {
   shape: { rx: number; ry: number };
   /** Tiere mit ungefährem Wohnort; die Welt sucht das nächste Feld, das vom Bett aus erreichbar ist */
   animals: readonly { species: SpeciesId; at: Point }[];
+  /** So viele Tiere je Art leben hier: das erste am Wohnort oben, die anderen verteilt die Welt aus dem Seed */
+  herd: number;
 };
 
 export type Gate = {
@@ -33,8 +35,23 @@ export type Gate = {
   sign?: Point; // Tafel mit den Tieren der Gegend (noch keine)
 };
 
-/** Tiere einer Gegend haben die Kennung `<gegend>:<art>` */
-export const animalId = (region: RegionId, species: SpeciesId) => `${region}:${species}`;
+/** Tiere einer Gegend haben die Kennung `<gegend>:<art>`, weitere Tiere derselben Art `<gegend>:<art>:<nummer>` (ab 2) */
+export const animalId = (region: RegionId, species: SpeciesId, n = 1) =>
+  n <= 1 ? `${region}:${species}` : `${region}:${species}:${n}`;
+
+/** Art eines Tiers der Gegenden aus seiner Kennung (Tiere der Landschaft: null) */
+export function speciesOf(id: string): SpeciesId | null {
+  const [region, species] = id.split(':');
+  return REGIONS.some((r) => r.id === region) && species in SPECIES ? (species as SpeciesId) : null;
+}
+
+/** Alle Tiere einer Gegend: je Art `herd` Stück, in fester Reihenfolge */
+export function regionAnimalList(region: Region): { id: string; species: SpeciesId; n: number }[] {
+  const out: { id: string; species: SpeciesId; n: number }[] = [];
+  for (let n = 1; n <= region.herd; n++)
+    for (const { species } of region.animals) out.push({ id: animalId(region.id, species, n), species, n });
+  return out;
+}
 
 /**
  * Am Anfang gibt es nur die Lichtung mit dem Bett. Ringsum Felsen mit vier großen Toren, die vorerst zu sind.
@@ -57,6 +74,7 @@ export const REGIONS: readonly Region[] = [
       { species: 'biene', at: [-26, 49] },
       { species: 'schildkroete', at: [55, -9] },
     ],
+    herd: 4, // erster Spieltest: zu wenige Tiere auf der großen Lichtung
   },
 ];
 
