@@ -7,6 +7,7 @@ import {
   TOWER,
   canStep,
   createWorld,
+  gatePlaces,
   standHeight,
   wildAnimals,
   type Cell,
@@ -185,21 +186,20 @@ describe('Start auf der Lichtung', () => {
   }
 
   it('Lage und Reihenfolge der Tore würfelt der Seed', () => {
-    const a = createWorld(5),
-      b = createWorld(6);
-    const mids = (w: ReturnType<typeof createWorld>) => GATES.map((g) => w.gates.get(g.id)!.mid.join(',')).join(' ');
-    expect(mids(a)).not.toBe(mids(b));
-    expect(mids(a)).toBe(mids(createWorld(5)));
+    const mids = (gates: World['gates']) => GATES.map((g) => gates.get(g.id)!.mid.join(',')).join(' ');
+    expect(mids(gatePlaces(5))).not.toBe(mids(gatePlaces(6)));
+    expect(mids(gatePlaces(5))).toBe(mids(gatePlaces(5)));
+    expect(mids(createWorld(5).gates)).toBe(mids(gatePlaces(5))); // die gebaute Welt hat dieselben Tore
   });
 
   it('Die fünf Felder jedes großen Tores liegen in einer geraden Reihe, Tore weit auseinander (viele Seeds)', () => {
     for (let seed = 1; seed < 400; seed += 25) {
-      const w = createWorld(seed * 4513);
-      const all = [...w.gates.values()];
+      const gates = gatePlaces(seed * 4513); // nur die Tore: schnell, auch auf dem langsamen Runner der Pipeline
+      const all = [...gates.values()];
       for (const a of all)
         for (const b of all)
           if (a !== b) expect(Math.hypot(a.mid[0] - b.mid[0], a.mid[1] - b.mid[1])).toBeGreaterThan(30);
-      for (const { cells } of w.gates.values()) {
+      for (const { cells } of gates.values()) {
         const xs = new Set(cells.map(([x]) => x)),
           ys = new Set(cells.map(([, y]) => y));
         expect(xs.size === 1 || ys.size === 1, `Seed ${seed * 4513}`).toBe(true);

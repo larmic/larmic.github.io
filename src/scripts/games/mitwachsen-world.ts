@@ -687,6 +687,11 @@ function dress(seed: number, x: number, y: number, c: Cell): Cell {
   return out;
 }
 
+/** Die großen Tore einer Welt; schnell, ohne die Welt zu bauen (Lage und Reihenfolge würfelt der Seed) */
+export const gatePlaces = (seed: number) => gatesOf(layouts(seed));
+const gatesOf = (places: readonly Layout[]) =>
+  new Map<GateId, GatePlace>(places.map(({ id, cells, mid, out, angle }) => [id, { id, cells, mid, out, angle }]));
+
 export function createWorld(seed: number): World {
   const places = layouts(seed);
   const { map: regions, spawns, spots } = buildStart(seed, places);
@@ -705,13 +710,10 @@ export function createWorld(seed: number): World {
         );
     return cells;
   });
-  const gates = new Map<GateId, GatePlace>(
-    places.map(({ id, cells, mid, out, angle }) => [id, { id, cells, mid, out, angle }]),
-  );
   return {
     seed,
     cell: (x, y) => cache.get(x, y),
-    gates,
+    gates: gatesOf(places),
     spawns,
     spots,
     portals: portalsOf(places),

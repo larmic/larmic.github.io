@@ -5,6 +5,9 @@ export default defineConfig({
   test: {
     include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
     environment: 'node',
+    // Der Runner der Pipeline ist mit Abdeckung gut dreimal langsamer als ein Entwickler-Rechner; die Simulationen
+    // (tausende Takte, ganze Welten) brauchen dort mehr als die üblichen 5 s. Langsame Tests trotzdem billig halten.
+    testTimeout: 15_000,
     // Abdeckung nur für die reinen Module – Web Components, Canvas und Three.js prüft der Browser-Test (e2e/)
     coverage: {
       provider: 'v8',
