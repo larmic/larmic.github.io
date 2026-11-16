@@ -45,7 +45,7 @@ Hintergrund, Altersstufen und gemeinsame Regeln: [README](README.md). Dieses Dok
 
 | | |
 | --- | --- |
-| Tiere zum Entdecken | zehn Arten: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte, je vier Tiere (aus dem ersten Spieltest: die Lichtung war zu leer). Die Leiste zeigt jede Art einmal. |
+| Tiere zum Entdecken | zwölf Arten: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte, Bär und Zicklein mit kleinen Hörnern, je vier Tiere (aus dem ersten Spieltest: die Lichtung war zu leer; Bär und Zicklein hat sich mein Sohn gewünscht). Die Leiste zeigt jede Art einmal. |
 | Tore | acht, eines je Welt (Eis, Sand, Wasser, Lava, Höhle, Wald, Wolken, Pilze), Lage und Reihenfolge je Welt gewürfelt, alle vorerst zu. Jedes Torhaus ist im Stil seiner Welt geschmückt |
 
 Die Leiste unten ist die **Liste der entdeckten Tiere**: Umriss mit Fragezeichen = noch nicht entdeckt, in Farbe = entdeckt, Herz = folgt gerade. Grün hinterlegt = zu Hause auf der Wiese. Wie sich die Tore später öffnen, hängt an der Geschichte (siehe Ideen: Tiere befreien).
@@ -77,7 +77,7 @@ Die Lichtung ist das Zuhause mit dem Bett. Hinter jedem der acht großen Tore li
 
 ### Lichtung
 
-Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzelnen Bäumen, Blumenwiesen und Klettersteinen, ringsum Felsen als feste Grenze. In der Mitte das Bett, darüber später die vier Portale in einer Reihe. Zehn Tiere: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte. Tag und Nacht, Schmetterlinge, nachts Glühwürmchen.
+Große, freie Wiese (gut 160 × 136 Felder) mit sanften Hügeln, Teichen, einzelnen Bäumen, Blumenwiesen und Klettersteinen, ringsum Felsen als feste Grenze. In der Mitte das Bett, darüber später die vier Portale in einer Reihe. Zwölf Tiere: Hase, Igel, Schaf, Eichhörnchen, Ente, Kuh, Fuchs, Frosch, Biene, Schildkröte, Bär, Zicklein. Tag und Nacht, Schmetterlinge, nachts Glühwürmchen.
 
 ### Eiswelt
 

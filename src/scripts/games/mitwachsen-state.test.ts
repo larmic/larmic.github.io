@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Dir } from '../../lib/games/front';
-import { HOME, animalId } from '../../data/games/mitwachsen';
+import { HOME, REGIONS, animalId } from '../../data/games/mitwachsen';
 import {
   SLEEP_LOCK,
   BERRY_REGROW,
@@ -358,7 +358,7 @@ describe('Tiere an wechselnden Stellen', () => {
     for (const seed of [1, 2, 3]) {
       const s = initialState(world, {}, seed);
       const region = s.animals.filter((a) => a.home.kind === 'region');
-      expect(region).toHaveLength(40);
+      expect(region).toHaveLength(REGIONS[0].animals.length * REGIONS[0].herd); // je Art eine Herde
       for (const a of region) {
         expect(spots.has(`${a.x},${a.y}`), a.id).toBe(true);
         expect(Math.max(Math.abs(a.x - HOME.bed[0]), Math.abs(a.y - HOME.bed[1]))).toBeGreaterThanOrEqual(8);

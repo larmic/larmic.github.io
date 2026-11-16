@@ -6,7 +6,18 @@ import { eyes, type Part } from '../../lib/games/front';
 
 export type RegionId = 'lichtung';
 export type SpeciesId =
-  'hase' | 'igel' | 'schaf' | 'kuh' | 'biene' | 'ente' | 'frosch' | 'schildkroete' | 'fuchs' | 'eichhoernchen';
+  | 'hase'
+  | 'igel'
+  | 'schaf'
+  | 'kuh'
+  | 'biene'
+  | 'ente'
+  | 'frosch'
+  | 'schildkroete'
+  | 'fuchs'
+  | 'eichhoernchen'
+  | 'baer'
+  | 'ziege';
 export type GateTheme = 'eis' | 'sand' | 'wasser' | 'lava' | 'hoehle' | 'wald' | 'wolken' | 'pilze';
 export type GateId = GateTheme; // je Welt genau ein Tor
 
@@ -72,6 +83,8 @@ export const REGIONS: readonly [Region, ...Region[]] = [
       { species: 'frosch', at: [20, 46] },
       { species: 'biene', at: [-26, 49] },
       { species: 'schildkroete', at: [55, -9] },
+      { species: 'baer', at: [-62, -8] }, // Wunsch meines Sohnes: Bären und kleine Ziegen mit Hörnern
+      { species: 'ziege', at: [14, -55] },
     ],
     herd: 4, // erster Spieltest: zu wenige Tiere auf der großen Lichtung
   },
@@ -336,6 +349,57 @@ export const SPECIES: Record<SpeciesId, Species> = {
       [0.18, -0.11, 0.42, 0.06, 0.07, 0.09, '#e0782e', '#3a2a22'],
       [0.18, 0.04, 0.42, 0.06, 0.07, 0.09, '#e0782e', '#3a2a22'],
       ...eyes(0.34, 0.12, 0.33, 0.05, 0.05, 0.04),
+    ],
+  },
+  baer: {
+    id: 'baer',
+    name: 'Bär',
+    scale: 1.35,
+    // tiefes, freundliches Brummen
+    tone: { notes: [130.81, 146.83], wave: 'triangle', len: 0.32, gap: 0.04, slide: 0.92, gain: 0.22 },
+    parts: [
+      ...legs(0.13, -0.27, 0.17, 0.13, 0.18, '#6e4527'), // dicke Tatzen
+      [-0.31, -0.2, 0.16, 0.56, 0.4, 0.34, '#8a5a34', '#9a6a40'], // runder Körper
+      [-0.16, -0.14, 0.14, 0.3, 0.28, 0.04, '#a77a4c'], // heller Bauch
+      [-0.35, -0.04, 0.36, 0.05, 0.08, 0.07, '#8a5a34'], // Stummelschwanz
+      [0.2, -0.15, 0.3, 0.24, 0.3, 0.26, '#8a5a34', '#9a6a40'], // Kopf
+      [0.44, -0.08, 0.32, 0.08, 0.16, 0.11, '#c49a6c'], // helle Schnauze
+      [0.52, -0.04, 0.39, 0.02, 0.08, 0.05, '#2a2020'], // Nase
+      [0.26, -0.19, 0.56, 0.08, 0.1, 0.08, '#8a5a34'], // runde Ohren
+      [0.26, 0.09, 0.56, 0.08, 0.1, 0.08, '#8a5a34'],
+      [0.33, -0.17, 0.58, 0.01, 0.06, 0.05, '#c49a6c'], // innen hell
+      [0.33, 0.11, 0.58, 0.01, 0.06, 0.05, '#c49a6c'],
+      ...eyes(0.44, 0.15, 0.47, 0.05, 0.05, 0.06),
+    ],
+  },
+  ziege: {
+    id: 'ziege',
+    name: 'Zicklein',
+    scale: 1.15,
+    // helles, wackliges Mäh (anders als das tiefe Mäh des Schafs)
+    tone: { notes: [659.25, 587.33, 659.25], wave: 'triangle', len: 0.09, gap: 0.01, slide: 0.97, gain: 0.13 },
+    parts: [
+      ...legs(0.12, -0.19, 0.1, 0.06, 0.22, '#eadfcd'),
+      ...legs(0.115, -0.195, 0.105, 0.07, 0.04), // dunkle Hufe
+      [-0.25, -0.11, 0.22, 0.45, 0.22, 0.2, '#eadfcd', '#f4ecdf'], // Körper
+      [-0.12, -0.115, 0.28, 0.16, 0.01, 0.1, '#a8743f'], // braune Flecken
+      [0.04, 0.105, 0.26, 0.12, 0.01, 0.12, '#a8743f'],
+      [-0.29, -0.03, 0.38, 0.05, 0.06, 0.09, '#eadfcd'], // Schwänzchen nach oben
+      [0.12, -0.07, 0.34, 0.1, 0.14, 0.12, '#eadfcd'], // Hals
+      [0.16, -0.085, 0.42, 0.18, 0.17, 0.16, '#eadfcd', '#f4ecdf'], // Kopf
+      [0.34, -0.06, 0.42, 0.07, 0.12, 0.09, '#d9cbb4'], // Schnauze
+      [0.4, -0.02, 0.47, 0.01, 0.04, 0.03, '#5a4636'], // Nase
+      [0.32, -0.02, 0.33, 0.03, 0.04, 0.09, '#d9cbb4'], // Ziegenbart
+      [0.22, -0.15, 0.5, 0.07, 0.06, 0.04, '#eadfcd'], // Ohren zur Seite
+      [0.22, 0.085, 0.5, 0.07, 0.06, 0.04, '#eadfcd'],
+      // Hörner: gut zu sehen, erst nach oben, dann nach hinten gebogen
+      [0.21, -0.08, 0.57, 0.06, 0.05, 0.12, '#5e4e3e', '#7a6a58'],
+      [0.15, -0.08, 0.67, 0.08, 0.05, 0.06, '#5e4e3e', '#7a6a58'],
+      [0.1, -0.08, 0.63, 0.05, 0.05, 0.05, '#5e4e3e', '#7a6a58'],
+      [0.21, 0.03, 0.57, 0.06, 0.05, 0.12, '#5e4e3e', '#7a6a58'],
+      [0.15, 0.03, 0.67, 0.08, 0.05, 0.06, '#5e4e3e', '#7a6a58'],
+      [0.1, 0.03, 0.63, 0.05, 0.05, 0.05, '#5e4e3e', '#7a6a58'],
+      ...eyes(0.34, 0.085, 0.49, 0.04, 0.04, 0.03),
     ],
   },
   eichhoernchen: {
