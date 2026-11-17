@@ -36,7 +36,7 @@ export default defineConfig(
   },
   {
     files: ['src/lib/voxel/world.ts'],
-    rules: { 'max-lines-per-function': ['error', { max: 171, skipBlankLines: true, skipComments: true }] },
+    rules: { 'max-lines-per-function': ['error', { max: 167, skipBlankLines: true, skipComments: true }] },
   },
   {
     files: ['src/scripts/games/larmic-mitwachsen.ts'],

@@ -1,5 +1,5 @@
-// Die Insel von larmic.de: feste Blöcke, Startfeld, Wege zu den fünf Bereichen, Plätze für die Kisten der Einträge
-// und das Easter Egg am Baum. Gebaut wird sie mit der Szenen-Engine aus src/lib/voxel/world.ts.
+// Die Insel von larmic.de: feste Blöcke, Startfeld, Wege zu den Bereichen, zum Blog und zum Pilz-Ausgang (Link auf
+// die eigene Seite des Kinderspiels), Plätze für die Kisten der Einträge und das Easter Egg am Baum. Gebaut wird sie mit der Szenen-Engine aus src/lib/voxel/world.ts.
 // Rein und ohne Astro, damit sie sich testen lässt (island-layout.test.ts); das Laden der Inhalte steckt in island.ts.
 import {
   buildScene,
@@ -13,6 +13,7 @@ import {
 } from '../lib/voxel/world';
 import type { Avatar } from '../lib/voxel/avatar';
 import { f } from '../lib/voxel/render';
+import { MITWACHSEN } from './site';
 
 // ---------- Insel ----------
 function islandBlocks(): Blocks {
@@ -86,7 +87,8 @@ const ROUTES: Record<string, RouteDef> = {
     tag: 'B',
   },
   blog: { walk: [[4, 3]], bridge: [], target: [7, 3, -2], tag: 'B', fall: [5, 3, 0] },
-  spiele: {
+  // Pilz-Ausgang: Fliegenpilz-Haus wie auf der Insel von mitwachsen-spiele.de, der Link führt dorthin (gleicher Tab)
+  mitwachsen: {
     walk: [
       [3, 2],
       [4, 2],
@@ -96,7 +98,7 @@ const ROUTES: Record<string, RouteDef> = {
       [5, 1, 0],
       [6, 1, 0],
     ],
-    target: [7, 1, 0], // so tief, dass die Sprechblase der Figur nicht über das Etikett der Workshops reicht
+    target: [7, 1, 0], // gleicher Platz wie früher der Würfel „Spiele“
     tag: 'R',
   },
 };
@@ -105,18 +107,18 @@ const navMeta = (avatar: Avatar): Record<string, NavMeta> => ({
   workshops: { label: 'Workshops', sym: 'board', delay: '-1.1s', p1: '#f39a3d', p2: '#5aa6e8', href: '/workshops/' },
   videos: { label: 'Videos', sym: 'screen', delay: '-2.2s', p1: '#ee4b3e', p2: '#454b59', href: '/videos/' },
   blog: { label: 'Blog', sym: 'shelf', delay: '-0.6s', p1: '#c0453a', p2: '#3f6fb5' },
-  spiele: { label: 'Spiele', sym: 'dice', delay: '-1.6s', p1: '#f6f3ec', p2: '#c0453a', href: '/spiele/' },
+  mitwachsen: { label: 'Mitwachsen', sym: 'pilz', delay: '-1.6s', p1: '#d9473a', p2: '#ffffff', href: MITWACHSEN.home },
 });
 
 // Kisten der Einträge: feste Plätze rund um ihren Bereichs-Block, Weg = Brücke(n) vom Bereichs-Block aus
-export type Section = 'workshops' | 'videos' | 'spiele';
+export type Section = 'workshops' | 'videos';
 
-/** Ruheblock einer Seite: ein Bereich oder die Kiste eines Eintrags. Tippfehler fallen so schon bei `npm run check` auf. */
+/**
+ * Ruheblock einer Seite: ein Bereich oder die Kiste eines Eintrags – nie ein Block, der nach außen führt.
+ * Tippfehler fallen so schon bei `npm run check` auf.
+ */
 export type RestId = 'about' | Section | `${Section}/${string}`;
 const CHILD_SLOTS: Record<Section, Pick<RouteDef, 'bridge' | 'target' | 'tag'>[]> = {
-  spiele: [
-    { bridge: [[8, 1, 0]], target: [9, 1, -1], tag: 'B' }, // rechts, Stufe runter, Etikett darunter (rechts wäre es am Rand abgeschnitten)
-  ],
   workshops: [
     { bridge: [[3, -4, 3]], target: [3, -5, 4], tag: 'R' }, // oben rechts, Treppe hoch
     { bridge: [[2, -3, 3]], target: [1, -3, 4], tag: 'L' }, // oben links, Treppe hoch
@@ -180,7 +182,7 @@ export function buildWorld(children: Record<Section, ChildItem[]>, avatar: Avata
     const m = NAV_META[id];
     if (!m) throw new Error(`Insel: Für ${id} fehlt das Etikett (navMeta)`);
     meta[id] = m;
-    if (id !== 'workshops' && id !== 'videos' && id !== 'spiele') continue;
+    if (id !== 'workshops' && id !== 'videos') continue;
     const slots = CHILD_SLOTS[id];
     if (children[id].length > slots.length)
       throw new Error(

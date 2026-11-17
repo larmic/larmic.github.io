@@ -5,8 +5,11 @@
 
 import type { RouteNode, WorldData } from '../lib/voxel/world';
 
-/** Was die Figur von der Insel braucht: Startfeld und Wege (vom Generator erzeugt, als JSON ins HTML geschrieben) */
-export type World = Pick<WorldData, 'home' | 'routes'>;
+/**
+ * Was die Figur von der Insel braucht: Startfeld, Wege und die Ziele, deren Link von der Seite wegführt (vom
+ * Generator erzeugt, als JSON ins HTML geschrieben)
+ */
+export type World = Pick<WorldData, 'home' | 'routes' | 'outside'>;
 
 export const FALL_TICKS = 7; // Dauer des Sturzes in Takten
 export const CRUMBLE_TICKS = 3; // so lange bleibt ein bröckelnder Brückenblock sichtbar
@@ -61,9 +64,9 @@ export function initialState(world: World, rest: string): FigureState {
   };
 }
 
-/** Neuer Inhalt wird angezeigt: Sein Block wird der Ruheblock, die Figur läuft hin. */
+/** Neuer Inhalt wird angezeigt: Sein Block wird der Ruheblock, die Figur läuft hin. Links nach außen nie. */
 export function select(state: FigureState, world: World, id: string): FigureState {
-  if (!world.routes[id] || id === state.rest) return state;
+  if (!world.routes[id] || world.outside.includes(id) || id === state.rest) return state;
   return { ...state, rest: id, show404: false, picks: state.picks + 1 };
 }
 

@@ -21,8 +21,6 @@ for (const path of [
   '/workshops/event_storming/',
   '/videos/',
   '/videos/testcontainers/',
-  '/spiele/',
-  '/spiele/mitwachsen/',
   '/impressum/',
   '/datenschutz/',
   '/gibt-es-nicht/',
@@ -31,12 +29,3 @@ for (const path of [
     await page.goto(path);
     expect(await violations(page)).toEqual([]);
   });
-
-test('Barrierefrei: Kinderspiel mit Hinweis für Eltern und danach', async ({ page }) => {
-  await page.goto('/spiele/mitwachsen/spielen/');
-  await expect(page.locator('dialog.mw-info')).toHaveJSProperty('open', true);
-  expect(await violations(page)).toEqual([]);
-  await page.getByRole('button', { name: /Verstanden/ }).click();
-  await expect(page.locator('larmic-mitwachsen')).toHaveClass(/ready/);
-  expect(await violations(page)).toEqual([]);
-});

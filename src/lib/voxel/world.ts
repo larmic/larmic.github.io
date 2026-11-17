@@ -104,6 +104,7 @@ export type WorldData = {
   // Inselblöcke, die vor einer Brücke oder einem Zielblock stehen: noch einmal darüber gezeichnet, damit sie verdecken
   front: { kind: string; x: number; y: number; w: number; z: number }[];
   eggs: { id: string; x: number; y: number; w: number; h: number }[];
+  outside: string[]; // Ziele, deren Link von der Seite wegführt: nie Ruheblock einer Seite
 };
 export type Scene = ReturnType<typeof buildScene>;
 
@@ -117,6 +118,12 @@ function need<T>(value: T | undefined, what: string): T {
 }
 
 const depthOrder = (a: Cell, b: Cell) => a[0] + a[1] + a[2] - (b[0] + b[1] + b[2]) || a[2] - b[2] || a[0] - b[0];
+/** Überdecken sich zwei Blöcke auf dem Bild? */
+const overlaps = (a: Cell, b: Cell) => {
+  const [ax, ay] = pos(...a);
+  const [bx, by] = pos(...b);
+  return Math.abs(ax - bx) < CUBE_W && Math.abs(ay - by) < CUBE_H;
+};
 
 export function buildScene(def: SceneDef, avatar: Avatar) {
   const has = (i: number, j: number, k: number) => def.blocks.has(key([i, j, k]));
@@ -230,11 +237,6 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
   // Ebenen über dem Insel-SVG (Brücken, Zielblöcke, Vordergrund) bekommen ihren z-index aus der Zeichenreihenfolge.
   // Inselblöcke, die vor einer dieser Ebenen stehen und sich mit ihr überschneiden, kommen als Vordergrund dazu.
   const dynamic = [...bridgesRaw.map((b) => b.c), ...Object.values(targets).map((t) => t.c)];
-  const overlaps = (a: Cell, b: Cell) => {
-    const [ax, ay] = pos(...a);
-    const [bx, by] = pos(...b);
-    return Math.abs(ax - bx) < CUBE_W && Math.abs(ay - by) < CUBE_H;
-  };
   // Mit dazu kommen alle Inselblöcke, die wiederum vor einem Vordergrund-Block stehen – sonst zeigte er Seiten,
   // die im Insel-SVG von Nachbarn verdeckt sind.
   const inFront = (c: Cell, of: Cell[]) => of.some((d) => depthOrder(c, d) > 0 && overlaps(c, d));
@@ -263,6 +265,7 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
       ]),
     ),
     bridges: bridgesRaw.map((b) => ({ x: px(b.X), y: py(b.Y), w: W, z: zi(b.c) })),
+    outside: Object.values(targets).flatMap(({ nav }) => (isExternal(nav.href) ? [nav.id] : [])),
     nav: Object.values(targets).map(({ X, Y, c, tag, nav }) => ({
       ...nav,
       x: px(X),

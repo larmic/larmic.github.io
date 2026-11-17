@@ -24,7 +24,6 @@ const world: World = buildWorld(
   {
     workshops: entries('workshops', ['ddd', 'es', 'ms']),
     videos: entries('videos', ['tc', 'hex', 'es', 'unit']),
-    spiele: entries('spiele', ['mitwachsen']),
   },
   AVATAR,
 ).data;
@@ -189,6 +188,16 @@ describe('Figur auf der Insel', () => {
     expect(select(s, world, 'https://www.mitwachsen-spiele.de/')).toBe(s);
   });
 
+  it('macht den Pilz-Ausgang nie zum Ruheblock: Er führt nach außen, die Figur läuft nur beim Zeigen hin', () => {
+    expect(world.outside).toEqual(['mitwachsen']);
+    const s = initialState(world, 'workshops/ddd');
+    expect(select(s, world, 'mitwachsen')).toBe(s);
+    const there = settle(aim(s, 'mitwachsen')).s;
+    standsOn(there, 'mitwachsen');
+    expect(view(there, world, BUBBLES).bubble.visible, 'nicht auf ihrem Ruheblock').toBe(false);
+    standsOn(settle(returned(there)).s, 'workshops/ddd');
+  });
+
   it('geht nach Zurück aus dem Cache von dem Block, auf den zuletzt gezeigt wurde, zu ihrem Ruheblock', () => {
     // Mit der Maus zum Block gelaufen, dann per Klick die Seite verlassen: Ein mouseleave kommt nie
     const away = settle(aim(initialState(world, 'about'), 'videos')).s;
@@ -208,9 +217,9 @@ describe('Figur auf der Insel', () => {
   });
 
   it('kommt aus jeder Kombination von Ruheblock und Ziel zur Ruhe', () => {
-    const ids = Object.keys(world.routes).filter((id) => id !== 'blog' && id !== 'tree');
+    const ids = Object.keys(world.routes).filter((id) => id !== 'blog' && id !== 'tree' && id !== 'mitwachsen');
     for (const rest of ids) {
-      for (const goal of [...ids, 'blog', 'tree']) {
+      for (const goal of [...ids, 'mitwachsen', 'blog', 'tree']) {
         const { s } = settle(aim(initialState(world, rest), goal));
         standsOn(s, goal === 'blog' ? rest : goal);
         standsOn(settle(leave(s, goal)).s, rest);

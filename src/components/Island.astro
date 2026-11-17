@@ -23,13 +23,14 @@ const route = d.routes[rest];
 const at = route?.at(-1);
 if (!route || !at)
   throw new Error(`Insel: Für die Seite ist rest="${rest}" gesetzt, einen solchen Block gibt es nicht`);
+if (d.outside.includes(rest)) throw new Error(`Insel: rest="${rest}" führt nach außen und kann kein Ruheblock sein`);
 const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
 const host = (href: string) => new URL(href).hostname.replace(/^www\./, '');
 ---
 
 <nav class="island-nav" aria-label="Hauptnavigation">
   <larmic-island
-    data-world={JSON.stringify({ home: d.home, routes: d.routes, rest })}
+    data-world={JSON.stringify({ home: d.home, routes: d.routes, outside: d.outside, rest })}
     style={`--home-x: ${d.home.x}%; --home-y: ${d.home.y}%`}
   >
     <div class="isle" style={`aspect-ratio: ${w.aspect}`}>

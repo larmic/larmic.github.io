@@ -2,9 +2,12 @@
 // 1. Keine externen Ressourcen ohne Klick (Regel aus CLAUDE.md): Was der Browser beim Laden von selbst holt –
 //    Skripte, Bilder, Stylesheets, Schriften, Vorschauen, iframes, url() in CSS –, kommt von der eigenen Seite.
 //    Links (<a href>) und Hinweise wie canonical sind erlaubt, sie lädt erst ein Klick bzw. niemand.
-// 2. Alte Adressen leiten weiter (Astro schreibt dafür kleine Seiten mit <meta http-equiv="refresh">).
+// 2. Alte Adressen leiten weiter (Astro schreibt dafür kleine Seiten mit <meta http-equiv="refresh">): auf eine
+//    Seite, die es gibt, oder auf eine freigegebene fremde Domain (deren Seiten liegen nicht in dist).
 
 const OWN_HOSTS = new Set(['larmic.de', 'www.larmic.de']);
+/** Fremde Hosts, auf die alte Adressen weiterleiten dürfen: das Kinderspiel Mitwachsen mit eigener Seite */
+export const REDIRECT_HOSTS = new Set(['www.mitwachsen-spiele.de']);
 /** <link rel="…">, die nichts laden */
 const NON_LOADING_REL = new Set([
   'canonical',
@@ -77,4 +80,15 @@ export function redirectTarget(html: string): string | null {
     return m?.[1]?.trim() ?? null;
   }
   return null;
+}
+
+/**
+ * Was an der Weiterleitung einer alten Adresse nicht stimmt (null = alles gut). `actual` ist das gelesene Ziel der
+ * Weiterleitungsseite, `exists` sagt, ob es eine eigene Seite unter diesem Pfad gibt.
+ */
+export function redirectProblem(to: string, actual: string | null, exists: (path: string) => boolean): string | null {
+  if (actual !== to) return `führt zu ${actual ?? 'nichts'} statt zu ${to}`;
+  if (!isForeign(to)) return exists(to) ? null : `Ziel ${to} fehlt`;
+  const host = new URL(to, 'https://larmic.de').hostname;
+  return REDIRECT_HOSTS.has(host) ? null : `Ziel ${to} liegt auf ${host}, das ist nicht freigegeben (REDIRECT_HOSTS)`;
 }

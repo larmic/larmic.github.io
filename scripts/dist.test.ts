@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { externalResources, isForeign, redirectTarget } from './dist';
+import { externalResources, isForeign, redirectProblem, redirectTarget } from './dist';
 
 describe('Externe Ressourcen', () => {
   it('erkennt fremde Hosts, auch protokollrelativ; eigene und relative Adressen sind erlaubt', () => {
@@ -46,5 +46,19 @@ describe('Weiterleitungen', () => {
     expect(redirectTarget('<title>Redirecting to: /</title><meta http-equiv="refresh" content="0;url=/">')).toBe('/');
     expect(redirectTarget('<meta http-equiv="Refresh" content="0; URL=/spiele/x/">')).toBe('/spiele/x/');
     expect(redirectTarget('<meta charset="utf-8">')).toBeNull();
+  });
+
+  it('verlangt eine Seite in dist, außer das Ziel liegt auf einer freigegebenen fremden Domain', () => {
+    const exists = (p: string) => p === '/';
+    expect(redirectProblem('/', '/', exists)).toBeNull();
+    expect(redirectProblem('/weg/', '/weg/', exists)).toBe('Ziel /weg/ fehlt');
+    expect(redirectProblem('/', '/videos/', exists)).toBe('führt zu /videos/ statt zu /');
+    expect(redirectProblem('/', null, exists)).toBe('führt zu nichts statt zu /');
+    const game = 'https://www.mitwachsen-spiele.de/spielen/';
+    expect(redirectProblem(game, game, exists)).toBeNull();
+    expect(redirectProblem(game, 'https://www.mitwachsen-spiele.de/', exists)).toMatch(/statt zu/);
+    expect(redirectProblem('https://example.com/', 'https://example.com/', exists)).toMatch(
+      /example\.com.*nicht freigegeben/,
+    );
   });
 });

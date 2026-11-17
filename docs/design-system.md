@@ -68,14 +68,14 @@ Die Insel ist auf jeder Seite dieselbe und die einzige Navigation. Oben stehen N
                    ▣ ▣ ▣ ▣  ← Video-Kisten, offen auf /videos/…
 ```
 
-Die Ziele bilden einen Baum: Insel → Bereich → Kiste. Jedes Ziel hat eine eigene Seite:
+Die Ziele bilden einen Baum: Insel → Bereich → Kiste. Jedes Ziel hat eine eigene Seite – bis auf den Blog und den Pilz-Ausgang:
 
 | Ziel | Adresse |
 | --- | --- |
 | Über mich | `/` |
 | Workshops / ein Workshop | `/workshops/`, `/workshops/<id>/` |
 | Videos / ein Video | `/videos/`, `/videos/<id>/` |
-| Spiele / ein Spiel | `/spiele/`, `/spiele/<id>/` (Spielwürfel als Bereich, Kiste mit Fliegenpilz-Block; Fläche `th-spiel` im Himmelblau der Insel, weil Spiele kein Themen-Material sind). Gespielt wird unter `/spiele/<id>/spielen/` |
+| Mitwachsen ↗ (Pilz-Ausgang) | `https://www.mitwachsen-spiele.de/` – die eigene Seite des Kinderspiels, im selben Tab. Fliegenpilz-Haus (`pilz`) wie auf der Insel von mitwachsen-spiele.de, rechts neben der Insel. Kein Ruheblock, keine Kisten |
 | Blog | keine – die Figur fällt |
 
 **Die Figur steht immer auf dem Block der angezeigten Seite.** Die Kisten eines Bereichs poppen auf, sobald er offen ist, und verschwinden, wenn die Figur ihn verlassen hat. Kisten haben die Themenfarbe ihres Eintrags; ihr Etikett erscheint beim Zeigen und an der gewählten Kiste.
@@ -86,7 +86,8 @@ Die Ziele bilden einen Baum: Insel → Bereich → Kiste. Jedes Ziel hat eine ei
 | Maus weg oder Fokus verlassen | Die Figur läuft zurück auf den Block der angezeigten Seite |
 | Klick auf einen Block oder eine Karte | Seitenwechsel ohne Neuladen. Der Block springt mit Partikeln, die Figur läuft hin und bleibt stehen |
 | Hover oder Klick auf Blog | Figur holt aus, hat keinen Block, fällt und spawnt auf ihrem Block mit „404 – Kein Blog gefunden“ |
-| Zurück-Taste des Browsers | Vorherige Seite, die Figur läuft mit |
+| Hover oder Fokus auf den Pilz-Ausgang | Die Figur baut die Brücke und läuft zum Pilz. Ein Klick lädt sofort mitwachsen-spiele.de (auf dem Handy, bei reduzierter Bewegung und ohne JavaScript ohne Weg). Etikett mit ↗, für Screenreader „– eigene Seite: mitwachsen-spiele.de“ |
+| Zurück-Taste des Browsers | Vorherige Seite, die Figur läuft mit. Zurück von mitwachsen-spiele.de: Die Figur geht vom Pilz zu ihrem Block |
 
 Die Sprechblase erscheint nur, wenn die Figur auf einem Bereichs-Block steht (auf Kisten schweigt sie) – außer der 404-Meldung, die überall erscheint und bleibt, bis man auf einen anderen Block zeigt. Beim ersten Aufruf der Startseite begrüßt sie („Hi! Zeig auf einen Block.“).
 

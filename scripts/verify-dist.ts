@@ -1,12 +1,12 @@
 // Guard-Gate nach dem Build (Teil von npm run verify): Regeln aus CLAUDE.md, die sonst nur Absprache wären.
 // – Keine externen Ressourcen ohne Klick auf irgendeiner Seite.
-// – Alte Adressen leiten an ihr Ziel weiter, und das Ziel gibt es. (Die Sprungmarken wie /#workshops prüft der
-//   Smoke-Test im Browser, e2e/smoke.spec.ts.)
+// – Alte Adressen leiten an ihr Ziel weiter, und das Ziel gibt es – oder es liegt auf einer freigegebenen fremden
+//   Domain (REDIRECT_HOSTS). (Die Sprungmarken wie /#workshops prüft der Smoke-Test im Browser, e2e/smoke.spec.ts.)
 // Logik und Tests: scripts/dist.ts, scripts/dist.test.ts
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { externalResources, redirectTarget } from './dist.ts';
+import { externalResources, redirectProblem, redirectTarget } from './dist.ts';
 
 const DIST = 'dist';
 /** Alte Adressen und wohin sie führen müssen */
@@ -14,7 +14,11 @@ export const LEGACY: [string, string][] = [
   ['/about/', '/'],
   ['/tags/', '/'],
   ['/categories/', '/'],
-  ['/spiele/threeyear/', '/spiele/mitwachsen/spielen/'],
+  // Das Kinderspiel Mitwachsen hat eine eigene Seite
+  ['/spiele/', 'https://www.mitwachsen-spiele.de/'],
+  ['/spiele/mitwachsen/', 'https://www.mitwachsen-spiele.de/'],
+  ['/spiele/mitwachsen/spielen/', 'https://www.mitwachsen-spiele.de/spielen/'],
+  ['/spiele/threeyear/', 'https://www.mitwachsen-spiele.de/spielen/'],
 ];
 
 const pagesIn = (dir: string): string[] =>
@@ -33,9 +37,10 @@ for (const [from, to] of LEGACY) {
     problems.push(`alte Adresse ${from}: keine Seite`);
     continue;
   }
-  const target = redirectTarget(readFileSync(pageFile(from), 'utf8'));
-  if (target !== to) problems.push(`alte Adresse ${from}: führt zu ${target ?? 'nichts'} statt zu ${to}`);
-  else if (!existsSync(pageFile(to))) problems.push(`alte Adresse ${from}: Ziel ${to} fehlt`);
+  const problem = redirectProblem(to, redirectTarget(readFileSync(pageFile(from), 'utf8')), (p) =>
+    existsSync(pageFile(p)),
+  );
+  if (problem) problems.push(`alte Adresse ${from}: ${problem}`);
 }
 
 if (problems.length) {
