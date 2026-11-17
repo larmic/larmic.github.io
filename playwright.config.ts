@@ -1,5 +1,5 @@
 // Smoke-Test im Browser (Guard-Gate nach dem Build): Die fertige Seite aus dist/ wird ausgeliefert und in Chromium
-// geöffnet. Prüft, was statische Gates nicht sehen: dass Insel und Spiel laufen, ohne Fehler in der Konsole.
+// geöffnet. Prüft, was statische Gates nicht sehen: dass die Insel läuft, ohne Fehler in der Konsole.
 // Einmalig lokal: npx playwright install chromium
 import { defineConfig, devices } from '@playwright/test';
 

@@ -31,65 +31,8 @@ export default defineConfig(
   // Sperrklinke für die großen Dateien von heute: genau ihr jetziger Stand, damit sie nicht weiter wachsen.
   // Wer eine davon verkleinert, senkt hier die Zahl (oder streicht die Zeile).
   {
-    files: ['src/data/games/mitwachsen.ts'],
-    rules: { 'max-lines': ['error', { max: 494, skipBlankLines: true, skipComments: true }] },
-  },
-  {
     files: ['src/lib/voxel/world.ts'],
     rules: { 'max-lines-per-function': ['error', { max: 167, skipBlankLines: true, skipComments: true }] },
-  },
-  {
-    files: ['src/scripts/games/larmic-mitwachsen.ts'],
-    rules: {
-      complexity: ['error', 31],
-      'max-lines': ['error', { max: 848, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 104, skipBlankLines: true, skipComments: true }],
-    },
-  },
-  {
-    files: ['src/scripts/games/mitwachsen-3d.ts'],
-    rules: {
-      complexity: ['error', 36],
-      'max-depth': ['error', 6],
-      'max-lines': ['error', { max: 963, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 133, skipBlankLines: true, skipComments: true }],
-    },
-  },
-  {
-    files: ['src/scripts/games/mitwachsen-gatehouse.ts'],
-    rules: {
-      complexity: ['error', 24],
-      'max-lines-per-function': ['error', { max: 169, skipBlankLines: true, skipComments: true }],
-    },
-  },
-  {
-    files: ['src/scripts/games/mitwachsen-map.ts'],
-    rules: { 'max-lines-per-function': ['error', { max: 84, skipBlankLines: true, skipComments: true }] },
-  },
-  {
-    files: ['src/scripts/games/mitwachsen-render.ts'],
-    rules: {
-      complexity: ['error', 57],
-      'max-lines': ['error', { max: 987, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 172, skipBlankLines: true, skipComments: true }],
-    },
-  },
-  { files: ['src/scripts/games/mitwachsen-save.ts'], rules: { complexity: ['error', 26] } },
-  {
-    files: ['src/scripts/games/mitwachsen-state.ts'],
-    rules: {
-      complexity: ['error', 27],
-      'max-lines': ['error', { max: 586, skipBlankLines: true, skipComments: true }],
-    },
-  },
-  {
-    files: ['src/scripts/games/mitwachsen-world.ts'],
-    rules: {
-      complexity: ['error', 79],
-      'max-depth': ['error', 5],
-      'max-lines': ['error', { max: 651, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 139, skipBlankLines: true, skipComments: true }],
-    },
   },
   { files: ['src/scripts/larmic-island.ts'], rules: { complexity: ['error', 26] } },
   // Konfigurationsdateien laufen in Node

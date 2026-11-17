@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Scene } from '../lib/voxel/world';
+import { cubeDefs, type Scene } from '../lib/voxel/world';
 import { CUBE_H, CUBE_W, HALF_W, LEVEL, STEP_Y } from '../lib/voxel/cube';
 import { AVATAR } from './avatar';
 import { buildWorld, type ChildItem } from './island-layout';
@@ -123,6 +123,18 @@ describe('buildWorld', () => {
       routes.mitwachsen!.filter((n) => n.b),
       'baut wie früher zum Würfel zwei Brückenblöcke',
     ).toHaveLength(2);
+  });
+
+  it('zeichnet Bart und Brille an Figur und Kopf-Block nur, wenn der Avatar sie hat', () => {
+    const glasses = '#1b1d24'; // Farbe der Brille (PAL_GLASS)
+    const plain = buildWorld({ workshops: [], videos: [] }, { ...AVATAR, beard: false, glasses: false });
+    const dressed = buildWorld({ workshops: [], videos: [] }, { ...AVATAR, beard: true, glasses: true });
+    expect(plain.figureSvg).not.toContain(glasses);
+    expect(dressed.figureSvg).toContain(glasses);
+    expect(dressed.figureSvg.length).toBeGreaterThan(plain.figureSvg.length);
+    expect(cubeDefs({ ...AVATAR, glasses: true })).toContain(glasses);
+    expect(cubeDefs({ ...AVATAR, glasses: false })).not.toContain(glasses);
+    expect(cubeDefs({ ...AVATAR, beard: true }).length).toBeGreaterThan(cubeDefs(AVATAR).length);
   });
 
   it('hat für den Baum eine Hover-Fläche und einen Weg ohne Sturz', () => {

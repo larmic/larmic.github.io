@@ -1,4 +1,4 @@
-// Unit-Tests für die reine Logik (Voxel-Generator, Zustandsmaschinen, Bundle-Gate). Kein DOM, kein Astro nötig.
+// Unit-Tests für die reine Logik (Voxel-Generator, Zustandsmaschine der Figur, Gates). Kein DOM, kein Astro nötig.
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
@@ -8,26 +8,19 @@ export default defineConfig({
     // Der Runner der Pipeline ist mit Abdeckung gut dreimal langsamer als ein Entwickler-Rechner; die Simulationen
     // (tausende Takte, ganze Welten) brauchen dort mehr als die üblichen 5 s. Langsame Tests trotzdem billig halten.
     testTimeout: 15_000,
-    // Abdeckung nur für die reinen Module – Web Components, Canvas und Three.js prüft der Browser-Test (e2e/)
+    // Abdeckung nur für die reinen Module – die Web Component der Insel prüft der Browser-Test (e2e/)
     coverage: {
       provider: 'v8',
-      include: [
-        'src/lib/**/*.ts',
-        'src/data/games/*.ts',
-        'src/scripts/island-state.ts',
-        'src/scripts/games/input-pace.ts',
-        'src/scripts/games/mitwachsen-{fog,growth,save,state,tired,weather,world}.ts',
-        'scripts/{bundles,dist}.ts',
-      ],
+      include: ['src/lib/**/*.ts', 'src/scripts/island-state.ts', 'scripts/{bundles,dist}.ts'],
       reporter: [['text', { skipFull: true }], 'text-summary'],
       // Knapp unter dem gemessenen Stand: Sinkt die Abdeckung, fällt das Gate. Steigt sie, die Schwellen mitziehen.
       thresholds: {
-        statements: 92,
-        branches: 89,
-        functions: 91,
-        lines: 92,
-        // Die Spielregeln und die Figur auf der Insel enger
-        'src/scripts/**/*.ts': { statements: 95, branches: 86, functions: 95, lines: 95 },
+        statements: 95,
+        branches: 92,
+        functions: 94,
+        lines: 95,
+        // Die Figur auf der Insel enger
+        'src/scripts/**/*.ts': { statements: 98, branches: 93, functions: 98, lines: 98 },
       },
     },
   },

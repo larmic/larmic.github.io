@@ -2,7 +2,6 @@
 //   src/lib       generische Bausteine (Voxel-Generator) – kennt keine Seiteninhalte
 //   src/data      Inhalte und Konfiguration der Seite – nutzt lib, kennt keine Oberfläche
 //   src/scripts   Code im Browser – nur so viel lib wie nötig, nichts aus Node
-//   src/lib/games, src/data/games – Bausteine und Inhalte der Kinderspiele, laufen im Browser
 //   components, layouts, pages – Oberfläche, darf alles darunter nutzen
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {
@@ -32,39 +31,14 @@ module.exports = {
       name: 'client-gets-only-browser-lib',
       severity: 'error',
       comment:
-        'Browser-Code nutzt aus lib nur den Kopf (head.ts), die Texturen (textures.ts, reine Daten) und die Spiel-Bausteine (lib/games). Alles andere ist Build-Code und gehört nicht ins Bundle.',
+        'Browser-Code nutzt aus lib nur den Kopf (head.ts) und die Texturen (textures.ts, reine Daten). Alles andere ist Build-Code und gehört nicht ins Bundle.',
       from: { path: '^src/scripts/', pathNot: '\\.test\\.ts$' },
       // Reine Typ-Importe verschwinden beim Kompilieren und sind erlaubt
       to: {
         path: '^src/lib/',
-        pathNot: '^src/lib/(voxel/head\\.ts|voxel/textures\\.ts|games/)',
+        pathNot: '^src/lib/voxel/(head|textures)\\.ts$',
         dependencyTypesNot: ['type-only'],
       },
-    },
-    {
-      name: 'games-lib-is-browser-safe',
-      severity: 'error',
-      comment: 'lib/games läuft im Browser: keine Node-Module und aus lib nur die Texturen.',
-      from: { path: '^src/lib/games/', pathNot: '\\.test\\.ts$' },
-      to: { path: '^src/lib/', pathNot: '^src/lib/(games/|voxel/textures\\.ts)', dependencyTypesNot: ['type-only'] },
-    },
-    {
-      name: 'games-data-is-browser-safe',
-      severity: 'error',
-      comment:
-        'Spieldaten werden vom Browser-Code geladen: Sie dürfen aus lib nur lib/games und die Texturen nutzen, sonst rutscht Build-Code ins Bundle.',
-      from: { path: '^src/data/games/', pathNot: '\\.test\\.ts$' },
-      to: {
-        path: '^src/(lib/(?!games/|voxel/textures\\.ts)|data/(?!games/))',
-        dependencyTypesNot: ['type-only'],
-      },
-    },
-    {
-      name: 'no-node-in-games',
-      severity: 'error',
-      comment: 'Spiel-Bausteine und Spieldaten laufen im Browser und können keine Node-Module laden.',
-      from: { path: '^src/(lib|data)/games/', pathNot: '\\.test\\.ts$' },
-      to: { dependencyTypes: ['core'] },
     },
     {
       name: 'no-node-in-client',

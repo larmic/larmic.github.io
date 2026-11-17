@@ -62,12 +62,7 @@ export const SHELF_L: Grid = ["AAAAAAAA", "rbBgyvrb", "rbBgyvrb", "zzzzzzzz", "g
 export const SHELF_R: Grid = ["AAAAAAAA", "gyrbvBgr", "gyrbvBgr", "zzzzzzzz", "bVgyrrby", "bVgyrrby", "bVgyrrby", "AAAAAAAA"];
 export const STONE: Grid = ["SSsSSSSr", "SrSSSsSS", "SSSSrSSS", "sSSSSSsS", "SSrSSSSS", "SSSsSSrS", "rSSSSSSS", "SSSSsSSs"];
 
-// Spielwürfel (Bereich Spiele auf der Insel): oben fünf, links drei, rechts zwei Augen
-export const DICE_T: Grid = ["wwwwwwww", "wkkwwkkw", "wkkwwkkw", "wwwkkwww", "wwwkkwww", "wkkwwkkw", "wkkwwkkw", "wwwwwwww"];
-export const DICE_L: Grid = ["gggggggg", "gkkwwwwg", "gkkwwwwg", "gwwkkwwg", "gwwkkwwg", "gwwwwkkg", "gwwwwkkg", "gggggggg"];
-export const DICE_R: Grid = ["gggggggg", "gkkwwwwg", "gkkwwwwg", "gwwwwwwg", "gwwwwwwg", "gwwwwkkg", "gwwwwkkg", "gggggggg"];
-export const PAL_DICE: Palette = {"w": [["#f6f3ec", 1]], "g": [["#ded7c8", 1]], "k": [["#c0453a", 1]]};
-// Fliegenpilz-Block (Kiste des Kinderspiels Mitwachsen): roter Hut mit weißen Tupfen, darunter Lamellen und Stiel
+// Fliegenpilz-Block (Pilz-Ausgang der Insel zum Kinderspiel Mitwachsen auf mitwachsen-spiele.de): roter Hut mit weißen Tupfen, darunter Lamellen und Stiel
 export const PILZ_T: Grid = ["rrrrrrrr", "rwwrrrrr", "rwwrrwwr", "rrrrrwwr", "rrwwrrrr", "rrwwrrwr", "rrrrrrrr", "rwrrrrrr"];
 export const PILZ_S: Grid = ["rrwwrrrr", "rrwwrrwr", "rrrrrrrr", "llllllll", "ggsccsgg", "ggcccsgg", "ggsccsgg", "GGccccGG"];
 export const PAL_PILZ: Palette = {"r": [["#d9473a", 1]], "w": [["#ffffff", 1]], "l": [["#f3e6c8", 1]], "c": [["#efe4d2", 1]], "s": [["#d9cdb5", 1]], "g": [["#6dbd47", 1]], "G": [["#58a73a", 1]]};

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { check, loaded, scriptsOf, staticImports, type Rule } from './bundles.ts';
+import { check, loaded, nowhere, scriptsOf, staticImports, type Rule } from './bundles.ts';
 
 const files: Record<string, string> = {
   '/_astro/home.js': 'import{a as b}from"./shared.js";console.log(b)',
@@ -8,10 +8,7 @@ const files: Record<string, string> = {
   '/_astro/three.module.js': 'class WebGLRenderer{}',
 };
 const read = (p: string) => files[p] ?? null;
-const RULES: Rule[] = [
-  { name: 'Homepage', pages: /^(?!spiele\/)/, budget: 100, forbidden: /game|WebGLRenderer/ },
-  { name: 'Spiel', pages: /^spiele\//, budget: 1000, forbidden: /WebGLRenderer/ },
-];
+const RULES: Rule[] = [{ name: 'Alle Seiten', pages: /./, budget: 100, forbidden: /game|WebGLRenderer/ }];
 const page = (...srcs: string[]) => srcs.map((s) => `<script type="module" src="${s}"></script>`).join('');
 
 describe('Bundle-Gate', () => {
@@ -23,6 +20,20 @@ describe('Bundle-Gate', () => {
   it('folgt statischen Importen, aber nicht dynamischen', () => {
     expect(staticImports(files['/_astro/game.js']!)).toEqual(['./shared.js']);
     expect(loaded(page('/_astro/game.js'), read).sort()).toEqual(['/_astro/game.js', '/_astro/shared.js']);
+  });
+
+  it('löst relative Importe aus Unterordnern auf', () => {
+    const nested: Record<string, string> = {
+      '/_astro/pages/a.js': 'import"../shared.js";import"./b.js";',
+      '/_astro/pages/b.js': '',
+      '/_astro/shared.js': '',
+    };
+    const html = page('/_astro/pages/a.js');
+    expect(loaded(html, (p) => nested[p] ?? null).sort()).toEqual([
+      '/_astro/pages/a.js',
+      '/_astro/pages/b.js',
+      '/_astro/shared.js',
+    ]);
   });
 
   it('lässt eine schlanke Homepage durch', () => {
@@ -39,10 +50,14 @@ describe('Bundle-Gate', () => {
     expect(check('index.html', page('/_astro/home.js'), read, tight)[0]).toMatch(/Bytes JavaScript/);
   });
 
-  it('erlaubt dem Spiel Three.js nur als nachträglichen Import', () => {
-    expect(check('spiele/x/index.html', page('/_astro/game.js'), read, RULES)).toEqual([]);
-    const eager = check('spiele/x/index.html', page('/_astro/game.js', '/_astro/three.module.js'), read, RULES);
-    expect(eager.length).toBeGreaterThan(0);
+  it('findet Three.js überall, auch wenn es nur nachgeladen wird', () => {
+    const all = Object.entries(files);
+    // gemeldet wird das Modul selbst und der Code, der es nachlädt
+    expect(nowhere(all, /WebGLRenderer|three\.module/)).toEqual([
+      '/_astro/game.js enthält, was es nirgends geben darf (/WebGLRenderer|three\\.module/)',
+      '/_astro/three.module.js enthält, was es nirgends geben darf (/WebGLRenderer|three\\.module/)',
+    ]);
+    expect(nowhere([['/_astro/home.js', files['/_astro/home.js']!]], /WebGLRenderer|three\.module/)).toEqual([]);
   });
 
   it('meldet fehlende Dateien', () => {

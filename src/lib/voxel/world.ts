@@ -39,7 +39,6 @@ export function cubeDefs(avatar: Avatar, prefix = 'v'): string {
     cube(id('screen'), T.SCREEN_T, T.SCREEN_L, T.SCREEN_R, T.PAL_SCREEN),
     cube(id('shelf'), T.PLANKS, T.SHELF_L, T.SHELF_R, T.PAL_SHELF),
     cube(id('plank'), T.PLANKS, T.PLANKS, T.PLANKS, T.PAL_BOARD),
-    cube(id('dice'), T.DICE_T, T.DICE_L, T.DICE_R, T.PAL_DICE),
     cube(id('pilz'), T.PILZ_T, T.PILZ_S, T.PILZ_S, T.PAL_PILZ),
     // getönte Blöcke: Farbe kommt per CSS `color` (currentColor)
     cube(id('crate'), T.CRATE, T.CRATE, T.CRATE, T.PAL_TINT),

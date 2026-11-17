@@ -1,10 +1,11 @@
 // Prüflogik für das Bundle-Gate (npm run verify:bundles) – rein, ohne Dateisystem, damit testbar.
 // Ermittelt, welches JavaScript eine fertige Seite beim Laden holt: die Skripte im HTML und alles, was diese
 // statisch importieren. Dynamische Importe (`import("…")`) zählen nicht, sie laden erst später und nur bei Bedarf.
+// Was es nirgends geben darf, auch nicht nachgeladen, prüft `nowhere` über alle Skripte der fertigen Seite.
 
 export type Rule = {
   name: string;
-  pages: RegExp; // für welche Seiten (Pfad relativ zu dist, z. B. "spiele/mitwachsen/index.html")
+  pages: RegExp; // für welche Seiten (Pfad relativ zu dist, z. B. "workshops/index.html")
   budget: number; // höchstens so viele Bytes JavaScript beim Laden
   forbidden: RegExp; // darf im geladenen Code nicht vorkommen
 };
@@ -70,4 +71,11 @@ export function check(page: string, html: string, read: (path: string) => string
       problems.push(`${page}: ${bytes} Bytes JavaScript beim Laden, erlaubt sind ${rule.budget} („${rule.name}“)`);
   }
   return problems;
+}
+
+/** Skripte der fertigen Seite (Pfad und Inhalt), in denen etwas steht, das es nirgends geben darf – auch nicht per import() */
+export function nowhere(scripts: [string, string][], forbidden: RegExp): string[] {
+  return scripts
+    .filter(([path, code]) => forbidden.test(code) || forbidden.test(path))
+    .map(([path]) => `${path} enthält, was es nirgends geben darf (${forbidden})`);
 }

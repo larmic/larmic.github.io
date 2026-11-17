@@ -60,7 +60,7 @@ jobs:
       - name: Browser für den Smoke-Test installieren
         run: npx playwright install --with-deps chromium
 
-      - name: Guard-Gate – Smoke-Test im Browser (Insel, Spiel, alte Adressen)
+      - name: Guard-Gate – Smoke-Test im Browser (Insel, Barrierefreiheit, alte Adressen)
         run: npm run test:e2e
 
       - name: Fertige Seite für den Deploy-Job bereitstellen

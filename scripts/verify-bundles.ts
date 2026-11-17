@@ -1,22 +1,23 @@
-// Guard-Gate nach dem Build (Teil von npm run verify): Die Homepage bleibt schnell und ohne Ballast.
-// Seiten außerhalb von /spiele/ laden kein Spiel und kein Three.js und bleiben unter einem festen Budget.
-// Die Spielseite lädt beim Start nur ihren eigenen Code; Three.js darf nur nachträglich (import()) kommen.
+// Guard-Gate nach dem Build (Teil von npm run verify): Jede Seite bleibt schnell und ohne Ballast.
+// Eine Regel für alle Seiten: höchstens 32 KB JavaScript beim Laden und nirgends Three.js oder ein Spiel (das
+// Kinderspiel Mitwachsen lebt auf seiner eigenen Seite, Repo mitwachsen-spiele).
 // Logik und Tests: scripts/bundles.ts, scripts/bundles.test.ts
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { check, type Rule } from './bundles.ts';
+import { check, nowhere, type Rule } from './bundles.ts';
 
 const DIST = 'dist';
-const GAME_CODE = /larmic-mitwachsen|Mitwachsen|WebGLRenderer|three\.module/;
+
+/** Three.js gibt es nirgends, auch nicht als nachgeladenes Modul */
+export const NOWHERE = /WebGLRenderer|three\.module/;
 
 export const RULES: Rule[] = [
-  { name: 'Homepage ohne Spiel', pages: /^(?!spiele\/)/, budget: 32 * 1024, forbidden: GAME_CODE },
   {
-    name: 'Spiel lädt 3D erst bei Bedarf',
-    pages: /^spiele\//,
-    budget: 128 * 1024, // Regeln, Welt, 2D-Ansicht und Daten des Spiels; 3D (Three.js) kommt erst per import()
-    forbidden: /WebGLRenderer|three\.module/,
+    name: 'schlank, ohne Spiel und 3D',
+    pages: /./,
+    budget: 32 * 1024,
+    forbidden: /larmic-mitwachsen|WebGLRenderer|three\.module/, // Web Component des Spiels, Three.js
   },
 ];
 
@@ -33,10 +34,24 @@ const read = (path: string) => {
   }
 };
 
+const scriptsIn = (dir: string): string[] =>
+  readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? scriptsIn(join(dir, e.name)) : e.name.endsWith('.js') ? [join(dir, e.name)] : [],
+  );
+
 const pages = pagesIn(DIST);
-const problems = pages.flatMap((file) => check(relative(DIST, file), readFileSync(file, 'utf8'), read, RULES));
+const scripts = scriptsIn(DIST);
+const problems = [
+  ...pages.flatMap((file) => check(relative(DIST, file), readFileSync(file, 'utf8'), read, RULES)),
+  ...nowhere(
+    scripts.map((file) => [`/${relative(DIST, file)}`, readFileSync(file, 'utf8')]),
+    NOWHERE,
+  ),
+];
 if (problems.length) {
   console.error(`Bundle-Gate: ${problems.length} Verstoß/Verstöße\n` + problems.map((p) => `  ✖ ${p}`).join('\n'));
   process.exit(1);
 }
-console.log(`✓ Bundle-Gate: ${pages.length} Seiten geprüft, Homepage ohne Spiel und im Budget`);
+console.log(
+  `✓ Bundle-Gate: ${pages.length} Seiten ohne Spiel und 3D im Budget, ${scripts.length} Skripte ohne Three.js`,
+);

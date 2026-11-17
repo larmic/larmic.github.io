@@ -13,7 +13,6 @@ export const SITE = {
 // Das Kinderspiel Mitwachsen hat eine eigene Seite (Repo mitwachsen-spiele); die Insel führt dorthin
 export const MITWACHSEN = {
   home: 'https://www.mitwachsen-spiele.de/',
-  play: 'https://www.mitwachsen-spiele.de/spielen/',
   privacy: 'https://www.mitwachsen-spiele.de/datenschutz/',
 };
 

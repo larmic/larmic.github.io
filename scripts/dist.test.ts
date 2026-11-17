@@ -9,6 +9,7 @@ describe('Externe Ressourcen', () => {
     expect(isForeign('https://www.larmic.de/a.png')).toBe(false);
     expect(isForeign('/_astro/a.js')).toBe(false);
     expect(isForeign('data:image/png;base64,AAA')).toBe(false);
+    expect(isForeign('https://[kaputt/x.js'), 'nicht lesbare Adresse gilt als fremd').toBe(true);
   });
 
   it('meldet Skripte, Bilder, srcset, Stylesheets, iframes und url() in CSS von fremden Hosts', () => {
