@@ -2,7 +2,7 @@
 
 Persönliche Website von Lars Michaelis im Voxel-Stil „Inselwelt“. Gebaut mit [Astro](https://astro.build), ausgeliefert als statische Seite über GitHub Pages.
 
-Auf jeder Seite schwebt oben eine Voxel-Insel: Sie ist die einzige Navigation. Die Figur steht auf dem Block der Seite, die gerade angezeigt wird. Zeigst du auf einen anderen Block, baut sie eine Brücke dorthin; Workshops und Videos haben eigene Kisten, die beim Öffnen des Bereichs aufpoppen. Beim Blog-Block fällt sie ins Leere und meldet „404 – Kein Blog gefunden“.
+Auf jeder Seite schwebt oben eine Voxel-Insel: Sie ist die einzige Navigation. Die Figur steht auf dem Block der Seite, die gerade angezeigt wird. Zeigst du auf einen anderen Block, baut sie eine Brücke dorthin; Workshops und Videos haben eigene Kisten, die beim Öffnen des Bereichs aufpoppen. Beim Blog-Block fällt sie ins Leere und meldet „404 – Kein Blog gefunden“. Der Fliegenpilz „Mitwachsen ↗“ führt im selben Tab auf [www.mitwachsen-spiele.de](https://www.mitwachsen-spiele.de/), die eigene Seite meines Kinderspiels; das Spiel lebt im Repo `mitwachsen-spiele`.
 
 ## Schnellstart
 
@@ -25,8 +25,8 @@ Die Seite läuft dann unter http://localhost:4321 und lädt Änderungen sofort n
 | `npm run format` / `format:check` | Prettier formatiert bzw. prüft den Code. `format:check` ist Guard-Gate |
 | `npm run arch` | Architekturregeln (dependency-cruiser, `.dependency-cruiser.cjs`): Schichten `lib` → `data` → Oberfläche, Browser-Code ohne Build-Code. Guard-Gate |
 | `npm run build` | Erzeugt die fertige Seite in `dist/` |
-| `npm run verify` | Prüft die fertige Seite in `dist/`: gültiges HTML (html-validate), keine toten internen Links und Sprungmarken (linkinator), das Bundle-Gate (Homepage ohne Spiel, JavaScript-Budget) und das Seiten-Gate (keine externen Ressourcen ohne Klick, alte Adressen leiten weiter). Guard-Gate nach dem Build |
-| `npm run test:e2e` | Smoke-Test im Browser (Playwright, `e2e/`): Startseite und Insel, Detailseiten, das Kinderspiel, alte Adressen, ohne Fehler in der Konsole, dazu Barrierefreiheit jeder Seite nach WCAG 2.2 AA (axe-core). Guard-Gate nach dem Build; einmalig `npx playwright install chromium` |
+| `npm run verify` | Prüft die fertige Seite in `dist/`: gültiges HTML (html-validate), keine toten internen Links und Sprungmarken (linkinator), das Bundle-Gate (jede Seite höchstens 32 KB JavaScript, nirgends Three.js oder Spielcode) und das Seiten-Gate (keine externen Ressourcen ohne Klick, alte Adressen leiten weiter). Guard-Gate nach dem Build |
+| `npm run test:e2e` | Smoke-Test im Browser (Playwright, `e2e/`): Startseite und Insel samt Pilz-Ausgang, Detailseiten, alte Adressen, ohne Fehler in der Konsole, dazu Barrierefreiheit jeder Seite nach WCAG 2.2 AA (axe-core). Guard-Gate nach dem Build; einmalig `npx playwright install chromium` |
 | `npm run preview` | Zeigt den gebauten Stand aus `dist/` lokal an |
 | `npm run gates` | Alle Guard-Gates in der Reihenfolge der Pipeline, inklusive Build |
 
@@ -103,9 +103,9 @@ Auf der Seite steht „KI mit Leitplanken“ – hier sind sie. Jeder Commit lä
 | Lint | typische Fehler in TypeScript und Astro | ESLint |
 | Architektur | Schichten: `lib` ist generisch, `data` kennt keine Oberfläche, Browser-Code bekommt keinen Build-Code, keine Zyklen | dependency-cruiser |
 | Typen und Inhalte | TypeScript strikt, auch jeder Zugriff per Index (`noUncheckedIndexedAccess`), Markdown-Inhalte gegen ihr Schema | astro check |
-| Unit-Tests | Zustandsmaschine der Figur (Spec: [docs/specs/insel.md](docs/specs/insel.md)), Geometrie der Insel, Kopf, Pixel-Raster, Regeln und Welt des Kinderspiels (Spec: [docs/specs/mitwachsen.md](docs/specs/mitwachsen.md)); die Abdeckung der reinen Module darf nicht sinken | Vitest, v8-Coverage |
-| Fertige Seite | gültiges HTML, keine toten internen Links und Sprungmarken, Homepage ohne Spiel und im JavaScript-Budget, keine externen Ressourcen ohne Klick, alte Adressen leiten weiter | html-validate, linkinator, Bundle-Gate, Seiten-Gate |
-| Im Browser | Insel und Seitenwechsel, Detailseiten, das Kinderspiel startet, alte Adressen führen weiter, keine Fehler in der Konsole; Barrierefreiheit jeder Seite nach WCAG 2.2 AA | Playwright, axe-core |
+| Unit-Tests | Zustandsmaschine der Figur (Spec: [docs/specs/insel.md](docs/specs/insel.md)), Geometrie der Insel, Kopf, Pixel-Raster, Bundle- und Seiten-Gate; die Abdeckung der reinen Module darf nicht sinken | Vitest, v8-Coverage |
+| Fertige Seite | gültiges HTML, keine toten internen Links und Sprungmarken, jede Seite im JavaScript-Budget und nirgends Three.js, keine externen Ressourcen ohne Klick, alte Adressen leiten weiter (fremde Ziele nur auf freigegebene Domains) | html-validate, linkinator, Bundle-Gate, Seiten-Gate |
+| Im Browser | Insel und Seitenwechsel, Pilz-Ausgang als Link im selben Tab, Zurück aus dem Cache, Detailseiten, alte Adressen führen weiter, keine Fehler in der Konsole; Barrierefreiheit jeder Seite nach WCAG 2.2 AA | Playwright, axe-core |
 
 Lokal laufen alle zusammen mit `npm run gates`. Zusätzlich prüft ein Git-Hook (`.githooks/pre-commit`) vor jedem Commit die schnellen Gates – Formatierung, Lint, Architektur, Unit-Tests – in wenigen Sekunden. `npm install` aktiviert ihn automatisch; im Notfall überspringt `git commit --no-verify` ihn. Dass die Gates wirklich etwas fangen, ist geprüft: absichtlich eingebaute Fehler (überlappende Kisten, übersprungene Felder, verbotene Imports, tote Links, kaputtes HTML) lassen sie scheitern.
 
@@ -124,7 +124,7 @@ Renovate hält Abhängigkeiten und Actions aktuell. Neue Versionen werden erst n
 
 ## Alte Adressen
 
-Die Seite löst die frühere Hugo-Seite ab (Historie in git). Alte Adressen funktionieren weiter: `/workshops/#workshop-…` und `/videos/#video-…` leiten auf die jeweilige Detailseite um, `/#workshops` und `/#videos` auf `/workshops/` und `/videos/`, `/about/` auf die Startseite. Die Microservices-Folien unter `/workshop_microservices/slides/` kommen aus ihrem eigenen Repository und sind nicht betroffen. Was beim Livegang mit den übrigen alten Adressen passiert, steht in [docs/todo.md](docs/todo.md).
+Die Seite löst die frühere Hugo-Seite ab (Historie in git). Alte Adressen funktionieren weiter: `/workshops/#workshop-…` und `/videos/#video-…` leiten auf die jeweilige Detailseite um, `/#workshops` und `/#videos` auf `/workshops/` und `/videos/`, `/about/` auf die Startseite. Die Adressen des Kinderspiels leiten dauerhaft auf seine eigene Seite: `/spiele/` und `/spiele/mitwachsen/` auf https://www.mitwachsen-spiele.de/, `/spiele/mitwachsen/spielen/` und `/spiele/threeyear/` auf https://www.mitwachsen-spiele.de/spielen/. Die Microservices-Folien unter `/workshop_microservices/slides/` kommen aus ihrem eigenen Repository und sind nicht betroffen. Was beim Livegang mit den übrigen alten Adressen passiert, steht in [docs/todo.md](docs/todo.md).
 
 ## Kommentare mit giscus
 

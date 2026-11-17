@@ -1,18 +1,17 @@
 ---
 import MailLink from '../components/MailLink.astro';
 import PlainPage from '../layouts/PlainPage.astro';
-import { SITE } from '../data/site';
+import { MITWACHSEN, SITE } from '../data/site';
 ---
 
 <PlainPage
   title="Datenschutz"
-  description="Datenschutzerklärung von larmic.de: keine Cookies, kein Tracking, YouTube-Videos erst nach Klick, Spielstände nur im eigenen Browser."
+  description="Datenschutzerklärung von larmic.de: keine Cookies, kein Tracking, YouTube-Videos erst nach Klick."
 >
   <p>
     Diese Seite ist bewusst sparsam: keine Cookies, kein Tracking, keine Statistik, keine Werbung. Schriften und
-    Grafiken werden mit der Seite selbst ausgeliefert, von anderen Anbietern wird nichts nachgeladen. Nur das
-    Kinderspiel speichert seinen Spielstand im Browser (siehe unten). Personenbezogene Daten fallen nur dort an, wo es
-    sich nicht vermeiden lässt – das steht hier.
+    Grafiken werden mit der Seite selbst ausgeliefert, von anderen Anbietern wird nichts nachgeladen. Personenbezogene
+    Daten fallen nur dort an, wo es sich nicht vermeiden lässt – das steht hier.
   </p>
 
   <h2>Verantwortlich</h2>
@@ -59,19 +58,10 @@ import { SITE } from '../data/site';
     ist. Mehr dazu in der <a href="https://policies.google.com/privacy?hl=de">Datenschutzerklärung von Google</a>.
   </p>
 
-  <h2>Kinderspiel Mitwachsen: Speichern im Browser</h2>
+  <h2>Kinderspiel Mitwachsen</h2>
   <p>
-    Das Kinderspiel Mitwachsen merkt sich im lokalen Speicher deines Browsers (localStorage), was zum Weiterspielen
-    nötig ist: die angelegten Welten mit Namen, gefundenen Tieren und erkundeten Gegenden, ob der Ton an ist, wie lange
-    heute schon gespielt wurde (damit die Figur rechtzeitig müde wird) und ob der Hinweis für Eltern schon gezeigt
-    wurde. Cookies setzt das Spiel nicht.
-  </p>
-  <p>
-    Diese Angaben bleiben auf deinem Gerät. Sie werden nicht an mich oder andere übertragen, ich kann sie nicht sehen,
-    und sie enthalten nichts, was dich als Person erkennbar macht. Gespeichert wird nur, weil du das Spiel nutzt und es
-    deinen Spielstand behalten soll; ohne den Speicher läuft das Spiel trotzdem, vergisst aber alles beim Neuladen (§ 25
-    Abs. 2 Nr. 2 TDDDG). Löschen kannst du einzelne Welten im Menü des Spiels oder alles, indem du die Websitedaten von
-    larmic.de in deinem Browser löschst.
+    Das Kinderspiel Mitwachsen hat eine eigene Seite, www.mitwachsen-spiele.de. Was es im Browser speichert, steht in
+    der <a href={MITWACHSEN.privacy}>Datenschutzerklärung von mitwachsen-spiele.de</a>.
   </p>
 
   <h2>Kontakt per E-Mail oder Telefon</h2>
