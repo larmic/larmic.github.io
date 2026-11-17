@@ -59,10 +59,41 @@ test('Kinderspiel: Hinweis für Eltern beim ersten Mal, eine Pfeiltaste weckt di
   expect(errors).toEqual([]);
 });
 
-test('Spielseite für Eltern: „Spiel starten“ lädt das Spiel ohne Seitenübergang', async ({ page }) => {
+test('Spielseite für Eltern: „Spiel starten“ führt im selben Tab auf die eigene Seite des Spiels', async ({ page }) => {
   await page.goto('/spiele/mitwachsen/');
-  for (const link of await page.locator('a[href="/spiele/mitwachsen/spielen/"]').all())
-    await expect(link).toHaveAttribute('data-astro-reload');
+  const links = page.locator('a', { hasText: 'Spiel starten' });
+  await expect(links).toHaveCount(2); // im Kopf und im Text
+  for (const link of await links.all()) {
+    await expect(link).toHaveAttribute('href', 'https://www.mitwachsen-spiele.de/spielen/');
+    await expect(link).not.toHaveAttribute('target');
+  }
+});
+
+// Die fremde Domain wird nie geladen: Der Test bleibt offline und prüft nur den Link
+test('Insel: die Pilz-Kiste führt im selben Tab auf www.mitwachsen-spiele.de', async ({ page }) => {
+  await page.goto('/spiele/');
+  const link = page.getByRole('link', { name: 'Mitwachsen – eigene Seite: mitwachsen-spiele.de', exact: true });
+  await expect(link).toHaveAttribute('href', 'https://www.mitwachsen-spiele.de/');
+  await expect(link).toHaveAttribute('data-external');
+  await expect(link).not.toHaveAttribute('target');
+  await expect(link).not.toHaveAttribute('rel');
+  await expect(link).toContainText('Mitwachsen ↗');
+});
+
+test('Insel: Zurück aus dem Cache schickt die Figur vom gezeigten Block zum Ruheblock', async ({ page }) => {
+  await page.goto('/');
+  const island = page.locator('larmic-island');
+  const state = () =>
+    island.evaluate((el) => {
+      const s = (el as unknown as { state: { hover: string | null; route: string; pos: number } }).state;
+      return `${s.hover ?? '-'} ${s.route} ${s.pos}`;
+    });
+  const about = await state();
+  await page.locator('.blk[data-id="videos"]').hover();
+  await expect.poll(state).toMatch(/^videos videos [1-9]/);
+  // So kommt die Seite nach einem Link nach außen und Zurück aus dem Cache wieder (die Maus bleibt, wo sie war)
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
+  await expect.poll(state).toBe(about);
 });
 
 const OLD: [string, RegExp][] = [

@@ -1,7 +1,10 @@
 ---
 import { CUBE_OUTLINE, CUBE_VIEWBOX } from '../lib/voxel/cube';
+import { isExternal } from '../lib/voxel/world';
 // Die Inselwelt: statisches SVG aus dem Voxel-Generator (beim Build) + Web Component für die Interaktion.
 // Alle Ziele sind Links, nur der Blog ist ein Button (er hat keine Seite, die Figur fällt).
+// Links nach außen (fremde Domain) öffnen im selben Tab; ihr Etikett trägt ↗ (für Screenreader versteckt), dazu nur
+// für Screenreader die Domain. Kein aria-label: Der sichtbare Text bleibt Teil des Namens.
 // `rest` ist der Block dessen, was gerade angezeigt wird, z. B. `about`, `workshops` oder `workshops/event_storming`.
 // Dort steht die Figur. Die Kisten eines Bereichs sind sichtbar, solange er offen ist.
 import { islandScene } from '../data/island';
@@ -21,6 +24,7 @@ const at = route?.at(-1);
 if (!route || !at)
   throw new Error(`Insel: Für die Seite ist rest="${rest}" gesetzt, einen solchen Block gibt es nicht`);
 const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
+const host = (href: string) => new URL(href).hostname.replace(/^www\./, '');
 ---
 
 <nav class="island-nav" aria-label="Hauptnavigation">
@@ -85,6 +89,7 @@ const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
         const Tag = n.href ? 'a' : 'button';
         const on = n.id === rest || rest.startsWith(`${n.id}/`);
         const closed = n.parent !== undefined && n.parent !== section;
+        const away = isExternal(n.href) ? host(n.href) : null; // Domain bei Links nach außen
         return (
           <Tag
             type={n.href ? undefined : 'button'}
@@ -92,6 +97,7 @@ const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
             class={`blk${n.parent ? ' child' : ''}${on ? ' on' : ''}${closed ? ' closed' : ''}`}
             data-id={n.id}
             data-parent={n.parent}
+            data-external={away ? '' : undefined}
             aria-current={n.id === rest ? 'page' : undefined}
             aria-label={n.href ? undefined : `${n.label} – gibt es noch nicht`}
             style={`left: ${n.x}%; top: ${n.y}%; width: ${n.w}%; z-index: ${n.z}${n.color ? `; color: ${n.color}` : ''}`}
@@ -105,7 +111,15 @@ const built = new Set(route.flatMap((n) => (n.k === undefined ? [] : [n.k])));
                 <span class="px" style={`background: ${i % 2 ? n.p2 : n.p1}`}></span>
               ))}
             </span>
-            <span class={`tag tag${n.tag}`}>{n.label}</span>
+            <span class={`tag tag${n.tag}`}>
+              {n.label}
+              {away && (
+                <>
+                  <span aria-hidden="true"> ↗</span>
+                  <span class="sr-only"> – eigene Seite: {away}</span>
+                </>
+              )}
+            </span>
           </Tag>
         );
       })}

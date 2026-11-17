@@ -2,7 +2,6 @@
 // Jede Seite mit Insel: oben Name, Intro und Insel (bleibt beim Seitenwechsel stehen), darunter der Inhalt der Seite.
 // `rest` ist der Block der Seite, z. B. `about`, `workshops` oder `workshops/event_storming`: Dort steht die Figur.
 // `cta` ersetzt den Button im Kopf: Link (`href`) oder Mail-Anfrage an neusta (`subject`, auf Workshop-Seiten).
-// `reload`: Der Link lädt ohne Seitenübergang (z. B. ins Spiel, das für sich steht).
 import BaseLayout from './BaseLayout.astro';
 import type { RestId } from '../data/island-layout';
 import SiteHeader from '../components/SiteHeader.astro';
@@ -18,7 +17,7 @@ interface Props {
   title?: string;
   description?: string;
   rest: RestId;
-  cta?: { label: string; href: string; reload?: boolean } | { label: string; subject: string };
+  cta?: { label: string; href: string } | { label: string; subject: string };
   jsonLd?: object;
 }
 const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/workshops/' }, jsonLd } = Astro.props;
@@ -48,7 +47,7 @@ const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/wo
               class="pxbtn"
             />
           ) : (
-            <a href={cta.href} class="pxbtn" data-astro-reload={cta.reload || undefined}>
+            <a href={cta.href} class="pxbtn">
               {cta.label}
             </a>
           )}
@@ -65,7 +64,6 @@ const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/wo
     data-rest={rest}
     data-cta-label={cta.label}
     data-cta-href={'href' in cta ? cta.href : undefined}
-    data-cta-reload={'reload' in cta && cta.reload ? '' : undefined}
     data-cta-subject={'subject' in cta ? cta.subject : undefined}
   >
     <div class="panel pxbox reveal">
@@ -96,7 +94,6 @@ const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/wo
       } else {
         button.href = main.dataset.ctaHref ?? '/';
         delete button.dataset.mailSubject;
-        button.toggleAttribute('data-astro-reload', main.dataset.ctaReload !== undefined);
       }
     });
   </script>

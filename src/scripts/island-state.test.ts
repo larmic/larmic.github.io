@@ -9,6 +9,7 @@ import {
   initialState,
   isSettled,
   leave,
+  returned,
   select,
   settle as settleAtOnce,
   step,
@@ -181,10 +182,24 @@ describe('Figur auf der Insel', () => {
     expect(view(fallen, world, BUBBLES).bubble).toEqual({ text: BUBBLE_404, visible: true, error: true });
   });
 
-  it('ignoriert select auf den aktuellen oder einen unbekannten Block', () => {
+  it('ignoriert select auf den aktuellen oder einen unbekannten Block, auch auf eine fremde Adresse', () => {
     const s = initialState(world, 'about');
     expect(select(s, world, 'about')).toBe(s);
     expect(select(s, world, 'gibt-es-nicht')).toBe(s);
+    expect(select(s, world, 'https://www.mitwachsen-spiele.de/')).toBe(s);
+  });
+
+  it('geht nach Zurück aus dem Cache von dem Block, auf den zuletzt gezeigt wurde, zu ihrem Ruheblock', () => {
+    // Mit der Maus zum Block gelaufen, dann per Klick die Seite verlassen: Ein mouseleave kommt nie
+    const away = settle(aim(initialState(world, 'about'), 'videos')).s;
+    standsOn(away, 'videos');
+    const back = returned(away);
+    expect(back.hover).toBeNull();
+    expect(back.rest).toBe('about');
+    standsOn(settle(back).s, 'about');
+    // Zeigte nichts, ändert sich nichts
+    const still = initialState(world, 'about');
+    expect(returned(still)).toBe(still);
   });
 
   it('spricht nach einer Auswahl zum Bereich statt zu begrüßen', () => {

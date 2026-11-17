@@ -1,8 +1,10 @@
 ---
-// Seite eines Spiels für Eltern: worum es geht, für wen, worauf geachtet ist. Gespielt wird unter /spiele/<id>/spielen/.
+// Seite eines Spiels für Eltern: worum es geht, für wen, worauf geachtet ist. Gespielt wird auf der eigenen Seite des
+// Spiels (www.mitwachsen-spiele.de/spielen/).
 import { getCollection, render } from 'astro:content';
 import IslandPage from '../../../layouts/IslandPage.astro';
 import VoxelIcon from '../../../components/VoxelIcon.astro';
+import { MITWACHSEN } from '../../../data/site';
 
 export async function getStaticPaths() {
   const games = await getCollection('games');
@@ -10,7 +12,7 @@ export async function getStaticPaths() {
 }
 const { g } = Astro.props;
 const { Content } = await render(g);
-const play = `/spiele/${g.id}/spielen/`;
+const play = MITWACHSEN.play;
 const facts = [
   ['Alter', g.data.age],
   ['Gespielt', g.data.together],
@@ -25,7 +27,7 @@ const facts = [
   title={`${g.data.short} – Kinderspiel`}
   description={g.data.teaser}
   rest={`spiele/${g.id}`}
-  cta={{ label: 'Spiel starten', href: play, reload: true }}
+  cta={{ label: 'Spiel starten', href: play }}
 >
   <div class="panel-head">
     <VoxelIcon block="pilz" size={64} />
@@ -46,7 +48,7 @@ const facts = [
   <div class="prose">
     <Content />
     <p>
-      <a class="pxbtn" href={play} data-astro-reload>
+      <a class="pxbtn" href={play}>
         Spiel starten
       </a>
     </p>

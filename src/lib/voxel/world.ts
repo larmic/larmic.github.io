@@ -11,6 +11,11 @@ export { pos };
 export type Cell = [number, number, number];
 export const key = (c: Cell) => c.join(',');
 
+/** Führt der Link eines Blocks von der Seite weg (auf eine fremde Domain)? Solche Blöcke tragen ↗ am Etikett. */
+export const isExternal = (href: string | undefined): href is string => !!href && /^https?:\/\//i.test(href);
+/** Sichtbarer Text des Etiketts: Name, bei Links nach außen mit ↗ */
+export const tagText = (meta: { label: string; href?: string }) => meta.label + (isExternal(meta.href) ? ' ↗' : '');
+
 // Platz über einer Figur mit Sprechblase und unter einem Block mit Etikett darunter (in Szenen-Einheiten)
 const BUBBLE_ROOM = 80;
 const TAG_ROOM = 46;
@@ -204,7 +209,7 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
     targets[rid] = { X, Y, c: d.target, tag: d.tag, nav: { id: rid, ...meta } };
     // Platz für das Etikett. Kisten zeigen ihres nur beim Zeigen und dürfen dann über den Rand ragen.
     if (!meta.parent) {
-      const tw = Math.max(125, meta.label.length * 10 + 30);
+      const tw = Math.max(125, tagText(meta).length * 10 + 30);
       const half = Math.max(60, (tw - 5) / 2);
       if (d.tag === 'B') {
         ys.push(Y + CUBE_H + TAG_ROOM);

@@ -76,6 +76,14 @@ export function leave(state: FigureState, id: string): FigureState {
   return state.hover === id ? { ...state, hover: null } : state;
 }
 
+/**
+ * Zurück aus dem Cache des Browsers (`pageshow` mit `persisted`, z. B. nach Zurück von einer fremden Seite): Die Seite
+ * war verlassen, auf nichts wird mehr gezeigt – die Figur geht wie bei `leave` zurück zu ihrem Ruheblock.
+ */
+export function returned(state: FigureState): FigureState {
+  return state.hover === null ? state : leave(state, state.hover);
+}
+
 /** Wohin die Figur will: zum gezeigten Block, sonst zum Ruheblock. Nach dem Sturz ist der Blog gesperrt. */
 export function target(state: FigureState): string {
   const want = state.hover ?? state.rest;

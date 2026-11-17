@@ -10,6 +10,13 @@ export const SITE = {
   workshopMail: 'l.michaelis@neusta.de', // Workshops und Beratung laufen über team neusta; wie `mail` nur per MailLink
 };
 
+// Das Kinderspiel Mitwachsen hat eine eigene Seite (Repo mitwachsen-spiele); die Insel führt dorthin
+export const MITWACHSEN = {
+  home: 'https://www.mitwachsen-spiele.de/',
+  play: 'https://www.mitwachsen-spiele.de/spielen/',
+  privacy: 'https://www.mitwachsen-spiele.de/datenschutz/',
+};
+
 export const SOCIALS = [
   { name: 'GitHub', href: 'https://github.com/larmic' },
   { name: 'LinkedIn', href: 'https://www.linkedin.com/in/lars-michaelis-6778761b3/' },

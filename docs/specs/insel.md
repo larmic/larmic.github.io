@@ -12,6 +12,7 @@ Die Insel ist die Navigation der Seite. Eine Figur zeigt, wo man gerade ist, und
 | **Ruheblock** (`rest`) | Ziel der angezeigten Seite. Dort steht die Figur, wenn sie nirgendwo anders hin will. |
 | **Gezeigter Block** (`hover`) | Block unter Maus oder Tastaturfokus. |
 | **Abzweigung** | Ende des gemeinsamen Anfangs zweier Wege. Bis dorthin muss die Figur nie zurück. |
+| **Link nach außen** | Block, dessen Link auf eine fremde Domain führt (heute die Kiste `spiele/mitwachsen` auf www.mitwachsen-spiele.de). Er lädt im selben Tab, sofort beim Klick; das Etikett trägt ↗ (für Screenreader versteckt), dazu nur für Screenreader „– eigene Seite: mitwachsen-spiele.de“. |
 
 ## Ereignisse
 
@@ -19,8 +20,11 @@ Die Insel ist die Navigation der Seite. Eine Figur zeigt, wo man gerade ist, und
 | --- | --- | --- |
 | `aim(id)` | Hover oder Tastatur-Fokus (`:focus-visible`) auf einen Block – beim Blog nur Hover, Klick oder Enter | `hover = id`, Blog-Sperre aufheben, 404-Meldung löschen (außer bei `blog`) |
 | `leave(id)` | Maus weg, Fokus verlassen | `hover = null`, falls `id` der gezeigte Block war |
-| `select(id)` | Seitenwechsel (nach `astro:after-swap`) | `id` wird Ruheblock, 404-Meldung löschen, Hüpf-Animation. Unbekannte Ziele und der aktuelle Ruheblock ändern nichts |
+| `select(id)` | Seitenwechsel (nach `astro:after-swap`) | `id` wird Ruheblock, 404-Meldung löschen, Hüpf-Animation. Unbekannte Ziele (auch fremde Adressen) und der aktuelle Ruheblock ändern nichts |
+| `returned` | Zurück aus dem Cache des Browsers (`pageshow` mit `persisted`), z. B. nach einem Link nach außen | wie `leave` für den gezeigten Block: `hover = null`, die Figur geht zum Ruheblock. Ohne gezeigten Block ändert sich nichts |
 | `step` | Takt alle 130 ms, solange die Figur nicht zur Ruhe gekommen ist | ein Schritt nach den Regeln unten |
+
+*Tests: „ignoriert select auf den aktuellen oder einen unbekannten Block …“, „geht nach Zurück aus dem Cache …“*
 
 ## Wohin die Figur will
 

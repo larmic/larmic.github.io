@@ -6,6 +6,8 @@
 // und baut die neue Brücke. Maus weg → zurück auf den Ruheblock.
 // Blog → die Figur fällt ins Leere und spawnt auf ihrem Ruheblock mit „404 – Kein Blog gefunden“.
 // Die Blöcke sind Links. Beim Seitenwechsel bleibt die Insel erhalten (transition:persist), die Seite ruft `select()`.
+// Links nach außen (fremde Domain) laden sofort; kommt die Seite per Zurück aus dem Cache des Browsers wieder,
+// geht die Figur zu ihrem Ruheblock zurück (`pageshow`).
 // Easter Egg: Hover über das Blätterdach → die Figur stapelt zwei Blöcke und klettert in die Krone.
 // Steht die Figur, schaut sie zum Cursor: Der Körper dreht sich zur Seite, der Kopf dreht und nickt in 15°/10°-Stufen.
 // Fährt die Maus über den Namen, hüpft sie zweimal mit den goldenen Buchstaben mit.
@@ -18,6 +20,7 @@ import {
   initialState,
   isSettled,
   leave,
+  returned,
   select,
   settle,
   step,
@@ -111,12 +114,21 @@ class LarmicIsland extends HTMLElement {
     this.start();
   }
 
-  /** Blick zum Cursor: nur mit Maus und ohne Wunsch nach reduzierter Bewegung. */
+  /** Zurück aus dem Cache des Browsers; Blick zum Cursor nur mit Maus und ohne Wunsch nach reduzierter Bewegung. */
   private listenGlobally() {
     if (this.globals) return;
-    if (!matchMedia('(hover: hover) and (pointer: fine)').matches || this.reducedMotion.matches) return;
     this.globals = new AbortController();
     const opts = { passive: true, signal: this.globals.signal };
+    // Nach einem Link nach außen und Zurück steht die Seite wieder wie verlassen da: Die Figur stünde noch dort,
+    // wohin zuletzt gezeigt wurde, ein mouseleave kommt nie. Sie geht zurück zum Ruheblock.
+    window.addEventListener(
+      'pageshow',
+      (e) => {
+        if (e.persisted && this.ready) this.update(returned(this.state));
+      },
+      opts,
+    );
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches || this.reducedMotion.matches) return;
     const follow = () => {
       if (!this.raf)
         this.raf = requestAnimationFrame(() => {
