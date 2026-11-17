@@ -4,7 +4,7 @@ import type { Material } from './materials';
 export const SITE = {
   title: 'larmic.de',
   description:
-    'Lars Michaelis – Entwickler, Architekt, Speaker und Berater. Software mit fachlichem Kern und KI mit Leitplanken; Workshops zu Domain-Driven Design, Event Storming und Microservices.',
+    'Lars Michaelis – Entwickler, Architekt, Speaker und Berater. Workshops zu Domain-Driven Design, Event Storming und Microservices, KI mit Leitplanken.',
   url: 'https://larmic.de',
   mail: 'mail@larmic.de', // privat, nur per JavaScript als Link (MailLink.astro)
   workshopMail: 'l.michaelis@neusta.de', // Workshops und Beratung laufen über team neusta; wie `mail` nur per MailLink
