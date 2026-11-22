@@ -34,6 +34,10 @@ Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run chec
 - `docs/design-system.md` – Farben, Materialien, Typografie, Interaktionen
 - `docs/specs/insel.md` – Spec der Figur auf der Insel (Ereignisse, Regeln, Invarianten, zugehörige Tests). Bei Änderungen am Verhalten Spec und Tests mitziehen
 
+## Entwürfe
+
+Konzepte und Entwürfe zu larmic.de und zum Spiel Mitwachsen liegen gesammelt im Artefakt „larmic.de und Mitwachsen“: https://claude.ai/artifact/7vR4q4XrCDj6eoeNkrwVtm. Meint der Nutzer „das Artefakt“, ist dieses gemeint. Neue Entwürfe kommen als eigene HTML-Seite dorthin (Eintrag im Array `G` der `index.html`), nicht in ein eigenes Artefakt. Die Höhlenwelt mit Zug steht in `gleisbahn.html`, die Fahrzeuge je Welt in `reisewege.html`.
+
 ## Regeln
 
 - Schichten (geprüft durch `npm run arch`): `src/lib` ist generisch und importiert nichts aus `src/data`, `components`, `layouts`, `pages`, `scripts`. `src/data` kennt keine Oberfläche. Browser-Code in `src/scripts` nutzt aus `lib` nur `head.ts` und `textures.ts`, nichts aus Node.
