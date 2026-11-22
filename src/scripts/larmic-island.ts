@@ -1,17 +1,16 @@
 // <larmic-island>: die schwebende Insel mit Figur und Navigationsblöcken.
 // Die Figur steht immer auf dem Block dessen, was gerade angezeigt wird (`rest`): einem Bereich (Über mich,
-// Workshops, Videos) oder der Kiste eines Eintrags (`workshops/event_storming`). Die Ziele bilden einen Baum:
+// Workshops, Videos, Blog) oder der Kiste eines Eintrags (`workshops/event_storming`, `blog/mitwachsen`). Die Ziele bilden einen Baum:
 // Insel → Bereich → Kiste. Die Kisten eines Bereichs poppen auf, sobald er offen ist.
 // Hover/Fokus auf einen anderen Block → die Figur läuft zurück bis zur Abzweigung (die Brücke dahinter zerbröselt)
 // und baut die neue Brücke. Maus weg → zurück auf den Ruheblock.
-// Blog → die Figur fällt ins Leere und spawnt auf ihrem Ruheblock mit „404 – Kein Blog gefunden“.
 // Die Blöcke sind Links. Beim Seitenwechsel bleibt die Insel erhalten (transition:persist), die Seite ruft `select()`.
 // Links nach außen (fremde Domain) laden sofort; kommt die Seite per Zurück aus dem Cache des Browsers wieder,
 // geht die Figur zu ihrem Ruheblock zurück (`pageshow`).
 // Easter Egg: Hover über das Blätterdach → die Figur stapelt zwei Blöcke und klettert in die Krone.
 // Steht die Figur, schaut sie zum Cursor: Der Körper dreht sich zur Seite, der Kopf dreht und nickt in 15°/10°-Stufen.
 // Fährt die Maus über den Namen, hüpft sie zweimal mit den goldenen Buchstaben mit.
-// Die Logik (Wege, Brücken, Sturz, Sprechblase) steckt rein und getestet in island-state.ts; hier nur DOM, Takt und Kopfblick.
+// Die Logik (Wege, Brücken, Sprechblase) steckt rein und getestet in island-state.ts; hier nur DOM, Takt und Kopfblick.
 
 import { BUBBLES } from '../data/site';
 import { headView } from '../lib/voxel/head';
@@ -42,7 +41,7 @@ class LarmicIsland extends HTMLElement {
   private hop!: HTMLElement;
   private bubble!: HTMLElement;
   private bridges: HTMLElement[] = [];
-  private blocks: HTMLElement[] = [];
+  private blocks: HTMLAnchorElement[] = [];
   private faces: SVGGElement[] = []; // Kopfseiten in der Reihenfolge von HEAD_FACES
   private look: { x: number; y: number } | null = null; // letzte Cursor-Position
   private headKey = '0,0';
@@ -67,19 +66,16 @@ class LarmicIsland extends HTMLElement {
     this.hop = this.querySelector('.fighop')!;
     this.bubble = this.querySelector('.bubble')!;
     this.bridges = [...this.querySelectorAll<HTMLElement>('.brk')];
-    this.blocks = [...this.querySelectorAll<HTMLElement>('.blk')];
+    this.blocks = [...this.querySelectorAll<HTMLAnchorElement>('.blk')];
     for (const b of this.blocks) {
       const id = b.dataset.id!;
       b.addEventListener('mouseenter', () => this.preview(id));
       b.addEventListener('mouseleave', () => this.update(leave(this.state, id)));
       // Nur Tastatur-Fokus: Fokus durch Mausklick oder beim Zurückkehren in den Tab soll die Figur nicht losschicken.
-      // Den Blog nur per Klick oder Enter – beim Durchtabben soll niemand stürzen.
       b.addEventListener('focus', () => {
-        if (id !== 'blog' && b.matches(':focus-visible')) this.preview(id);
+        if (b.matches(':focus-visible')) this.preview(id);
       });
       b.addEventListener('blur', () => this.update(leave(this.state, id)));
-      // Links navigieren selbst, nur der Blog-Button löst den Sturz aus
-      if (b instanceof HTMLButtonElement) b.addEventListener('click', () => this.update(aim(this.state, id)));
     }
     for (const e of this.querySelectorAll<HTMLElement>('.egg')) {
       e.addEventListener('mouseenter', () => this.preview(e.dataset.egg!));
@@ -156,9 +152,9 @@ class LarmicIsland extends HTMLElement {
     );
   }
 
-  /** Freudenhüpfer: nur wenn die Figur steht, sonst würde er den Schritt- oder Sturz-Sprung überdecken. */
+  /** Freudenhüpfer: nur wenn die Figur steht, sonst würde er den Schritt überdecken. */
   private cheer() {
-    if (this.timer !== undefined || this.state.falling) return;
+    if (this.timer !== undefined) return;
     this.jump.classList.remove('cheer');
     void this.jump.offsetWidth; // Animation neu starten, auch wenn sie gerade noch läuft
     this.jump.classList.add('cheer');
@@ -204,7 +200,7 @@ class LarmicIsland extends HTMLElement {
 
   /** Kopf zum Cursor drehen, solange die Figur steht. Beim Laufen schaut sie geradeaus in Laufrichtung. */
   private aimHead() {
-    if (!this.look || this.timer !== undefined || this.state.falling) return this.setHead(0, 0);
+    if (!this.look || this.timer !== undefined) return this.setHead(0, 0);
     const box = this.figpos.getBoundingClientRect();
     const dx = this.look.x - (box.left + box.width / 2);
     const dy = this.look.y - (box.top + box.height * 0.2);
@@ -249,13 +245,10 @@ class LarmicIsland extends HTMLElement {
     const v = view(s, this.world, BUBBLES);
     const ab = s.picks % 2 ? 'A' : 'B';
 
-    // Klasse zuerst setzen: beim Respawn ("tp") ohne Übergang springen
-    this.figpos.className =
-      'figpos' + (s.respawnedAt === s.tick ? ' tp' : '') + (s.respawns ? (s.respawns % 2 ? ' spawnA' : ' spawnB') : '');
     this.figpos.style.left = `${v.at.x}%`;
     this.figpos.style.top = `${v.at.y}%`;
     this.flip.className = 'figflip' + (s.facing === 'R' ? ' flip' : '');
-    this.jump.className = 'figw' + (s.falling > 0 ? ' falling' : s.picks ? ` jump${ab}` : '');
+    this.jump.className = 'figw' + (s.picks ? ` jump${ab}` : '');
     this.hop.className =
       'fighop' +
       (s.steps ? (s.steps % 2 ? ' stepA' : ' stepB') : '') +
@@ -277,11 +270,11 @@ class LarmicIsland extends HTMLElement {
         (s.rest === id && s.picks ? ` pop${ab}` : '') +
         (v.held.has(id) ? ' held' : '') +
         (parent && !v.openSections.has(parent) ? ' closed' : '');
-      if (b instanceof HTMLAnchorElement) this.markCurrent(b, id === s.rest);
+      this.markCurrent(b, id === s.rest);
     }
 
     this.bubble.textContent = v.bubble.text;
-    this.bubble.className = 'bubble pxf' + (v.bubble.error ? ' err' : '') + (v.bubble.visible ? '' : ' off');
+    this.bubble.className = 'bubble pxf' + (v.bubble.visible ? '' : ' off');
   }
 }
 

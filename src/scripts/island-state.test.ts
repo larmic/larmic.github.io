@@ -2,9 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { AVATAR } from '../data/avatar';
 import { buildWorld } from '../data/island-layout';
 import {
-  BUBBLE_404,
   BUBBLE_IDLE,
-  FALL_TICKS,
   aim,
   initialState,
   isSettled,
@@ -29,14 +27,6 @@ const world: World = buildWorld(
   AVATAR,
 ).data;
 const BUBBLES = { about: 'A', workshops: 'W', videos: 'V', blog: 'B', tree: 'T' };
-// Die Insel von früher: Hinter dem ersten Feld zum Blog ist nichts, die Figur stürzt
-const pit: World = {
-  ...world,
-  routes: {
-    ...world.routes,
-    blog: [world.routes.blog![0]!, { ...world.routes.blog![1]!, b: false, k: undefined, fall: true }],
-  },
-};
 
 /** Takte bis zur Ruhe; liefert den Endzustand und alle Orte, an denen die Figur dabei stand. */
 function settle(state: FigureState, max = 400) {
@@ -60,7 +50,7 @@ describe('Figur auf der Insel', () => {
     standsOn(s, 'about');
     const v = view(s, world, BUBBLES);
     expect(v.standingBridges.size).toBe(world.routes.about!.filter((n) => n.b).length);
-    expect(v.bubble).toEqual({ text: BUBBLE_IDLE, visible: true, error: false });
+    expect(v.bubble).toEqual({ text: BUBBLE_IDLE, visible: true });
     expect(isSettled(s, world)).toBe(true);
   });
 
@@ -142,7 +132,7 @@ describe('Figur auf der Insel', () => {
     expect(view(there, world, BUBBLES).standingBridges).toEqual(new Set(bridges));
     const s = settle(select(leave(there, 'blog'), world, 'blog')).s;
     standsOn(s, 'blog');
-    expect(view(s, world, BUBBLES).bubble).toEqual({ text: 'B', visible: true, error: false });
+    expect(view(s, world, BUBBLES).bubble).toEqual({ text: 'B', visible: true });
     expect(view(s, world, BUBBLES).openSections).toEqual(new Set(['blog']));
   });
 
@@ -156,29 +146,10 @@ describe('Figur auf der Insel', () => {
     expect(select(s, world, 'blog/mitwachsen'), 'nächster Teil, gleiche Kiste').toBe(s);
   });
 
-  it('stürzte früher am Blog: ohne Brücke fällt sie, spawnt auf ihrem Ruheblock mit 404 und will nicht gleich wieder hin', () => {
-    let s = aim(initialState(pit, 'workshops/es'), 'blog');
-    let fell = 0;
-    for (let i = 0; i < 200 && !isSettled(s, pit); i++) {
-      s = step(s, pit);
-      fell = Math.max(fell, s.falling);
-    }
-    expect(fell).toBe(FALL_TICKS);
-    standsOn(s, 'workshops/es');
-    expect(s.blogBlocked).toBe(true);
-    expect(s.hover).toBe('blog'); // Maus ist noch über dem Blog, die Figur bleibt trotzdem stehen
-    expect(view(s, pit, BUBBLES).bubble).toEqual({ text: BUBBLE_404, visible: true, error: true });
-    // 404 bleibt, bis man auf einen anderen Block zeigt
-    s = settleAtOnce(leave(s, 'blog'), pit);
-    expect(view(s, pit, BUBBLES).bubble.text).toBe(BUBBLE_404);
-    s = aim(s, 'about');
-    expect(view(s, pit, BUBBLES).bubble.error).toBe(false);
-  });
-
   it('klettert beim Baum über zwei gestapelte Blöcke in die Krone und sagt ihren Spruch', () => {
     const { s } = settle(aim(initialState(world, 'about'), 'tree'));
     standsOn(s, 'tree');
-    expect(view(s, world, BUBBLES).bubble).toEqual({ text: 'T', visible: true, error: false });
+    expect(view(s, world, BUBBLES).bubble).toEqual({ text: 'T', visible: true });
     expect(world.routes.tree!.filter((n) => n.b)).toHaveLength(2);
   });
 
@@ -201,6 +172,8 @@ describe('Figur auf der Insel', () => {
       ['about', 'videos/tc'],
       ['workshops/ddd', 'workshops/ms'],
       ['videos/hex', 'about'],
+      ['about', 'blog/mitwachsen'],
+      ['blog/mitwachsen', 'blog'],
     ];
     for (const [rest, next] of cases) {
       const start = select(initialState(world, rest), world, next);
@@ -208,9 +181,6 @@ describe('Figur auf der Insel', () => {
       expect(isSettled(atOnce, world)).toBe(true);
       expect(view(atOnce, world, BUBBLES).at).toEqual(view(settle(start).s, world, BUBBLES).at);
     }
-    // Ohne Brücke zum Blog: Sturz und Respawn passieren sofort, die 404-Meldung steht
-    const fallen = settleAtOnce(aim(initialState(pit, 'about'), 'blog'), pit);
-    expect(view(fallen, pit, BUBBLES).bubble).toEqual({ text: BUBBLE_404, visible: true, error: true });
   });
 
   it('ignoriert select auf den aktuellen oder einen unbekannten Block, auch auf eine fremde Adresse', () => {
@@ -218,6 +188,23 @@ describe('Figur auf der Insel', () => {
     expect(select(s, world, 'about')).toBe(s);
     expect(select(s, world, 'gibt-es-nicht')).toBe(s);
     expect(select(s, world, 'https://www.mitwachsen-spiele.de/')).toBe(s);
+  });
+
+  it('bleibt bei einem unbekannten Ruheblock in der Inselmitte und begrüßt, statt zu scheitern', () => {
+    const s = initialState(world, 'gibt-es-nicht');
+    expect(isSettled(s, world)).toBe(true);
+    expect(s.facing).toBe('L');
+    const v = view(s, world, BUBBLES);
+    expect(v.at).toEqual(world.home);
+    expect(v.standingBridges.size).toBe(0);
+    expect(v.bubble).toEqual({ text: BUBBLE_IDLE, visible: true });
+  });
+
+  it('ignoriert das Verlassen eines Blocks, auf den nicht mehr gezeigt wird, und schweigt ohne Spruch im Baum', () => {
+    const s = aim(initialState(world, 'about'), 'tree');
+    expect(leave(s, 'videos')).toBe(s);
+    const up = settle(s).s;
+    expect(view(up, world, {}).bubble).toEqual({ text: '', visible: false });
   });
 
   it('macht den Pilz-Ausgang nie zum Ruheblock: Er führt nach außen, die Figur läuft nur beim Zeigen hin', () => {
@@ -245,7 +232,7 @@ describe('Figur auf der Insel', () => {
 
   it('spricht nach einer Auswahl zum Bereich statt zu begrüßen', () => {
     const s = settle(select(initialState(world, 'workshops/ddd'), world, 'workshops')).s;
-    expect(view(s, world, BUBBLES).bubble).toEqual({ text: 'W', visible: true, error: false });
+    expect(view(s, world, BUBBLES).bubble).toEqual({ text: 'W', visible: true });
   });
 
   it('kommt aus jeder Kombination von Ruheblock und Ziel zur Ruhe', () => {

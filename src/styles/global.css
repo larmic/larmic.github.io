@@ -356,7 +356,7 @@ larmic-island {
   }
 }
 
-/* Figur: Position (figpos) › Blickrichtung (figflip) › Respawn (figspawn) › Sprung/Sturz (figw) › Schritt (fighop) */
+/* Figur: Position (figpos) › Blickrichtung (figflip) › Sprung (figw) › Schritt (fighop) */
 .figpos {
   position: absolute;
   z-index: 200;
@@ -365,9 +365,6 @@ larmic-island {
     left 0.13s linear,
     top 0.13s linear;
 }
-.figpos.tp {
-  transition: none;
-}
 .fig-svg {
   display: block;
   width: 100%;
@@ -375,7 +372,6 @@ larmic-island {
   overflow: visible;
 }
 .figflip,
-.figspawn,
 .figw,
 .fighop {
   transform-origin: 50% 100%;
@@ -448,63 +444,6 @@ larmic-island {
     transform: scale(1.03, 0.96);
   }
 }
-.falling {
-  animation: fall 0.8s steps(8) forwards;
-}
-@keyframes fall {
-  0% {
-    opacity: 1;
-    transform: none;
-  }
-  20% {
-    opacity: 1;
-    transform: translateY(-8%);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(240%) rotate(28deg);
-  }
-}
-.spawnA .figspawn {
-  animation: spawnA 0.5s steps(6);
-}
-.spawnB .figspawn {
-  animation: spawnB 0.5s steps(6);
-}
-@keyframes spawnA {
-  0% {
-    opacity: 0;
-    transform: scale(0.3, 1.5);
-  }
-  45% {
-    opacity: 1;
-    transform: scale(1.15, 0.85);
-  }
-  75% {
-    transform: scale(0.96, 1.04);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes spawnB {
-  0% {
-    opacity: 0;
-    transform: scale(0.3, 1.5);
-  }
-  45% {
-    opacity: 1;
-    transform: scale(1.15, 0.85);
-  }
-  75% {
-    transform: scale(0.96, 1.04);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
 .fig-arm-r {
   transform-box: fill-box;
   transform-origin: 50% 8%;
@@ -543,16 +482,6 @@ larmic-island {
     opacity: 0;
   }
 }
-.sp {
-  position: absolute;
-  left: 44%;
-  top: 52%;
-  width: 12%;
-  aspect-ratio: 1;
-  opacity: 0;
-  pointer-events: none;
-}
-
 .bubble {
   position: absolute;
   left: 50%;
@@ -571,9 +500,6 @@ larmic-island {
 }
 .bubble.off {
   display: none;
-}
-.bubble.err {
-  color: var(--error);
 }
 .bubble::after {
   content: '';
@@ -749,7 +675,7 @@ a.blk {
     width: 142%;
     margin-left: -21%;
   }
-  /* Erste Reihe: die vier Bereiche. Darunter, zentriert, die Kisten des offenen Bereichs. */
+  /* Erste Reihe: die Bereiche und der Pilz-Ausgang. Darunter, zentriert, die Kisten des offenen Bereichs. */
   .blkrow {
     position: static;
     display: flex;

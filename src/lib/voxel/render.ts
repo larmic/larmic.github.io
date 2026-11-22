@@ -141,7 +141,7 @@ export function tileDataUri(grid: Grid, pal: Palette, px = 6): string {
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 
-// Partikel-Flugbahnen für Block-Pop und Respawn
+// Partikel-Flugbahnen für den Block-Pop
 export function particlesCss(seed: number, pre: string, sel: string, kf: string, r0: number, r1: number): string {
   let s = seed;
   const rnd = () => {

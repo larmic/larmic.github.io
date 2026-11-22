@@ -47,9 +47,9 @@ export function cubeDefs(avatar: Avatar, prefix = 'v'): string {
   ].join('');
 }
 
-// ---------- Partikel: Flugbahnen für Block-Pop und Respawn (fester Seed, gehört in den <head>) ----------
+// ---------- Partikel: Flugbahnen für den Block-Pop (fester Seed, gehört in den <head>) ----------
 export function particleCss(): string {
-  return particlesCss(1234, 'pop', '.px', 'p', 46, 64) + '\n' + particlesCss(98765, 'spawn', '.sp', 's', 50, 78);
+  return particlesCss(1234, 'pop', '.px', 'p', 46, 64);
 }
 
 // ---------- Hintergrund-Texturen als CSS-Variablen ----------
@@ -69,7 +69,6 @@ export type RouteDef = {
   climb?: Cell[];
   target: Cell;
   tag: Tag;
-  fall?: Cell;
   via?: string;
 };
 export type NavMeta = {
@@ -79,7 +78,7 @@ export type NavMeta = {
   p1: string;
   p2: string;
   color?: string;
-  href?: string;
+  href: string;
   parent?: string;
 };
 // Easter Egg: Weg ohne Block und Link, ausgelöst durch Hover über eine Fläche aus vorhandenen Blöcken
@@ -93,7 +92,7 @@ export type SceneDef = {
   eggs?: Record<string, EggDef>;
 };
 
-export type RouteNode = { x: number; y: number; f: 'L' | 'R'; b: boolean; k?: number; fall?: boolean };
+export type RouteNode = { x: number; y: number; f: 'L' | 'R'; b: boolean; k?: number };
 export type NavItem = NavMeta & { id: string; x: number; y: number; w: number; z: number; tag: Tag };
 export type WorldData = {
   home: { x: number; y: number };
@@ -107,7 +106,7 @@ export type WorldData = {
 };
 export type Scene = ReturnType<typeof buildScene>;
 
-type Step = { c: Cell; b: boolean; fall: boolean };
+type Step = { c: Cell; b: boolean };
 
 // Zeichenreihenfolge von hinten nach vorn: erst nach i + j + k, dann nach Höhe, dann nach i
 /** Eintrag einer Szenenbeschreibung, auf den sich ein anderer bezieht – fehlt er, ist die Beschreibung kaputt */
@@ -159,27 +158,22 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
   };
   const steps = (rid: string): Step[] => {
     const d = need(allRoutes[rid], `Weg ${rid}`);
-    const start: Step[] = d.via
-      ? steps(d.via)
-      : d.walk.map(([i, j]) => ({ c: [i, j, 0] as Cell, b: false, fall: false }));
-    const own: Step[] = d.fall
-      ? [{ c: d.fall, b: false, fall: true }]
-      : [
-          ...d.bridge.map((c) => ({ c, b: true, fall: false })),
-          ...(d.climb ?? []).map((c) => ({ c, b: false, fall: false })),
-          { c: d.target, b: false, fall: false },
-        ];
-    return [...start, ...own];
+    const start: Step[] = d.via ? steps(d.via) : d.walk.map(([i, j]) => ({ c: [i, j, 0] as Cell, b: false }));
+    return [
+      ...start,
+      ...d.bridge.map((c) => ({ c, b: true })),
+      ...(d.climb ?? []).map((c) => ({ c, b: false })),
+      { c: d.target, b: false },
+    ];
   };
 
   const bridgeAt = new Map<string, number>();
   const bridgesRaw: { X: number; Y: number; c: Cell }[] = [];
-  const nodesRaw: Record<string, { fx: number; fy: number; f: 'L' | 'R'; b: boolean; k?: number; fall?: boolean }[]> =
-    {};
+  const nodesRaw: Record<string, { fx: number; fy: number; f: 'L' | 'R'; b: boolean; k?: number }[]> = {};
   const targets: Record<string, { X: number; Y: number; c: Cell; tag: Tag; nav: Pick<NavItem, 'id'> & NavMeta }> = {};
   for (const [rid, d] of Object.entries(allRoutes)) {
     let prev = def.home;
-    nodesRaw[rid] = steps(rid).map(({ c, b, fall }) => {
+    nodesRaw[rid] = steps(rid).map(({ c, b }) => {
       const dx = c[0] - prev[0] - (c[1] - prev[1]);
       const [fx, fy] = footpt(...c);
       xs.push(fx - figHW - 8, fx + figHW + 8);
@@ -196,14 +190,7 @@ export function buildScene(def: SceneDef, avatar: Avatar) {
         }
       }
       prev = c;
-      return {
-        fx,
-        fy,
-        f: dx > 0 ? 'R' : 'L',
-        b,
-        ...(k !== undefined ? { k } : {}),
-        ...(fall ? { fall: true } : {}),
-      } as const;
+      return { fx, fy, f: dx > 0 ? 'R' : 'L', b, ...(k !== undefined ? { k } : {}) } as const;
     });
     if (def.bubbles.includes(rid)) headroom(footpt(...d.target));
     if (!def.routes[rid]) continue; // Easter Egg: kein Zielblock, kein Etikett

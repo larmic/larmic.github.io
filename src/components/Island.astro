@@ -2,7 +2,7 @@
 import { CUBE_OUTLINE, CUBE_VIEWBOX } from '../lib/voxel/cube';
 import { isExternal } from '../lib/voxel/world';
 // Die Inselwelt: statisches SVG aus dem Voxel-Generator (beim Build) + Web Component für die Interaktion.
-// Alle Ziele sind Links, nur der Blog ist ein Button (er hat keine Seite, die Figur fällt).
+// Alle Ziele sind Links, auch ohne JavaScript.
 // Links nach außen (fremde Domain) öffnen im selben Tab; ihr Etikett trägt ↗ (für Screenreader versteckt), dazu nur
 // für Screenreader die Domain. Kein aria-label: Der sichtbare Text bleibt Teil des Namens.
 // `rest` ist der Block dessen, was gerade angezeigt wird, z. B. `about`, `workshops` oder `workshops/event_storming`.
@@ -17,7 +17,6 @@ interface Props {
 const { rest } = Astro.props;
 const w = await islandScene();
 const d = w.data;
-const sparks = ['#ffffff', '#f0a531', '#ffffff', '#f0a531', '#ffffff', '#f0a531'];
 const section = rest.split('/')[0];
 // Startbild ohne JavaScript: Die Figur steht schon auf ihrem Block, die Brücken dorthin stehen
 const route = d.routes[rest];
@@ -74,34 +73,26 @@ const host = (href: string) => new URL(href).hostname.replace(/^www\./, '');
         <p class={`bubble pxf${rest.includes('/') ? ' off' : ''}`} aria-hidden="true">
           Hi! Zeig auf einen Block.
         </p>
-        {sparks.map((c) => (
-          <span class="sp" style={`background: ${c}`}></span>
-        ))}
         <div class={`figflip${at.f === 'R' ? ' flip' : ''}`}>
-          <div class="figspawn">
-            <div class="figw">
-              <div class="fighop" set:html={w.figureSvg} />
-            </div>
+          <div class="figw">
+            <div class="fighop" set:html={w.figureSvg} />
           </div>
         </div>
       </div>
     </div>
     <div class="blkrow">
       {d.nav.map((n) => {
-        const Tag = n.href ? 'a' : 'button';
         const on = n.id === rest || rest.startsWith(`${n.id}/`);
         const closed = n.parent !== undefined && n.parent !== section;
         const away = isExternal(n.href) ? host(n.href) : null; // Domain bei Links nach außen
         return (
-          <Tag
-            type={n.href ? undefined : 'button'}
+          <a
             href={n.href}
             class={`blk${n.parent ? ' child' : ''}${on ? ' on' : ''}${closed ? ' closed' : ''}`}
             data-id={n.id}
             data-parent={n.parent}
             data-external={away ? '' : undefined}
             aria-current={n.id === rest ? (n.href === Astro.url.pathname ? 'page' : 'true') : undefined}
-            aria-label={n.href ? undefined : `${n.label} – gibt es noch nicht`}
             style={`left: ${n.x}%; top: ${n.y}%; width: ${n.w}%; z-index: ${n.z}${n.color ? `; color: ${n.color}` : ''}`}
           >
             <span class="bob" style={`animation-delay: ${n.delay}`}>
@@ -122,7 +113,7 @@ const host = (href: string) => new URL(href).hostname.replace(/^www\./, '');
                 </>
               )}
             </span>
-          </Tag>
+          </a>
         );
       })}
     </div>

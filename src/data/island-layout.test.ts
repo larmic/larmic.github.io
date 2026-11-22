@@ -49,7 +49,7 @@ describe('buildWorld', () => {
         const dx = cur.X - prev.X;
         const dy = cur.Y - prev.Y;
         const pillar = Math.abs(dx) < 0.5 && Math.abs(dy + LEVEL) < 0.5; // Baum: Block unter sich setzen und draufsteigen
-        if (!node.fall && !pillar) {
+        if (!pillar) {
           expect(Math.abs(Math.abs(dx) - HALF_W), `${id}: Schritt seitlich`).toBeLessThan(0.5);
           // ein Feld weiter: ±20, dazu eine Stufe hoch (−44,8) oder runter (+44,8)
           const level = [-STEP_Y, STEP_Y].flatMap((s) => [s - LEVEL, s, s + LEVEL]).some((s) => Math.abs(dy - s) < 0.5);
@@ -160,11 +160,11 @@ describe('buildWorld', () => {
     expect(cubeDefs({ ...AVATAR, beard: true }).length).toBeGreaterThan(cubeDefs(AVATAR).length);
   });
 
-  it('hat für den Baum eine Hover-Fläche und einen Weg ohne Sturz', () => {
+  it('hat für den Baum eine Hover-Fläche und einen Weg in die Krone', () => {
     const scene = full();
     const egg = scene.data.eggs.find((e) => e.id === 'tree')!;
     expect(egg.w).toBeGreaterThan(0);
     expect(egg.h).toBeGreaterThan(0);
-    expect(scene.data.routes.tree!.at(-1)!.fall).toBeUndefined();
+    expect(scene.data.routes.tree!.filter((n) => n.b)).toHaveLength(2);
   });
 });

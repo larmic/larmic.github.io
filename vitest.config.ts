@@ -16,11 +16,11 @@ export default defineConfig({
       // Knapp unter dem gemessenen Stand: Sinkt die Abdeckung, fällt das Gate. Steigt sie, die Schwellen mitziehen.
       thresholds: {
         statements: 96,
-        branches: 92,
+        branches: 94,
         functions: 96,
         lines: 96,
         // Die Figur auf der Insel enger
-        'src/scripts/**/*.ts': { statements: 98, branches: 93, functions: 98, lines: 98 },
+        'src/scripts/**/*.ts': { statements: 98, branches: 98, functions: 98, lines: 98 },
       },
     },
   },

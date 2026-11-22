@@ -11,10 +11,8 @@ import type { RouteNode, WorldData } from '../lib/voxel/world';
  */
 export type World = Pick<WorldData, 'home' | 'routes' | 'outside'>;
 
-export const FALL_TICKS = 7; // Dauer des Sturzes in Takten
 export const CRUMBLE_TICKS = 3; // so lange bleibt ein bröckelnder Brückenblock sichtbar
 export const BUBBLE_IDLE = 'Hi! Zeig auf einen Block.';
-export const BUBBLE_404 = '404 – Kein Blog gefunden';
 
 export type FigureState = {
   rest: string; // Block der angezeigten Seite: Dort steht die Figur, wenn sie nirgendwo anders hin will
@@ -25,11 +23,6 @@ export type FigureState = {
   facing: 'L' | 'R';
   tick: number;
   crumbling: { bridge: number; until: number }[];
-  falling: number; // Takte im Sturz, 0 = nicht im Sturz
-  respawns: number;
-  respawnedAt: number; // Takt des letzten Respawns (Figur springt dann ohne Übergang)
-  blogBlocked: boolean; // nach dem Sturz will sie nicht gleich wieder zum Blog
-  show404: boolean;
   picks: number; // gewählte Blöcke – für die Hüpf- und Pop-Animation
   steps: number; // Schritte – für die Schritt-Animation
   placed: number; // gesetzte Blöcke – für die Arm-Animation
@@ -53,11 +46,6 @@ export function initialState(world: World, rest: string): FigureState {
     ...restPose(world, rest),
     tick: 0,
     crumbling: [],
-    falling: 0,
-    respawns: 0,
-    respawnedAt: -1,
-    blogBlocked: false,
-    show404: false,
     picks: 0,
     steps: 0,
     placed: 0,
@@ -67,12 +55,12 @@ export function initialState(world: World, rest: string): FigureState {
 /** Neuer Inhalt wird angezeigt: Sein Block wird der Ruheblock, die Figur läuft hin. Links nach außen nie. */
 export function select(state: FigureState, world: World, id: string): FigureState {
   if (!world.routes[id] || world.outside.includes(id) || id === state.rest) return state;
-  return { ...state, rest: id, show404: false, picks: state.picks + 1 };
+  return { ...state, rest: id, picks: state.picks + 1 };
 }
 
 /** Zeigen auf einen Block (Hover oder Tastaturfokus). */
 export function aim(state: FigureState, id: string): FigureState {
-  return { ...state, hover: id, blogBlocked: false, show404: id === 'blog' ? state.show404 : false };
+  return { ...state, hover: id };
 }
 
 export function leave(state: FigureState, id: string): FigureState {
@@ -87,10 +75,9 @@ export function returned(state: FigureState): FigureState {
   return state.hover === null ? state : leave(state, state.hover);
 }
 
-/** Wohin die Figur will: zum gezeigten Block, sonst zum Ruheblock. Nach dem Sturz ist der Blog gesperrt. */
+/** Wohin die Figur will: zum gezeigten Block, sonst zum Ruheblock. */
 export function target(state: FigureState): string {
-  const want = state.hover ?? state.rest;
-  return want === 'blog' && state.blogBlocked ? state.rest : want;
+  return state.hover ?? state.rest;
 }
 
 /** Länge des gemeinsamen Anfangs zweier Wege: Bis dorthin muss die Figur nicht zurück. */
@@ -100,7 +87,7 @@ export function common(world: World, a: string, b: string): number {
   for (let n = 0; ; n++) {
     const p = ra[n];
     const q = rb[n];
-    if (!p || !q || p.fall || q.fall || p.x !== q.x || p.y !== q.y) return n;
+    if (!p || !q || p.x !== q.x || p.y !== q.y) return n;
   }
 }
 
@@ -111,26 +98,11 @@ export function step(state: FigureState, world: World): FigureState {
   const s: FigureState = { ...state, tick, crumbling: state.crumbling.filter((c) => c.until > tick) };
   const route = routeOf(world, s.route);
 
-  if (s.pos > 0 && route[s.pos - 1]?.fall) {
-    // Sturz läuft immer bis zum Respawn auf dem Ruheblock durch
-    if (s.falling < FALL_TICKS) return { ...s, falling: s.falling + 1 };
-    const stillAtBlog = !s.hover || s.hover === 'blog';
-    return {
-      ...s,
-      ...restPose(world, s.rest),
-      falling: 0,
-      respawns: s.respawns + 1,
-      respawnedAt: tick,
-      blogBlocked: true,
-      show404: stillAtBlog,
-    };
-  }
-
   if (goal === s.route) {
-    // Vorwärts: Block setzen (oder es versuchen, wenn dort nichts ist), dann draufsteigen
+    // Vorwärts: Block setzen, dann draufsteigen
     const next = route[s.pos];
     if (!next) return s;
-    if ((next.b || next.fall) && s.built <= s.pos) return { ...s, built: s.pos + 1, placed: s.placed + 1 };
+    if (next.b && s.built <= s.pos) return { ...s, built: s.pos + 1, placed: s.placed + 1 };
     return { ...s, pos: s.pos + 1, facing: next.f, steps: s.steps + 1 };
   }
 
@@ -155,9 +127,7 @@ function stepBack(s: FigureState, world: World, goal: string, route: RouteNode[]
 /** Steht die Figur am Ziel und ist nichts mehr in Bewegung? Dann kann der Takt aufhören. */
 export function isSettled(state: FigureState, world: World): boolean {
   const route = routeOf(world, state.route);
-  return (
-    target(state) === state.route && state.pos >= route.length && !last(route)?.fall && state.crumbling.length === 0
-  );
+  return target(state) === state.route && state.pos >= route.length && state.crumbling.length === 0;
 }
 
 /** Alle Takte auf einmal bis zur Ruhe – für die schmale Ansicht, in der die Figur nicht läuft. */
@@ -173,7 +143,7 @@ export type FigureView = {
   crumblingBridges: Set<number>;
   openSections: Set<string>; // Bereiche, deren Kisten sichtbar sind
   held: Set<string>; // Blöcke, über die die Figur gerade geht oder auf denen sie steht: Sie wippen nicht
-  bubble: { text: string; visible: boolean; error: boolean };
+  bubble: { text: string; visible: boolean };
 };
 
 /** Was zu zeichnen ist. `bubbles` sind die Sprüche je Bereich (src/data/site.ts). */
@@ -190,25 +160,22 @@ export function view(state: FigureState, world: World, bubbles: Record<string, s
   const held = new Set(
     Object.keys(world.routes).filter((id) => {
       const r = routeOf(world, id);
-      return !last(r)?.fall && state.pos >= r.length && common(world, id, state.route) === r.length;
+      return state.pos >= r.length && common(world, id, state.route) === r.length;
     }),
   );
 
   // Sprechblase nur, wenn die Figur auf ihrem Ruheblock steht und nirgendwo anders hin will. Auf Bereichen spricht sie
   // zum Bereich (beim ersten Aufruf der Startseite begrüßt sie), auf Kisten schweigt sie, oben im Baum hat sie einen Spruch.
   const pose = restPose(world, state.rest);
-  const atRest =
-    state.route === pose.route && state.pos === pose.pos && state.falling === 0 && target(state) === state.rest;
+  const atRest = state.route === pose.route && state.pos === pose.pos && target(state) === state.rest;
   const inTree = state.route === 'tree' && state.pos === world.routes.tree?.length && target(state) === 'tree';
   const text = inTree
     ? (bubbles.tree ?? '')
-    : state.show404
-      ? BUBBLE_404
-      : state.rest.includes('/')
-        ? ''
-        : state.picks === 0 && state.rest === 'about'
-          ? BUBBLE_IDLE
-          : (bubbles[state.rest] ?? BUBBLE_IDLE);
+    : state.rest.includes('/')
+      ? ''
+      : state.picks === 0 && state.rest === 'about'
+        ? BUBBLE_IDLE
+        : (bubbles[state.rest] ?? BUBBLE_IDLE);
 
   return {
     at,
@@ -216,6 +183,6 @@ export function view(state: FigureState, world: World, bubbles: Record<string, s
     crumblingBridges: new Set(state.crumbling.map((c) => c.bridge)),
     openSections,
     held,
-    bubble: { text, visible: (atRest || inTree) && text !== '', error: state.show404 && !inTree },
+    bubble: { text, visible: (atRest || inTree) && text !== '' },
   };
 }
