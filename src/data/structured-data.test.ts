@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { courseLd, personLd } from './structured-data';
+import { blogPostingLd, courseLd, personLd } from './structured-data';
 import { SITE } from './site';
 
 describe('strukturierte Daten', () => {
@@ -19,5 +19,27 @@ describe('strukturierte Daten', () => {
     expect(course.provider.name).toBe('neusta GmbH');
     expect(course.hasCourseInstance.instructor['@id']).toBe(personLd()['@id']);
     expect(course.hasCourseInstance.courseMode).toEqual(['Onsite']);
+  });
+
+  const post = {
+    id: 'erst-die-zaeune',
+    data: { title: 'Erst die Zäune', teaser: '…', date: new Date('2026-11-22'), tags: ['guards', 'ki'] },
+  };
+
+  it('beschreibt einen Blogpost mit Lars als Autor und der Serie, zu der er gehört', () => {
+    const ld = blogPostingLd(post, { id: 'mitwachsen', title: 'Mitwachsen' });
+    expect(ld.url).toBe('https://larmic.de/blog/erst-die-zaeune/');
+    expect(ld.datePublished).toBe('2026-11-22');
+    expect(ld.author['@id']).toBe(personLd()['@id']);
+    expect(ld.keywords).toBe('guards, ki');
+    expect(ld.isPartOf).toEqual({
+      '@type': 'CreativeWorkSeries',
+      name: 'Mitwachsen',
+      url: 'https://larmic.de/blog/serie/mitwachsen/',
+    });
+  });
+
+  it('lässt bei einer Notiz die Serie weg', () => {
+    expect(blogPostingLd(post)).not.toHaveProperty('isPartOf');
   });
 });

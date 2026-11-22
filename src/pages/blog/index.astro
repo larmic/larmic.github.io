@@ -16,6 +16,7 @@ const current = series.find((s) => s.status === 'läuft') ?? series.at(-1);
   description="Notizen eines Architekten, der nebenbei Vater ist: KI mit Leitplanken, Guards, Testing und ein Spiel für einen Dreijährigen."
   rest={restFor()}
 >
+  <link slot="head" rel="alternate" type="application/rss+xml" title="larmic.de – Blog" href="/blog/rss.xml" />
   <div class="panel-head">
     <VoxelIcon block="shelf" size={64} />
     <div>
@@ -26,4 +27,7 @@ const current = series.find((s) => s.status === 'läuft') ?? series.at(-1);
   {current && <SeriesBox series={current} />}
   <h2 class="blog-h2">Alle Posts</h2>
   {posts.length > 0 ? <PostList posts={posts} series={series} /> : <p>Hier steht bald der erste Post.</p>}
+  <p class="feed">
+    <a href="/blog/rss.xml">Feed abonnieren</a>
+  </p>
 </IslandPage>

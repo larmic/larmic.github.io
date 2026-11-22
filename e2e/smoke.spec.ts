@@ -76,6 +76,19 @@ test('Insel: Zurück aus dem Cache schickt die Figur vom gezeigten Block zum Ruh
   await expect.poll(state).toBe(about);
 });
 
+test('Blog: Der Feed listet den Post und ist im Kopf der Seite verlinkt', async ({ page, request }) => {
+  const res = await request.get('/blog/rss.xml');
+  expect(res.status()).toBe(200);
+  const xml = await res.text();
+  expect(xml).toContain('<item>');
+  expect(xml).toContain('<link>https://larmic.de/blog/erst-die-zaeune/</link>');
+  await page.goto('/blog/');
+  await expect(page.locator('head link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute(
+    'href',
+    '/blog/rss.xml',
+  );
+});
+
 const OLD: [string, RegExp][] = [
   ['/about/', /\/$/],
   ['/#workshops', /\/workshops\/$/],

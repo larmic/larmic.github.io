@@ -7,6 +7,7 @@ import PatternNote from '../../components/PatternNote.astro';
 import Topics from '../../components/Topics.astro';
 import PostSide from '../../components/PostSide.astro';
 import { loadBlog, restFor } from '../../data/blog';
+import { blogPostingLd } from '../../data/structured-data';
 import { formatDate, isoDate, neighbours } from '../../lib/blog/posts';
 
 export async function getStaticPaths() {
@@ -27,7 +28,9 @@ const { Content, headings } = await render(post);
   description={d.teaser}
   rest={restFor(series && { id: series.entry.id, featured: series.entry.data.featured })}
   ogType="article"
+  jsonLd={blogPostingLd(post, series && { id: series.entry.id, title: series.entry.data.title })}
 >
+  <link slot="head" rel="alternate" type="application/rss+xml" title="larmic.de – Blog" href="/blog/rss.xml" />
   <article class="post">
     <header class="post-head">
       {series && (

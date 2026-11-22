@@ -25,6 +25,7 @@ const rest = upcoming(posts.length, d.parts);
   description={d.teaser}
   rest={restFor({ id: entry.id, featured: d.featured })}
 >
+  <link slot="head" rel="alternate" type="application/rss+xml" title="larmic.de – Blog" href="/blog/rss.xml" />
   <div class="panel-head">
     <VoxelIcon block={m.block} color={m.icon} size={64} />
     <div>
