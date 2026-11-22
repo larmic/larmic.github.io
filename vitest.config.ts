@@ -1,4 +1,4 @@
-// Unit-Tests für die reine Logik (Voxel-Generator, Zustandsmaschine der Figur, Gates). Kein DOM, kein Astro nötig.
+// Unit-Tests für die reine Logik (Voxel-Generator, Blog, Zustandsmaschine der Figur, Gates). Kein DOM, kein Astro nötig.
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
@@ -15,10 +15,10 @@ export default defineConfig({
       reporter: [['text', { skipFull: true }], 'text-summary'],
       // Knapp unter dem gemessenen Stand: Sinkt die Abdeckung, fällt das Gate. Steigt sie, die Schwellen mitziehen.
       thresholds: {
-        statements: 95,
+        statements: 96,
         branches: 92,
-        functions: 94,
-        lines: 95,
+        functions: 96,
+        lines: 96,
         // Die Figur auf der Insel enger
         'src/scripts/**/*.ts': { statements: 98, branches: 93, functions: 98, lines: 98 },
       },
