@@ -30,9 +30,20 @@
   --crystal-link: #d9c6ff;
   --grass-bg: #e3ecd2; /* Gras: Testing */
 
+  /* Blog: Spur-Label (immer mit Symbol und Text), Zettel „Das Muster in einem Satz“, Code-Block */
+  --track-eltern: #a3221b;
+  --track-technik: #34506f;
+  --track-beide: #5b3f8f;
+  --note: #f39a3d; /* einzige nicht klickbare Signalfläche, bewusst nicht Gold */
+  --note-ink: #2a1608;
+  --code-bg: #1c2130;
+  --code-bar: #2a3142; /* Dateileiste über dem Code */
+  --code-text: #e8ecf2;
+
   /* Schriften */
   --font-pixel: 'Pixelify Sans', 'Courier New', monospace;
   --font-body: 'Nunito', 'Trebuchet MS', sans-serif;
+  --font-code: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; /* Systemschrift, nichts wird geladen */
 
   /* Pixel-Rahmen: vier Schatten statt border, dadurch fehlen die Eckpixel */
   --px-4: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink);

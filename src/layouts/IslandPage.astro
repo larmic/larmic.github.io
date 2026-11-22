@@ -2,6 +2,7 @@
 // Jede Seite mit Insel: oben Name, Intro und Insel (bleibt beim Seitenwechsel stehen), darunter der Inhalt der Seite.
 // `rest` ist der Block der Seite, z. B. `about`, `workshops` oder `workshops/event_storming`: Dort steht die Figur.
 // `cta` ersetzt den Button im Kopf: Link (`href`) oder Mail-Anfrage an neusta (`subject`, auf Workshop-Seiten).
+// Slots: `head` (z. B. Feed-Verweis), `aside` (Seitenleiste neben dem Panel, Blogposts), `after` (unter dem Panel, auf Erde).
 import BaseLayout from './BaseLayout.astro';
 import type { RestId } from '../data/island-layout';
 import SiteHeader from '../components/SiteHeader.astro';
@@ -19,12 +20,21 @@ interface Props {
   rest: RestId;
   cta?: { label: string; href: string } | { label: string; subject: string };
   jsonLd?: object;
+  ogType?: 'website' | 'article';
 }
-const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/workshops/' }, jsonLd } = Astro.props;
+const {
+  title,
+  description,
+  rest,
+  cta = { label: 'Workshops ansehen', href: '/workshops/' },
+  jsonLd,
+  ogType,
+} = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+<BaseLayout title={title} description={description} jsonLd={jsonLd} ogType={ogType}>
   <Fragment slot="head" set:html={`<style>${particleCss()}</style>`} />
+  <slot name="head" slot="head" />
   <header class="sky" transition:persist="hero">
     <Clouds />
     <SiteHeader />
@@ -66,9 +76,21 @@ const { title, description, rest, cta = { label: 'Workshops ansehen', href: '/wo
     data-cta-href={'href' in cta ? cta.href : undefined}
     data-cta-subject={'subject' in cta ? cta.subject : undefined}
   >
-    <div class="panel pxbox reveal">
-      <slot />
-    </div>
+    {Astro.slots.has('aside') ? (
+      <div class="post-layout">
+        <div class="panel pxbox reveal">
+          <slot />
+        </div>
+        <aside class="post-side" aria-label="Zum Artikel">
+          <slot name="aside" />
+        </aside>
+      </div>
+    ) : (
+      <div class="panel pxbox reveal">
+        <slot />
+      </div>
+    )}
+    <slot name="after" />
   </main>
   <SiteFooter />
 

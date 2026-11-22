@@ -1,0 +1,38 @@
+---
+// Die laufende Serie auf der Blog-Übersicht: Kristall-Kasten mit Stand und Einstieg
+import type { SeriesView } from '../data/blog';
+interface Props {
+  series: SeriesView;
+}
+const { series } = Astro.props;
+const { entry, posts, status } = series;
+const first = posts[0];
+const latest = posts.at(-1);
+---
+
+<section class="series-box th-ki pxsm">
+  <p class="series-status">
+    {status === 'läuft' ? 'Aktuelle Serie' : 'Serie'} · {status}, Teil {posts.length} von {entry.data.parts}
+  </p>
+  <h2>{entry.data.title}</h2>
+  <p>{entry.data.teaser}</p>
+  <div class="series-actions">
+    {first && latest && first.id !== latest.id ? (
+      <>
+        <a class="pxbtn small" href={`/blog/${first.id}/`}>
+          Von vorn lesen
+        </a>
+        <a class="pxbtn small" href={`/blog/${latest.id}/`}>
+          Neuester Teil
+        </a>
+      </>
+    ) : (
+      first && (
+        <a class="pxbtn small" href={`/blog/${first.id}/`}>
+          Teil {first.data.part} lesen
+        </a>
+      )
+    )}
+    <a href={`/blog/serie/${entry.id}/`}>Zur Serie</a>
+  </div>
+</section>

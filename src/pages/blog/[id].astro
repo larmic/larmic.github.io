@@ -1,0 +1,92 @@
+---
+import '../../styles/blog.css';
+import { render } from 'astro:content';
+import IslandPage from '../../layouts/IslandPage.astro';
+import TrackLabel from '../../components/TrackLabel.astro';
+import PatternNote from '../../components/PatternNote.astro';
+import Topics from '../../components/Topics.astro';
+import PostSide from '../../components/PostSide.astro';
+import { loadBlog, restFor } from '../../data/blog';
+import { formatDate, isoDate, neighbours } from '../../lib/blog/posts';
+
+export async function getStaticPaths() {
+  const { posts } = await loadBlog();
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}
+const { post } = Astro.props;
+const d = post.data;
+const { posts, series: allSeries } = await loadBlog();
+const series = allSeries.find((s) => s.entry.id === d.series);
+const { prev, next } = series ? neighbours(series.posts, series.posts.indexOf(post)) : {};
+const counterpart = posts.find((p) => p.id === d.counterpart);
+const { Content, headings } = await render(post);
+---
+
+<IslandPage
+  title={`${d.title} – Blog`}
+  description={d.teaser}
+  rest={restFor(series && { id: series.entry.id, featured: series.entry.data.featured })}
+  ogType="article"
+>
+  <article class="post">
+    <header class="post-head">
+      {series && (
+        <p class="post-series pxf">
+          <a href={`/blog/serie/${series.entry.id}/`}>
+            {series.entry.data.short} · Teil {d.part} von {series.entry.data.parts}
+          </a>
+        </p>
+      )}
+      <h1>{d.title}</h1>
+      {d.pattern && (
+        <p class="post-sub">
+          Muster{d.part ? ` ${d.part}` : ''}: {d.pattern.title}
+        </p>
+      )}
+      <p class="post-meta">
+        <TrackLabel track={d.track} />
+        <time class="pxf" datetime={isoDate(d.date)}>
+          {formatDate(d.date)}
+        </time>
+        <span>{post.minutes} Min. Lesezeit</span>
+        <span>von Lars Michaelis</span>
+      </p>
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+    {d.pattern && <PatternNote sentence={d.pattern.sentence} />}
+    {d.confession && <p class="confession">Kleines Geständnis: {d.confession}</p>}
+    <Topics tags={d.tags} />
+  </article>
+  <PostSide slot="aside" post={post} headings={headings} series={series} counterpart={counterpart} />
+  <section slot="after" class="post-next">
+    <h2>Weiterlesen</h2>
+    <div class="post-next-grid">
+      {prev && (
+        <a class="next pxsm" href={`/blog/${prev.id}/`}>
+          <span class="pxf">Vorheriger Teil</span>
+          <strong>{prev.data.title}</strong>
+        </a>
+      )}
+      {next && (
+        <a class="next pxsm" href={`/blog/${next.id}/`}>
+          <span class="pxf">Nächster Teil</span>
+          <strong>{next.data.title}</strong>
+        </a>
+      )}
+      {series && !prev && !next && (
+        <a class="next pxsm" href={`/blog/serie/${series.entry.id}/`}>
+          <span class="pxf">Zur Serie</span>
+          <strong>{series.entry.data.short}</strong>
+        </a>
+      )}
+      {!prev && !next && (
+        <a class="next pxsm" href="/blog/">
+          <span class="pxf">Blog</span>
+          <strong>Alle Posts</strong>
+        </a>
+      )}
+    </div>
+  </section>
+</IslandPage>

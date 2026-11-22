@@ -19,8 +19,9 @@ interface Props {
   description?: string;
   noindex?: boolean; // z. B. 404: nicht indexieren, kein canonical
   jsonLd?: object; // strukturierte Daten (schema.org) für Suchmaschinen
+  ogType?: 'website' | 'article'; // Blogposts sind Artikel
 }
-const { title, description = SITE.description, noindex = false, jsonLd } = Astro.props;
+const { title, description = SITE.description, noindex = false, jsonLd, ogType = 'website' } = Astro.props;
 // Startseite: Name und Rolle statt nur der Domain
 const fullTitle = title ? `${title} – ${SITE.title}` : 'Lars Michaelis – Entwickler, Architekt, Speaker und Berater';
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -41,7 +42,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={SITE.title} />
     <meta property="og:locale" content="de_DE" />
     <meta property="og:image" content={new URL('/og.png', Astro.site)} />

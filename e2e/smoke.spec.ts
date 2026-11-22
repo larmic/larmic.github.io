@@ -32,6 +32,9 @@ for (const path of [
   '/workshops/event_storming/',
   '/videos/',
   '/videos/testcontainers/',
+  '/blog/',
+  '/blog/erst-die-zaeune/',
+  '/blog/serie/mitwachsen/',
   '/impressum/',
   '/datenschutz/',
 ])
@@ -113,5 +116,18 @@ test.describe('ohne JavaScript', () => {
       'href',
       'https://www.mitwachsen-spiele.de/',
     );
+  });
+
+  test('Blogpost: Text, Dateileiste, Zettel und Inhaltsverzeichnis stehen im HTML', async ({ page }) => {
+    await page.goto('/blog/erst-die-zaeune/');
+    await expect(page.getByRole('heading', { level: 1, name: 'Erst die Zäune, dann der Spielplatz' })).toBeVisible();
+    await expect(page.locator('figure.code figcaption')).toHaveText('.dependency-cruiser.cjs');
+    await expect(page.getByRole('note')).toContainText('Das Muster in einem Satz');
+    const toc = page.getByRole('navigation', { name: 'Inhalt' }).getByRole('link');
+    await expect(toc).toHaveCount(7);
+    for (const link of await toc.all()) {
+      await expect(link).toBeVisible();
+      await expect(page.locator(`[id="${(await link.getAttribute('href'))!.slice(1)}"]`)).toBeVisible();
+    }
   });
 });

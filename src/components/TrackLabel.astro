@@ -1,0 +1,13 @@
+---
+// Spur eines Posts: Symbol (dekorativ) und Text, nie nur Farbe
+import { TRACKS, type Track } from '../data/blog-taxonomy';
+interface Props {
+  track: Track;
+}
+const { track } = Astro.props;
+const t = TRACKS[track];
+---
+
+<span class={`track t-${track}`}>
+  <span aria-hidden="true">{t.symbol}</span> {t.label}
+</span>

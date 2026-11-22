@@ -1,0 +1,12 @@
+---
+// Der orange Zettel am Ende eines Posts: das Muster in einem Satz
+interface Props {
+  sentence: string;
+}
+const { sentence } = Astro.props;
+---
+
+<div class="note" role="note">
+  <p class="note-title">Das Muster in einem Satz</p>
+  <p>{sentence}</p>
+</div>

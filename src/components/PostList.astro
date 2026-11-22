@@ -1,0 +1,29 @@
+---
+// Liste von Posts: Datum, Titel als Link, Spur, Serie und Lesezeit
+import type { Post, SeriesView } from '../data/blog';
+import { formatDate, isoDate } from '../lib/blog/posts';
+import TrackLabel from './TrackLabel.astro';
+interface Props {
+  posts: Post[];
+  series: SeriesView[];
+}
+const { posts, series } = Astro.props;
+const short = (id?: string) => series.find((s) => s.entry.id === id)?.entry.data.short;
+---
+
+<ul class="postlist">
+  {posts.map((p) => (
+    <li>
+      <time class="pxf" datetime={isoDate(p.data.date)}>
+        {formatDate(p.data.date)}
+      </time>
+      <a href={`/blog/${p.id}/`}>{p.data.title}</a>
+      <p class="postlist-meta">
+        <TrackLabel track={p.data.track} />
+        <span>
+          {p.data.series ? `${short(p.data.series)} · Teil ${p.data.part}` : 'Notiz'} · {p.minutes} Min.
+        </span>
+      </p>
+    </li>
+  ))}
+</ul>

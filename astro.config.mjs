@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { codeTitle } from './src/lib/blog/code-title.ts';
 
 // Reine Weiterleitungen gehören nicht in die Sitemap, auch nichts unter /spiele/ (das Spiel hat eine eigene Seite)
 const redirectPages = /^\/(about|tags|categories)\/$|^\/spiele\//;
@@ -10,6 +11,9 @@ export default defineConfig({
   trailingSlash: 'ignore',
   // Bilder (auch in Markdown) mit Breite/Höhe, lazy und in passenden Größen (srcset), höchstens so breit wie der Text
   image: { layout: 'constrained' },
+  // Code-Blöcke: Farben aus eigenen Tokens (blog.css) statt eines fertigen Themes, dessen Kommentare zu blass wären;
+  // ```js title="datei.ts" bekommt eine Dateileiste
+  markdown: { shikiConfig: { theme: 'css-variables', transformers: [codeTitle()] } },
   integrations: [sitemap({ filter: (page) => !redirectPages.test(new URL(page).pathname) })],
   // Alte Adressen weiterleiten, für immer (Lesezeichen, auch auf dem Startbildschirm). Ziele direkt, ohne Umweg.
   redirects: {

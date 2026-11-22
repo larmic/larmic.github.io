@@ -8,6 +8,7 @@ import {
   neighbours,
   partsOf,
   published,
+  upcoming,
   type PostMeta,
 } from './posts';
 
@@ -65,6 +66,17 @@ describe('neighbours', () => {
 
   it('hat bei einem einzelnen Teil keine Nachbarn', () => {
     expect(neighbours(['eins'], 0)).toEqual({ prev: undefined, next: undefined });
+  });
+});
+
+describe('upcoming', () => {
+  it('nennt die Teile, die noch fehlen', () => {
+    expect(upcoming(1, 8)).toBe('Teil 2 bis 8 erscheinen noch.');
+    expect(upcoming(7, 8)).toBe('Teil 8 erscheint noch.');
+  });
+
+  it('sagt nichts, wenn die Serie vollständig ist', () => {
+    expect(upcoming(8, 8)).toBeUndefined();
   });
 });
 

@@ -1,0 +1,74 @@
+---
+// Seitenleiste eines Posts: Inhalt, Serie, Belege und das Gegenstück aus der anderen Spur
+import type { MarkdownHeading } from 'astro';
+import type { Post, SeriesView } from '../data/blog';
+import { formatDate, upcoming } from '../lib/blog/posts';
+import TrackLabel from './TrackLabel.astro';
+interface Props {
+  post: Post;
+  headings: MarkdownHeading[];
+  series?: SeriesView;
+  counterpart?: Post;
+}
+const { post, headings, series, counterpart } = Astro.props;
+const toc = headings.filter((h) => h.depth === 2);
+const evidence = post.data.evidence;
+const rest = series && upcoming(series.posts.length, series.entry.data.parts);
+---
+
+{toc.length > 0 && (
+  <nav class="side pxsm toc" aria-label="Inhalt">
+    <h2>Inhalt</h2>
+    <ol>
+      {toc.map((h) => (
+        <li>
+          <a href={`#${h.slug}`}>{h.text}</a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
+{series && (
+  <div class="side pxsm side-series">
+    <h2>
+      <a href={`/blog/serie/${series.entry.id}/`}>{series.entry.data.short}</a> · Teil {post.data.part} von{' '}
+      {series.entry.data.parts}
+    </h2>
+    <ol>
+      {series.posts.map((p) => (
+        <li class={p.id === post.id ? 'current' : undefined}>
+          <span class="no pxf">{p.data.part}</span>
+          <a href={`/blog/${p.id}/`} aria-current={p.id === post.id ? 'page' : undefined}>
+            {p.data.title}
+          </a>
+        </li>
+      ))}
+    </ol>
+    {rest && <p>{rest}</p>}
+  </div>
+)}
+{evidence && (
+  <div class="side pxsm side-evidence">
+    <h2>Belege</h2>
+    <ul>
+      {evidence.items.map((e) => (
+        <li>
+          <code>{e.hash}</code>
+          {e.text}
+        </li>
+      ))}
+    </ul>
+    <p>Commits im Repository dieser Seite. Stand {formatDate(evidence.asOf)}.</p>
+  </div>
+)}
+{counterpart && (
+  <div class="side pxsm side-other">
+    <h2>Die andere Seite</h2>
+    <p>
+      Dieselbe Geschichte aus der anderen Spur: <a href={`/blog/${counterpart.id}/`}>{counterpart.data.title}</a>
+    </p>
+    <p>
+      <TrackLabel track={counterpart.data.track} />
+    </p>
+  </div>
+)}

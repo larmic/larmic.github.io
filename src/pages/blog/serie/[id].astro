@@ -1,0 +1,62 @@
+---
+import '../../../styles/blog.css';
+import { render } from 'astro:content';
+import IslandPage from '../../../layouts/IslandPage.astro';
+import VoxelIcon from '../../../components/VoxelIcon.astro';
+import TrackLabel from '../../../components/TrackLabel.astro';
+import { loadBlog, restFor } from '../../../data/blog';
+import { MATERIALS } from '../../../data/materials';
+import { upcoming } from '../../../lib/blog/posts';
+
+export async function getStaticPaths() {
+  const { series } = await loadBlog();
+  return series.map((s) => ({ params: { id: s.entry.id }, props: { series: s } }));
+}
+const { series } = Astro.props;
+const { entry, posts, status } = series;
+const d = entry.data;
+const m = MATERIALS[d.material];
+const { Content } = await render(entry);
+const rest = upcoming(posts.length, d.parts);
+---
+
+<IslandPage
+  title={`${d.short} – Blog-Serie`}
+  description={d.teaser}
+  rest={restFor({ id: entry.id, featured: d.featured })}
+>
+  <div class="panel-head">
+    <VoxelIcon block={m.block} color={m.icon} size={64} />
+    <div>
+      <h1>{d.title}</h1>
+      <p class="series-status">
+        Serie · {status}, Teil {posts.length} von {d.parts}
+      </p>
+    </div>
+  </div>
+  <div class="prose">
+    <Content />
+  </div>
+  <h2 class="blog-h2">Die Teile</h2>
+  <ol class="series-parts">
+    {posts.map((p) => (
+      <li>
+        <span class="no pxf">{p.data.part}</span>
+        <div>
+          <a href={`/blog/${p.id}/`}>{p.data.title}</a>
+          <p class="postlist-meta">
+            <TrackLabel track={p.data.track} />
+            <span>
+              {p.data.pattern && `Muster ${p.data.part}: ${p.data.pattern.title} · `}
+              {p.minutes} Min.
+            </span>
+          </p>
+        </div>
+      </li>
+    ))}
+  </ol>
+  {rest && <p class="upcoming">{rest}</p>}
+  <a class="backlink" href="/blog/">
+    Alle Posts
+  </a>
+</IslandPage>

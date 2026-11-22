@@ -33,6 +33,13 @@ export function neighbours<T>(parts: readonly T[], index: number): { prev?: T; n
   return { prev: index > 0 ? parts[index - 1] : undefined, next: parts[index + 1] };
 }
 
+/** „Teil 2 bis 8 erscheinen noch.“ – ohne Titel, damit die änderbar bleiben; nichts, wenn die Serie vollständig ist */
+export function upcoming(publishedParts: number, parts: number): string | undefined {
+  if (publishedParts >= parts) return undefined;
+  const next = publishedParts + 1;
+  return next === parts ? `Teil ${parts} erscheint noch.` : `Teil ${next} bis ${parts} erscheinen noch.`;
+}
+
 const two = (n: number) => String(n).padStart(2, '0');
 
 /** „22.11.2026“, in UTC, damit der Build überall dasselbe Datum zeigt */

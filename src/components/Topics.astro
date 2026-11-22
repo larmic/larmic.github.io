@@ -1,0 +1,24 @@
+---
+// Themen eines Posts. Kein Link: Themenseiten gibt es noch nicht. Der Rand trägt die Materialfarbe des Themas.
+import { TAGS, type TagId } from '../data/blog-taxonomy';
+import { MATERIALS } from '../data/materials';
+interface Props {
+  tags: TagId[];
+}
+const { tags } = Astro.props;
+const color = (tag: TagId) => {
+  const t: { material?: keyof typeof MATERIALS } = TAGS[tag];
+  if (!t.material) return undefined;
+  return MATERIALS[t.material].icon ?? 'var(--green)'; // Gras hat keine Icon-Farbe
+};
+---
+
+<ul class="topics" aria-label="Themen">
+  {tags.map((tag) => (
+    <li>
+      <span class="topic" style={color(tag) ? `--topic: ${color(tag)}` : undefined}>
+        #{tag}
+      </span>
+    </li>
+  ))}
+</ul>
