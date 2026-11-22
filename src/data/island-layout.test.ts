@@ -13,7 +13,8 @@ const items = (section: string, n: number): ChildItem[] =>
   }));
 
 // So viele Einträge, wie es Plätze gibt: Hier müssen Geometrie und Wege noch stimmen
-const full = () => buildWorld({ workshops: items('workshops', 4), videos: items('videos', 4) }, AVATAR);
+const full = () =>
+  buildWorld({ workshops: items('workshops', 4), videos: items('videos', 4), blog: items('blog', 1) }, AVATAR);
 
 /** Prozentangaben der Szene zurück in Szenen-Einheiten (Würfel CUBE_W × CUBE_H) */
 function units(scene: Scene) {
@@ -107,10 +108,13 @@ describe('buildWorld', () => {
   });
 
   it('bricht bei mehr Einträgen als Plätzen mit einer Meldung ab, die sagt, was zu tun ist', () => {
-    expect(() => buildWorld({ workshops: items('workshops', 5), videos: [] }, AVATAR)).toThrow(
+    expect(() => buildWorld({ workshops: items('workshops', 5), videos: [], blog: [] }, AVATAR)).toThrow(
       /CHILD_SLOTS.*draft: true/,
     );
-    expect(() => buildWorld({ workshops: [], videos: items('videos', 5) }, AVATAR)).toThrow(/Plätze/);
+    expect(() => buildWorld({ workshops: [], videos: items('videos', 5), blog: [] }, AVATAR)).toThrow(/Plätze/);
+    expect(() => buildWorld({ workshops: [], videos: [], blog: items('blog', 2) }, AVATAR)).toThrow(
+      /blog gibt es 1 Plätze.*featured: false.*eine Kiste pro Serie/,
+    );
   });
 
   it('führt mit dem Pilz-Ausgang nach außen: Fliegenpilz-Block, Link auf mitwachsen-spiele.de, kein Ruheblock', () => {
@@ -125,10 +129,29 @@ describe('buildWorld', () => {
     ).toHaveLength(2);
   });
 
+  it('führt zum Blog über zwei Brückenblöcke: ein Link auf /blog/, kein Block ohne Link', () => {
+    const { nav, outside, routes } = full().data;
+    expect(nav.find((n) => n.id === 'blog')).toMatchObject({ sym: 'shelf', href: '/blog/', tag: 'R' });
+    expect(routes.blog!.filter((n) => n.b)).toHaveLength(2);
+    expect(outside).not.toContain('blog');
+    for (const n of nav) expect(n.href, `${n.id}: Link`).toBeTruthy();
+  });
+
+  it('stellt die Kiste einer Serie hinter das Regal: Ihr Weg beginnt mit dem Weg zum Blog', () => {
+    const { nav, routes } = full().data;
+    expect(nav.find((n) => n.id === 'blog/e0')).toMatchObject({ parent: 'blog', href: '/blog/e0/' });
+    expect(routes['blog/e0']!.slice(0, routes.blog!.length)).toEqual(routes.blog);
+    expect(routes['blog/e0']!.filter((n) => n.b)).toHaveLength(3);
+  });
+
+  it('wächst durch Brücke und Kiste am Blog nicht: Der Ausschnitt bleibt, nichts verschiebt sich', () => {
+    expect(full().sceneSvg).toContain('viewBox="-379 -344.715 863 837.915"');
+  });
+
   it('zeichnet Bart und Brille an Figur und Kopf-Block nur, wenn der Avatar sie hat', () => {
     const glasses = '#1b1d24'; // Farbe der Brille (PAL_GLASS)
-    const plain = buildWorld({ workshops: [], videos: [] }, { ...AVATAR, beard: false, glasses: false });
-    const dressed = buildWorld({ workshops: [], videos: [] }, { ...AVATAR, beard: true, glasses: true });
+    const plain = buildWorld({ workshops: [], videos: [], blog: [] }, { ...AVATAR, beard: false, glasses: false });
+    const dressed = buildWorld({ workshops: [], videos: [], blog: [] }, { ...AVATAR, beard: true, glasses: true });
     expect(plain.figureSvg).not.toContain(glasses);
     expect(dressed.figureSvg).toContain(glasses);
     expect(dressed.figureSvg.length).toBeGreaterThan(plain.figureSvg.length);

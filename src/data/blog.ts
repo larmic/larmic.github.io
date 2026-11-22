@@ -63,5 +63,6 @@ export function loadBlog(): Promise<Blog> {
   return cached;
 }
 
-/** Ruheblock einer Blog-Seite. Vorläufig „Über mich“, bis die Insel den Blog kennt. */
-export const restFor: (series?: { id: string; featured: boolean }) => RestId = () => 'about';
+/** Ruheblock einer Blog-Seite: die Kiste der Serie, wenn sie eine hat (`featured`), sonst das Regal */
+export const restFor = (series?: { id: string; featured: boolean }): RestId =>
+  series?.featured ? `blog/${series.id}` : 'blog';

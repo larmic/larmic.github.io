@@ -7,6 +7,7 @@ import { isExternal } from '../lib/voxel/world';
 // für Screenreader die Domain. Kein aria-label: Der sichtbare Text bleibt Teil des Namens.
 // `rest` ist der Block dessen, was gerade angezeigt wird, z. B. `about`, `workshops` oder `workshops/event_storming`.
 // Dort steht die Figur. Die Kisten eines Bereichs sind sichtbar, solange er offen ist.
+// Der Ruheblock trägt aria-current: `page`, wenn sein Link die Seite selbst ist, sonst `true` (Post auf der Kiste seiner Serie).
 import { islandScene } from '../data/island';
 import type { RestId } from '../data/island-layout';
 
@@ -99,7 +100,7 @@ const host = (href: string) => new URL(href).hostname.replace(/^www\./, '');
             data-id={n.id}
             data-parent={n.parent}
             data-external={away ? '' : undefined}
-            aria-current={n.id === rest ? 'page' : undefined}
+            aria-current={n.id === rest ? (n.href === Astro.url.pathname ? 'page' : 'true') : undefined}
             aria-label={n.href ? undefined : `${n.label} – gibt es noch nicht`}
             style={`left: ${n.x}%; top: ${n.y}%; width: ${n.w}%; z-index: ${n.z}${n.color ? `; color: ${n.color}` : ''}`}
           >

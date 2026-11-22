@@ -1,5 +1,5 @@
-// Die Insel von larmic.de: feste Blöcke, Startfeld, Wege zu den Bereichen, zum Blog und zum Pilz-Ausgang (Link auf
-// die eigene Seite des Kinderspiels), Plätze für die Kisten der Einträge und das Easter Egg am Baum. Gebaut wird sie mit der Szenen-Engine aus src/lib/voxel/world.ts.
+// Die Insel von larmic.de: feste Blöcke, Startfeld, Wege zu den Bereichen und zum Pilz-Ausgang (Link auf
+// die eigene Seite des Kinderspiels), Plätze für die Kisten der Einträge und Blog-Serien und das Easter Egg am Baum. Gebaut wird sie mit der Szenen-Engine aus src/lib/voxel/world.ts.
 // Rein und ohne Astro, damit sie sich testen lässt (island-layout.test.ts); das Laden der Inhalte steckt in island.ts.
 import {
   buildScene,
@@ -86,7 +86,15 @@ const ROUTES: Record<string, RouteDef> = {
     target: [3, 7, -1],
     tag: 'B',
   },
-  blog: { walk: [[4, 3]], bridge: [], target: [7, 3, -2], tag: 'B', fall: [5, 3, 0] },
+  blog: {
+    walk: [[4, 3]],
+    bridge: [
+      [5, 3, 0],
+      [6, 3, -1],
+    ],
+    target: [7, 3, -2],
+    tag: 'R', // unten steht die Kiste der Serie
+  },
   // Pilz-Ausgang: Fliegenpilz-Haus wie auf der Insel von mitwachsen-spiele.de, der Link führt dorthin (gleicher Tab)
   mitwachsen: {
     walk: [
@@ -106,12 +114,12 @@ const navMeta = (avatar: Avatar): Record<string, NavMeta> => ({
   about: { label: 'Über mich', sym: 'head', delay: '0s', p1: avatar.skin, p2: avatar.hair, href: '/' },
   workshops: { label: 'Workshops', sym: 'board', delay: '-1.1s', p1: '#f39a3d', p2: '#5aa6e8', href: '/workshops/' },
   videos: { label: 'Videos', sym: 'screen', delay: '-2.2s', p1: '#ee4b3e', p2: '#454b59', href: '/videos/' },
-  blog: { label: 'Blog', sym: 'shelf', delay: '-0.6s', p1: '#c0453a', p2: '#3f6fb5' },
+  blog: { label: 'Blog', sym: 'shelf', delay: '-0.6s', p1: '#c0453a', p2: '#3f6fb5', href: '/blog/' },
   mitwachsen: { label: 'Mitwachsen', sym: 'pilz', delay: '-1.6s', p1: '#d9473a', p2: '#ffffff', href: MITWACHSEN.home },
 });
 
 // Kisten der Einträge: feste Plätze rund um ihren Bereichs-Block, Weg = Brücke(n) vom Bereichs-Block aus
-export type Section = 'workshops' | 'videos';
+export type Section = 'workshops' | 'videos' | 'blog';
 
 /**
  * Ruheblock einer Seite: ein Bereich oder die Kiste eines Eintrags – nie ein Block, der nach außen führt.
@@ -145,6 +153,15 @@ const CHILD_SLOTS: Record<Section, Pick<RouteDef, 'bridge' | 'target' | 'tag'>[]
       tag: 'B',
     }, // ganz unten, Treppe runter
   ],
+  // Blog: eine Kiste pro Serie, nie pro Post
+  blog: [{ bridge: [[7, 4, -2]], target: [7, 5, -2], tag: 'B' }], // links unten, eben
+};
+const isSection = (id: string): id is Section => id in CHILD_SLOTS;
+// Was zu tun ist, wenn ein Bereich mehr Einträge als Plätze hat
+const FULL: Record<Section, string> = {
+  workshops: 'einen Eintrag auf draft: true setzen',
+  videos: 'einen Eintrag entfernen',
+  blog: 'bei einer Serie featured: false setzen (eine Kiste pro Serie)',
 };
 
 export type ChildItem = { id: string; label: string; block: string; color?: string; href: string };
@@ -182,11 +199,11 @@ export function buildWorld(children: Record<Section, ChildItem[]>, avatar: Avata
     const m = NAV_META[id];
     if (!m) throw new Error(`Insel: Für ${id} fehlt das Etikett (navMeta)`);
     meta[id] = m;
-    if (id !== 'workshops' && id !== 'videos') continue;
+    if (!isSection(id)) continue;
     const slots = CHILD_SLOTS[id];
     if (children[id].length > slots.length)
       throw new Error(
-        `Insel: Für ${id} gibt es ${slots.length} Plätze, gefunden: ${children[id].length} Einträge. Einen Platz in CHILD_SLOTS (src/data/island-layout.ts) ergänzen oder einen Eintrag auf draft: true setzen.`,
+        `Insel: Für ${id} gibt es ${slots.length} Plätze, gefunden: ${children[id].length} Einträge. Einen Platz in CHILD_SLOTS (src/data/island-layout.ts) ergänzen oder ${FULL[id]}.`,
       );
     children[id].forEach((it, n) => {
       const cid = `${id}/${it.id}`;

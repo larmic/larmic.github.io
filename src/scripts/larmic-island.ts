@@ -238,6 +238,12 @@ class LarmicIsland extends HTMLElement {
     });
   }
 
+  /** `page` nur, wenn der Link die Seite selbst ist; ein Post steht auf der Kiste seiner Serie (`true`) */
+  private markCurrent(link: HTMLAnchorElement, current: boolean) {
+    if (current) link.setAttribute('aria-current', link.pathname === location.pathname ? 'page' : 'true');
+    else link.removeAttribute('aria-current');
+  }
+
   private render() {
     const s = this.state;
     const v = view(s, this.world, BUBBLES);
@@ -271,10 +277,7 @@ class LarmicIsland extends HTMLElement {
         (s.rest === id && s.picks ? ` pop${ab}` : '') +
         (v.held.has(id) ? ' held' : '') +
         (parent && !v.openSections.has(parent) ? ' closed' : '');
-      if (b instanceof HTMLAnchorElement) {
-        if (id === s.rest) b.setAttribute('aria-current', 'page');
-        else b.removeAttribute('aria-current');
-      }
+      if (b instanceof HTMLAnchorElement) this.markCurrent(b, id === s.rest);
     }
 
     this.bubble.textContent = v.bubble.text;
