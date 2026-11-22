@@ -3,6 +3,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { MATERIAL_IDS } from './data/materials';
+import { TAG_IDS, TRACK_IDS } from './data/blog-taxonomy';
 
 const material = z.enum(MATERIAL_IDS);
 
@@ -41,4 +42,41 @@ const videos = defineCollection({
   }),
 });
 
-export const collections = { workshops, videos };
+// Blog: Was ein einzelner Post erfüllen muss, steht hier. Was mehrere Posts betrifft (Teile lückenlos, Lesezeit,
+// Slugs), prüft der Lader src/data/blog.ts beim Build.
+const posts = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/posts' }),
+  schema: z.object({
+    title: z.string().max(51), // „<Titel> – Blog – larmic.de“ bleibt unter 70 Zeichen (html-validate)
+    teaser: z.string().max(160),
+    date: z.coerce.date(),
+    series: z.string().optional(), // Dateiname der Serie; nur zusammen mit part
+    part: z.number().int().positive().optional(),
+    track: z.enum(TRACK_IDS),
+    tags: z.array(z.enum(TAG_IDS)).min(1).max(4), // der erste ist der Aspekt
+    pattern: z.object({ title: z.string(), sentence: z.string() }).optional(), // Pflicht bei Serienteilen
+    confession: z.string().optional(), // „Kleines Geständnis“: was an der Erzählung verdichtet ist
+    evidence: z
+      .object({
+        asOf: z.coerce.date(),
+        items: z.array(z.object({ hash: z.string().regex(/^[0-9a-f]{7,40}$/), text: z.string() })).min(1),
+      })
+      .optional(),
+    counterpart: z.string().optional(), // Gegenstück in der anderen Spur
+    draft: z.boolean().default(false),
+  }),
+});
+
+const series = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/series' }),
+  schema: z.object({
+    title: z.string(),
+    short: z.string().max(40),
+    teaser: z.string().max(160),
+    material,
+    parts: z.number().int().positive(), // geplante Länge; der Status „läuft“ oder „abgeschlossen“ ergibt sich daraus
+    featured: z.boolean().default(true), // eigene Kiste auf der Insel
+  }),
+});
+
+export const collections = { workshops, videos, posts, series };
