@@ -15,6 +15,9 @@ Vorbild ist die Optik von Hytale und Minecraft. Alle Grafiken sind eigene Voxel-
 | Grün | `--green` | #3f7f27 | Chips mit weißer Schrift |
 | Grau | `--muted` | #4b5563 | Unterzeilen |
 | Fehlerrot | `--error` | #a3221b | 404-Sprechblase |
+| Spur-Farben | `--track-eltern`, `--track-technik`, `--track-beide` | #a3221b, #34506f, #5b3f8f | Spur-Label im Blog, immer mit Symbol und Text |
+| Zettel | `--note`, `--note-ink` | #f39a3d, #2a1608 | „Das Muster in einem Satz“ am Ende eines Blogposts. Einzige nicht klickbare Signalfläche, bewusst nicht Gold |
+| Code | `--code-bg`, `--code-bar`, `--code-text` | #1c2130, #2a3142, #e8ecf2 | Code-Block und seine Dateileiste |
 | Erde | `--tex-dirt` + `--dirt-shade` | Textur, 40 % #2b1a0f darüber | Hintergrund hinter dem Inhalt |
 | Stein | `--tex-stone` + `--stone-shade` | Textur, 62 % #14161c darüber | Footer |
 
@@ -38,7 +41,9 @@ Offene Frage: Soll Violett nur für KI stehen? Dann bekäme Event Storming Grün
 | Pixelify Sans | 500, 700 | Logo, Namenskacheln, Überschriften, Buttons, Etiketten, Sprechblase |
 | Nunito | 400, 600, 800 | Fließtext, 18–19 px, Zeilenhöhe 1,6–1,7 |
 
-Beide Schriften sind über `@fontsource` lokal gebündelt.
+| Systemschrift mit fester Breite (`--font-code`) | – | Code im Blog |
+
+Pixelify Sans und Nunito sind über `@fontsource` lokal gebündelt. Für Code wird nichts geladen: `ui-monospace` und die üblichen Systemschriften.
 
 ## Bausteine
 
@@ -47,6 +52,18 @@ Beide Schriften sind über `@fontsource` lokal gebündelt.
 - **Name aus Buchstabenblöcken:** LAR und MIC in Gold, der Rest auf Holz-Slots. Beim Laden fallen die Blöcke nacheinander ein, beim Hover hüpfen die Goldblöcke.
 - **Inventar-Slots:** gleichmäßiger Innenrahmen von 3 px, Block und Text in beide Richtungen zentriert, lange Wörter brechen um.
 - **Sprechblase:** weiß, 3 px Pixel-Rahmen, eckiger Zipfel.
+
+### Blog
+
+Die Styles stehen in `src/styles/blog.css`, das nur die Blog-Seiten laden. Der Blog bringt kein JavaScript mit.
+
+- **Spur-Label (`.track`):** Pixelschrift im 2-px-Rahmen in der Spur-Farbe: „♥ Für Eltern“, „⚙ Für Techniker“, „◆ Für beide“. Das Symbol ist dekorativ (`aria-hidden`), der Text steht immer dabei; die Farbe ist Zugabe. Auf Kristall erbt das Label die helle Schrift. Quelle für Text und Symbol: `TRACKS` in `src/data/blog-taxonomy.ts`.
+- **Serien-Kasten:** Kristall-Fläche (`.th-ki`), weil die Serie „KI mit Leitplanken“ erzählt. Die Statuszeile („Aktuelle Serie · läuft, Teil 1 von 8“) wird aus den veröffentlichten Teilen berechnet.
+- **Post:** Papier auf Erde wie jedes Panel, daneben die Seitenleiste aus kleinen Papier-Kästen (Inhalt, Serie, Belege auf Metall, „Die andere Seite“ auf Holz). Unter etwa 970 px rutscht die Seitenleiste unter den Artikel; unter 700 px entfällt das Inhaltsverzeichnis. Der aktuelle Teil in der Serienliste trägt eine goldene Nummer, wie das ausgewählte Etikett der Insel.
+- **Code-Block:** dunkle Fläche (`--code-bg`) im 4-px-Rahmen, darüber die Dateileiste als `figcaption` in Pixelschrift. Sie entsteht aus ```` ```js title="datei.ts" ````. Die Syntaxfarben sind eigene Werte für Shikis Theme `css-variables` (Schlüsselwort #ffb454, Konstante #7fd1f5, Zeichenkette #a5d86e, Kommentar #8b95a8, Funktion #9fe0c7), alle mit mindestens 4,5:1 auf der Fläche. Kein Kopieren-Knopf.
+- **Zettel (`.note`):** orange Fläche, 1° gedreht, versetzter Schatten, `role="note"`. Der Satz kommt aus dem Feld `pattern.sentence`, nicht aus dem Text. Links darin erben die Tinte des Zettels.
+- **Themen (`.topic`):** kleine Holz-Fläche mit 4 px Rand links in der Materialfarbe des Themas (Guards und DevOps Metall, KI Kristall, Testing und Barrierefreiheit Grün, Architektur Holz, alles andere neutral). Keine Links, solange es keine Themenseiten gibt.
+- **Weiterlesen:** Überschrift hell auf Erde, darunter Papier-Karten mit 3-px-Rahmen.
 
 ## Bewegung
 

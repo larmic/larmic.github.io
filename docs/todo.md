@@ -47,7 +47,7 @@ Stand nach dem vollständigen Review (Inhalt und Code) vom November 2026. Erledi
     - `/workshop/ddd_hex_architecture.png`, `/workshop/event_storming.png` entstehen beim Build aus den WebP-Dateien in `src/assets/workshops/` (verkleinert, 0,5 bzw. 0,3 MB statt 13,8 bzw. 9 MB)
     - `/tags/`, `/categories/` leiten auf die Startseite um
     - `/sitemap.xml` ist ein Sitemap-Index, der auf die neue Sitemap zeigt
-    - RSS (`/index.xml`, `/videos/index.xml`, `/workshops/index.xml`) entfällt bewusst, solange es keinen Blog gibt
+    - RSS (`/index.xml`, `/videos/index.xml`, `/workshops/index.xml`) entfällt bewusst; der Blog hat seinen eigenen Feed unter `/blog/rss.xml`
   - [ ] Branch-Schutz für `main` (Settings → Branches → Add rule): „Require a pull request before merging“ und „Require status checks to pass“ mit „Guard-Gates und Build“.
   - [x] Pages-Einstellungen prüfen: Custom domain `larmic.de` steht weiter drin, „Enforce HTTPS“ an. Seite mit CSS und Insel ausgeliefert?
   - [x] Stichprobe der alten Adressen nach dem Deploy (`/about/`, `/#workshops`, `/workshops/#workshop-…`, `/videos/#video-…`).
@@ -138,4 +138,18 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [ ] Content-Security-Policy (Astro bringt sie mit, passt zu DevSecOps).
 - [ ] Druckansicht ohne Himmel und Insel.
 - [ ] Copyright-Jahr wird beim Build eingefroren. Wird die Seite länger nicht gebaut, steht das alte Jahr.
-- [ ] Blog: Der Blog-Block ist ohne JavaScript ein toter Button. Mit Blog wird er ein echter Link.
+- [ ] Blog: Der Blog-Block ist ohne JavaScript ein toter Button. Die Blog-Seiten gibt es jetzt; der Block wird ein echter Link auf `/blog/`, die Serie bekommt eine Kiste (Insel Stufe 1). Bis dahin sind die Blog-Seiten von der Insel aus nicht erreichbar, darum vorher nicht veröffentlichen.
+
+## Blog
+
+- [x] **Blog-Kern:** `/blog/`, `/blog/<slug>/`, `/blog/serie/<id>/`, Feed `/blog/rss.xml`, Guards (Spur, Themen, Lesezeit, lückenlose Teile, Entwürfe), `BlogPosting` als strukturierte Daten.
+- [ ] **Text und Fakten von Teil 1 freigeben** (Lars), bevor gepusht wird. Dazu das Vorwort der Serie in `src/content/series/mitwachsen.md`.
+- [ ] **Teil 2 und 3 zeitnah**, sonst steht „Teil 1 von 8“ verwaist. Danach die Teile 4 bis 8.
+- [ ] Spur-Seiten `/blog/fuer-eltern/` und `/blog/fuer-techniker/`, dazu die zwei Einstiege auf `/blog/` (ab Teil 2 und 3).
+- [ ] Themenseiten `/blog/tag/<tag>/` (unter drei Posts `noindex`); dann werden die Themen unter dem Post zu Links.
+- [ ] Feeds je Spur und je Serie.
+- [ ] Prolog „Wer hier früher klickte, fiel ins Leere“ als Notiz.
+- [ ] Kommentare (giscus) unter Posts, erst mit dem Abschnitt in der Datenschutzerklärung.
+- [ ] Kopieren-Knopf an Code-Blöcken: per JavaScript einfügen, delegiert, ins 32-KB-Budget einrechnen.
+- [ ] Negativkontrolle für die Kommentarfarbe im Code: Teil 1 hat keinen Kommentar im Code-Block, axe misst die Farbe also noch nicht. Beim ersten Post mit Code-Kommentar nachholen.
+- [ ] `article:published_time` fehlt bewusst; das Datum steht im JSON-LD.
