@@ -138,17 +138,19 @@ Die Seite wirbt mit Spec-Driven, Guard-Gates, ArchUnit und BDD. Beim Review war 
 - [ ] Content-Security-Policy (Astro bringt sie mit, passt zu DevSecOps).
 - [ ] Druckansicht ohne Himmel und Insel.
 - [ ] Copyright-Jahr wird beim Build eingefroren. Wird die Seite länger nicht gebaut, steht das alte Jahr.
-- [ ] Blog: Der Blog-Block ist ohne JavaScript ein toter Button. Die Blog-Seiten gibt es jetzt; der Block wird ein echter Link auf `/blog/`, die Serie bekommt eine Kiste (Insel Stufe 1). Bis dahin sind die Blog-Seiten von der Insel aus nicht erreichbar, darum vorher nicht veröffentlichen.
 
 ## Blog
 
 - [x] **Blog-Kern:** `/blog/`, `/blog/<slug>/`, `/blog/serie/<id>/`, Feed `/blog/rss.xml`, Guards (Spur, Themen, Lesezeit, lückenlose Teile, Entwürfe), `BlogPosting` als strukturierte Daten.
+- [x] **Insel Stufe 1:** Der Blog-Block ist ein Link auf `/blog/` mit Brücke zum Regal, die Serie hat eine Kiste dahinter; der Sturz mit „404 – Kein Blog gefunden“ ist entfernt. Der Block war ohne JavaScript ein toter Button.
 - [ ] **Text und Fakten von Teil 1 freigeben** (Lars), bevor gepusht wird. Dazu das Vorwort der Serie in `src/content/series/mitwachsen.md`.
 - [ ] **Teil 2 und 3 zeitnah**, sonst steht „Teil 1 von 8“ verwaist. Danach die Teile 4 bis 8.
 - [ ] Spur-Seiten `/blog/fuer-eltern/` und `/blog/fuer-techniker/`, dazu die zwei Einstiege auf `/blog/` (ab Teil 2 und 3).
 - [ ] Themenseiten `/blog/tag/<tag>/` (unter drei Posts `noindex`); dann werden die Themen unter dem Post zu Links.
 - [ ] Feeds je Spur und je Serie.
 - [ ] Prolog „Wer hier früher klickte, fiel ins Leere“ als Notiz.
+- [ ] Die Kiste der Serie und der Pilz-Ausgang heißen beide „Mitwachsen“. In der schmalen Ansicht stehen sie nebeneinander, unterschieden nur durch ↗ (für Screenreader „– eigene Seite: mitwachsen-spiele.de“). Entscheiden, ob `short` der Serie anders heißen soll.
+- [ ] Zweite Serie: Am Blog gibt es einen Kisten-Platz. Vorher einen zweiten Platz in `CHILD_SLOTS` suchen und im Browser ansehen (Etiketten prüft kein Test).
 - [ ] Kommentare (giscus) unter Posts, erst mit dem Abschnitt in der Datenschutzerklärung.
 - [ ] Kopieren-Knopf an Code-Blöcken: per JavaScript einfügen, delegiert, ins 32-KB-Budget einrechnen.
 - [ ] Negativkontrolle für die Kommentarfarbe im Code: Teil 1 hat keinen Kommentar im Code-Block, axe misst die Farbe also noch nicht. Beim ersten Post mit Code-Kommentar nachholen.

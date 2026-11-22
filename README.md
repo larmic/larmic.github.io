@@ -2,7 +2,7 @@
 
 Persönliche Website von Lars Michaelis im Voxel-Stil „Inselwelt“. Gebaut mit [Astro](https://astro.build), ausgeliefert als statische Seite über GitHub Pages.
 
-Auf jeder Seite schwebt oben eine Voxel-Insel: Sie ist die einzige Navigation. Die Figur steht auf dem Block der Seite, die gerade angezeigt wird. Zeigst du auf einen anderen Block, baut sie eine Brücke dorthin; Workshops und Videos haben eigene Kisten, die beim Öffnen des Bereichs aufpoppen. Beim Blog-Block fällt sie ins Leere und meldet „404 – Kein Blog gefunden“. Der Fliegenpilz „Mitwachsen ↗“ führt im selben Tab auf [www.mitwachsen-spiele.de](https://www.mitwachsen-spiele.de/), die eigene Seite meines Kinderspiels; das Spiel lebt im Repo `mitwachsen-spiele`.
+Auf jeder Seite schwebt oben eine Voxel-Insel: Sie ist die einzige Navigation. Die Figur steht auf dem Block der Seite, die gerade angezeigt wird. Zeigst du auf einen anderen Block, baut sie eine Brücke dorthin; Workshops, Videos und Blog-Serien haben eigene Kisten, die beim Öffnen des Bereichs aufpoppen. Zum Blog führt eine Brücke aus zwei Blöcken zum Bücherregal; früher fiel die Figur dort ins Leere. Der Fliegenpilz „Mitwachsen ↗“ führt im selben Tab auf [www.mitwachsen-spiele.de](https://www.mitwachsen-spiele.de/), die eigene Seite meines Kinderspiels; das Spiel lebt im Repo `mitwachsen-spiele`.
 
 ## Schnellstart
 
@@ -54,7 +54,7 @@ src/
     site.ts           Adressen, Social Links, Sprechblasen, Werkzeugkisten, Schwerpunkte, giscus
     materials.ts      Materialien (Holz, Metall, Kristall, Gras): Block und Farben je Thema
     island-layout.ts  die konkrete Insel: Wege, Kisten-Plätze, Baum (rein, getestet)
-    island.ts         lädt Workshops und Videos und baut daraus die Insel
+    island.ts         lädt Workshops, Videos und Blog-Serien und baut daraus die Insel
     avatar.ts         Aussehen der Figur
     blog.ts           lädt Posts und Serien: einziger Zugang, filtert Entwürfe, ruft die Guards
     blog-taxonomy.ts  Spuren (Eltern, Techniker, beide) und die geschlossene Liste der Themen
@@ -124,7 +124,7 @@ Text in Markdown, Zwischenüberschriften mit `##` (daraus entsteht das Inhaltsve
 ```
 ````
 
-**Serie hinzufügen:** neue Datei in `src/content/series/` mit `title`, `short`, `teaser`, `material`, `parts` (geplante Länge) und optional `featured: false`. Der Text ist das Vorwort auf `/blog/serie/<dateiname>/`. Eine Serie erscheint erst, wenn ein Teil veröffentlicht ist; noch nicht erschienene Teile stehen dort nur als „Teil 2 bis 8 erscheinen noch.“
+**Serie hinzufügen:** neue Datei in `src/content/series/` mit `title`, `short`, `teaser`, `material`, `parts` (geplante Länge) und optional `featured: false`. Der Text ist das Vorwort auf `/blog/serie/<dateiname>/`. Die Serie bekommt eine Kiste hinter dem Bücherregal der Insel, `short` ist deren Beschriftung; auf ihr steht die Figur bei jedem Teil. Dafür gibt es einen Platz: Eine zweite Serie braucht `featured: false` (ihre Teile stehen dann auf dem Regal) oder einen weiteren Platz in `CHILD_SLOTS`, sonst bricht der Build ab. Eine Serie erscheint erst, wenn ein Teil veröffentlicht ist; noch nicht erschienene Teile stehen dort nur als „Teil 2 bis 8 erscheinen noch.“
 
 Fehlt ein Pflichtfeld oder hat es den falschen Typ, bricht `npm run check` ab. So landet kein kaputter Inhalt online. Für den Blog gilt das auch für eine unbekannte Spur oder ein Thema außerhalb der Liste. Was mehrere Posts betrifft, prüft der Lader `src/data/blog.ts` und bricht `npm run build` mit einer Meldung ab:
 
@@ -152,7 +152,7 @@ Auf der Seite steht „KI mit Leitplanken“ – hier sind sie. Jeder Commit lä
 | Unit-Tests | Zustandsmaschine der Figur (Spec: [docs/specs/insel.md](docs/specs/insel.md)), Geometrie der Insel, Kopf, Pixel-Raster, Blog-Guards (jeder fällt in einem Test einmal), Lesezeit, RSS, Bundle- und Seiten-Gate; die Abdeckung der reinen Module darf nicht sinken | Vitest, v8-Coverage |
 | Build | die Seite entsteht; die Blog-Guards über alle Posts brechen hier ab (Lesezeit über 6 Minuten, Lücke oder Dublette in einer Serie, fehlendes Muster, reservierter Dateiname) | astro build |
 | Fertige Seite | gültiges HTML, keine toten internen Links und Sprungmarken, jede Seite im JavaScript-Budget und nirgends Three.js, keine externen Ressourcen ohne Klick, alte Adressen leiten weiter (fremde Ziele nur auf freigegebene Domains) | html-validate, linkinator, Bundle-Gate, Seiten-Gate |
-| Im Browser | Insel und Seitenwechsel, Pilz-Ausgang als Link im selben Tab, Zurück aus dem Cache, Detailseiten, Blog (Feed, Post ohne JavaScript lesbar), alte Adressen führen weiter, keine Fehler in der Konsole; Barrierefreiheit jeder Seite nach WCAG 2.2 AA | Playwright, axe-core |
+| Im Browser | Insel und Seitenwechsel, Blog und Serien-Kiste als Links (auch ohne JavaScript und per Tastatur), Pilz-Ausgang als Link im selben Tab, Zurück aus dem Cache, Detailseiten, Blog (Feed, Post ohne JavaScript lesbar), alte Adressen führen weiter, keine Fehler in der Konsole; Barrierefreiheit jeder Seite nach WCAG 2.2 AA | Playwright, axe-core |
 
 Lokal laufen alle zusammen mit `npm run gates`. Zusätzlich prüft ein Git-Hook (`.githooks/pre-commit`) vor jedem Commit die schnellen Gates – Formatierung, Lint, Architektur, Unit-Tests – in wenigen Sekunden. `npm install` aktiviert ihn automatisch; im Notfall überspringt `git commit --no-verify` ihn. Dass die Gates wirklich etwas fangen, ist geprüft: absichtlich eingebaute Fehler (überlappende Kisten, übersprungene Felder, verbotene Imports, tote Links, kaputtes HTML) lassen sie scheitern.
 

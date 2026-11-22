@@ -14,7 +14,6 @@ Vorbild ist die Optik von Hytale und Minecraft. Alle Grafiken sind eigene Voxel-
 | Papier | `--paper` | #fffdf7 | Inhaltspanel |
 | Grün | `--green` | #3f7f27 | Chips mit weißer Schrift |
 | Grau | `--muted` | #4b5563 | Unterzeilen |
-| Fehlerrot | `--error` | #a3221b | 404-Sprechblase |
 | Spur-Farben | `--track-eltern`, `--track-technik`, `--track-beide` | #a3221b, #34506f, #5b3f8f | Spur-Label im Blog, immer mit Symbol und Text |
 | Zettel | `--note`, `--note-ink` | #f39a3d, #2a1608 | „Das Muster in einem Satz“ am Ende eines Blogposts. Einzige nicht klickbare Signalfläche, bewusst nicht Gold |
 | Code | `--code-bg`, `--code-bar`, `--code-text` | #1c2130, #2a3142, #e8ecf2 | Code-Block und seine Dateileiste |
@@ -78,14 +77,15 @@ Die Insel ist auf jeder Seite dieselbe und die einzige Navigation. Oben stehen N
                         ╱
                  [Workshops]
                 ╱
-  [Über mich] ☺ Insel        [Blog]
-                ╲
-                 [Videos]
-                  ╲
+  [Über mich] ☺ Insel
+                ╲    ╲
+                 ╲    [Blog]
+                 [Videos] ╲
+                  ╲        ▣  ← Kiste der Serie, offen auf /blog/…
                    ▣ ▣ ▣ ▣  ← Video-Kisten, offen auf /videos/…
 ```
 
-Die Ziele bilden einen Baum: Insel → Bereich → Kiste. Jedes Ziel hat eine eigene Seite – bis auf den Blog und den Pilz-Ausgang:
+Die Ziele bilden einen Baum: Insel → Bereich → Kiste. Jedes Ziel hat eine eigene Seite – bis auf den Pilz-Ausgang:
 
 | Ziel | Adresse |
 | --- | --- |
@@ -93,7 +93,7 @@ Die Ziele bilden einen Baum: Insel → Bereich → Kiste. Jedes Ziel hat eine ei
 | Workshops / ein Workshop | `/workshops/`, `/workshops/<id>/` |
 | Videos / ein Video | `/videos/`, `/videos/<id>/` |
 | Mitwachsen ↗ (Pilz-Ausgang) | `https://www.mitwachsen-spiele.de/` – die eigene Seite des Kinderspiels, im selben Tab. Fliegenpilz-Haus (`pilz`) wie auf der Insel von mitwachsen-spiele.de, rechts neben der Insel. Kein Ruheblock, keine Kisten |
-| Blog | keine – die Figur fällt |
+| Blog / eine Serie | `/blog/`, `/blog/serie/<id>/`. Posts haben keine eigene Kiste: Ein Teil einer Serie steht auf der Kiste seiner Serie, jeder andere Post auf dem Regal |
 
 **Die Figur steht immer auf dem Block der angezeigten Seite.** Die Kisten eines Bereichs poppen auf, sobald er offen ist, und verschwinden, wenn die Figur ihn verlassen hat. Kisten haben die Themenfarbe ihres Eintrags; ihr Etikett erscheint beim Zeigen und an der gewählten Kiste.
 
@@ -102,19 +102,19 @@ Die Ziele bilden einen Baum: Insel → Bereich → Kiste. Jedes Ziel hat eine ei
 | Hover oder Fokus auf einen anderen Block | Die Figur läuft zurück bis zur Abzweigung (die Brücke dahinter zerbröselt) und baut die neue Brücke. Von Kiste zu Kiste geht es über den Bereichs-Block, zu einem anderen Bereich über die Inselmitte |
 | Maus weg oder Fokus verlassen | Die Figur läuft zurück auf den Block der angezeigten Seite |
 | Klick auf einen Block oder eine Karte | Seitenwechsel ohne Neuladen. Der Block springt mit Partikeln, die Figur läuft hin und bleibt stehen |
-| Hover oder Klick auf Blog | Figur holt aus, hat keinen Block, fällt und spawnt auf ihrem Block mit „404 – Kein Blog gefunden“ |
+| Hover oder Fokus auf den Blog | Die Figur baut zwei Brückenblöcke zum Regal. Früher fiel sie hier ins Leere; daran erinnert nur noch ihre Sprechblase auf `/blog/`: „Früher bin ich hier runtergefallen.“ |
 | Hover oder Fokus auf den Pilz-Ausgang | Die Figur baut die Brücke und läuft zum Pilz. Ein Klick lädt sofort mitwachsen-spiele.de (auf dem Handy, bei reduzierter Bewegung und ohne JavaScript ohne Weg). Etikett mit ↗, für Screenreader „– eigene Seite: mitwachsen-spiele.de“ |
 | Zurück-Taste des Browsers | Vorherige Seite, die Figur läuft mit. Zurück von mitwachsen-spiele.de: Die Figur geht vom Pilz zu ihrem Block |
 
-Die Sprechblase erscheint nur, wenn die Figur auf einem Bereichs-Block steht (auf Kisten schweigt sie) – außer der 404-Meldung, die überall erscheint und bleibt, bis man auf einen anderen Block zeigt. Beim ersten Aufruf der Startseite begrüßt sie („Hi! Zeig auf einen Block.“).
+Die Sprechblase erscheint nur, wenn die Figur auf einem Bereichs-Block steht (auf Kisten schweigt sie). Beim ersten Aufruf der Startseite begrüßt sie („Hi! Zeig auf einen Block.“).
 
 Takt der Figur: 130 ms. Auf schmalen Bildschirmen (unter 700 px Containerbreite) stehen die Blöcke als Reihe unter der Insel, offene Kisten reihen sich dazu, Brücken entfallen.
 
 **Easter Egg Baum:** Zeigt man auf das Blätterdach, läuft die Figur zum Baum, stapelt zwei Blöcke, klettert in die Krone und sagt „Schöne Aussicht!“. Maus weg: Die Blöcke zerbröseln, sie läuft zurück. Nicht klickbar, nicht per Tastatur erreichbar, auf dem Handy nicht vorhanden.
 
-**Blick zum Cursor:** Steht die Figur, schaut sie zum Mauszeiger. Ist er deutlich auf der anderen Seite, dreht sich die ganze Figur um; den Rest macht der Kopf: drehen (15°-Stufen, von „schaut nach links“ über „schaut dich an“ bis zur Ohrseite) und nicken (10°-Stufen, nach oben oder zum Text darunter). Der Kopf ist ein echter Würfel mit fünf Seiten (`src/lib/voxel/head.ts`), dieselbe Rechnung erzeugt beim Build das Startbild. Beim Laufen, Bauen und Fallen schaut sie geradeaus; ohne Maus und bei reduzierter Bewegung gar nicht.
+**Blick zum Cursor:** Steht die Figur, schaut sie zum Mauszeiger. Ist er deutlich auf der anderen Seite, dreht sich die ganze Figur um; den Rest macht der Kopf: drehen (15°-Stufen, von „schaut nach links“ über „schaut dich an“ bis zur Ohrseite) und nicken (10°-Stufen, nach oben oder zum Text darunter). Der Kopf ist ein echter Würfel mit fünf Seiten (`src/lib/voxel/head.ts`), dieselbe Rechnung erzeugt beim Build das Startbild. Beim Laufen und Bauen schaut sie geradeaus; ohne Maus und bei reduzierter Bewegung gar nicht.
 
-**Plätze für Kisten:** drei an Workshops, vier an Videos (`CHILD_SLOTS` in `src/data/island-layout.ts`). Ein weiterer Eintrag bricht den Build mit einer Meldung ab – dann braucht es einen neuen Platz.
+**Plätze für Kisten:** vier an Workshops, vier an Videos, einer am Blog (`CHILD_SLOTS` in `src/data/island-layout.ts`). Ein weiterer Eintrag bricht den Build mit einer Meldung ab – dann braucht es einen neuen Platz. Am Blog steht eine Kiste pro Serie (`featured: true`, mindestens ein veröffentlichter Teil), nie eine pro Post; das Etikett des Regals steht deshalb rechts, das der Kiste darunter.
 
 ## Voxel-Technik
 
@@ -124,4 +124,4 @@ Alle Blöcke und die Figur entstehen beim Build als SVG (`src/lib/voxel/`).
 - **Texturen:** 8×8 Pixel pro Fläche, definiert als Textraster in `textures.ts`. Schattierung: oben 5 % weiß, links 8 % schwarz, rechts 26 % schwarz.
 - **Getönte Blöcke:** Kiste, Kristall und Metall nutzen `currentColor` und werden per CSS `color` eingefärbt.
 - **Figur:** sechs Quader in eigener Projektion (C = 2, V = 2,236), Gesicht auf der +y-Seite, Skalierung 1,9.
-- **Insel und Routen:** in `world.ts`. Die Figur startet auf (3, 3, 0). Routen zu den vier Blöcken stehen in `ROUTES`.
+- **Insel und Routen:** Die Szenen-Engine steht in `world.ts`, die konkrete Insel in `src/data/island-layout.ts`. Die Figur startet auf (3, 3, 0). Die Routen zu den fünf Blöcken stehen dort in `ROUTES`.

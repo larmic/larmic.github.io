@@ -18,7 +18,7 @@ test('Startseite: Insel ist da und navigiert zu allen Bereichen', async ({ page 
   await page.goto('/');
   await expect(page.locator('h1, .name-tiles').first()).toBeVisible();
   expect(await page.evaluate(() => !!customElements.get('larmic-island'))).toBe(true);
-  for (const href of ['/workshops/', '/videos/'])
+  for (const href of ['/workshops/', '/videos/', '/blog/'])
     await expect(page.locator(`a[href="${href}"]`).first()).toBeAttached();
   // Seitenwechsel über die Insel (View Transition): Inhalt wechselt, die Insel bleibt
   await page.locator('.blk[data-id="videos"]').click();
@@ -47,7 +47,8 @@ for (const path of [
   });
 
 // Der Pilz-Ausgang ist ein normaler Link im selben Tab (kein target, kein rel); geklickt wird er nicht
-for (const path of ['/', '/workshops/event_storming/', '/videos/'])
+// Auch neben der gleichnamigen Kiste der Serie „Mitwachsen“ bleibt sein Name eindeutig
+for (const path of ['/', '/workshops/event_storming/', '/videos/', '/blog/erst-die-zaeune/'])
   test(`Insel auf ${path}: der Pilz führt im selben Tab auf www.mitwachsen-spiele.de`, async ({ page }) => {
     await page.goto(path);
     const link = page.getByRole('link', { name: 'Mitwachsen – eigene Seite: mitwachsen-spiele.de', exact: true });
@@ -74,6 +75,40 @@ test('Insel: Zurück aus dem Cache schickt die Figur vom gezeigten Block zum Ruh
   // So kommt die Seite nach einem Link nach außen und Zurück aus dem Cache wieder (die Maus bleibt, wo sie war)
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
   await expect.poll(state).toBe(about);
+});
+
+test('Insel: Das Regal führt zum Blog, die Kiste dahinter zur Serie, jeder Block ist ein Link', async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.goto('/');
+  await expect(page.locator('larmic-island button')).toHaveCount(0);
+  const shelf = page.locator('.blk[data-id="blog"]');
+  const crate = page.locator('.blk[data-id="blog/mitwachsen"]');
+  await shelf.click();
+  await expect(page).toHaveURL(/\/blog\/$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Blog' })).toBeVisible();
+  await expect(shelf).toHaveAttribute('aria-current', 'page');
+  await crate.click();
+  await expect(page).toHaveURL(/\/blog\/serie\/mitwachsen\/$/);
+  await expect(crate).toHaveAttribute('aria-current', 'page');
+  await expect(shelf).not.toHaveAttribute('aria-current');
+  // Ein Teil der Serie: Die Figur bleibt auf der Kiste, deren Link ist aber nicht die Seite selbst
+  await page.locator('main a[href="/blog/erst-die-zaeune/"]').first().click();
+  await expect(page).toHaveURL(/\/blog\/erst-die-zaeune\/$/);
+  await expect(crate).toHaveAttribute('aria-current', 'true');
+  expect(errors).toEqual([]);
+});
+
+test('Insel: Tastaturfokus schickt die Figur auch zum Blog', async ({ page }) => {
+  await page.goto('/');
+  const island = page.locator('larmic-island');
+  for (let i = 0; i < 30; i++) {
+    await page.keyboard.press('Tab');
+    if (await page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset.id === 'blog')) break;
+  }
+  await expect(page.locator('.blk[data-id="blog"]')).toBeFocused();
+  const route = () => island.evaluate((el) => (el as unknown as { state: { route: string; pos: number } }).state);
+  await expect.poll(async () => (await route()).route).toBe('blog');
+  await expect.poll(async () => (await route()).pos).toBeGreaterThan(0);
 });
 
 test('Blog: Der Feed listet den Post und ist im Kopf der Seite verlinkt', async ({ page, request }) => {
@@ -129,6 +164,18 @@ test.describe('ohne JavaScript', () => {
       'href',
       'https://www.mitwachsen-spiele.de/',
     );
+    await expect(page.locator('larmic-island a.blk[data-id="blog"]')).toHaveAttribute('href', '/blog/');
+    await expect(page.locator('larmic-island button')).toHaveCount(0);
+  });
+
+  test('Blogpost: Die Figur steht auf der Kiste der Serie, die Brücken dorthin stehen', async ({ page }) => {
+    await page.goto('/blog/erst-die-zaeune/');
+    const crate = page.locator('larmic-island a.blk[data-id="blog/mitwachsen"]');
+    await expect(crate).toHaveAttribute('href', '/blog/serie/mitwachsen/');
+    await expect(crate).toHaveAttribute('aria-current', 'true');
+    await expect(page.locator('larmic-island .brk:not(.off)')).toHaveCount(3);
+    await page.goto('/blog/serie/mitwachsen/');
+    await expect(crate).toHaveAttribute('aria-current', 'page');
   });
 
   test('Blogpost: Text, Dateileiste, Zettel und Inhaltsverzeichnis stehen im HTML', async ({ page }) => {
