@@ -142,8 +142,8 @@ for (const [from, to] of OLD)
 const GAME: [string, string][] = [
   ['/spiele/', 'https://www.mitwachsen-spiele.de/'],
   ['/spiele/mitwachsen/', 'https://www.mitwachsen-spiele.de/'],
-  ['/spiele/mitwachsen/spielen/', 'https://www.mitwachsen-spiele.de/spielen/'],
-  ['/spiele/threeyear/', 'https://www.mitwachsen-spiele.de/spielen/'],
+  ['/spiele/mitwachsen/spielen/', 'https://weltenbummler.mitwachsen-spiele.de/'],
+  ['/spiele/threeyear/', 'https://weltenbummler.mitwachsen-spiele.de/'],
 ];
 for (const [from, to] of GAME)
   test(`alte Adresse ${from} leitet direkt auf ${to} weiter`, async ({ request }) => {

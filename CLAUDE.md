@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Persönliche Website von Lars Michaelis (larmic.de) im Voxel-Stil „Inselwelt“. Astro 7, statische Ausgabe, Sprache Deutsch. Das Kinderspiel Mitwachsen lebt im Repo `mitwachsen-spiele` (www.mitwachsen-spiele.de); larmic.de verlinkt es nur.
+Persönliche Website von Lars Michaelis (larmic.de) im Voxel-Stil „Inselwelt“. Astro 7, statische Ausgabe, Sprache Deutsch. Das Kinderspiel lebt in der GitHub-Organisation `mitwachsen-spiele`: Homepage www.mitwachsen-spiele.de (Repo `website`), das Spiel „Weltenbummler“ (früher Mitwachsen) unter weltenbummler.mitwachsen-spiele.de (Repo `weltenbummler`); larmic.de verlinkt es nur.
 
 ## Befehle
 
@@ -22,7 +22,7 @@ Vor jedem Commit `npm run format`, `npm run lint`, `npm run arch`, `npm run chec
 
 ## Aufbau
 
-- `src/pages/` – Seiten: `/` (Über mich), `/workshops/`, `/workshops/<id>/`, `/videos/`, `/videos/<id>/`, `/blog/`, `/blog/<slug>/`, `/blog/serie/<id>/`, Feed `/blog/rss.xml`, `/impressum/`, `/datenschutz/`, 404. Unter `/spiele/` gibt es keine Seiten mehr, nur Weiterleitungen auf www.mitwachsen-spiele.de (`astro.config.mjs`)
+- `src/pages/` – Seiten: `/` (Über mich), `/workshops/`, `/workshops/<id>/`, `/videos/`, `/videos/<id>/`, `/blog/`, `/blog/<slug>/`, `/blog/serie/<id>/`, Feed `/blog/rss.xml`, `/impressum/`, `/datenschutz/`, 404. Unter `/spiele/` gibt es keine Seiten mehr, nur Weiterleitungen auf mitwachsen-spiele.de (`astro.config.mjs`)
 - `src/layouts/PlainPage.astro` – Layout der Seiten ohne Insel (Impressum, Datenschutz, 404)
 - `src/layouts/IslandPage.astro` – Layout aller Seiten mit Insel: Kopf bleibt beim Seitenwechsel stehen (`transition:persist`), `rest` sagt der Figur, wo sie steht. Slots `head`, `aside` (Seitenleiste eines Blogposts), `after` (unter dem Panel)
 - `src/content/` – Workshops, Videos, Blogposts (`posts/`, Dateiname = Slug) und Blog-Serien (`series/`, Text = Vorwort) als Markdown, Schema in `src/content.config.ts`
@@ -59,4 +59,4 @@ Konzepte und Entwürfe zu larmic.de und zum Spiel Mitwachsen liegen gesammelt im
 - Der Blog bringt kein eigenes JavaScript mit. Spur-Label zeigen immer Symbol und Text, nie nur Farbe. Der orange Zettel (`--note`) ist keine Aktion; Gold bleibt Aktionsfarbe.
 - TypeScript prüft jeden Index-Zugriff (`noUncheckedIndexedAccess`): fehlende Einträge behandeln. `!` nur, wo die Stelle selbst zeigt, dass der Eintrag existiert, und in Tests.
 - Skripte laufen wegen der View Transitions nur einmal: Klicks über `document` delegieren, nicht an Elemente hängen.
-- Alte Adressen müssen für immer funktionieren (Lesezeichen, auch auf dem Startbildschirm): `/#workshops`, `/#videos`, `/workshops/#workshop-<id>`, `/videos/#video-<id>`, `/about/`; dazu leiten `/spiele/` und `/spiele/mitwachsen/` direkt auf https://www.mitwachsen-spiele.de/, `/spiele/mitwachsen/spielen/` und `/spiele/threeyear/` direkt auf https://www.mitwachsen-spiele.de/spielen/ (ohne Umweg). Geprüft durch `npm run verify:dist` (fremde Ziele nur aus `REDIRECT_HOSTS`) und `e2e/smoke.spec.ts`.
+- Alte Adressen müssen für immer funktionieren (Lesezeichen, auch auf dem Startbildschirm): `/#workshops`, `/#videos`, `/workshops/#workshop-<id>`, `/videos/#video-<id>`, `/about/`; dazu leiten `/spiele/` und `/spiele/mitwachsen/` direkt auf https://www.mitwachsen-spiele.de/, `/spiele/mitwachsen/spielen/` und `/spiele/threeyear/` direkt auf https://weltenbummler.mitwachsen-spiele.de/ (ohne Umweg). Geprüft durch `npm run verify:dist` (fremde Ziele nur aus `REDIRECT_HOSTS`) und `e2e/smoke.spec.ts`.

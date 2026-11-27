@@ -55,7 +55,7 @@ describe('Weiterleitungen', () => {
     expect(redirectProblem('/weg/', '/weg/', exists)).toBe('Ziel /weg/ fehlt');
     expect(redirectProblem('/', '/videos/', exists)).toBe('führt zu /videos/ statt zu /');
     expect(redirectProblem('/', null, exists)).toBe('führt zu nichts statt zu /');
-    const game = 'https://www.mitwachsen-spiele.de/spielen/';
+    const game = 'https://weltenbummler.mitwachsen-spiele.de/';
     expect(redirectProblem(game, game, exists)).toBeNull();
     expect(redirectProblem(game, 'https://www.mitwachsen-spiele.de/', exists)).toMatch(/statt zu/);
     expect(redirectProblem('https://example.com/', 'https://example.com/', exists)).toMatch(

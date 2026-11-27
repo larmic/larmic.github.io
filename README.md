@@ -2,7 +2,7 @@
 
 Persönliche Website von Lars Michaelis im Voxel-Stil „Inselwelt“. Gebaut mit [Astro](https://astro.build), ausgeliefert als statische Seite über GitHub Pages.
 
-Auf jeder Seite schwebt oben eine Voxel-Insel: Sie ist die einzige Navigation. Die Figur steht auf dem Block der Seite, die gerade angezeigt wird. Zeigst du auf einen anderen Block, baut sie eine Brücke dorthin; Workshops, Videos und Blog-Serien haben eigene Kisten, die beim Öffnen des Bereichs aufpoppen. Zum Blog führt eine Brücke aus zwei Blöcken zum Bücherregal; früher fiel die Figur dort ins Leere. Der Fliegenpilz „Mitwachsen ↗“ führt im selben Tab auf [www.mitwachsen-spiele.de](https://www.mitwachsen-spiele.de/), die eigene Seite meines Kinderspiels; das Spiel lebt im Repo `mitwachsen-spiele`.
+Auf jeder Seite schwebt oben eine Voxel-Insel: Sie ist die einzige Navigation. Die Figur steht auf dem Block der Seite, die gerade angezeigt wird. Zeigst du auf einen anderen Block, baut sie eine Brücke dorthin; Workshops, Videos und Blog-Serien haben eigene Kisten, die beim Öffnen des Bereichs aufpoppen. Zum Blog führt eine Brücke aus zwei Blöcken zum Bücherregal; früher fiel die Figur dort ins Leere. Der Fliegenpilz „Mitwachsen ↗“ führt im selben Tab auf [www.mitwachsen-spiele.de](https://www.mitwachsen-spiele.de/), die eigene Seite meines Kinderspiels; das Spiel „Weltenbummler“ lebt in der Organisation `mitwachsen-spiele` unter https://weltenbummler.mitwachsen-spiele.de/.
 
 ## Schnellstart
 
@@ -171,7 +171,7 @@ Renovate hält Abhängigkeiten und Actions aktuell. Neue Versionen werden erst n
 
 ## Alte Adressen
 
-Die Seite löst die frühere Hugo-Seite ab (Historie in git). Alte Adressen funktionieren weiter: `/workshops/#workshop-…` und `/videos/#video-…` leiten auf die jeweilige Detailseite um, `/#workshops` und `/#videos` auf `/workshops/` und `/videos/`, `/about/` auf die Startseite. Die Adressen des Kinderspiels leiten dauerhaft auf seine eigene Seite: `/spiele/` und `/spiele/mitwachsen/` auf https://www.mitwachsen-spiele.de/, `/spiele/mitwachsen/spielen/` und `/spiele/threeyear/` auf https://www.mitwachsen-spiele.de/spielen/. Die Microservices-Folien unter `/workshop_microservices/slides/` kommen aus ihrem eigenen Repository und sind nicht betroffen. Was beim Livegang mit den übrigen alten Adressen passiert, steht in [docs/todo.md](docs/todo.md).
+Die Seite löst die frühere Hugo-Seite ab (Historie in git). Alte Adressen funktionieren weiter: `/workshops/#workshop-…` und `/videos/#video-…` leiten auf die jeweilige Detailseite um, `/#workshops` und `/#videos` auf `/workshops/` und `/videos/`, `/about/` auf die Startseite. Die Adressen des Kinderspiels leiten dauerhaft auf seine eigene Seite: `/spiele/` und `/spiele/mitwachsen/` auf https://www.mitwachsen-spiele.de/, `/spiele/mitwachsen/spielen/` und `/spiele/threeyear/` auf https://weltenbummler.mitwachsen-spiele.de/. Die Microservices-Folien unter `/workshop_microservices/slides/` kommen aus ihrem eigenen Repository und sind nicht betroffen. Was beim Livegang mit den übrigen alten Adressen passiert, steht in [docs/todo.md](docs/todo.md).
 
 ## Kommentare mit giscus
 

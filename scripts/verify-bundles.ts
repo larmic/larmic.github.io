@@ -1,6 +1,6 @@
 // Guard-Gate nach dem Build (Teil von npm run verify): Jede Seite bleibt schnell und ohne Ballast.
 // Eine Regel für alle Seiten: höchstens 32 KB JavaScript beim Laden und nirgends Three.js oder ein Spiel (das
-// Kinderspiel Mitwachsen lebt auf seiner eigenen Seite, Repo mitwachsen-spiele).
+// Kinderspiel lebt auf eigenen Seiten, Organisation mitwachsen-spiele).
 // Logik und Tests: scripts/bundles.ts, scripts/bundles.test.ts
 
 import { readFileSync, readdirSync } from 'node:fs';

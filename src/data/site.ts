@@ -10,7 +10,7 @@ export const SITE = {
   workshopMail: 'l.michaelis@neusta.de', // Workshops und Beratung laufen über team neusta; wie `mail` nur per MailLink
 };
 
-// Das Kinderspiel Mitwachsen hat eine eigene Seite (Repo mitwachsen-spiele); die Insel führt dorthin
+// Das Kinderspiel hat eigene Seiten (Organisation mitwachsen-spiele); die Insel führt zur Homepage dort
 export const MITWACHSEN = {
   home: 'https://www.mitwachsen-spiele.de/',
   privacy: 'https://www.mitwachsen-spiele.de/datenschutz/',

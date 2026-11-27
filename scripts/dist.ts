@@ -7,7 +7,7 @@
 
 const OWN_HOSTS = new Set(['larmic.de', 'www.larmic.de']);
 /** Fremde Hosts, auf die alte Adressen weiterleiten dürfen: das Kinderspiel Mitwachsen mit eigener Seite */
-export const REDIRECT_HOSTS = new Set(['www.mitwachsen-spiele.de']);
+export const REDIRECT_HOSTS = new Set(['www.mitwachsen-spiele.de', 'weltenbummler.mitwachsen-spiele.de']);
 /** <link rel="…">, die nichts laden */
 const NON_LOADING_REL = new Set([
   'canonical',

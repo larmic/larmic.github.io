@@ -17,8 +17,8 @@ export const LEGACY: [string, string][] = [
   // Das Kinderspiel Mitwachsen hat eine eigene Seite
   ['/spiele/', 'https://www.mitwachsen-spiele.de/'],
   ['/spiele/mitwachsen/', 'https://www.mitwachsen-spiele.de/'],
-  ['/spiele/mitwachsen/spielen/', 'https://www.mitwachsen-spiele.de/spielen/'],
-  ['/spiele/threeyear/', 'https://www.mitwachsen-spiele.de/spielen/'],
+  ['/spiele/mitwachsen/spielen/', 'https://weltenbummler.mitwachsen-spiele.de/'],
+  ['/spiele/threeyear/', 'https://weltenbummler.mitwachsen-spiele.de/'],
 ];
 
 const pagesIn = (dir: string): string[] =>

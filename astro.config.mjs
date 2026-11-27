@@ -21,10 +21,11 @@ export default defineConfig({
     '/about': '/',
     '/tags': '/',
     '/categories': '/',
-    // Das Kinderspiel Mitwachsen lebt heute auf seiner eigenen Seite (Repo mitwachsen-spiele)
+    // Das Kinderspiel lebt heute auf eigenen Seiten (Organisation mitwachsen-spiele): die Homepage auf www, das Spiel
+    // „Weltenbummler“ (früher Mitwachsen) auf seiner Subdomain. Ohne Umweg über www.mitwachsen-spiele.de/spielen/
     '/spiele': 'https://www.mitwachsen-spiele.de/',
     '/spiele/mitwachsen': 'https://www.mitwachsen-spiele.de/',
-    '/spiele/mitwachsen/spielen': 'https://www.mitwachsen-spiele.de/spielen/',
-    '/spiele/threeyear': 'https://www.mitwachsen-spiele.de/spielen/', // Arbeitstitel des Spiels
+    '/spiele/mitwachsen/spielen': 'https://weltenbummler.mitwachsen-spiele.de/',
+    '/spiele/threeyear': 'https://weltenbummler.mitwachsen-spiele.de/', // Arbeitstitel des Spiels
   },
 });
